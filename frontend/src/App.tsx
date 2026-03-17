@@ -1,0 +1,110 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useState } from 'react';
+
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
+import ProjectsPage from './pages/ProjectsPage';
+import ReportPage from './pages/ReportPage';
+import Layout from './components/ui/Layout';
+import type { UserRole } from './types';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+function getStoredUser(): { role: UserRole } | null {
+  try {
+    const s = localStorage.getItem('user');
+    return s ? JSON.parse(s) : null;
+  } catch {
+    return null;
+  }
+}
+
+function ProtectedRoute({ children, roles }: { children: React.ReactNode; roles?: UserRole[] }) {
+  const token = localStorage.getItem('token');
+  const user = getStoredUser();
+
+  if (!token || !user) return <Navigate to="/login" replace />;
+  if (roles && !roles.includes(user.role)) {
+    return user.role === 'technician' ? <Navigate to="/report" replace /> : <Navigate to="/dashboard" replace />;
+  }
+
+  return <Layout>{children}</Layout>;
+}
+
+export default function App() {
+  const [, forceUpdate] = useState(0);
+
+  const handleLogin = () => {
+    forceUpdate((n) => n + 1);
+  };
+
+  const user = getStoredUser();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+
+          {/* Manager / Admin routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute roles={['manager', 'admin']}>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <ProtectedRoute roles={['manager', 'admin']}>
+                <ProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects/:id"
+            element={
+              <ProtectedRoute roles={['manager', 'admin']}>
+                <ProjectDetailPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Technician routes */}
+          <Route
+            path="/report"
+            element={
+              <ProtectedRoute roles={['technician', 'admin']}>
+                <ReportPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Root redirect */}
+          <Route
+            path="/"
+            element={
+              user?.role === 'technician'
+                ? <Navigate to="/report" replace />
+                : user
+                ? <Navigate to="/dashboard" replace />
+                : <Navigate to="/login" replace />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
