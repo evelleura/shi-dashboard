@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 
 import LoginPage from './pages/LoginPage';
+import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import ProjectsPage from './pages/ProjectsPage';
@@ -91,7 +92,7 @@ export default function App() {
             }
           />
 
-          {/* Root redirect */}
+          {/* Root: landing for guests, redirect authenticated users */}
           <Route
             path="/"
             element={
@@ -99,7 +100,7 @@ export default function App() {
                 ? <Navigate to="/report" replace />
                 : user
                 ? <Navigate to="/dashboard" replace />
-                : <Navigate to="/login" replace />
+                : <LandingPage />
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
