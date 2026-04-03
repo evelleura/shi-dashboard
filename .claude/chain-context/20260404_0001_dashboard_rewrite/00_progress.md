@@ -1,9 +1,9 @@
 ---
 task_id: "20260404_0001_dashboard_rewrite"
 created: "2026-04-04T02:00:00Z"
-last_updated: "2026-04-04T02:15:00Z"
+last_updated: "2026-04-04T02:45:00Z"
 status: "in_progress"
-current_agent: "naomi (returning to tanaka)"
+current_agent: "tanaka"
 ---
 
 # Task: Rewrite SHI Dashboard to Match Thesis + User Stories
@@ -14,7 +14,7 @@ Reference implementation: D:\__CODING\05-MyProjects\__TOOLING\workbench_tools\__
 Goal: Dashboard for project management with all charts and metrics needed.
 
 ## Tasks
-- [ ] Phase 1: EXPLORE -- Read thesis, user stories, reference app, current codebase
+- [x] Phase 1: EXPLORE -- Read thesis, user stories, reference app, current codebase
 - [ ] Phase 2: STRATEGIZE -- Design rewrite approach, data model, architecture
 - [ ] Phase 3: VALIDATE -- Security, quality, build review of plan
 - [ ] Phase 4: IMPLEMENT -- Backend rewrite (schema, API, SPI engine)
@@ -22,16 +22,24 @@ Goal: Dashboard for project management with all charts and metrics needed.
 - [ ] Phase 6: VERIFY -- Integration test, deliver
 
 ## In Progress
-Phase 1: EXPLORE -- Deploying Naomi for thesis + user stories + reference app + codebase analysis
+(returning to tanaka for Phase 2)
 
 ## Completed
 - [x] User stories extraction + requirements analysis (agent: naomi, file: 02_naomi_user_stories.md)
+- [x] Reference app exploration + pattern extraction (agent: naomi, file: 03_naomi_reference_app.md)
+- [x] Current codebase full analysis (agent: naomi, file: 04_naomi_current_codebase.md)
+- [x] Thesis document full requirements extraction (agent: naomi, file: 01_naomi_thesis.md)
 
 ## Blockers
-- Thesis is .docx format -- need to check if RTF version is readable
+- (resolved) Thesis RTF parsed successfully via Python state-machine extractor
 
 ## Key Decisions
 - CONFLICT FOUND: User stories describe task-evidence model, NOT daily-report model (CLAUDE.md needs update)
 - CONFLICT FOUND: Manager has full CRUD, NOT read-only (CLAUDE.md needs update)
 - CONFLICT FOUND: Client entity required but missing from CLAUDE.md data model
+- CONFLICT: Thesis says Next.js; CLAUDE.md says Vite+React+TanStack Query -- go with CLAUDE.md
+- CONFLICT: SPI thresholds differ between thesis (SPI<1 = behind) and CLAUDE.md (0.95/0.85 bands) -- use 3-tier bands
 - UI Reference: Monday.com (primary, 3/4 images), Zoho Projects (secondary, analytics dashboard)
+- CODEBASE VERDICT: Backend/frontend patterns are solid (KEEP auth, SPI core, TanStack hooks), but 7 critical feature gaps found vs user stories
+- Thesis Chapters 4-5 are EMPTY STUBS -- no ERD, wireframes, or class diagrams available; must design from scratch
+- 9 functional requirements extracted, 7 entities identified, 18 visualization components specified
