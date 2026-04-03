@@ -31,4 +31,7 @@ Phase 1: EXPLORE -- Deploying Naomi for thesis + user stories + reference app + 
 - Thesis is .docx format -- need to check if RTF version is readable
 
 ## Key Decisions
-(pending exploration)
+- CONFLICT FOUND: User stories describe task-evidence model, NOT daily-report model (CLAUDE.md needs update)
+- CONFLICT FOUND: Manager has full CRUD, NOT read-only (CLAUDE.md needs update)
+- CONFLICT FOUND: Client entity required but missing from CLAUDE.md data model
+- UI Reference: Monday.com (primary, 3/4 images), Zoho Projects (secondary, analytics dashboard)
