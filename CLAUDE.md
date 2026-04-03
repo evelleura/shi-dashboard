@@ -105,6 +105,12 @@ project_health (denormalized for performance)
 3. **Phase 3:** Dashboard UI components + TanStack Query integration
 4. **Phase 4:** Testing, UAT, deployment
 
+## PROJECT MEMORY
+
+| Date | Cat | Score | Learning | Action |
+|------|-----|-------|----------|--------|
+| 2026-04-04 | ACC | 16 | CLAUDE.md data model (daily_reports + progress %) diverges from user stories which require: task-level tracking, survey phases, evidence uploads, Kanban views, budget planning, client management, auto-assign, project value in rupiah. Current schema will need significant expansion. | Before implementing features: reconcile CLAUDE.md spec with `docs/user-story/user-stories.md`. Update data model FIRST. Flag spec-vs-stories conflicts immediately. |
+
 ## Success Criteria
 ✓ Technicians can input daily reports directly
 ✓ SPI auto-calculated from reports
