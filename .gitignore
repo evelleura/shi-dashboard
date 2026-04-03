@@ -10,3 +10,7 @@ pnpm-lock.yaml
 # Uploaded files (keep directory structure, ignore content)
 server/uploads/*
 !server/uploads/.gitkeep
+
+# Portable PostgreSQL (auto-installed by run.py)
+postgres/
+postgres-download.zip
