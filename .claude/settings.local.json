@@ -6,7 +6,10 @@
       "Bash(node_modules/.bin/tsc --noEmit)",
       "Bash(npx vite:*)",
       "Bash(docker --version)",
-      "Bash(pg_isready --version)"
+      "Bash(pg_isready --version)",
+      "mcp__web-search__research",
+      "Bash(curl -sI \"https://get.enterprisedb.com/postgresql/postgresql-17.5-1-windows-x64-binaries.zip\")",
+      "Bash(curl -sI \"https://get.enterprisedb.com/postgresql/postgresql-16.8-1-windows-x64-binaries.zip\")"
     ]
   }
 }
