@@ -6,3 +6,7 @@ dist/
 .DS_Store
 pnpm-lock.yaml
 *.txt
+
+# Uploaded files (keep directory structure, ignore content)
+server/uploads/*
+!server/uploads/.gitkeep

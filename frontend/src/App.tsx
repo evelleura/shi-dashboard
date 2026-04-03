@@ -8,6 +8,8 @@ import DashboardPage from './pages/DashboardPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ReportPage from './pages/ReportPage';
+import ClientsPage from './pages/ClientsPage';
+import TechnicianDashboard from './pages/TechnicianDashboard';
 import Layout from './components/ui/Layout';
 import type { UserRole } from './types';
 
@@ -35,7 +37,7 @@ function ProtectedRoute({ children, roles }: { children: React.ReactNode; roles?
 
   if (!token || !user) return <Navigate to="/login" replace />;
   if (roles && !roles.includes(user.role)) {
-    return user.role === 'technician' ? <Navigate to="/report" replace /> : <Navigate to="/dashboard" replace />;
+    return user.role === 'technician' ? <Navigate to="/my-dashboard" replace /> : <Navigate to="/dashboard" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -81,8 +83,24 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/clients"
+            element={
+              <ProtectedRoute roles={['manager', 'admin']}>
+                <ClientsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Technician routes */}
+          <Route
+            path="/my-dashboard"
+            element={
+              <ProtectedRoute roles={['technician', 'admin']}>
+                <TechnicianDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/report"
             element={
@@ -97,7 +115,7 @@ export default function App() {
             path="/"
             element={
               user?.role === 'technician'
-                ? <Navigate to="/report" replace />
+                ? <Navigate to="/my-dashboard" replace />
                 : user
                 ? <Navigate to="/dashboard" replace />
                 : <LandingPage />

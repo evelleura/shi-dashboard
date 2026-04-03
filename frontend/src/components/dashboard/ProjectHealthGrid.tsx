@@ -1,5 +1,6 @@
 import type { DashboardProject } from '../../types';
 import ProjectCard from './ProjectCard';
+import EmptyState from '../ui/EmptyState';
 
 interface Props {
   projects: DashboardProject[];
@@ -12,12 +13,7 @@ export default function ProjectHealthGrid({ projects, filter }: Props) {
     : projects;
 
   if (filtered.length === 0) {
-    return (
-      <div className="text-center py-16 text-gray-400">
-        <p className="text-4xl mb-2">📊</p>
-        <p className="text-sm">No projects found</p>
-      </div>
-    );
+    return <EmptyState title="No projects found" description="Try changing the filter or create a new project." />;
   }
 
   return (

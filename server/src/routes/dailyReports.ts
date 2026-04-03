@@ -7,7 +7,7 @@ const router = Router();
 
 // POST /api/daily-reports - Submit daily report (technician)
 router.post('/', authenticate, authorize('technician', 'admin'), async (req: AuthRequest, res: Response) => {
-  const { project_id, report_date, progress_percentage, constraints } = req.body;
+  const { project_id, task_id, report_date, progress_percentage, constraints } = req.body;
 
   if (!project_id || !report_date || progress_percentage === undefined) {
     res.status(400).json({ success: false, error: 'project_id, report_date, and progress_percentage are required' });
@@ -37,6 +37,23 @@ router.post('/', authenticate, authorize('technician', 'admin'), async (req: Aut
       return;
     }
 
+    // Verify task_id exists and belongs to this project if provided
+    if (task_id) {
+      const taskCheck = await query(
+        'SELECT id, project_id FROM tasks WHERE id = $1',
+        [task_id]
+      );
+      if (taskCheck.rowCount === 0) {
+        res.status(400).json({ success: false, error: 'Task not found' });
+        return;
+      }
+      const task = taskCheck.rows[0] as { project_id: number };
+      if (task.project_id !== parseInt(project_id)) {
+        res.status(400).json({ success: false, error: 'Task does not belong to this project' });
+        return;
+      }
+    }
+
     // Check if technician is assigned to this project (skip for admin)
     if (req.user!.role === 'technician') {
       const assigned = await query(
@@ -50,14 +67,15 @@ router.post('/', authenticate, authorize('technician', 'admin'), async (req: Aut
     }
 
     const result = await query(
-      `INSERT INTO daily_reports (project_id, report_date, progress_percentage, constraints, created_by)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO daily_reports (project_id, task_id, report_date, progress_percentage, constraints, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (project_id, report_date, created_by)
        DO UPDATE SET
          progress_percentage = EXCLUDED.progress_percentage,
-         constraints = EXCLUDED.constraints
+         constraints = EXCLUDED.constraints,
+         task_id = EXCLUDED.task_id
        RETURNING *`,
-      [project_id, report_date, progress, constraints || null, req.user!.userId]
+      [project_id, task_id || null, report_date, progress, constraints || null, req.user!.userId]
     );
 
     // Trigger SPI recalculation after report submission
@@ -82,10 +100,12 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
 
   try {
     let sql = `
-      SELECT dr.*, u.name AS reporter_name, p.name AS project_name
+      SELECT dr.*, u.name AS reporter_name, p.name AS project_name,
+             t.name AS task_name
       FROM daily_reports dr
       LEFT JOIN users u ON u.id = dr.created_by
       LEFT JOIN projects p ON p.id = dr.project_id
+      LEFT JOIN tasks t ON t.id = dr.task_id
       WHERE 1=1
     `;
     const params: unknown[] = [];

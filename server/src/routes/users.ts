@@ -50,16 +50,25 @@ router.get('/technicians', authenticate, authorize('manager', 'admin'), async (_
   }
 });
 
-// GET /api/users/me/projects - Get projects assigned to current technician
+// GET /api/users/me/projects - Get projects assigned to current technician with task counts
 router.get('/me/projects', authenticate, authorize('technician'), async (req: AuthRequest, res: Response) => {
   try {
     const result = await query(
       `SELECT p.id, p.name, p.description, p.start_date, p.end_date, p.status,
-              ph.spi_value, ph.status AS health_status
+              p.phase, p.project_value,
+              ph.spi_value, ph.status AS health_status,
+              COUNT(t.id) FILTER (WHERE t.assigned_to = $1)::int AS my_task_count,
+              COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'done')::int AS my_completed_tasks,
+              COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'working_on_it')::int AS my_working_tasks,
+              COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'stuck')::int AS my_stuck_tasks,
+              COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.due_date < CURRENT_DATE AND t.status NOT IN ('done'))::int AS my_overdue_tasks
        FROM projects p
        JOIN project_assignments pa ON pa.project_id = p.id
        LEFT JOIN project_health ph ON ph.project_id = p.id
+       LEFT JOIN tasks t ON t.project_id = p.id
        WHERE pa.user_id = $1 AND p.status = 'active'
+       GROUP BY p.id, p.name, p.description, p.start_date, p.end_date, p.status,
+                p.phase, p.project_value, ph.spi_value, ph.status
        ORDER BY p.end_date ASC`,
       [req.user!.userId]
     );

@@ -29,7 +29,7 @@ export default function LoginPage({ onLogin }: Props) {
       if (user.role === 'manager' || user.role === 'admin') {
         navigate('/dashboard');
       } else {
-        navigate('/report');
+        navigate('/my-dashboard');
       }
     } catch {
       setError('Invalid email or password.');

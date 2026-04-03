@@ -19,20 +19,34 @@ function formatDate(dateStr: string) {
 
 export default function ProjectCard({ project }: Props) {
   const borderClass = project.health_status ? borderColor[project.health_status] : 'border-l-gray-300';
+  const taskProgress = project.total_tasks > 0
+    ? Math.round((project.completed_tasks / project.total_tasks) * 100)
+    : 0;
 
   return (
     <Link to={`/projects/${project.id}`}>
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 border-l-4 ${borderClass} p-4 hover:shadow-md transition-shadow cursor-pointer`}>
+      <div className={`bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 ${borderClass} p-4 hover:shadow-md transition-shadow cursor-pointer`}>
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 truncate">{project.name}</h3>
-            <p className="text-xs text-gray-400 mt-0.5">
-              {formatDate(project.start_date)} – {formatDate(project.end_date)}
+            <h3 className="font-semibold text-gray-900 truncate text-sm">{project.name}</h3>
+            {project.client_name && (
+              <p className="text-xs text-blue-500 mt-0.5">{project.client_name}</p>
+            )}
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {formatDate(project.start_date)} -- {formatDate(project.end_date)}
             </p>
           </div>
-          <StatusBadge status={project.health_status} />
+          <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+            <StatusBadge status={project.health_status} />
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+              project.phase === 'survey' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
+            }`}>
+              {project.phase === 'survey' ? 'Survey' : 'Execution'}
+            </span>
+          </div>
         </div>
 
+        {/* Progress */}
         <div className="mt-3">
           <ProgressBar
             actual={project.actual_progress ?? 0}
@@ -40,37 +54,38 @@ export default function ProjectCard({ project }: Props) {
           />
         </div>
 
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+        {/* Metrics row */}
+        <div className="mt-3 grid grid-cols-4 gap-2 text-center">
           <div>
-            <p className="text-xs text-gray-400">SPI</p>
-            <p className="text-sm font-bold text-gray-700">
-              {project.spi_value != null ? project.spi_value.toFixed(3) : '—'}
+            <p className="text-[10px] text-gray-400">SPI</p>
+            <p className="text-xs font-bold text-gray-700">
+              {project.spi_value != null ? Number(project.spi_value).toFixed(2) : '--'}
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Deviation</p>
-            <p className={`text-sm font-bold ${(project.deviation_percent ?? 0) < 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <p className="text-[10px] text-gray-400">Dev</p>
+            <p className={`text-xs font-bold ${(project.deviation_percent ?? 0) < 0 ? 'text-red-600' : 'text-green-600'}`}>
               {project.deviation_percent != null
-                ? `${project.deviation_percent >= 0 ? '+' : ''}${project.deviation_percent.toFixed(1)}%`
-                : '—'}
+                ? `${project.deviation_percent >= 0 ? '+' : ''}${Number(project.deviation_percent).toFixed(1)}%`
+                : '--'}
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Duration</p>
-            <p className="text-sm font-bold text-gray-700">{project.duration}d</p>
+            <p className="text-[10px] text-gray-400">Tasks</p>
+            <p className="text-xs font-bold text-gray-700">
+              {project.completed_tasks}/{project.total_tasks}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] text-gray-400">Done</p>
+            <p className="text-xs font-bold text-gray-700">{taskProgress}%</p>
           </div>
         </div>
 
-        {project.latest_constraints && (
-          <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600 line-clamp-2">
-            <span className="font-medium">Constraint: </span>
-            {project.latest_constraints}
-          </div>
-        )}
-
-        {project.last_report_date && (
-          <p className="mt-2 text-xs text-gray-400 text-right">
-            Last report: {formatDate(project.last_report_date)}
+        {/* Value */}
+        {Number(project.project_value) > 0 && (
+          <p className="mt-2 text-[10px] text-gray-400 text-right">
+            Rp {Number(project.project_value).toLocaleString('id-ID')}
           </p>
         )}
       </div>
