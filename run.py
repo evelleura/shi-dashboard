@@ -1,10 +1,12 @@
 """
 SHI Dashboard - Build & Run Script
-Starts PostgreSQL (Docker), installs deps (bun), sets up DB, runs backend + frontend.
+Installs deps (bun), sets up DB, runs backend + frontend.
+Expects PostgreSQL to be running (see docker-compose.yml).
 """
 
 import subprocess
 import sys
+import socket
 import signal
 import shutil
 import time
@@ -22,12 +24,12 @@ def run(cmd: list[str], cwd: Path = ROOT, check: bool = True, **kwargs) -> subpr
     return subprocess.run(cmd, cwd=cwd, check=check, **kwargs)
 
 
-def find_bin(name: str, url: str) -> str:
-    path = shutil.which(name)
-    if not path:
-        print(f"[ERROR] {name} not found. Install: {url}")
+def find_bun() -> str:
+    bun = shutil.which("bun")
+    if not bun:
+        print("[ERROR] bun not found. Install: https://bun.sh")
         sys.exit(1)
-    return path
+    return bun
 
 
 def ensure_env():
@@ -38,34 +40,42 @@ def ensure_env():
         print("[CREATED] .env from .env.example")
 
 
-def start_postgres(docker: str):
-    print("\n=== PostgreSQL ===")
+def read_env_port() -> int:
+    if ENV_FILE.exists():
+        for line in ENV_FILE.read_text().splitlines():
+            if line.startswith("DB_PORT="):
+                return int(line.split("=", 1)[1].strip().strip('"'))
+    return 5432
 
-    # Check if container already running
-    result = subprocess.run(
-        [docker, "compose", "ps", "--status", "running", "--format", "{{.Name}}"],
-        cwd=ROOT, capture_output=True, text=True
-    )
-    if "shi-postgres" in result.stdout:
-        print("[OK] PostgreSQL already running")
+
+def check_postgres() -> bool:
+    port = read_env_port()
+    try:
+        with socket.create_connection(("127.0.0.1", port), timeout=2):
+            return True
+    except (ConnectionRefusedError, OSError):
+        return False
+
+
+def ensure_postgres():
+    print("\n=== PostgreSQL ===")
+    if check_postgres():
+        print("[OK] PostgreSQL reachable")
         return
 
-    # Start container
-    print("  Starting PostgreSQL container...")
-    run([docker, "compose", "up", "-d", "--wait"], cwd=ROOT, check=False)
-
-    # Wait for healthy
-    for i in range(15):
-        result = subprocess.run(
-            [docker, "compose", "ps", "--status", "running", "--format", "{{.Name}}"],
-            cwd=ROOT, capture_output=True, text=True
-        )
-        if "shi-postgres" in result.stdout:
-            print("[OK] PostgreSQL ready")
+    # Try auto-starting via docker compose if available
+    docker = shutil.which("docker")
+    if docker:
+        print("  PostgreSQL not running. Starting via docker compose...")
+        result = run([docker, "compose", "up", "-d", "--wait"], cwd=ROOT, check=False)
+        if result.returncode == 0 and check_postgres():
+            print("[OK] PostgreSQL started via Docker")
             return
-        time.sleep(1)
 
-    print("[ERROR] PostgreSQL failed to start. Check: docker compose logs postgres")
+    print("[ERROR] PostgreSQL not reachable on port", read_env_port())
+    print("  Option 1: docker compose up -d")
+    print("  Option 2: Install PostgreSQL and start the service")
+    print("  Option 3: run.py --skip-db  (start app without DB)")
     sys.exit(1)
 
 
@@ -143,8 +153,7 @@ def main():
     print("  SHI Dashboard")
     print("=" * 50)
 
-    bun = find_bin("bun", "https://bun.sh")
-    docker = find_bin("docker", "https://docker.com")
+    bun = find_bun()
     ensure_env()
 
     if "--clean" in args:
@@ -157,27 +166,20 @@ def main():
             if f.exists():
                 f.unlink()
 
-    # 1. PostgreSQL
-    if "--no-docker" not in args:
-        start_postgres(docker)
-
-    # 2. Dependencies
     install_deps(bun)
 
     if "--install" in args:
         return
 
-    # 3. Uploads dir
     (SERVER_DIR / "uploads").mkdir(exist_ok=True)
 
-    # 4. Database schema + seed
     if "--skip-db" not in args:
+        ensure_postgres()
         setup_db(bun, seed="--seed" in args)
 
     if "--db-only" in args:
         return
 
-    # 5. Run
     start_services(bun)
 
 
