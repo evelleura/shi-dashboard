@@ -4,12 +4,13 @@
 .DESCRIPTION
     Runs run.py with all arguments forwarded.
     Usage:
-        .\run.ps1              # install + db setup + start both servers
+        .\run.ps1              # start postgres + install + db setup + run servers
         .\run.ps1 --seed       # also seed test data
-        .\run.ps1 --clean      # clean reinstall
-        .\run.ps1 --db-only    # only run database setup
-        .\run.ps1 --skip-db    # skip database, just start servers
+        .\run.ps1 --clean      # clean reinstall node_modules
+        .\run.ps1 --db-only    # only start postgres + run schema
+        .\run.ps1 --skip-db    # skip database setup, just start servers
         .\run.ps1 --install    # only install dependencies
+        .\run.ps1 --no-docker  # skip docker/postgres (use existing DB)
 #>
 
 $ErrorActionPreference = "Stop"
