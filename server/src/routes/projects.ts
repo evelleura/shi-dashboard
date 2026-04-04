@@ -16,7 +16,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
         c.name AS client_name,
         ph.spi_value, ph.status AS health_status, ph.deviation_percent,
         ph.actual_progress, ph.planned_progress, ph.last_updated AS health_last_updated,
-        ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.stuck_tasks, ph.overdue_tasks,
+        ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.overtime_tasks, ph.overdue_tasks,
         dr.progress_percentage AS latest_progress,
         dr.constraints AS latest_constraints,
         dr.report_date AS last_report_date,
@@ -61,7 +61,7 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response) => {
         c.email AS client_email, c.address AS client_address,
         ph.spi_value, ph.status AS health_status,
         ph.deviation_percent, ph.actual_progress, ph.planned_progress,
-        ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.stuck_tasks, ph.overdue_tasks,
+        ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.overtime_tasks, ph.overdue_tasks,
         ph.last_updated AS health_last_updated,
         u.name AS created_by_name,
         approver.name AS survey_approved_by_name

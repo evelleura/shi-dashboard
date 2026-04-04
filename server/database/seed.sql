@@ -10,14 +10,14 @@
 -- 1. USERS (1 admin, 2 managers, 5 technicians)
 -- ============================================================
 INSERT INTO users (name, email, role, password_hash) VALUES
-  ('Admin SHI',       'admin@shi.co.id',    'admin',      '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-  ('Budi Santoso',    'budi@shi.co.id',     'manager',    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-  ('Diana Kusuma',    'diana@shi.co.id',    'manager',    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-  ('Siti Rahma',      'siti@shi.co.id',     'technician', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-  ('Andi Wijaya',     'andi@shi.co.id',     'technician', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-  ('Reza Pratama',    'reza@shi.co.id',     'technician', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-  ('Fajar Nugroho',   'fajar@shi.co.id',    'technician', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-  ('Putri Handayani', 'putri@shi.co.id',    'technician', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
+  ('Admin SHI',       'admin@shi.co.id',    'admin',      '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'),
+  ('Budi Santoso',    'budi@shi.co.id',     'manager',    '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'),
+  ('Diana Kusuma',    'diana@shi.co.id',    'manager',    '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'),
+  ('Siti Rahma',      'siti@shi.co.id',     'technician', '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'),
+  ('Andi Wijaya',     'andi@shi.co.id',     'technician', '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'),
+  ('Reza Pratama',    'reza@shi.co.id',     'technician', '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'),
+  ('Fajar Nugroho',   'fajar@shi.co.id',    'technician', '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'),
+  ('Putri Handayani', 'putri@shi.co.id',    'technician', '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6')
 ON CONFLICT (email) DO NOTHING;
 
 
@@ -83,7 +83,7 @@ ON CONFLICT DO NOTHING;
 --   P10: Active/Execution, AMBER health (small project, near deadline)
 
 INSERT INTO projects (name, description, client_id, start_date, end_date, status, phase, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
--- P1: RED - Behind schedule, 60-day window, stuck tasks
+-- P1: RED - Behind schedule, 60-day window, overtime tasks
 (
   'Smart Home IoT - Perumahan Citra Raya',
   'Instalasi sistem smart home lengkap di 10 unit rumah kawasan Citra Raya',
@@ -107,7 +107,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
   'Pemasangan 32 kamera CCTV, NVR, dan access control di 4 lantai kantor',
   (SELECT id FROM users WHERE email = 'budi@shi.co.id')
 ),
--- P3: RED - Critical, deadline very close, many stuck
+-- P3: RED - Critical, deadline very close, many overtime
 (
   'Smart Home Automation - Villa Kaliurang',
   'Home automation system lengkap di villa premium Kaliurang',
@@ -262,21 +262,21 @@ SELECT p.id, u.id FROM projects p, users u WHERE p.name = 'CCTV Gudang Farmasi R
 -- 5. TASKS
 -- ============================================================
 
--- P1: Smart Home Citra Raya (RED) -- 10 tasks: 3 done, 4 working, 1 stuck, 2 to_do
+-- P1: Smart Home Citra Raya (RED) -- 10 tasks: 3 done, 5 working (1 overtime), 2 to_do
 INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by) VALUES
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Survey lokasi & pengukuran', 'Survey awal dan pengukuran seluruh unit rumah', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '50 days', 5000000, 1, TRUE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Penarikan kabel jaringan', 'Penarikan kabel UTP dan power untuk controller', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '35 days', 15000000, 2, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Instalasi smart lock', 'Pemasangan smart lock di pintu utama 10 unit', (SELECT id FROM users WHERE email = 'reza@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '20 days', 20000000, 3, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Instalasi lighting control', 'Smart switch dan dimmer di setiap unit', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'working_on_it', CURRENT_DATE - INTERVAL '5 days', 18000000, 4, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Instalasi CCTV per unit', 'Pemasangan 2 kamera CCTV per unit', (SELECT id FROM users WHERE email = 'reza@shi.co.id'), 'working_on_it', CURRENT_DATE + INTERVAL '5 days', 25000000, 5, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
-((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Setup gateway IoT', 'Konfigurasi gateway IoT dan koneksi cloud', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'stuck', CURRENT_DATE - INTERVAL '10 days', 12000000, 6, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
+((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Setup gateway IoT', 'Konfigurasi gateway IoT dan koneksi cloud', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'working_on_it', CURRENT_DATE - INTERVAL '10 days', 12000000, 6, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Konfigurasi mobile app', 'Setup dan testing mobile app kontrol smart home', (SELECT id FROM users WHERE email = 'reza@shi.co.id'), 'working_on_it', CURRENT_DATE + INTERVAL '10 days', 8000000, 7, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Integrasi sistem keamanan', 'Integrasi CCTV, smart lock, alarm ke satu dashboard', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'working_on_it', CURRENT_DATE + INTERVAL '15 days', 15000000, 8, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Testing & QC', 'Testing menyeluruh semua sistem setiap unit', (SELECT id FROM users WHERE email = 'reza@shi.co.id'), 'to_do', CURRENT_DATE + INTERVAL '22 days', 5000000, 9, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya'), 'Serah terima & training', 'Serah terima ke penghuni dan training penggunaan', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'to_do', CURRENT_DATE + INTERVAL '28 days', 2000000, 10, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id'))
 ON CONFLICT DO NOTHING;
 
--- P2: CCTV BPD DIY (GREEN) -- 8 tasks: 4 done, 2 working, 0 stuck, 2 to_do
+-- P2: CCTV BPD DIY (GREEN) -- 8 tasks: 4 done, 2 working, 2 to_do
 INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by) VALUES
 ((SELECT id FROM projects WHERE name = 'CCTV & Security System - Kantor BPD DIY'), 'Survey gedung & titik kamera', 'Survey 4 lantai, posisi kamera optimal', (SELECT id FROM users WHERE email = 'andi@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '22 days', 3000000, 1, TRUE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'CCTV & Security System - Kantor BPD DIY'), 'Penarikan kabel lantai 1-2', 'Kabel coaxial + UTP untuk 16 kamera', (SELECT id FROM users WHERE email = 'andi@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '15 days', 10000000, 2, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
@@ -288,17 +288,17 @@ INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date,
 ((SELECT id FROM projects WHERE name = 'CCTV & Security System - Kantor BPD DIY'), 'Testing & commissioning', 'Testing seluruh sistem, uji recording 24 jam', (SELECT id FROM users WHERE email = 'andi@shi.co.id'), 'to_do', CURRENT_DATE + INTERVAL '55 days', 3000000, 8, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id'))
 ON CONFLICT DO NOTHING;
 
--- P3: Villa Kaliurang (RED Critical) -- 6 tasks: 1 done, 2 working, 2 stuck, 1 to_do
+-- P3: Villa Kaliurang (RED Critical) -- 6 tasks: 1 done, 4 working (3 overtime), 1 to_do
 INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by) VALUES
 ((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Survey villa & desain sistem', 'Survey layout villa dan desain automasi', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '38 days', 2000000, 1, TRUE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Instalasi panel kontrol utama', 'Panel kontrol automasi di ruang utility', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'working_on_it', CURRENT_DATE - INTERVAL '15 days', 8000000, 2, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
-((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Instalasi smart curtain & AC', 'Motor curtain dan kontrol AC seluruh ruangan', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'stuck', CURRENT_DATE - INTERVAL '5 days', 12000000, 3, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
-((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Instalasi lighting automation', 'Smart switch, dimmer, motion sensor', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'stuck', CURRENT_DATE - INTERVAL '2 days', 8000000, 4, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
+((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Instalasi smart curtain & AC', 'Motor curtain dan kontrol AC seluruh ruangan', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'working_on_it', CURRENT_DATE - INTERVAL '5 days', 12000000, 3, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
+((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Instalasi lighting automation', 'Smart switch, dimmer, motion sensor', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'working_on_it', CURRENT_DATE - INTERVAL '2 days', 8000000, 4, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Instalasi security system', 'CCTV, alarm, smart lock villa', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'working_on_it', CURRENT_DATE + INTERVAL '5 days', 10000000, 5, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang'), 'Integrasi & testing', 'Integrasi seluruh sistem, testing end-to-end', (SELECT id FROM users WHERE email = 'siti@shi.co.id'), 'to_do', CURRENT_DATE + INTERVAL '12 days', 3000000, 6, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id'))
 ON CONFLICT DO NOTHING;
 
--- P4: IoT Gudang (AMBER) -- 5 tasks: 1 done, 2 working, 0 stuck, 2 to_do
+-- P4: IoT Gudang (AMBER) -- 5 tasks: 1 done, 2 working, 2 to_do
 INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by) VALUES
 ((SELECT id FROM projects WHERE name = 'IoT Sensor Network - Gudang Logistik'), 'Survey gudang & titik sensor', 'Survey 3 gudang, titik sensor optimal', (SELECT id FROM users WHERE email = 'reza@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '12 days', 3000000, 1, TRUE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'IoT Sensor Network - Gudang Logistik'), 'Instalasi sensor gudang 1', '8 sensor suhu/kelembaban + 4 sensor keamanan', (SELECT id FROM users WHERE email = 'reza@shi.co.id'), 'working_on_it', CURRENT_DATE + INTERVAL '5 days', 12000000, 2, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
@@ -332,7 +332,7 @@ INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date,
 ((SELECT id FROM projects WHERE name = 'Smart Traffic Light - Simpang Tiga Janti'), 'UAT & serah terima', 'User acceptance test dan serah terima', (SELECT id FROM users WHERE email = 'fajar@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '22 days', 2000000, 6, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id'))
 ON CONFLICT DO NOTHING;
 
--- P8: Rumah Ibu Ratna (ON-HOLD) -- 4 tasks: 1 done, 1 working, 0 stuck, 2 to_do
+-- P8: Rumah Ibu Ratna (ON-HOLD) -- 4 tasks: 1 done, 1 working, 2 to_do
 INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by) VALUES
 ((SELECT id FROM projects WHERE name = 'Smart Home - Rumah Ibu Ratna'), 'Survey rumah', 'Survey layout rumah untuk instalasi', (SELECT id FROM users WHERE email = 'putri@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '35 days', 500000, 1, TRUE, (SELECT id FROM users WHERE email = 'diana@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Home - Rumah Ibu Ratna'), 'Instalasi smart lock & switch', 'Smart lock pintu + 4 smart switch', (SELECT id FROM users WHERE email = 'putri@shi.co.id'), 'working_on_it', CURRENT_DATE - INTERVAL '10 days', 6000000, 2, FALSE, (SELECT id FROM users WHERE email = 'diana@shi.co.id')),
@@ -340,7 +340,7 @@ INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date,
 ((SELECT id FROM projects WHERE name = 'Smart Home - Rumah Ibu Ratna'), 'Testing & serah terima', 'Testing dan training klien', (SELECT id FROM users WHERE email = 'putri@shi.co.id'), 'to_do', CURRENT_DATE + INTERVAL '15 days', 500000, 4, FALSE, (SELECT id FROM users WHERE email = 'diana@shi.co.id'))
 ON CONFLICT DO NOTHING;
 
--- P9: Smart Building Dishub (GREEN) -- 12 tasks: 7 done, 3 working, 0 stuck, 2 to_do
+-- P9: Smart Building Dishub (GREEN) -- 12 tasks: 7 done, 3 working, 2 to_do
 INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by) VALUES
 ((SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta'), 'Survey gedung & kebutuhan', 'Survey 3 lantai gedung kantor Dishub', (SELECT id FROM users WHERE email = 'fajar@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '35 days', 2000000, 1, TRUE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta'), 'Desain sistem terintegrasi', 'Desain arsitektur lighting + AC + sensor', (SELECT id FROM users WHERE email = 'fajar@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '28 days', 3000000, 2, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id')),
@@ -356,7 +356,7 @@ INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date,
 ((SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta'), 'UAT & training operator', 'Testing dan training operator gedung', (SELECT id FROM users WHERE email = 'putri@shi.co.id'), 'to_do', CURRENT_DATE + INTERVAL '48 days', 2000000, 12, FALSE, (SELECT id FROM users WHERE email = 'budi@shi.co.id'))
 ON CONFLICT DO NOTHING;
 
--- P10: CCTV Gudang RS PKU (AMBER) -- 4 tasks: 1 done, 2 working, 0 stuck, 1 to_do
+-- P10: CCTV Gudang RS PKU (AMBER) -- 4 tasks: 1 done, 2 working (1 overtime), 1 to_do
 INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by) VALUES
 ((SELECT id FROM projects WHERE name = 'CCTV Gudang Farmasi RS PKU'), 'Survey gudang & titik kamera', 'Survey area farmasi dan gudang obat', (SELECT id FROM users WHERE email = 'fajar@shi.co.id'), 'done', CURRENT_DATE - INTERVAL '20 days', 1000000, 1, TRUE, (SELECT id FROM users WHERE email = 'diana@shi.co.id')),
 ((SELECT id FROM projects WHERE name = 'CCTV Gudang Farmasi RS PKU'), 'Instalasi kamera & kabel', 'Pemasangan 8 kamera + penarikan kabel', (SELECT id FROM users WHERE email = 'fajar@shi.co.id'), 'working_on_it', CURRENT_DATE - INTERVAL '3 days', 12000000, 2, FALSE, (SELECT id FROM users WHERE email = 'diana@shi.co.id')),
@@ -570,17 +570,17 @@ ON CONFLICT DO NOTHING;
 -- ============================================================
 -- 9. PROJECT HEALTH (pre-calculated for dashboard)
 -- ============================================================
-INSERT INTO project_health (project_id, spi_value, status, deviation_percent, actual_progress, planned_progress, total_tasks, completed_tasks, working_tasks, stuck_tasks, overdue_tasks)
-SELECT p.id, d.spi, d.st, d.dev, d.ap, d.pp, d.tt, d.ct, d.wt, d.stt, d.ot
+INSERT INTO project_health (project_id, spi_value, status, deviation_percent, actual_progress, planned_progress, total_tasks, completed_tasks, working_tasks, overtime_tasks, overdue_tasks)
+SELECT p.id, d.spi, d.st, d.dev, d.ap, d.pp, d.tt, d.ct, d.wt, d.ott, d.ot
 FROM projects p,
 (VALUES
-  ('Smart Home IoT - Perumahan Citra Raya',       0.4500, 'red',   -37.67, 30.00, 66.67, 10, 3, 4, 1, 3),
+  ('Smart Home IoT - Perumahan Citra Raya',       0.4500, 'red',   -37.67, 30.00, 66.67, 10, 3, 5, 2, 3),
   ('CCTV & Security System - Kantor BPD DIY',     1.5000, 'green',  16.67, 50.00, 33.33,  8, 4, 2, 0, 0),
-  ('Smart Home Automation - Villa Kaliurang',      0.2222, 'red',   -58.33, 16.67, 75.00,  6, 1, 2, 2, 4),
+  ('Smart Home Automation - Villa Kaliurang',      0.2222, 'red',   -58.33, 16.67, 75.00,  6, 1, 4, 3, 4),
   ('IoT Sensor Network - Gudang Logistik',         0.6000, 'red',   -13.33, 20.00, 33.33,  5, 1, 2, 0, 0),
   ('Smart Building - Kantor Dishub Yogyakarta',    1.3125, 'green',  13.89, 58.33, 44.44, 12, 7, 3, 0, 0),
-  ('CCTV Gudang Farmasi RS PKU',                   0.3000, 'red',   -58.33, 25.00, 83.33,  4, 1, 2, 0, 1)
-) AS d(pname, spi, st, dev, ap, pp, tt, ct, wt, stt, ot)
+  ('CCTV Gudang Farmasi RS PKU',                   0.3000, 'red',   -58.33, 25.00, 83.33,  4, 1, 2, 1, 1)
+) AS d(pname, spi, st, dev, ap, pp, tt, ct, wt, ott, ot)
 WHERE p.name = d.pname
 ON CONFLICT (project_id) DO UPDATE SET
   spi_value = EXCLUDED.spi_value,
@@ -591,6 +591,6 @@ ON CONFLICT (project_id) DO UPDATE SET
   total_tasks = EXCLUDED.total_tasks,
   completed_tasks = EXCLUDED.completed_tasks,
   working_tasks = EXCLUDED.working_tasks,
-  stuck_tasks = EXCLUDED.stuck_tasks,
+  overtime_tasks = EXCLUDED.overtime_tasks,
   overdue_tasks = EXCLUDED.overdue_tasks,
   last_updated = CURRENT_TIMESTAMP;

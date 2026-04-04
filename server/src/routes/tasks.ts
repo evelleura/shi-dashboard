@@ -5,14 +5,13 @@ import { recalculateSPI } from '../services/spiCalculator';
 
 const router = Router();
 
-const VALID_STATUSES = ['to_do', 'working_on_it', 'done', 'stuck'];
+const VALID_STATUSES = ['to_do', 'working_on_it', 'done'];
 
 // Valid status transitions: from -> [allowed targets]
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   to_do: ['working_on_it'],
-  working_on_it: ['done', 'stuck'],
+  working_on_it: ['done', 'to_do'],
   done: ['working_on_it'],
-  stuck: ['working_on_it'],
 };
 
 // Managers can reset any task to any status

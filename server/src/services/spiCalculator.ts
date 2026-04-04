@@ -43,21 +43,21 @@ export async function getTaskCounts(projectId: number): Promise<{
   total: number;
   completed: number;
   working: number;
-  stuck: number;
+  overtime: number;
   overdue: number;
 }> {
   const result = await query<{
     total: string;
     completed: string;
     working: string;
-    stuck: string;
+    overtime: string;
     overdue: string;
   }>(
     `SELECT
       COUNT(*)::int AS total,
       COUNT(*) FILTER (WHERE status = 'done')::int AS completed,
       COUNT(*) FILTER (WHERE status = 'working_on_it')::int AS working,
-      COUNT(*) FILTER (WHERE status = 'stuck')::int AS stuck,
+      COUNT(*) FILTER (WHERE status = 'working_on_it' AND due_date < CURRENT_DATE)::int AS overtime,
       COUNT(*) FILTER (WHERE due_date < CURRENT_DATE AND status NOT IN ('done'))::int AS overdue
     FROM tasks
     WHERE project_id = $1`,
@@ -69,7 +69,7 @@ export async function getTaskCounts(projectId: number): Promise<{
     total: parseInt(String(row.total)) || 0,
     completed: parseInt(String(row.completed)) || 0,
     working: parseInt(String(row.working)) || 0,
-    stuck: parseInt(String(row.stuck)) || 0,
+    overtime: parseInt(String(row.overtime)) || 0,
     overdue: parseInt(String(row.overdue)) || 0,
   };
 }
@@ -154,7 +154,7 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
   const upsertResult = await query<ProjectHealth>(
     `INSERT INTO project_health
       (project_id, spi_value, status, deviation_percent, actual_progress, planned_progress,
-       total_tasks, completed_tasks, working_tasks, stuck_tasks, overdue_tasks, last_updated)
+       total_tasks, completed_tasks, working_tasks, overtime_tasks, overdue_tasks, last_updated)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
      ON CONFLICT (project_id)
      DO UPDATE SET
@@ -166,7 +166,7 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
        total_tasks = EXCLUDED.total_tasks,
        completed_tasks = EXCLUDED.completed_tasks,
        working_tasks = EXCLUDED.working_tasks,
-       stuck_tasks = EXCLUDED.stuck_tasks,
+       overtime_tasks = EXCLUDED.overtime_tasks,
        overdue_tasks = EXCLUDED.overdue_tasks,
        last_updated = NOW()
      RETURNING *`,
@@ -180,7 +180,7 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
       taskCounts.total,
       taskCounts.completed,
       taskCounts.working,
-      taskCounts.stuck,
+      taskCounts.overtime,
       taskCounts.overdue,
     ]
   );

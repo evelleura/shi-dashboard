@@ -60,7 +60,7 @@ router.get('/me/projects', authenticate, authorize('technician'), async (req: Au
               COUNT(t.id) FILTER (WHERE t.assigned_to = $1)::int AS my_task_count,
               COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'done')::int AS my_completed_tasks,
               COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'working_on_it')::int AS my_working_tasks,
-              COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'stuck')::int AS my_stuck_tasks,
+              COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'working_on_it' AND t.due_date < CURRENT_DATE)::int AS my_overtime_tasks,
               COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.due_date < CURRENT_DATE AND t.status NOT IN ('done'))::int AS my_overdue_tasks
        FROM projects p
        JOIN project_assignments pa ON pa.project_id = p.id

@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
   FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (created_by) REFERENCES users(id),
-  CONSTRAINT task_status_check CHECK (status IN ('to_do', 'working_on_it', 'done', 'stuck'))
+  CONSTRAINT task_status_check CHECK (status IN ('to_do', 'working_on_it', 'done'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id);
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS project_health (
   total_tasks INT DEFAULT 0,
   completed_tasks INT DEFAULT 0,
   working_tasks INT DEFAULT 0,
-  stuck_tasks INT DEFAULT 0,
+  overtime_tasks INT DEFAULT 0,
   overdue_tasks INT DEFAULT 0,
   last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
@@ -211,12 +211,12 @@ CREATE TABLE IF NOT EXISTS project_health (
 );
 
 -- ============================================================
--- Seed admin user (password: admin123)
+-- Seed admin user (password: password123)
 -- ============================================================
 INSERT INTO users (name, email, role, password_hash)
 VALUES (
   'Administrator',
   'admin@shi.co.id',
   'admin',
-  '$2b$10$UGFOrEkQHpQbv5SWlbFs3O8ydQGozEQR1JN/WYTSqAj7wE7x0Jr8O'
+  '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'
 ) ON CONFLICT (email) DO NOTHING;

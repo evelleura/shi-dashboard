@@ -3,7 +3,7 @@ export type UserRole = 'technician' | 'manager' | 'admin';
 export type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'cancelled';
 export type ProjectPhase = 'survey' | 'execution';
 export type HealthStatus = 'green' | 'amber' | 'red';
-export type TaskStatus = 'to_do' | 'working_on_it' | 'done' | 'stuck';
+export type TaskStatus = 'to_do' | 'working_on_it' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
 
 // === Entity Interfaces ===
@@ -128,7 +128,7 @@ export interface ProjectHealth {
   total_tasks: number;
   completed_tasks: number;
   working_tasks: number;
-  stuck_tasks: number;
+  overtime_tasks: number;
   overdue_tasks: number;
   last_updated: Date;
 }
@@ -162,7 +162,7 @@ export interface DashboardProject {
   total_tasks: number;
   completed_tasks: number;
   working_tasks: number;
-  stuck_tasks: number;
+  overtime_tasks: number;
   overdue_tasks: number;
   latest_constraints: string | null;
   last_report_date: Date | null;
@@ -192,7 +192,7 @@ export interface DashboardSummary {
   total_tasks: number;
   completed_tasks: number;
   working_tasks: number;
-  stuck_tasks: number;
+  overtime_tasks: number;
   overdue_projects: number;
 }
 
@@ -210,7 +210,7 @@ export interface TasksByOwnerData {
   total: number;
   done: number;
   working: number;
-  stuck: number;
+  overtime: number;
   to_do: number;
 }
 
@@ -219,14 +219,13 @@ export interface TasksByDueDateData {
   to_do: number;
   working_on_it: number;
   done: number;
-  stuck: number;
 }
 
 export interface OverdueTasksData {
   project_id: number;
   project_name: string;
   overdue_working: number;
-  overdue_stuck: number;
+  overdue_todo: number;
 }
 
 export interface BudgetStatusData {

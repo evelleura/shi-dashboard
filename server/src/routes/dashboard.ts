@@ -16,7 +16,7 @@ router.get('/', authenticate, authorize('manager', 'admin'), async (_req: AuthRe
         c.name AS client_name,
         ph.spi_value, ph.status AS health_status, ph.deviation_percent,
         ph.actual_progress, ph.planned_progress, ph.last_updated AS health_last_updated,
-        ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.stuck_tasks, ph.overdue_tasks,
+        ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.overtime_tasks, ph.overdue_tasks,
         dr.constraints AS latest_constraints,
         dr.report_date AS last_report_date,
         dr.progress_percentage AS last_reported_progress
@@ -58,7 +58,7 @@ router.get('/', authenticate, authorize('manager', 'admin'), async (_req: AuthRe
         COUNT(*)::int AS total_tasks,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS completed_tasks,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working_tasks,
-        COUNT(*) FILTER (WHERE t.status = 'stuck')::int AS stuck_tasks
+        COUNT(*) FILTER (WHERE t.status = 'working_on_it' AND t.due_date < CURRENT_DATE)::int AS overtime_tasks
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
       WHERE p.status = 'active'`
@@ -113,7 +113,7 @@ router.get('/', authenticate, authorize('manager', 'admin'), async (_req: AuthRe
           total_tasks: taskStats.total_tasks,
           completed_tasks: taskStats.completed_tasks,
           working_tasks: taskStats.working_tasks,
-          stuck_tasks: taskStats.stuck_tasks,
+          overtime_tasks: taskStats.overtime_tasks,
         },
         recent_activity: recentResult.rows,
       },
@@ -136,7 +136,7 @@ router.get('/charts/tasks-by-status', authenticate, authorize('manager', 'admin'
       WHERE p.status = 'active'
       GROUP BY t.status
       ORDER BY
-        CASE t.status WHEN 'done' THEN 1 WHEN 'working_on_it' THEN 2 WHEN 'to_do' THEN 3 WHEN 'stuck' THEN 4 END`
+        CASE t.status WHEN 'done' THEN 1 WHEN 'working_on_it' THEN 2 WHEN 'to_do' THEN 3 END`
     );
 
     const total = result.rows.reduce((sum, r) => sum + parseInt(String((r as Record<string, unknown>).count)), 0);
@@ -168,7 +168,7 @@ router.get('/charts/tasks-by-owner', authenticate, authorize('manager', 'admin')
         COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS done,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working,
-        COUNT(*) FILTER (WHERE t.status = 'stuck')::int AS stuck,
+        COUNT(*) FILTER (WHERE t.status = 'working_on_it' AND t.due_date < CURRENT_DATE)::int AS overtime,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do
       FROM tasks t
       JOIN users u ON u.id = t.assigned_to
@@ -193,7 +193,6 @@ router.get('/charts/overdue-tasks', authenticate, authorize('manager', 'admin'),
         p.id AS project_id,
         p.name AS project_name,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS overdue_working,
-        COUNT(*) FILTER (WHERE t.status = 'stuck')::int AS overdue_stuck,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS overdue_todo
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
@@ -220,8 +219,7 @@ router.get('/charts/tasks-by-due-date', authenticate, authorize('manager', 'admi
         TO_CHAR(t.due_date, 'YYYY-MM') AS month,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working_on_it,
-        COUNT(*) FILTER (WHERE t.status = 'done')::int AS done,
-        COUNT(*) FILTER (WHERE t.status = 'stuck')::int AS stuck
+        COUNT(*) FILTER (WHERE t.status = 'done')::int AS done
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
       WHERE t.due_date IS NOT NULL AND p.status = 'active'
@@ -404,7 +402,8 @@ router.get('/technician', authenticate, async (req: AuthRequest, res: Response) 
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working_on_it,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS done,
-        COUNT(*) FILTER (WHERE t.status = 'stuck')::int AS stuck,
+        COUNT(*) FILTER (WHERE t.status = 'working_on_it' AND t.due_date < CURRENT_DATE)::int AS overtime,
+        COUNT(*) FILTER (WHERE t.status = 'to_do' AND t.due_date < CURRENT_DATE)::int AS over_deadline,
         COUNT(*) FILTER (WHERE t.due_date < CURRENT_DATE AND t.status NOT IN ('done'))::int AS overdue
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
