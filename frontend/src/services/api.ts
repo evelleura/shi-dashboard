@@ -44,11 +44,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Redirect on 401
+// Redirect on 401 (skip for auth endpoints -- let login page handle its own errors)
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const isAuthRoute = err.config?.url?.startsWith('/auth/');
+    if (err.response?.status === 401 && !isAuthRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';

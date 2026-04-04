@@ -217,10 +217,26 @@ def reset_database():
 
 # -- Node/Bun ----------------------------------------------------------------
 
+def check_native_bindings() -> bool:
+    """Verify Vite's rolldown native binding exists and isn't empty."""
+    binding_dir = FRONTEND_DIR / "node_modules" / "@rolldown" / "binding-win32-x64-msvc"
+    if not binding_dir.exists():
+        return False
+    # Directory exists but might be empty (interrupted install)
+    return any(binding_dir.iterdir())
+
+
 def install_deps(bun: str):
     print("\n=== Dependencies ===")
     server_ok = (SERVER_DIR / "node_modules").exists()
-    frontend_ok = (FRONTEND_DIR / "node_modules").exists()
+    frontend_ok = (FRONTEND_DIR / "node_modules").exists() and check_native_bindings()
+
+    if not frontend_ok and (FRONTEND_DIR / "node_modules").exists():
+        print("  Broken native bindings detected, reinstalling frontend...")
+        shutil.rmtree(FRONTEND_DIR / "node_modules")
+        for f in [FRONTEND_DIR / "package-lock.json", FRONTEND_DIR / "bun.lock", FRONTEND_DIR / "bun.lockb"]:
+            if f.exists():
+                f.unlink()
 
     if server_ok and frontend_ok:
         print("[OK] Already installed (use --clean to reinstall)")
