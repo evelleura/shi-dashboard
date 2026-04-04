@@ -3,7 +3,7 @@ export type UserRole = 'technician' | 'manager' | 'admin';
 export type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'cancelled';
 export type ProjectPhase = 'survey' | 'execution';
 export type HealthStatus = 'green' | 'amber' | 'red';
-export type TaskStatus = 'to_do' | 'working_on_it' | 'done' | 'stuck';
+export type TaskStatus = 'to_do' | 'working_on_it' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
 
 // === Entities ===
@@ -131,7 +131,7 @@ export interface ProjectHealth {
   total_tasks: number;
   completed_tasks: number;
   working_tasks: number;
-  stuck_tasks: number;
+  overtime_tasks: number;
   overdue_tasks: number;
   last_updated: string;
 }
@@ -149,7 +149,8 @@ export interface DashboardSummary {
   total_tasks: number;
   completed_tasks: number;
   working_tasks: number;
-  stuck_tasks: number;
+  overtime_tasks: number;
+  over_deadline_tasks: number;
   overdue_projects: number;
 }
 
@@ -208,15 +209,15 @@ export interface TasksByOwnerData {
   total: number;
   done: number;
   working: number;
-  stuck: number;
+  overtime: number;
   to_do: number;
 }
 
 export interface OverdueTaskData {
   project_id: number;
   project_name: string;
-  overdue_working: number;
-  overdue_stuck: number;
+  overtime: number;
+  over_deadline: number;
 }
 
 export interface TasksByDueDateData {
@@ -224,7 +225,8 @@ export interface TasksByDueDateData {
   to_do: number;
   working_on_it: number;
   done: number;
-  stuck: number;
+  overtime: number;
+  over_deadline: number;
 }
 
 export interface BudgetStatusData {
@@ -252,13 +254,16 @@ export interface TechnicianDashboardData {
     to_do: number;
     working_on_it: number;
     done: number;
-    stuck: number;
-    overdue: number;
+    overtime: number;
+    over_deadline: number;
   };
   assigned_projects: {
     id: number;
     name: string;
+    client_name?: string;
+    client_address?: string;
     phase: ProjectPhase;
+    health_status?: HealthStatus | null;
     my_task_count: number;
     my_completed: number;
   }[];

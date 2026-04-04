@@ -1,4 +1,4 @@
-import type { Task, TaskStatus } from '../../types';
+import type { Task, TaskStatus, UserRole } from '../../types';
 import TaskStatusSelect from './TaskStatusSelect';
 
 interface Props {
@@ -6,23 +6,34 @@ interface Props {
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   onClick?: (task: Task) => void;
   isChanging?: boolean;
+  userRole?: UserRole;
+  columnId?: string;
 }
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
 }
 
-export default function KanbanCard({ task, onStatusChange, onClick, isChanging }: Props) {
+export default function KanbanCard({ task, onStatusChange, onClick, isChanging, userRole, columnId }: Props) {
   const isOverdue =
     task.due_date &&
     task.status !== 'done' &&
     new Date(task.due_date) < new Date();
 
+  const isOvertimeColumn = columnId === 'overtime';
+  const isOverDeadlineColumn = columnId === 'over_deadline';
+
+  const borderClass = isOverDeadlineColumn
+    ? 'border-red-300 bg-red-50/30'
+    : isOvertimeColumn
+    ? 'border-amber-300 bg-amber-50/30'
+    : isOverdue
+    ? 'border-red-300'
+    : 'border-gray-200';
+
   return (
     <div
-      className={`bg-white rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
-        isOverdue ? 'border-red-300' : 'border-gray-200'
-      }`}
+      className={`bg-white rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${borderClass}`}
       onClick={() => onClick?.(task)}
       onKeyDown={(e) => { if (e.key === 'Enter') onClick?.(task); }}
       role="button"
@@ -65,6 +76,7 @@ export default function KanbanCard({ task, onStatusChange, onClick, isChanging }
             onChange={(newStatus) => onStatusChange(task.id, newStatus)}
             disabled={isChanging}
             size="sm"
+            userRole={userRole}
           />
         </div>
       </div>
