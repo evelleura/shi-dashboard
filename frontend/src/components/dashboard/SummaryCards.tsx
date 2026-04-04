@@ -26,7 +26,7 @@ export default function SummaryCards({ summary }: Props) {
     },
     {
       label: 'Avg SPI',
-      value: summary.avg_spi != null ? summary.avg_spi.toFixed(3) : '--',
+      value: summary.avg_spi != null ? Number(summary.avg_spi).toFixed(3) : '--',
       color: spiColor,
       bg: 'bg-purple-50',
     },

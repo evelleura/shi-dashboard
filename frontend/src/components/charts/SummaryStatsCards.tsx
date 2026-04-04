@@ -57,7 +57,7 @@ export default function SummaryStatsCards({ summary }: Props) {
     },
     {
       label: 'Avg SPI',
-      value: summary.avg_spi != null ? summary.avg_spi.toFixed(3) : '--',
+      value: summary.avg_spi != null ? Number(summary.avg_spi).toFixed(3) : '--',
       sub: 'schedule performance',
       color: spiColor,
       bg: 'bg-purple-50',
