@@ -40,6 +40,9 @@ export default function KanbanCard({ task, onStatusChange, onClick, isChanging, 
       tabIndex={0}
       aria-label={`Task: ${task.name}`}
     >
+      {task.project_name && (
+        <p className="text-[10px] font-medium text-blue-500 uppercase tracking-wide mb-1 truncate">{task.project_name}</p>
+      )}
       <div className="flex items-start justify-between gap-2 mb-2">
         <h4 className="text-sm font-medium text-gray-900 line-clamp-2 flex-1">{task.name}</h4>
         {task.evidence_count != null && task.evidence_count > 0 && (

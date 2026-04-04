@@ -411,32 +411,42 @@ router.get('/technician', authenticate, async (req: AuthRequest, res: Response) 
       [userId]
     );
 
-    // My assigned projects with task counts
+    // My assigned projects with client info and task counts
     const assignedProjects = await query(
       `SELECT
         p.id, p.name, p.phase, p.start_date, p.end_date,
+        p.target_description, p.project_value,
+        c.name AS client_name, c.address AS client_address, c.phone AS client_phone,
         ph.spi_value, ph.status AS health_status,
         COUNT(t.id) FILTER (WHERE t.assigned_to = $1)::int AS my_task_count,
         COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'done')::int AS my_completed
       FROM projects p
       JOIN project_assignments pa ON pa.project_id = p.id AND pa.user_id = $1
+      LEFT JOIN clients c ON c.id = p.client_id
       LEFT JOIN project_health ph ON ph.project_id = p.id
       LEFT JOIN tasks t ON t.project_id = p.id
       WHERE p.status = 'active'
-      GROUP BY p.id, p.name, p.phase, p.start_date, p.end_date, ph.spi_value, ph.status
+      GROUP BY p.id, p.name, p.phase, p.start_date, p.end_date,
+        p.target_description, p.project_value,
+        c.name, c.address, c.phone,
+        ph.spi_value, ph.status
       ORDER BY p.end_date ASC`,
       [userId]
     );
 
-    // Recent tasks (last 10 updated)
+    // All tasks assigned to this technician (with full details)
     const recentTasks = await query(
-      `SELECT t.id, t.name, t.status, t.due_date, t.updated_at,
-        p.name AS project_name, p.id AS project_id
+      `SELECT t.*,
+        u.name AS assigned_to_name,
+        p.name AS project_name,
+        COUNT(te.id)::int AS evidence_count
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
+      LEFT JOIN users u ON u.id = t.assigned_to
+      LEFT JOIN task_evidence te ON te.task_id = t.id
       WHERE t.assigned_to = $1 AND p.status = 'active'
-      ORDER BY t.updated_at DESC
-      LIMIT 10`,
+      GROUP BY t.id, u.name, p.name
+      ORDER BY t.sort_order ASC, t.due_date ASC NULLS LAST`,
       [userId]
     );
 
