@@ -1,6 +1,6 @@
 import Modal from '../ui/Modal';
 import TaskStatusSelect from './TaskStatusSelect';
-import type { Task, TaskStatus } from '../../types';
+import type { Task, TaskStatus, UserRole } from '../../types';
 
 interface Props {
   task: Task | null;
@@ -8,16 +8,19 @@ interface Props {
   onClose: () => void;
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   isChanging?: boolean;
+  userRole?: UserRole;
 }
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-export default function TaskDetailModal({ task, open, onClose, onStatusChange, isChanging }: Props) {
+export default function TaskDetailModal({ task, open, onClose, onStatusChange, isChanging, userRole }: Props) {
   if (!task) return null;
 
   const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
+  const isOvertime = isOverdue && task.status === 'working_on_it';
+  const isOverDeadline = isOverdue && task.status === 'to_do';
 
   return (
     <Modal open={open} onClose={onClose} title="Task Details" maxWidth="max-w-xl">
@@ -31,9 +34,16 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
               onChange={(s) => onStatusChange(task.id, s)}
               disabled={isChanging}
               size="md"
+              userRole={userRole}
             />
             {task.is_survey_task && (
               <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full font-medium">Survey Task</span>
+            )}
+            {isOvertime && (
+              <span className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full font-medium">Overtime</span>
+            )}
+            {isOverDeadline && (
+              <span className="text-xs text-red-700 bg-red-100 px-2 py-0.5 rounded-full font-medium">Over Deadline</span>
             )}
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { Task, TaskStatus } from '../../types';
+import type { Task, TaskStatus, UserRole } from '../../types';
 import TaskStatusSelect from './TaskStatusSelect';
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
   onTaskClick?: (task: Task) => void;
   changingTaskId?: number;
   showProject?: boolean;
+  userRole?: UserRole;
 }
 
 type SortKey = 'name' | 'status' | 'assigned_to_name' | 'due_date' | 'budget';
@@ -16,7 +17,19 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-export default function TaskTable({ tasks, onStatusChange, onTaskClick, changingTaskId, showProject = false }: Props) {
+function getTaskUrgency(task: Task): 'overtime' | 'over_deadline' | null {
+  if (task.status === 'done' || !task.due_date) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(task.due_date);
+  due.setHours(0, 0, 0, 0);
+  if (due >= today) return null;
+  if (task.status === 'working_on_it') return 'overtime';
+  if (task.status === 'to_do') return 'over_deadline';
+  return null;
+}
+
+export default function TaskTable({ tasks, onStatusChange, onTaskClick, changingTaskId, showProject = false, userRole }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>('sort_order' as SortKey);
   const [sortAsc, setSortAsc] = useState(true);
 
@@ -29,7 +42,7 @@ export default function TaskTable({ tasks, onStatusChange, onTaskClick, changing
           cmp = a.name.localeCompare(b.name);
           break;
         case 'status': {
-          const order: Record<string, number> = { stuck: 0, working_on_it: 1, to_do: 2, done: 3 };
+          const order: Record<string, number> = { working_on_it: 0, to_do: 1, done: 2 };
           cmp = (order[a.status] ?? 9) - (order[b.status] ?? 9);
           break;
         }
@@ -102,18 +115,39 @@ export default function TaskTable({ tasks, onStatusChange, onTaskClick, changing
           </thead>
           <tbody className="divide-y divide-gray-100">
             {sorted.map((task) => {
+              const urgency = getTaskUrgency(task);
               const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
+              const rowBg = urgency === 'over_deadline'
+                ? 'bg-red-50/50 hover:bg-red-50'
+                : urgency === 'overtime'
+                ? 'bg-amber-50/50 hover:bg-amber-50'
+                : 'hover:bg-gray-50';
+
               return (
                 <tr
                   key={task.id}
-                  className="hover:bg-gray-50 transition-colors cursor-pointer"
+                  className={`${rowBg} transition-colors cursor-pointer`}
                   onClick={() => onTaskClick?.(task)}
                 >
                   <td className="px-3 py-2.5">
-                    <p className="text-sm font-medium text-gray-900">{task.name}</p>
-                    {task.description && (
-                      <p className="text-xs text-gray-400 truncate max-w-xs">{task.description}</p>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{task.name}</p>
+                        {task.description && (
+                          <p className="text-xs text-gray-400 truncate max-w-xs">{task.description}</p>
+                        )}
+                      </div>
+                      {urgency === 'overtime' && (
+                        <span className="shrink-0 inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">
+                          Overtime
+                        </span>
+                      )}
+                      {urgency === 'over_deadline' && (
+                        <span className="shrink-0 inline-flex items-center gap-0.5 text-[10px] font-medium text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full">
+                          Over Deadline
+                        </span>
+                      )}
+                    </div>
                   </td>
                   {showProject && (
                     <td className="px-3 py-2.5 text-sm text-gray-600">{task.project_name ?? '--'}</td>
@@ -123,6 +157,7 @@ export default function TaskTable({ tasks, onStatusChange, onTaskClick, changing
                       value={task.status}
                       onChange={(newStatus) => onStatusChange(task.id, newStatus)}
                       disabled={changingTaskId === task.id}
+                      userRole={userRole}
                     />
                   </td>
                   <td className="px-3 py-2.5 text-sm text-gray-600">

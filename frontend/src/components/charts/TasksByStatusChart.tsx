@@ -2,17 +2,19 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { useTasksByStatusChart } from '../../hooks/useDashboard';
 
 const STATUS_COLORS: Record<string, string> = {
-  to_do: '#9ca3af',
+  to_do: '#94a3b8',
   working_on_it: '#3b82f6',
-  done: '#06d6a0',
-  stuck: '#ef4444',
+  done: '#22c55e',
+  overtime: '#f59e0b',
+  over_deadline: '#ef4444',
 };
 
 const STATUS_LABELS: Record<string, string> = {
   to_do: 'To Do',
   working_on_it: 'Working On It',
   done: 'Done',
-  stuck: 'Stuck',
+  overtime: 'Overtime',
+  over_deadline: 'Over Deadline',
 };
 
 export default function TasksByStatusChart() {
@@ -32,7 +34,7 @@ export default function TasksByStatusChart() {
   const chartData = (rawData ?? []).map((d) => ({
     name: STATUS_LABELS[d.status] ?? d.status,
     value: d.count,
-    color: STATUS_COLORS[d.status] ?? '#9ca3af',
+    color: STATUS_COLORS[d.status] ?? '#94a3b8',
   })).filter((d) => d.value > 0);
 
   if (chartData.length === 0) {

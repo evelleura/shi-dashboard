@@ -36,8 +36,8 @@ export default function OverdueTasksChart() {
           <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
           <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }} />
           <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: '12px' }} />
-          <Bar dataKey="overdue_working" fill="#f59e0b" name="Overdue (Working)" />
-          <Bar dataKey="overdue_stuck" fill="#ef4444" name="Overdue (Stuck)" />
+          <Bar dataKey="overtime" fill="#f59e0b" name="Overtime" />
+          <Bar dataKey="over_deadline" fill="#ef4444" name="Over Deadline" />
         </BarChart>
       </ResponsiveContainer>
     </div>

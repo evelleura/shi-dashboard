@@ -36,10 +36,11 @@ export default function TasksByDueDateChart() {
           <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
           <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }} />
           <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: '12px' }} />
-          <Bar dataKey="done" stackId="a" fill="#06d6a0" name="Done" />
+          <Bar dataKey="done" stackId="a" fill="#22c55e" name="Done" />
           <Bar dataKey="working_on_it" stackId="a" fill="#3b82f6" name="Working On It" />
-          <Bar dataKey="stuck" stackId="a" fill="#ef4444" name="Stuck" />
-          <Bar dataKey="to_do" stackId="a" fill="#9ca3af" name="To Do" />
+          <Bar dataKey="overtime" stackId="a" fill="#f59e0b" name="Overtime" />
+          <Bar dataKey="over_deadline" stackId="a" fill="#ef4444" name="Over Deadline" />
+          <Bar dataKey="to_do" stackId="a" fill="#94a3b8" name="To Do" />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -7,9 +7,10 @@ import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import ProjectsPage from './pages/ProjectsPage';
-import ReportPage from './pages/ReportPage';
 import ClientsPage from './pages/ClientsPage';
 import TechnicianDashboard from './pages/TechnicianDashboard';
+import TechnicianProjectsPage from './pages/TechnicianProjectsPage';
+import TechnicianTasksPage from './pages/TechnicianTasksPage';
 import Layout from './components/ui/Layout';
 import type { UserRole } from './types';
 
@@ -76,18 +77,20 @@ export default function App() {
             }
           />
           <Route
-            path="/projects/:id"
-            element={
-              <ProtectedRoute roles={['manager', 'admin']}>
-                <ProjectDetailPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/clients"
             element={
               <ProtectedRoute roles={['manager', 'admin']}>
                 <ClientsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Project detail -- accessible by all authenticated users (technicians view their assigned projects) */}
+          <Route
+            path="/projects/:id"
+            element={
+              <ProtectedRoute>
+                <ProjectDetailPage />
               </ProtectedRoute>
             }
           />
@@ -102,10 +105,18 @@ export default function App() {
             }
           />
           <Route
-            path="/report"
+            path="/my-projects"
             element={
               <ProtectedRoute roles={['technician', 'admin']}>
-                <ReportPage />
+                <TechnicianProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-tasks"
+            element={
+              <ProtectedRoute roles={['technician', 'admin']}>
+                <TechnicianTasksPage />
               </ProtectedRoute>
             }
           />
