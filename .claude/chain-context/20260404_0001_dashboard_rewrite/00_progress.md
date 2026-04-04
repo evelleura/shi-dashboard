@@ -1,9 +1,9 @@
 ---
 task_id: "20260404_0001_dashboard_rewrite"
 created: "2026-04-04T02:00:00Z"
-last_updated: "2026-04-04T06:00:00Z"
-status: "complete"
-current_agent: "tanaka"
+last_updated: "2026-04-04T07:00:00Z"
+status: "in_progress"
+current_agent: "sato"
 ---
 
 # Task: Rewrite SHI Dashboard to Match Thesis + User Stories
@@ -32,6 +32,7 @@ Goal: Dashboard for project management with all charts and metrics needed.
 - [x] Complete rewrite strategy designed (agent: yamamoto, file: 05_yamamoto_strategy.md)
 - [x] Backend rewrite: schema migration, types, SPI calculator, 5 new routes, 3 modified routes, app.ts, package.json (agent: sato, file: 06_sato_backend.md)
 - [x] Frontend rewrite: 49 files total -- types, API service, 7 hooks, 8 charts, 7 task/kanban components, 3 project components, 2 evidence components, 6 UI components, 8 pages, layout with sidebar, routing (agent: takahashi, file: 07_takahashi_frontend.md)
+- [x] Remove 'stuck' task status from backend, replace with computed overtime/over_deadline (agent: sato, file: 08_sato_remove_stuck.md)
 
 ## Blockers
 - (resolved) Thesis RTF parsed successfully via Python state-machine extractor
