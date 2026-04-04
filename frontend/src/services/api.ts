@@ -2,7 +2,6 @@ import axios from 'axios';
 import type {
   ApiResponse,
   DashboardData,
-  DailyReport,
   LoginResponse,
   Project,
   ProjectWithDetail,
@@ -19,7 +18,6 @@ import type {
   CreateClientData,
   CreateMaterialData,
   CreateBudgetItemData,
-  SubmitReportData,
   TasksByStatusData,
   TasksByOwnerData,
   OverdueTaskData,
@@ -267,18 +265,6 @@ export const updateBudgetItem = async (id: number, data: Partial<CreateBudgetIte
 
 export const deleteBudgetItem = async (id: number): Promise<void> => {
   await api.delete(`/budget/${id}`);
-};
-
-// ==================== Daily Reports ====================
-
-export const submitReport = async (data: SubmitReportData): Promise<{ report: DailyReport }> => {
-  const res = await api.post<ApiResponse<{ report: DailyReport }>>('/daily-reports', data);
-  return res.data.data!;
-};
-
-export const getReports = async (params?: { project_id?: number; from?: string; to?: string }): Promise<DailyReport[]> => {
-  const res = await api.get<ApiResponse<DailyReport[]>>('/daily-reports', { params });
-  return res.data.data!;
 };
 
 // ==================== Dashboard ====================

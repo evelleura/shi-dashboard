@@ -108,19 +108,6 @@ export interface BudgetItem {
   created_at?: string;
 }
 
-export interface DailyReport {
-  id: number;
-  project_id: number;
-  task_id?: number;
-  project_name?: string;
-  report_date: string;
-  progress_percentage: number;
-  constraints?: string;
-  created_by: number;
-  reporter_name?: string;
-  created_at?: string;
-}
-
 export interface ProjectHealth {
   project_id: number;
   spi_value: number;
@@ -184,7 +171,6 @@ export interface ProjectWithDetail extends Project {
   tasks: Task[];
   materials: Material[];
   budget_items: BudgetItem[];
-  daily_reports: DailyReport[];
   assigned_technicians: User[];
 }
 
@@ -345,14 +331,6 @@ export interface CreateBudgetItemData {
   description?: string;
   amount: number;
   is_actual: boolean;
-}
-
-export interface SubmitReportData {
-  project_id: number;
-  task_id?: number;
-  report_date: string;
-  progress_percentage: number;
-  constraints?: string;
 }
 
 // === API Types ===

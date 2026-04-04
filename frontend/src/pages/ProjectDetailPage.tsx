@@ -19,7 +19,7 @@ import EvidenceUploader from '../components/evidence/EvidenceUploader';
 import type { Task, TaskStatus, CreateTaskData } from '../types';
 import { useAuth } from '../hooks/useAuth';
 
-type TabId = 'tasks' | 'budget' | 'materials' | 'reports' | 'evidence' | 'charts';
+type TabId = 'tasks' | 'budget' | 'materials' | 'evidence' | 'charts';
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -84,7 +84,6 @@ export default function ProjectDetailPage() {
     { id: 'tasks', label: 'Tasks', count: project.tasks?.length ?? 0 },
     { id: 'budget', label: 'Budget', count: project.budget_items?.length ?? 0 },
     { id: 'materials', label: 'Materials', count: project.materials?.length ?? 0 },
-    { id: 'reports', label: 'Reports', count: project.daily_reports?.length ?? 0 },
     { id: 'evidence', label: 'Evidence' },
     { id: 'charts', label: 'Charts' },
   ];
@@ -280,34 +279,6 @@ export default function ProjectDetailPage() {
               materials={project.materials ?? []}
               canEdit={isManager}
             />
-          </div>
-        )}
-
-        {activeTab === 'reports' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">
-              Daily Reports ({project.daily_reports?.length ?? 0})
-            </h3>
-            {(project.daily_reports ?? []).length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">No reports yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {project.daily_reports.map((r) => (
-                  <div key={r.id} className="flex gap-4 p-3 rounded-lg bg-gray-50">
-                    <div className="text-center min-w-16">
-                      <p className="text-xs text-gray-400">
-                        {new Date(r.report_date).toLocaleDateString('id-ID', { month: 'short', day: '2-digit' })}
-                      </p>
-                      <p className="text-lg font-bold text-blue-600">{Number(r.progress_percentage).toFixed(0)}%</p>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-600">{r.reporter_name}</p>
-                      {r.constraints && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{r.constraints}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         )}
 

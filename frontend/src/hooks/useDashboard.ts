@@ -1,8 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   getDashboard,
-  submitReport,
-  getReports,
   getTechnicians,
   getTasksByStatus,
   getTasksByOwner,
@@ -12,11 +10,9 @@ import {
   getEarnedValue,
   getTechnicianDashboard,
 } from '../services/api';
-import type { SubmitReportData } from '../types';
 
 export const QUERY_KEYS = {
   dashboard: ['dashboard'] as const,
-  reports: (params?: object) => ['reports', params] as const,
   technicians: ['technicians'] as const,
   chartTasksByStatus: ['charts', 'tasks-by-status'] as const,
   chartTasksByOwner: ['charts', 'tasks-by-owner'] as const,
@@ -41,26 +37,6 @@ export function useTechnicians() {
     queryKey: QUERY_KEYS.technicians,
     queryFn: getTechnicians,
     staleTime: 1000 * 60 * 5,
-  });
-}
-
-export function useReports(params?: { project_id?: number; from?: string; to?: string }) {
-  return useQuery({
-    queryKey: QUERY_KEYS.reports(params),
-    queryFn: () => getReports(params),
-    staleTime: 1000 * 60,
-  });
-}
-
-export function useSubmitReport() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (data: SubmitReportData) => submitReport(data),
-    onSuccess: (_data, variables) => {
-      void qc.invalidateQueries({ queryKey: ['projects', variables.project_id] });
-      void qc.invalidateQueries({ queryKey: QUERY_KEYS.dashboard });
-      void qc.invalidateQueries({ queryKey: QUERY_KEYS.reports() });
-    },
   });
 }
 
