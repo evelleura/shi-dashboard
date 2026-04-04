@@ -1,9 +1,9 @@
 ---
 task_id: "20260404_0001_dashboard_rewrite"
 created: "2026-04-04T02:00:00Z"
-last_updated: "2026-04-04T07:00:00Z"
+last_updated: "2026-04-04T09:00:00Z"
 status: "in_progress"
-current_agent: "sato"
+current_agent: "takahashi"
 ---
 
 # Task: Rewrite SHI Dashboard to Match Thesis + User Stories
@@ -20,9 +20,10 @@ Goal: Dashboard for project management with all charts and metrics needed.
 - [x] Phase 4: IMPLEMENT -- Backend rewrite (schema, API, SPI engine)
 - [x] Phase 5: IMPLEMENT -- Frontend rewrite (dashboard, forms, charts)
 - [x] Phase 6: VERIFY -- TypeScript compilation passes (0 errors both sides)
+- [x] Phase 7: IMPLEMENT -- Remove stuck status, redesign technician UX, add charts
 
 ## In Progress
-(returning to tanaka -- frontend complete, ready for verification)
+(returning to parent -- frontend overhaul complete)
 
 ## Completed
 - [x] User stories extraction + requirements analysis (agent: naomi, file: 02_naomi_user_stories.md)
@@ -33,6 +34,7 @@ Goal: Dashboard for project management with all charts and metrics needed.
 - [x] Backend rewrite: schema migration, types, SPI calculator, 5 new routes, 3 modified routes, app.ts, package.json (agent: sato, file: 06_sato_backend.md)
 - [x] Frontend rewrite: 49 files total -- types, API service, 7 hooks, 8 charts, 7 task/kanban components, 3 project components, 2 evidence components, 6 UI components, 8 pages, layout with sidebar, routing (agent: takahashi, file: 07_takahashi_frontend.md)
 - [x] Remove 'stuck' task status from backend, replace with computed overtime/over_deadline (agent: sato, file: 08_sato_remove_stuck.md)
+- [x] Frontend overhaul: remove stuck, redesign technician UX (3 pages), 5-column Kanban, role-based status, charts on tech dashboard (agent: takahashi, file: 09_takahashi_frontend_overhaul.md)
 
 ## Blockers
 - (resolved) Thesis RTF parsed successfully via Python state-machine extractor
@@ -54,3 +56,8 @@ Goal: Dashboard for project management with all charts and metrics needed.
 - STRATEGY DECISION: Backend-first implementation order (schema -> SPI -> routes -> frontend)
 - STRATEGY DECISION: Earned value chart computed on read (no snapshot table needed for thesis scope)
 - STRATEGY DECISION: Click-to-change task status (not drag-and-drop) for Kanban -- simpler for thesis
+- FRONTEND OVERHAUL: Removed 'stuck' status entirely. Replaced with computed overtime (working_on_it + past due) and over_deadline (to_do + past due)
+- FRONTEND OVERHAUL: Technician sidebar redesigned: Dashboard, My Projects, My Tasks (removed Daily Report)
+- FRONTEND OVERHAUL: Kanban now 5 columns: To Do, Working On It, Done, Overtime (amber), Over Deadline (red)
+- FRONTEND OVERHAUL: Technicians cannot set status to 'done' -- only managers/admins can
+- FRONTEND OVERHAUL: TechnicianDashboard now has pie chart (task distribution) and bar chart (tasks per project)

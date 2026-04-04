@@ -18,7 +18,12 @@ export default function SummaryCards({ summary }: Props) {
     { label: 'Warning', value: summary.total_amber, color: 'text-yellow-600', bg: 'bg-yellow-50' },
     { label: 'On Track', value: summary.total_green, color: 'text-green-600', bg: 'bg-green-50' },
     { label: 'Total Tasks', value: summary.total_tasks, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-    { label: 'Stuck', value: summary.stuck_tasks, color: summary.stuck_tasks > 0 ? 'text-red-600' : 'text-gray-600', bg: summary.stuck_tasks > 0 ? 'bg-red-50' : 'bg-gray-50' },
+    {
+      label: 'Overtime',
+      value: summary.overtime_tasks,
+      color: summary.overtime_tasks > 0 ? 'text-amber-600' : 'text-gray-600',
+      bg: summary.overtime_tasks > 0 ? 'bg-amber-50' : 'bg-gray-50',
+    },
     {
       label: 'Avg SPI',
       value: summary.avg_spi != null ? summary.avg_spi.toFixed(3) : '--',

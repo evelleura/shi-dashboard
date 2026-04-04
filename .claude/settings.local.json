@@ -11,7 +11,8 @@
       "Bash(curl -sI \"https://get.enterprisedb.com/postgresql/postgresql-17.5-1-windows-x64-binaries.zip\")",
       "Bash(curl -sI \"https://get.enterprisedb.com/postgresql/postgresql-16.8-1-windows-x64-binaries.zip\")",
       "Bash(node -e \"const bcrypt = require\\(''bcryptjs''\\); bcrypt.hash\\(''password123'', 10\\).then\\(h => console.log\\(h\\)\\)\")",
-      "Bash(./node_modules/.bin/tsc --noEmit)"
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc.exe --noEmit)"
     ]
   }
 }

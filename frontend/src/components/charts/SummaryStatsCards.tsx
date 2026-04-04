@@ -72,12 +72,12 @@ export default function SummaryStatsCards({ summary }: Props) {
       border: 'border-indigo-200',
     },
     {
-      label: 'Stuck Tasks',
-      value: summary.stuck_tasks,
-      sub: 'blocked',
-      color: summary.stuck_tasks > 0 ? 'text-red-600' : 'text-gray-600',
-      bg: summary.stuck_tasks > 0 ? 'bg-red-50' : 'bg-gray-50',
-      border: summary.stuck_tasks > 0 ? 'border-red-200' : 'border-gray-200',
+      label: 'Overtime',
+      value: summary.overtime_tasks,
+      sub: 'working past due',
+      color: summary.overtime_tasks > 0 ? 'text-amber-600' : 'text-gray-600',
+      bg: summary.overtime_tasks > 0 ? 'bg-amber-50' : 'bg-gray-50',
+      border: summary.overtime_tasks > 0 ? 'border-amber-200' : 'border-gray-200',
     },
     {
       label: 'Overdue',

@@ -145,7 +145,7 @@ export default function TechnicianDashboard() {
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={120} />
                 <Tooltip
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
-                  formatter={(value: number, name: string) => [value, name === 'tasks' ? 'Total Tasks' : 'Completed']}
+                  formatter={(value, name) => [String(value), name === 'tasks' ? 'Total Tasks' : 'Completed']}
                 />
                 <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: '12px' }} />
                 <Bar dataKey="tasks" fill="#3b82f6" name="Total Tasks" radius={[0, 4, 4, 0]} />

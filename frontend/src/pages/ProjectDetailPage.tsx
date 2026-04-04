@@ -133,7 +133,7 @@ export default function ProjectDetailPage() {
             color: (project.health?.deviation_percent ?? 0) >= 0 ? 'text-green-600' : 'text-red-600',
           },
           { label: 'Tasks Done', value: `${project.health?.completed_tasks ?? 0}/${project.health?.total_tasks ?? 0}`, color: 'text-gray-700' },
-          { label: 'Stuck', value: project.health?.stuck_tasks ?? 0, color: (project.health?.stuck_tasks ?? 0) > 0 ? 'text-red-600' : 'text-gray-600' },
+          { label: 'Overtime', value: project.health?.overtime_tasks ?? 0, color: (project.health?.overtime_tasks ?? 0) > 0 ? 'text-amber-600' : 'text-gray-600' },
           { label: 'Overdue', value: project.health?.overdue_tasks ?? 0, color: (project.health?.overdue_tasks ?? 0) > 0 ? 'text-orange-600' : 'text-gray-600' },
         ].map((m) => (
           <div key={m.label} className="bg-white rounded-xl border border-gray-200 p-3 text-center">
@@ -249,6 +249,7 @@ export default function ProjectDetailPage() {
                 onStatusChange={handleStatusChange}
                 onTaskClick={setSelectedTask}
                 changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
+                userRole={user?.role}
               />
             ) : (
               <TaskTable
@@ -256,6 +257,7 @@ export default function ProjectDetailPage() {
                 onStatusChange={handleStatusChange}
                 onTaskClick={setSelectedTask}
                 changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
+                userRole={user?.role}
               />
             )}
           </div>
@@ -359,6 +361,7 @@ export default function ProjectDetailPage() {
         onClose={() => setSelectedTask(null)}
         onStatusChange={handleStatusChange}
         isChanging={changeStatus.isPending}
+        userRole={user?.role}
       />
 
       {/* Create Task Modal */}
