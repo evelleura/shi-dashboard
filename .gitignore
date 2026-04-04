@@ -14,3 +14,5 @@ server/uploads/*
 # Portable PostgreSQL (auto-installed by run.py)
 postgres/
 postgres-download.zip
+
+ACCOUNTS.md
