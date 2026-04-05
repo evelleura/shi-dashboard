@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { useEscalationSummary } from '../../hooks/useEscalations';
 import type { ReactNode } from 'react';
@@ -57,14 +58,15 @@ function EscalationsIcon() {
 
 export default function Layout({ children }: Props) {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data: escalationSummary } = useEscalationSummary();
   const openEscalations = escalationSummary?.open ?? 0;
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    router.push('/login');
   };
 
   const isManager = user?.role === 'manager' || user?.role === 'admin';
@@ -108,28 +110,29 @@ export default function Layout({ children }: Props) {
 
           {/* Nav Links */}
           <nav className="flex-1 px-3 py-4 space-y-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={() => setSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+            {navItems.map((item) => {
+              const isActive = pathname === item.to;
+              return (
+                <Link
+                  key={item.to}
+                  href={item.to}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
                     isActive
                       ? 'bg-blue-600 text-white font-medium'
                       : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                  }`
-                }
-              >
-                {item.icon}
-                {item.label}
-                {item.badge != null && item.badge > 0 && (
-                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center" aria-label={`${item.badge} open`}>
-                    {item.badge}
-                  </span>
-                )}
-              </NavLink>
-            ))}
+                  }`}
+                >
+                  {item.icon}
+                  {item.label}
+                  {item.badge != null && item.badge > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center" aria-label={`${item.badge} open`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* User info + logout */}

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import type { DashboardProject } from '../../types';
 import StatusBadge from '../ui/StatusBadge';
 import ProgressBar from '../ui/ProgressBar';
@@ -24,7 +24,7 @@ export default function ProjectCard({ project }: Props) {
     : 0;
 
   return (
-    <Link to={`/projects/${project.id}`}>
+    <Link href={`/projects/${project.id}`}>
       <div className={`bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 ${borderClass} p-4 hover:shadow-md transition-shadow cursor-pointer`}>
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">

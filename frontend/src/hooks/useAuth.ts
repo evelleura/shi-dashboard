@@ -4,10 +4,14 @@ import type { User } from '../types';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === 'undefined') return null;
     const stored = localStorage.getItem('user');
     return stored ? (JSON.parse(stored) as User) : null;
   });
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('token');
+  });
 
   const login = useCallback(async (email: string, password: string) => {
     const data = await apiLogin(email, password);

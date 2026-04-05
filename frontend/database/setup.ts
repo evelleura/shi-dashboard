@@ -1,12 +1,14 @@
 /**
  * Database setup script
- * Run: npx ts-node database/setup.ts
+ * Run: npx tsx database/setup.ts
  */
 import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
+// Load .env.local first (Next.js convention), fallback to .env
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 dotenv.config();
 
 const pool = new Pool({
@@ -20,18 +22,19 @@ const pool = new Pool({
 async function runSQL(filePath: string) {
   const sql = fs.readFileSync(filePath, 'utf-8');
   await pool.query(sql);
-  console.log(`✓ Executed: ${path.basename(filePath)}`);
+  console.log(`Done: ${path.basename(filePath)}`);
 }
 
 async function main() {
   console.log('Setting up database...');
   try {
-    await runSQL(path.join(__dirname, 'schema.sql'));
+    const scriptDir = path.resolve(path.dirname(process.argv[1] || __filename));
+    await runSQL(path.join(scriptDir, 'schema.sql'));
     console.log('Schema created.');
 
     const seedArg = process.argv.includes('--seed');
     if (seedArg) {
-      await runSQL(path.join(__dirname, 'seed.sql'));
+      await runSQL(path.join(scriptDir, 'seed.sql'));
       console.log('Seed data inserted.');
     }
 

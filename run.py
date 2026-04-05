@@ -19,10 +19,9 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-SERVER_DIR = ROOT / "server"
-FRONTEND_DIR = ROOT / "frontend"
-ENV_FILE = SERVER_DIR / ".env"
-ENV_EXAMPLE = SERVER_DIR / ".env.example"
+APP_DIR = ROOT / "frontend"
+ENV_FILE = APP_DIR / ".env.local"
+ENV_EXAMPLE = APP_DIR / ".env.example"
 PG_DIR = ROOT / "postgres"
 PG_BIN = PG_DIR / "bin"
 PG_DATA = PG_DIR / "data"
@@ -70,19 +69,6 @@ def pg_env() -> dict:
     elif PLATFORM == "linux":
         env["LD_LIBRARY_PATH"] = lib_dir
     return env
-
-
-def get_native_binding_name() -> str:
-    """Returns the expected rolldown native binding directory name for this platform."""
-    if PLATFORM == "win32":
-        return "binding-win32-x64-msvc"
-    elif PLATFORM == "darwin":
-        if ARCH == "arm64":
-            return "binding-darwin-arm64"
-        return "binding-darwin-x64"
-    elif PLATFORM == "linux":
-        return "binding-linux-x64-gnu"
-    return "binding-unknown"
 
 
 def make_executable(path: Path):
@@ -341,49 +327,23 @@ def reset_database():
 
 # -- Node/Bun ----------------------------------------------------------------
 
-def check_native_bindings() -> bool:
-    """Verify Vite's rolldown native binding exists and isn't empty."""
-    binding_name = get_native_binding_name()
-    binding_dir = FRONTEND_DIR / "node_modules" / "@rolldown" / binding_name
-    if not binding_dir.exists():
-        return False
-    # Directory exists but might be empty (interrupted install)
-    return any(binding_dir.iterdir())
-
-
 def install_deps(bun: str):
     print("\n=== Dependencies ===")
-    server_ok = (SERVER_DIR / "node_modules").exists()
-    frontend_ok = (FRONTEND_DIR / "node_modules").exists() and check_native_bindings()
-
-    if not frontend_ok and (FRONTEND_DIR / "node_modules").exists():
-        print("  Broken native bindings detected, reinstalling frontend...")
-        shutil.rmtree(FRONTEND_DIR / "node_modules")
-        for f in [FRONTEND_DIR / "package-lock.json", FRONTEND_DIR / "bun.lock", FRONTEND_DIR / "bun.lockb"]:
-            if f.exists():
-                f.unlink()
-
-    if server_ok and frontend_ok:
+    if (APP_DIR / "node_modules").exists():
         print("[OK] Already installed (use --clean to reinstall)")
         return
 
-    procs = []
-    if not server_ok:
-        procs.append(("server", subprocess.Popen([bun, "install"], cwd=SERVER_DIR)))
-    if not frontend_ok:
-        procs.append(("frontend", subprocess.Popen([bun, "install"], cwd=FRONTEND_DIR)))
-
-    for name, p in procs:
-        if p.wait() != 0:
-            print(f"[ERROR] bun install failed in {name}/")
-            sys.exit(1)
-        print(f"  [OK] {name}")
+    p = subprocess.Popen([bun, "install"], cwd=APP_DIR)
+    if p.wait() != 0:
+        print("[ERROR] bun install failed")
+        sys.exit(1)
+    print("  [OK] Dependencies installed")
 
 
 def setup_db(bun: str, seed: bool = False):
     print("\n=== Schema ===")
     cmd = [bun, "run", "db:seed"] if seed else [bun, "run", "db:setup"]
-    result = run(cmd, cwd=SERVER_DIR, check=False)
+    result = run(cmd, cwd=APP_DIR, check=False)
     if result.returncode != 0:
         print("[ERROR] Schema setup failed")
         sys.exit(1)
@@ -393,25 +353,21 @@ def setup_db(bun: str, seed: bool = False):
 # -- Services -----------------------------------------------------------------
 
 def start_services(bun: str):
-    print("\n=== Services ===")
-    print("  Backend:  http://localhost:3000")
-    print("  Frontend: http://localhost:5173")
+    print("\n=== Next.js Dev Server ===")
+    print("  App: http://localhost:3000")
     print("  Ctrl+C to stop\n")
 
-    backend = subprocess.Popen([bun, "run", "dev"], cwd=SERVER_DIR)
-    time.sleep(1)
-    frontend = subprocess.Popen([bun, "run", "dev"], cwd=FRONTEND_DIR)
+    app = subprocess.Popen([bun, "run", "dev"], cwd=APP_DIR)
 
     def shutdown(signum=None, frame=None):
         print("\n\nShutting down...")
-        for name, proc in [("frontend", frontend), ("backend", backend)]:
-            if proc.poll() is None:
-                proc.terminate()
-                try:
-                    proc.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    proc.kill()
-                print(f"  [{name}] stopped")
+        if app.poll() is None:
+            app.terminate()
+            try:
+                app.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                app.kill()
+            print("  [next.js] stopped")
         stop_postgres()
         sys.exit(0)
 
@@ -419,11 +375,8 @@ def start_services(bun: str):
     signal.signal(signal.SIGTERM, shutdown)
 
     while True:
-        if backend.poll() is not None:
-            print(f"[WARNING] Backend exited ({backend.returncode})")
-            shutdown()
-        if frontend.poll() is not None:
-            print(f"[WARNING] Frontend exited ({frontend.returncode})")
+        if app.poll() is not None:
+            print(f"[WARNING] Next.js exited ({app.returncode})")
             shutdown()
         time.sleep(1)
 
@@ -442,11 +395,11 @@ def main():
 
     if "--clean" in args:
         print("\n=== Clean ===")
-        for d in [SERVER_DIR / "node_modules", FRONTEND_DIR / "node_modules"]:
+        for d in [APP_DIR / "node_modules", APP_DIR / ".next"]:
             if d.exists():
                 shutil.rmtree(d)
-                print(f"  Removed {d.parent.name}/{d.name}")
-        for f in [SERVER_DIR / "package-lock.json", FRONTEND_DIR / "package-lock.json"]:
+                print(f"  Removed {d.name}")
+        for f in [APP_DIR / "package-lock.json", APP_DIR / "bun.lock", APP_DIR / "bun.lockb"]:
             if f.exists():
                 f.unlink()
 
@@ -468,7 +421,7 @@ def main():
         return
 
     # 3. Uploads dir
-    (SERVER_DIR / "uploads").mkdir(exist_ok=True)
+    (APP_DIR / "uploads").mkdir(exist_ok=True)
 
     # 4. Database schema
     if "--skip-db" not in args:
