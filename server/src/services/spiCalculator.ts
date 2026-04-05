@@ -56,8 +56,8 @@ export async function getTaskCounts(projectId: number): Promise<{
     `SELECT
       COUNT(*)::int AS total,
       COUNT(*) FILTER (WHERE status = 'done')::int AS completed,
-      COUNT(*) FILTER (WHERE status = 'working_on_it')::int AS working,
-      COUNT(*) FILTER (WHERE status = 'working_on_it' AND due_date < CURRENT_DATE)::int AS overtime,
+      COUNT(*) FILTER (WHERE status IN ('working_on_it', 'in_progress'))::int AS working,
+      COUNT(*) FILTER (WHERE status IN ('working_on_it', 'in_progress') AND due_date < CURRENT_DATE)::int AS overtime,
       COUNT(*) FILTER (WHERE due_date < CURRENT_DATE AND status NOT IN ('done'))::int AS overdue
     FROM tasks
     WHERE project_id = $1`,

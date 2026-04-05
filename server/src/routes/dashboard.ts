@@ -235,7 +235,9 @@ router.get('/charts/tasks-by-due-date', authenticate, authorize('manager', 'admi
       `SELECT
         TO_CHAR(t.due_date, 'YYYY-MM') AS month,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do,
+        COUNT(*) FILTER (WHERE t.status = 'in_progress')::int AS in_progress,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working_on_it,
+        COUNT(*) FILTER (WHERE t.status = 'review')::int AS review,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS done
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
@@ -417,9 +419,11 @@ router.get('/technician', authenticate, async (req: AuthRequest, res: Response) 
       `SELECT
         COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do,
+        COUNT(*) FILTER (WHERE t.status = 'in_progress')::int AS in_progress,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working_on_it,
+        COUNT(*) FILTER (WHERE t.status = 'review')::int AS review,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS done,
-        COUNT(*) FILTER (WHERE t.status = 'working_on_it' AND t.due_date < CURRENT_DATE)::int AS overtime,
+        COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress') AND t.due_date < CURRENT_DATE)::int AS overtime,
         COUNT(*) FILTER (WHERE t.status = 'to_do' AND t.due_date < CURRENT_DATE)::int AS over_deadline,
         COUNT(*) FILTER (WHERE t.due_date < CURRENT_DATE AND t.status NOT IN ('done'))::int AS overdue
       FROM tasks t
