@@ -439,7 +439,8 @@ router.get('/technician', authenticate, async (req: AuthRequest, res: Response) 
       `SELECT t.*,
         u.name AS assigned_to_name,
         p.name AS project_name,
-        COUNT(te.id)::int AS evidence_count
+        COUNT(te.id)::int AS evidence_count,
+        (SELECT COUNT(*)::int FROM task_activities WHERE task_id = t.id) AS activity_count
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
       LEFT JOIN users u ON u.id = t.assigned_to

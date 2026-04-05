@@ -5,6 +5,7 @@ export type ProjectPhase = 'survey' | 'execution';
 export type HealthStatus = 'green' | 'amber' | 'red';
 export type TaskStatus = 'to_do' | 'working_on_it' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
+export type ActivityType = 'arrival' | 'start_work' | 'pause' | 'resume' | 'note' | 'photo' | 'complete';
 
 // === Entities ===
 
@@ -67,7 +68,12 @@ export interface Task {
   budget: number;
   sort_order: number;
   is_survey_task: boolean;
+  timer_started_at?: string;
+  time_spent_seconds?: number;
+  is_tracking?: boolean;
+  estimated_hours?: number;
   evidence_count?: number;
+  activity_count?: number;
   created_by?: number;
   created_at?: string;
   updated_at?: string;
@@ -84,6 +90,20 @@ export interface TaskEvidence {
   uploaded_by: number;
   uploaded_by_name?: string;
   uploaded_at?: string;
+}
+
+export interface TaskActivity {
+  id: number;
+  task_id: number;
+  user_id: number;
+  user_name?: string;
+  message: string;
+  activity_type: ActivityType;
+  file_path?: string;
+  file_name?: string;
+  file_type?: string;
+  file_size?: number;
+  created_at: string;
 }
 
 export interface Material {

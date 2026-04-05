@@ -77,7 +77,8 @@ router.get(
         `SELECT t.*,
           u.name AS assigned_to_name,
           creator.name AS created_by_name,
-          p.name AS project_name
+          p.name AS project_name,
+          (SELECT COUNT(*)::int FROM task_activities WHERE task_id = t.id) AS activity_count
         FROM tasks t
         LEFT JOIN users u ON u.id = t.assigned_to
         LEFT JOIN users creator ON creator.id = t.created_by

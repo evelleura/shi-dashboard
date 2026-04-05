@@ -924,3 +924,194 @@ ON CONFLICT (project_id) DO UPDATE SET
   overtime_tasks = EXCLUDED.overtime_tasks,
   overdue_tasks = EXCLUDED.overdue_tasks,
   last_updated = CURRENT_TIMESTAMP;
+
+
+-- ============================================================
+-- 19. TASK TIME TRACKING (time_spent_seconds + estimated_hours on completed/active tasks)
+-- ============================================================
+
+-- P1: Survey lokasi (done) - 4 hours
+UPDATE tasks SET time_spent_seconds = 14400, estimated_hours = 4.0
+WHERE name = 'Survey lokasi & pengukuran'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya');
+
+-- P1: Penarikan kabel jaringan (done) - 16 hours
+UPDATE tasks SET time_spent_seconds = 57600, estimated_hours = 16.0
+WHERE name = 'Penarikan kabel jaringan'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya');
+
+-- P1: Instalasi smart lock (done) - 12 hours
+UPDATE tasks SET time_spent_seconds = 43200, estimated_hours = 12.0
+WHERE name = 'Instalasi smart lock'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya');
+
+-- P1: Instalasi lighting control (working, overtime) - 8 hours so far, estimated 20
+UPDATE tasks SET time_spent_seconds = 28800, estimated_hours = 20.0
+WHERE name = 'Instalasi lighting control'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya');
+
+-- P3: Instalasi panel kontrol (working, overtime) - 6 hours so far, estimated 10
+UPDATE tasks SET time_spent_seconds = 21600, estimated_hours = 10.0
+WHERE name = 'Instalasi panel kontrol utama'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang');
+
+-- P9: Instalasi lighting Lt 1 (done) - 10 hours
+UPDATE tasks SET time_spent_seconds = 36000, estimated_hours = 10.0
+WHERE name = 'Instalasi lighting controller Lt 1'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta');
+
+-- P9: Instalasi lighting Lt 2 (done) - 9 hours
+UPDATE tasks SET time_spent_seconds = 32400, estimated_hours = 10.0
+WHERE name = 'Instalasi lighting controller Lt 2'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta');
+
+-- P9: Instalasi lighting Lt 3 (done) - 11 hours
+UPDATE tasks SET time_spent_seconds = 39600, estimated_hours = 10.0
+WHERE name = 'Instalasi lighting controller Lt 3'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta');
+
+-- P11: Penarikan kabel gedung A (done) - 14 hours
+UPDATE tasks SET time_spent_seconds = 50400, estimated_hours = 16.0
+WHERE name = 'Penarikan kabel fire alarm gedung A'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Fire Alarm System - Kampus UTY');
+
+-- P11: Instalasi panel gedung A (working) - 5 hours so far
+UPDATE tasks SET time_spent_seconds = 18000, estimated_hours = 12.0
+WHERE name = 'Instalasi panel & detector gedung A'
+  AND project_id = (SELECT id FROM projects WHERE name = 'Fire Alarm System - Kampus UTY');
+
+
+-- ============================================================
+-- 20. TASK ACTIVITIES (field journal entries)
+-- ============================================================
+
+-- P1: Survey lokasi & pengukuran (done, siti)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di lokasi Perumahan Citra Raya', 'arrival',    CURRENT_TIMESTAMP - INTERVAL '55 days' + INTERVAL '8 hours'),
+  ('Mulai survey unit 1-5',              'start_work', CURRENT_TIMESTAMP - INTERVAL '55 days' + INTERVAL '8 hours 15 minutes'),
+  ('Unit 1-5 selesai diukur, lanjut unit 6-10', 'note', CURRENT_TIMESTAMP - INTERVAL '55 days' + INTERVAL '10 hours 30 minutes'),
+  ('Survey selesai, semua unit terukur', 'complete',   CURRENT_TIMESTAMP - INTERVAL '55 days' + INTERVAL '12 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Survey lokasi & pengukuran'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya')
+  AND u.email = 'siti@shi.co.id';
+
+-- P1: Instalasi smart lock (done, reza)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di lokasi, bawa 10 unit smart lock', 'arrival',    CURRENT_TIMESTAMP - INTERVAL '25 days' + INTERVAL '7 hours 30 minutes'),
+  ('Mulai instalasi unit 1-3',                'start_work', CURRENT_TIMESTAMP - INTERVAL '25 days' + INTERVAL '8 hours'),
+  ('Unit 1-3 done, baut mounting perlu diganti untuk tipe pintu cluster B', 'note', CURRENT_TIMESTAMP - INTERVAL '25 days' + INTERVAL '11 hours'),
+  ('Foto hasil pemasangan unit 1-3',          'photo',      CURRENT_TIMESTAMP - INTERVAL '25 days' + INTERVAL '11 hours 30 minutes'),
+  ('Lanjut unit 4-7 hari ini',                'note',       CURRENT_TIMESTAMP - INTERVAL '24 days' + INTERVAL '8 hours 15 minutes'),
+  ('Semua smart lock terpasang dan tested',   'complete',   CURRENT_TIMESTAMP - INTERVAL '22 days' + INTERVAL '15 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Instalasi smart lock'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya')
+  AND u.email = 'reza@shi.co.id';
+
+-- P1: Instalasi lighting control (working_on_it, overtime, siti)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di lokasi, mulai dari unit 1',              'arrival',    CURRENT_TIMESTAMP - INTERVAL '10 days' + INTERVAL '8 hours'),
+  ('Mulai pasang smart switch unit 1-2',             'start_work', CURRENT_TIMESTAMP - INTERVAL '10 days' + INTERVAL '8 hours 30 minutes'),
+  ('Switch unit 1 ok, unit 2 ada masalah wiring lama', 'note',    CURRENT_TIMESTAMP - INTERVAL '10 days' + INTERVAL '12 hours'),
+  ('Wiring lama di unit 3-5 juga bermasalah, perlu re-wire dulu sebelum pasang switch', 'note', CURRENT_TIMESTAMP - INTERVAL '8 days' + INTERVAL '10 hours'),
+  ('Unit 1-4 selesai, sisa 6 unit lagi',            'note',       CURRENT_TIMESTAMP - INTERVAL '5 days' + INTERVAL '14 hours'),
+  ('Kendala: stok dimmer habis, tunggu pengiriman',  'note',       CURRENT_TIMESTAMP - INTERVAL '3 days' + INTERVAL '9 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Instalasi lighting control'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya')
+  AND u.email = 'siti@shi.co.id';
+
+-- P3: Instalasi panel kontrol utama (working_on_it, overtime, siti)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di villa Kaliurang',                        'arrival',    CURRENT_TIMESTAMP - INTERVAL '20 days' + INTERVAL '8 hours'),
+  ('Mulai instalasi panel di ruang utility',         'start_work', CURRENT_TIMESTAMP - INTERVAL '20 days' + INTERVAL '8 hours 30 minutes'),
+  ('Panel terpasang tapi modul controller belum datang', 'note',   CURRENT_TIMESTAMP - INTERVAL '18 days' + INTERVAL '10 hours'),
+  ('Modul controller datang tapi salah spek, perlu return', 'note', CURRENT_TIMESTAMP - INTERVAL '15 days' + INTERVAL '9 hours'),
+  ('Replacement sudah datang, mulai konfigurasi ulang', 'note',    CURRENT_TIMESTAMP - INTERVAL '10 days' + INTERVAL '8 hours 30 minutes'),
+  ('Konfigurasi panel 60% - masih troubleshoot komunikasi RS485', 'note', CURRENT_TIMESTAMP - INTERVAL '5 days' + INTERVAL '14 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Instalasi panel kontrol utama'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang')
+  AND u.email = 'siti@shi.co.id';
+
+-- P9: Instalasi lighting controller Lt 1 (done, fajar)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di kantor Dishub, lantai 1',                 'arrival',    CURRENT_TIMESTAMP - INTERVAL '18 days' + INTERVAL '7 hours 45 minutes'),
+  ('Mulai pasang smart switch ruang utama',            'start_work', CURRENT_TIMESTAMP - INTERVAL '18 days' + INTERVAL '8 hours'),
+  ('Ruang utama + ruang rapat selesai, lanjut koridor', 'note',     CURRENT_TIMESTAMP - INTERVAL '18 days' + INTERVAL '12 hours'),
+  ('Semua switch lantai 1 terpasang dan tested',       'complete',  CURRENT_TIMESTAMP - INTERVAL '16 days' + INTERVAL '16 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Instalasi lighting controller Lt 1'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta')
+  AND u.email = 'fajar@shi.co.id';
+
+-- P11: Penarikan kabel fire alarm gedung A (done, yoga)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di kampus UTY gedung A',                      'arrival',    CURRENT_TIMESTAMP - INTERVAL '23 days' + INTERVAL '7 hours 30 minutes'),
+  ('Mulai tarik kabel dari panel ke lantai 1',         'start_work', CURRENT_TIMESTAMP - INTERVAL '23 days' + INTERVAL '8 hours'),
+  ('Lantai 1 selesai, lanjut ke lantai 2',             'note',       CURRENT_TIMESTAMP - INTERVAL '23 days' + INTERVAL '12 hours 30 minutes'),
+  ('Kabel gedung A seluruh lantai selesai ditarik',    'complete',   CURRENT_TIMESTAMP - INTERVAL '21 days' + INTERVAL '15 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Penarikan kabel fire alarm gedung A'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Fire Alarm System - Kampus UTY')
+  AND u.email = 'yoga@shi.co.id';
+
+-- P11: Instalasi panel & detector gedung A (working_on_it, yoga)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di gedung A, bawa panel + detector',          'arrival',    CURRENT_TIMESTAMP - INTERVAL '5 days' + INTERVAL '7 hours 45 minutes'),
+  ('Mulai pasang panel alarm di ruang security',       'start_work', CURRENT_TIMESTAMP - INTERVAL '5 days' + INTERVAL '8 hours'),
+  ('Panel terpasang, mulai pasang detector lantai 1',  'note',       CURRENT_TIMESTAMP - INTERVAL '5 days' + INTERVAL '11 hours'),
+  ('Smoke detector lantai 1 selesai (15 unit), besok lanjut lantai 2', 'note', CURRENT_TIMESTAMP - INTERVAL '4 days' + INTERVAL '15 hours'),
+  ('Lantai 2 smoke detector terpasang, MCP lantai 1-2 done', 'note', CURRENT_TIMESTAMP - INTERVAL '3 days' + INTERVAL '14 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Instalasi panel & detector gedung A'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Fire Alarm System - Kampus UTY')
+  AND u.email = 'yoga@shi.co.id';
+
+-- P3: Instalasi smart curtain & AC (working_on_it, siti)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di villa, bawa motor curtain',                'arrival',    CURRENT_TIMESTAMP - INTERVAL '8 days' + INTERVAL '8 hours'),
+  ('Mulai instalasi motor curtain kamar utama',        'start_work', CURRENT_TIMESTAMP - INTERVAL '8 days' + INTERVAL '8 hours 30 minutes'),
+  ('Motor curtain kamar utama ok, kamar tamu stuck - perlu adapter custom', 'note', CURRENT_TIMESTAMP - INTERVAL '8 days' + INTERVAL '13 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Instalasi smart curtain & AC'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Home Automation - Villa Kaliurang')
+  AND u.email = 'siti@shi.co.id';
+
+-- P9: Penarikan kabel data (done, reza)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT t.id, u.id, d.msg, d.atype, d.ts
+FROM tasks t, users u,
+(VALUES
+  ('Tiba di Dishub, mulai dari basement',              'arrival',    CURRENT_TIMESTAMP - INTERVAL '25 days' + INTERVAL '7 hours 30 minutes'),
+  ('Tarik kabel UTP dari server room ke lantai 1',     'start_work', CURRENT_TIMESTAMP - INTERVAL '25 days' + INTERVAL '8 hours'),
+  ('Kabel ke semua lantai selesai, testing koneksi ok', 'complete',  CURRENT_TIMESTAMP - INTERVAL '23 days' + INTERVAL '16 hours')
+) AS d(msg, atype, ts)
+WHERE t.name = 'Penarikan kabel data'
+  AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta')
+  AND u.email = 'reza@shi.co.id';

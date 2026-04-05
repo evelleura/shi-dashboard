@@ -215,6 +215,29 @@ CREATE TABLE IF NOT EXISTS project_health (
 );
 
 -- ============================================================
+-- Task activities (field journal entries)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS task_activities (
+  id SERIAL PRIMARY KEY,
+  task_id INT NOT NULL,
+  user_id INT NOT NULL,
+  message TEXT NOT NULL,
+  activity_type VARCHAR(50) NOT NULL DEFAULT 'note',
+  file_path VARCHAR(1000),
+  file_name VARCHAR(500),
+  file_type VARCHAR(50),
+  file_size INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT activity_type_check CHECK (activity_type IN (
+    'arrival', 'start_work', 'pause', 'resume', 'note', 'photo', 'complete'
+  ))
+);
+CREATE INDEX IF NOT EXISTS idx_activities_task ON task_activities(task_id);
+CREATE INDEX IF NOT EXISTS idx_activities_user ON task_activities(user_id);
+
+-- ============================================================
 -- Seed admin user (password: password123)
 -- ============================================================
 INSERT INTO users (name, email, role, password_hash)

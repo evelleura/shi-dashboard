@@ -9,6 +9,7 @@ import type {
   Client,
   Task,
   TaskEvidence,
+  TaskActivity,
   Material,
   BudgetItem,
   CreateProjectData,
@@ -265,6 +266,30 @@ export const updateBudgetItem = async (id: number, data: Partial<CreateBudgetIte
 
 export const deleteBudgetItem = async (id: number): Promise<void> => {
   await api.delete(`/budget/${id}`);
+};
+
+// ==================== Activities ====================
+
+export const getTaskActivities = async (taskId: number): Promise<TaskActivity[]> => {
+  const res = await api.get<ApiResponse<TaskActivity[]>>(`/activities/task/${taskId}`);
+  return res.data.data!;
+};
+
+export const createActivity = async (data: FormData): Promise<TaskActivity> => {
+  const res = await api.post<ApiResponse<TaskActivity>>('/activities', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data.data!;
+};
+
+export const startTimer = async (taskId: number): Promise<Task> => {
+  const res = await api.post<ApiResponse<Task>>(`/activities/task/${taskId}/timer/start`);
+  return res.data.data!;
+};
+
+export const stopTimer = async (taskId: number): Promise<Task> => {
+  const res = await api.post<ApiResponse<Task>>(`/activities/task/${taskId}/timer/stop`);
+  return res.data.data!;
 };
 
 // ==================== Dashboard ====================

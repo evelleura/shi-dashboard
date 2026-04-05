@@ -1,5 +1,6 @@
 import type { Task, TaskStatus, UserRole } from '../../types';
 import TaskStatusSelect from './TaskStatusSelect';
+import { formatTimeSpent } from './TaskTimer';
 
 interface Props {
   task: Task;
@@ -15,6 +16,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function KanbanCard({ task, onStatusChange, onClick, isChanging, userRole, columnId }: Props) {
+  const isTechnician = userRole === 'technician';
   const isOverdue =
     task.due_date &&
     task.status !== 'done' &&
@@ -31,6 +33,8 @@ export default function KanbanCard({ task, onStatusChange, onClick, isChanging, 
     ? 'border-red-300'
     : 'border-gray-200';
 
+  const timeSpent = Number(task.time_spent_seconds) || 0;
+
   return (
     <div
       className={`bg-white rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${borderClass}`}
@@ -44,7 +48,16 @@ export default function KanbanCard({ task, onStatusChange, onClick, isChanging, 
         <p className="text-[10px] font-medium text-blue-500 uppercase tracking-wide mb-1 truncate">{task.project_name}</p>
       )}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h4 className="text-sm font-medium text-gray-900 line-clamp-2 flex-1">{task.name}</h4>
+        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+          {/* Pulsing green dot when tracking */}
+          {task.is_tracking && (
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+            </span>
+          )}
+          <h4 className="text-sm font-medium text-gray-900 line-clamp-2">{task.name}</h4>
+        </div>
         {task.evidence_count != null && task.evidence_count > 0 && (
           <span className="text-xs text-gray-400 flex items-center gap-0.5 shrink-0" aria-label={`${task.evidence_count} evidence files`}>
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -65,14 +78,25 @@ export default function KanbanCard({ task, onStatusChange, onClick, isChanging, 
       )}
 
       <div className="flex items-center justify-between mt-2">
-        {task.due_date ? (
-          <span className={`text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
-            {isOverdue ? 'Overdue: ' : 'Due: '}
-            {formatDate(task.due_date)}
-          </span>
-        ) : (
-          <span className="text-xs text-gray-300">No due date</span>
-        )}
+        <div className="flex items-center gap-2">
+          {task.due_date ? (
+            <span className={`text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+              {isOverdue ? 'Overdue: ' : 'Due: '}
+              {formatDate(task.due_date)}
+            </span>
+          ) : (
+            <span className="text-xs text-gray-300">No due date</span>
+          )}
+          {/* Show elapsed time if not tracking but has time */}
+          {!task.is_tracking && timeSpent > 0 && (
+            <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {formatTimeSpent(timeSpent)}
+            </span>
+          )}
+        </div>
         <div onClick={(e) => e.stopPropagation()} role="presentation">
           <TaskStatusSelect
             value={task.status}
@@ -84,7 +108,7 @@ export default function KanbanCard({ task, onStatusChange, onClick, isChanging, 
         </div>
       </div>
 
-      {task.budget > 0 && (
+      {!isTechnician && task.budget > 0 && (
         <p className="text-[10px] text-gray-400 mt-1.5">
           Budget: Rp {Number(task.budget).toLocaleString('id-ID')}
         </p>

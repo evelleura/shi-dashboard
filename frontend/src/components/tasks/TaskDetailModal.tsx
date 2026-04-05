@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Modal from '../ui/Modal';
 import TaskStatusSelect from './TaskStatusSelect';
 import EvidenceUploader from '../evidence/EvidenceUploader';
 import EvidenceGallery from '../evidence/EvidenceGallery';
-import type { Task, TaskStatus, UserRole } from '../../types';
+import ActivityFeed from './ActivityFeed';
+import TaskTimer from './TaskTimer';
+import { useStartTimer, useStopTimer } from '../../hooks/useActivities';
+import { getProjectMaterials } from '../../services/api';
+import type { Task, TaskStatus, UserRole, Material } from '../../types';
+
+type Section = 'details' | 'evidence' | 'activity' | 'materials';
 
 interface Props {
   task: Task | null;
@@ -25,20 +31,48 @@ function formatCurrency(amount: number): string {
 
 export default function TaskDetailModal({ task, open, onClose, onStatusChange, isChanging, userRole }: Props) {
   const qc = useQueryClient();
-  const [activeSection, setActiveSection] = useState<'details' | 'evidence'>('details');
+  const [activeSection, setActiveSection] = useState<Section>('details');
+
+  const startTimerMutation = useStartTimer();
+  const stopTimerMutation = useStopTimer();
+
+  // Fetch project materials for the Materials tab
+  const { data: materials = [], isLoading: materialsLoading } = useQuery({
+    queryKey: ['materials', task?.project_id],
+    queryFn: () => getProjectMaterials(task!.project_id),
+    staleTime: 1000 * 60 * 2,
+    enabled: !!task && task.project_id > 0 && activeSection === 'materials',
+  });
 
   if (!task) return null;
 
+  const isTechnician = userRole === 'technician';
   const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
   const isOvertime = isOverdue && task.status === 'working_on_it';
   const isOverDeadline = isOverdue && task.status === 'to_do';
 
   const evidenceCount = task.evidence_count ?? 0;
+  const activityCount = task.activity_count ?? 0;
 
   const handleUploadComplete = () => {
     void qc.invalidateQueries({ queryKey: ['task', task.id] });
     void qc.invalidateQueries({ queryKey: ['technician-dashboard'] });
   };
+
+  const handleStartTimer = () => {
+    startTimerMutation.mutate({ taskId: task.id, projectId: task.project_id });
+  };
+
+  const handleStopTimer = () => {
+    stopTimerMutation.mutate({ taskId: task.id, projectId: task.project_id });
+  };
+
+  const tabs: { id: Section; label: string; badge?: number }[] = [
+    { id: 'details', label: 'Details' },
+    { id: 'evidence', label: 'Evidence', badge: evidenceCount },
+    { id: 'activity', label: 'Activity', badge: activityCount },
+    { id: 'materials', label: 'Materials' },
+  ];
 
   return (
     <Modal open={open} onClose={onClose} title="Task Details" maxWidth="max-w-2xl">
@@ -75,7 +109,7 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
         )}
 
         {/* Info grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className={`grid ${isTechnician ? 'grid-cols-2' : 'grid-cols-2'} gap-3`}>
           <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-xs text-gray-500">Assignee</p>
             <p className="text-sm font-medium text-gray-900">{task.assigned_to_name ?? 'Unassigned'}</p>
@@ -91,12 +125,14 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
               {isOverdue && ' (overdue)'}
             </p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Budget</p>
-            <p className="text-sm font-medium text-gray-900">
-              {Number(task.budget) > 0 ? formatCurrency(Number(task.budget)) : '--'}
-            </p>
-          </div>
+          {!isTechnician && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs text-gray-500">Budget</p>
+              <p className="text-sm font-medium text-gray-900">
+                {Number(task.budget) > 0 ? formatCurrency(Number(task.budget)) : '--'}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Notes */}
@@ -107,37 +143,32 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
           </div>
         )}
 
-        {/* Section tabs: Details / Evidence */}
+        {/* Section tabs */}
         <div className="border-t border-gray-200 pt-3">
-          <div className="flex gap-4 border-b border-gray-200">
-            <button
-              className={`pb-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                activeSection === 'details'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-              onClick={() => setActiveSection('details')}
-            >
-              Details
-            </button>
-            <button
-              className={`pb-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-1.5 ${
-                activeSection === 'evidence'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-              onClick={() => setActiveSection('evidence')}
-            >
-              Evidence
-              {evidenceCount > 0 && (
-                <span className="bg-blue-100 text-blue-700 text-xs px-1.5 py-0.5 rounded-full">{evidenceCount}</span>
-              )}
-            </button>
+          <div className="flex gap-4 border-b border-gray-200 overflow-x-auto" role="tablist" aria-label="Task detail tabs">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                className={`pb-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+                  activeSection === tab.id
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-400 hover:text-gray-600'
+                }`}
+                onClick={() => setActiveSection(tab.id)}
+              >
+                {tab.label}
+                {tab.badge != null && tab.badge > 0 && (
+                  <span className="bg-blue-100 text-blue-700 text-xs px-1.5 py-0.5 rounded-full">{tab.badge}</span>
+                )}
+              </button>
+            ))}
           </div>
 
+          {/* Details tab */}
           {activeSection === 'details' && (
             <div className="pt-3 space-y-3">
-              {/* Timeline */}
               {(task.timeline_start || task.timeline_end) && (
                 <div className="bg-gray-50 rounded-lg p-3">
                   <p className="text-xs text-gray-500 mb-1">Timeline</p>
@@ -147,7 +178,6 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
                 </div>
               )}
 
-              {/* Created info */}
               <div className="text-xs text-gray-400 space-y-1">
                 {task.created_at && <p>Created: {formatDate(task.created_at)}</p>}
                 {task.updated_at && <p>Last updated: {formatDate(task.updated_at)}</p>}
@@ -155,17 +185,71 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
             </div>
           )}
 
+          {/* Evidence tab */}
           {activeSection === 'evidence' && (
             <div className="pt-3 space-y-4">
-              {/* Upload section */}
               <EvidenceUploader taskId={task.id} onUploadComplete={handleUploadComplete} />
-
-              {/* Evidence list */}
               <EvidenceGallery taskId={task.id} />
+            </div>
+          )}
+
+          {/* Activity tab */}
+          {activeSection === 'activity' && (
+            <div className="pt-3 space-y-4">
+              {/* Timer at top */}
+              <TaskTimer
+                task={task}
+                onStart={handleStartTimer}
+                onStop={handleStopTimer}
+                isLoading={startTimerMutation.isPending || stopTimerMutation.isPending}
+              />
+
+              {/* Activity feed */}
+              <ActivityFeed taskId={task.id} />
+            </div>
+          )}
+
+          {/* Materials tab */}
+          {activeSection === 'materials' && (
+            <div className="pt-3">
+              {materialsLoading ? (
+                <div className="flex justify-center py-6">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
+                </div>
+              ) : materials.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-6">No materials recorded for this project</p>
+              ) : (
+                <MaterialsReadOnly materials={materials} />
+              )}
             </div>
           )}
         </div>
       </div>
     </Modal>
+  );
+}
+
+function MaterialsReadOnly({ materials }: { materials: Material[] }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm" role="table">
+        <thead>
+          <tr className="border-b border-gray-200">
+            <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">Name</th>
+            <th className="text-right py-2 px-2 text-xs font-medium text-gray-500">Qty</th>
+            <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">Unit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {materials.map((m) => (
+            <tr key={m.id} className="border-b border-gray-100">
+              <td className="py-2 px-2 text-gray-700">{m.name}</td>
+              <td className="py-2 px-2 text-gray-600 text-right">{Number(m.quantity)}</td>
+              <td className="py-2 px-2 text-gray-600">{m.unit}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
