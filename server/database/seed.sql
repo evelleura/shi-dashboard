@@ -1015,7 +1015,7 @@ WHERE t.name = 'Instalasi smart lock'
   AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya')
   AND u.email = 'reza@shi.co.id';
 
--- P1: Instalasi lighting control (working_on_it, overtime, siti)
+-- P1: Instalasi lighting control (in_progress, overtime, siti)
 INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
 SELECT t.id, u.id, d.msg, d.atype, d.ts
 FROM tasks t, users u,
@@ -1031,7 +1031,7 @@ WHERE t.name = 'Instalasi lighting control'
   AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Home IoT - Perumahan Citra Raya')
   AND u.email = 'siti@shi.co.id';
 
--- P3: Instalasi panel kontrol utama (working_on_it, overtime, siti)
+-- P3: Instalasi panel kontrol utama (in_progress, overtime, siti)
 INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
 SELECT t.id, u.id, d.msg, d.atype, d.ts
 FROM tasks t, users u,
@@ -1075,7 +1075,7 @@ WHERE t.name = 'Penarikan kabel fire alarm gedung A'
   AND t.project_id = (SELECT id FROM projects WHERE name = 'Fire Alarm System - Kampus UTY')
   AND u.email = 'yoga@shi.co.id';
 
--- P11: Instalasi panel & detector gedung A (working_on_it, yoga)
+-- P11: Instalasi panel & detector gedung A (in_progress, yoga)
 INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
 SELECT t.id, u.id, d.msg, d.atype, d.ts
 FROM tasks t, users u,
@@ -1090,7 +1090,7 @@ WHERE t.name = 'Instalasi panel & detector gedung A'
   AND t.project_id = (SELECT id FROM projects WHERE name = 'Fire Alarm System - Kampus UTY')
   AND u.email = 'yoga@shi.co.id';
 
--- P3: Instalasi smart curtain & AC (working_on_it, siti)
+-- P3: Instalasi smart curtain & AC (in_progress, siti)
 INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
 SELECT t.id, u.id, d.msg, d.atype, d.ts
 FROM tasks t, users u,
