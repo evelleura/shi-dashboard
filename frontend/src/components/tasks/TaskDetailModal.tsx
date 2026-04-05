@@ -128,6 +128,20 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
             {isOverDeadline && (
               <span className="text-xs text-red-700 bg-red-100 px-2 py-0.5 rounded-full font-medium">Over Deadline</span>
             )}
+            {/* Submit for Review -- technician only, task in_progress/working_on_it (not already review/done/to_do) */}
+            {isTechnician && (task.status === 'in_progress' || task.status === 'working_on_it') && (
+              <button
+                onClick={() => onStatusChange(task.id, 'review')}
+                disabled={isChanging}
+                className="text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
+                aria-label="Submit task for review"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                Submit for Review
+              </button>
+            )}
             {/* Escalate button -- technician only, task not done */}
             {isTechnician && task.status !== 'done' && (
               <button

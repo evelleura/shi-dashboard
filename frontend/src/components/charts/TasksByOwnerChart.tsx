@@ -36,8 +36,10 @@ export default function TasksByOwnerChart() {
           <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={80} />
           <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }} />
           <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: '12px' }} />
-          <Bar dataKey="done" stackId="a" fill="#22c55e" name="Done" />
-          <Bar dataKey="working" stackId="a" fill="#3b82f6" name="Working" />
+          <Bar dataKey="done" stackId="a" fill="#10b981" name="Done" />
+          <Bar dataKey="review" stackId="a" fill="#a855f7" name="Review" />
+          <Bar dataKey="working" stackId="a" fill="#22c55e" name="Working" />
+          <Bar dataKey="in_progress" stackId="a" fill="#3b82f6" name="In Progress" />
           <Bar dataKey="overtime" stackId="a" fill="#f59e0b" name="Overtime" />
           <Bar dataKey="to_do" stackId="a" fill="#94a3b8" name="To Do" />
         </BarChart>

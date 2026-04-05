@@ -5,8 +5,10 @@ import type { HealthStatus } from '../types';
 
 const STATUS_COLORS = {
   to_do: '#94a3b8',
-  working_on_it: '#3b82f6',
-  done: '#22c55e',
+  in_progress: '#3b82f6',
+  working_on_it: '#22c55e',
+  review: '#a855f7',
+  done: '#10b981',
   overtime: '#f59e0b',
   over_deadline: '#ef4444',
 };
@@ -45,10 +47,20 @@ export default function TechnicianDashboard() {
   const stats = data.my_tasks;
   const openEscalations = data.escalation_summary?.open ?? 0;
 
+  const inProgressCount = (stats.in_progress ?? 0) + (stats.working_on_it ?? 0);
+  const reviewCount = stats.review ?? 0;
+
   const statCards = [
     { label: 'Total Tasks', value: stats.total, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
     { label: 'To Do', value: stats.to_do, color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' },
-    { label: 'In Progress', value: stats.working_on_it, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
+    { label: 'In Progress', value: inProgressCount, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
+    {
+      label: 'Review',
+      value: reviewCount,
+      color: reviewCount > 0 ? 'text-purple-600' : 'text-gray-600',
+      bg: reviewCount > 0 ? 'bg-purple-50' : 'bg-gray-50',
+      border: reviewCount > 0 ? 'border-purple-200' : 'border-gray-200',
+    },
     { label: 'Done', value: stats.done, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
     {
       label: 'Overtime',
@@ -76,7 +88,9 @@ export default function TechnicianDashboard() {
   // Pie chart data -- task status distribution
   const pieData = [
     { name: 'To Do', value: stats.to_do, color: STATUS_COLORS.to_do },
-    { name: 'Working On It', value: stats.working_on_it, color: STATUS_COLORS.working_on_it },
+    { name: 'In Progress', value: stats.in_progress ?? 0, color: STATUS_COLORS.in_progress },
+    { name: 'Working On It', value: stats.working_on_it ?? 0, color: STATUS_COLORS.working_on_it },
+    { name: 'Review', value: stats.review ?? 0, color: STATUS_COLORS.review },
     { name: 'Done', value: stats.done, color: STATUS_COLORS.done },
     { name: 'Overtime', value: stats.overtime, color: STATUS_COLORS.overtime },
     { name: 'Over Deadline', value: stats.over_deadline, color: STATUS_COLORS.over_deadline },
@@ -98,7 +112,7 @@ export default function TechnicianDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
         {statCards.map((card) => (
           <div key={card.label} className={`${card.bg} border ${card.border} rounded-xl p-3 text-center`}>
             <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>

@@ -12,12 +12,27 @@ export default function SummaryCards({ summary }: Props) {
       ? 'text-yellow-600'
       : 'text-red-600';
 
+  const inProgressCount = (summary.in_progress_tasks ?? 0) + (summary.working_tasks ?? 0);
+  const reviewCount = summary.review_tasks ?? 0;
+
   const cards = [
     { label: 'Active Projects', value: summary.active_projects, color: 'text-blue-600', bg: 'bg-blue-50' },
     { label: 'Critical', value: summary.total_red, color: 'text-red-600', bg: 'bg-red-50' },
     { label: 'Warning', value: summary.total_amber, color: 'text-yellow-600', bg: 'bg-yellow-50' },
     { label: 'On Track', value: summary.total_green, color: 'text-green-600', bg: 'bg-green-50' },
     { label: 'Total Tasks', value: summary.total_tasks, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    {
+      label: 'In Progress',
+      value: inProgressCount,
+      color: inProgressCount > 0 ? 'text-blue-600' : 'text-gray-600',
+      bg: inProgressCount > 0 ? 'bg-blue-50' : 'bg-gray-50',
+    },
+    {
+      label: 'Review',
+      value: reviewCount,
+      color: reviewCount > 0 ? 'text-purple-600' : 'text-gray-600',
+      bg: reviewCount > 0 ? 'bg-purple-50' : 'bg-gray-50',
+    },
     {
       label: 'Overtime',
       value: summary.overtime_tasks,
@@ -33,7 +48,7 @@ export default function SummaryCards({ summary }: Props) {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3">
       {cards.map((card) => (
         <div key={card.label} className={`${card.bg} rounded-xl p-3 text-center`}>
           <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>

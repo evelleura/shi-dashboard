@@ -3,15 +3,19 @@ import { useTasksByStatusChart } from '../../hooks/useDashboard';
 
 const STATUS_COLORS: Record<string, string> = {
   to_do: '#94a3b8',
-  working_on_it: '#3b82f6',
-  done: '#22c55e',
+  in_progress: '#3b82f6',
+  working_on_it: '#22c55e',
+  review: '#a855f7',
+  done: '#10b981',
   overtime: '#f59e0b',
   over_deadline: '#ef4444',
 };
 
 const STATUS_LABELS: Record<string, string> = {
   to_do: 'To Do',
+  in_progress: 'In Progress',
   working_on_it: 'Working On It',
+  review: 'Review',
   done: 'Done',
   overtime: 'Overtime',
   over_deadline: 'Over Deadline',

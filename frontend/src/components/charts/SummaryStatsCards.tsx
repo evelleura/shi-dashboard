@@ -22,6 +22,9 @@ export default function SummaryStatsCards({ summary }: Props) {
       ? ((summary.total_green / summary.active_projects) * 100).toFixed(0)
       : '0';
 
+  const inProgressCount = (summary.in_progress_tasks ?? 0) + (summary.working_tasks ?? 0);
+  const reviewCount = summary.review_tasks ?? 0;
+
   const cards = [
     {
       label: 'Total Projects',
@@ -72,6 +75,22 @@ export default function SummaryStatsCards({ summary }: Props) {
       border: 'border-indigo-200',
     },
     {
+      label: 'In Progress',
+      value: inProgressCount,
+      sub: 'active tasks',
+      color: inProgressCount > 0 ? 'text-blue-600' : 'text-gray-600',
+      bg: inProgressCount > 0 ? 'bg-blue-50' : 'bg-gray-50',
+      border: inProgressCount > 0 ? 'border-blue-200' : 'border-gray-200',
+    },
+    {
+      label: 'Review',
+      value: reviewCount,
+      sub: 'pending approval',
+      color: reviewCount > 0 ? 'text-purple-600' : 'text-gray-600',
+      bg: reviewCount > 0 ? 'bg-purple-50' : 'bg-gray-50',
+      border: reviewCount > 0 ? 'border-purple-200' : 'border-gray-200',
+    },
+    {
       label: 'Overtime',
       value: summary.overtime_tasks,
       sub: 'working past due',
@@ -90,7 +109,7 @@ export default function SummaryStatsCards({ summary }: Props) {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3">
       {cards.map((card) => (
         <div
           key={card.label}
