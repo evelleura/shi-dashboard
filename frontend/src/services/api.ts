@@ -229,8 +229,8 @@ export const getEvidenceDownloadUrl = (id: number): string => `/api/evidence/${i
 // ==================== Materials ====================
 
 export const getProjectMaterials = async (projectId: number): Promise<Material[]> => {
-  const res = await api.get<ApiResponse<Material[]>>(`/materials/project/${projectId}`);
-  return res.data.data!;
+  const res = await api.get<ApiResponse<{ materials: Material[]; totals: unknown }>>(`/materials/project/${projectId}`);
+  return res.data.data!.materials;
 };
 
 export const createMaterial = async (data: CreateMaterialData): Promise<Material> => {
