@@ -1,0 +1,7 @@
+1.3	Batasan Masalah
+1.	Data yang diolah dalam sistem terbatas pada data daily report yang mencakup nama proyek, tanggal laporan, persentase progres harian, dan catatan kendala, serta data baseline jadwal proyek (tanggal mulai dan target selesai).
+2.	Sistem menghitung deviasi progres dengan membandingkan persentase realisasi aktual dari daily report terhadap progres ideal berdasarkan baseline jadwal, tanpa menggunakan metode prediksi berbasis machine learning atau kecerdasan buatan.
+3.	Sistem secara otomatis mengkategorikan status kesehatan proyek (Project Health Status) ke dalam beberapa kategori berdasarkan nilai deviasi, serta mengurutkan proyek berdasarkan tingkat urgensi pada tampilan dashboard.
+4.	Output sistem berupa fitur dashboard yang menampilkan ringkasan proyek aktif dengan indikator kode warna (hijau, kuning, merah), serta detail progres aktual, progres ideal, deviasi, dan catatan kendala terakhir.
+5.	Pengguna sistem terdiri dari Manajer Proyek sebagai pemantau dashboard dan Teknisi Lapangan sebagai penginput data daily report.
+6.	Sistem tidak mencakup pengelolaan data di luar lingkup daily report, seperti data keuangan, pengadaan material, atau manajemen sumber daya manusia.

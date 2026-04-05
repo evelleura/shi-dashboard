@@ -75,7 +75,7 @@ export default function ProjectDetailPage() {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showAssign, setShowAssign] = useState(false);
   const [assignUserId, setAssignUserId] = useState('');
-  const [selectedEvidenceTaskId, setSelectedEvidenceTaskId] = useState<number | null>(null);
+
 
   const userRole = user?.role;
   const isManager = userRole === 'manager' || userRole === 'admin';
@@ -357,33 +357,20 @@ export default function ProjectDetailPage() {
             {(project.tasks ?? []).length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-8">Create tasks first to upload evidence.</p>
             ) : (
-              <>
-                <div className="bg-white rounded-xl border border-gray-200 p-4">
-                  <label htmlFor="evidence-task-select" className="block text-sm font-medium text-gray-700 mb-2">
-                    Select task to view/upload evidence
-                  </label>
-                  <select
-                    id="evidence-task-select"
-                    value={selectedEvidenceTaskId ?? ''}
-                    onChange={(e) => setSelectedEvidenceTaskId(e.target.value ? parseInt(e.target.value) : null)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">-- Select Task --</option>
-                    {(project.tasks ?? []).map((t) => (
-                      <option key={t.id} value={t.id}>{t.name} ({t.evidence_count ?? 0} files)</option>
-                    ))}
-                  </select>
-                </div>
-                {selectedEvidenceTaskId && (
-                  <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-                    <h3 className="text-sm font-semibold text-gray-900">Upload Evidence</h3>
-                    <EvidenceUploader taskId={selectedEvidenceTaskId} />
-                    <hr className="border-gray-200" />
-                    <h3 className="text-sm font-semibold text-gray-900">Uploaded Files</h3>
-                    <EvidenceGallery taskId={selectedEvidenceTaskId} canDelete={isManager} />
+              (project.tasks ?? []).map((t) => (
+                <div key={t.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-900">{t.name}</h3>
+                      <span className="text-xs text-gray-400">({t.evidence_count ?? 0} files)</span>
+                    </div>
                   </div>
-                )}
-              </>
+                  <div className="p-4 space-y-3">
+                    <EvidenceUploader taskId={t.id} />
+                    <EvidenceGallery taskId={t.id} canDelete={isManager} />
+                  </div>
+                </div>
+              ))
             )}
           </div>
         )}
