@@ -26,6 +26,7 @@ export default function KanbanCard({
   const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
   const isOvertimeColumn = columnId === 'overtime';
   const isOverDeadlineColumn = columnId === 'over_deadline';
+  const isReview = task.status === 'review';
 
   const borderClass = isOverDeadlineColumn
     ? 'border-red-300 bg-red-50/30'
@@ -33,6 +34,8 @@ export default function KanbanCard({
     ? 'border-amber-300 bg-amber-50/30'
     : task.is_tracking
     ? 'border-green-400 bg-green-50/20'
+    : isReview
+    ? 'border-purple-300 bg-purple-50/20'
     : isOverdue
     ? 'border-red-300'
     : 'border-gray-200';

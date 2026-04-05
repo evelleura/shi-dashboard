@@ -3,7 +3,7 @@ export type UserRole = 'technician' | 'manager' | 'admin';
 export type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'cancelled';
 export type ProjectPhase = 'survey' | 'execution';
 export type HealthStatus = 'green' | 'amber' | 'red';
-export type TaskStatus = 'to_do' | 'working_on_it' | 'done';
+export type TaskStatus = 'to_do' | 'in_progress' | 'working_on_it' | 'review' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
 export type ActivityType = 'arrival' | 'start_work' | 'pause' | 'resume' | 'note' | 'photo' | 'complete';
 export type EscalationStatus = 'open' | 'in_review' | 'resolved';
@@ -188,7 +188,9 @@ export interface DashboardSummary {
   avg_spi: number | null;
   total_tasks: number;
   completed_tasks: number;
+  in_progress_tasks: number;
   working_tasks: number;
+  review_tasks: number;
   overtime_tasks: number;
   over_deadline_tasks: number;
   overdue_projects: number;
@@ -249,7 +251,9 @@ export interface TasksByOwnerData {
   name: string;
   total: number;
   done: number;
+  in_progress: number;
   working: number;
+  review: number;
   overtime: number;
   to_do: number;
 }
@@ -264,7 +268,9 @@ export interface OverdueTaskData {
 export interface TasksByDueDateData {
   month: string;
   to_do: number;
+  in_progress: number;
   working_on_it: number;
+  review: number;
   done: number;
   overtime: number;
   over_deadline: number;
@@ -293,7 +299,9 @@ export interface TechnicianDashboardData {
   my_tasks: {
     total: number;
     to_do: number;
+    in_progress: number;
     working_on_it: number;
+    review: number;
     done: number;
     overtime: number;
     over_deadline: number;

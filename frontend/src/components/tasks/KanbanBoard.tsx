@@ -13,7 +13,16 @@ interface Props {
   userRole?: UserRole;
 }
 
-type KanbanColumn = 'to_do' | 'working_on_it' | 'done' | 'overtime' | 'over_deadline';
+/**
+ * Kanban columns:
+ * 1. To Do (gray) -- to_do, not overdue
+ * 2. In Progress (blue) -- in_progress AND working_on_it (not overdue). Cards with working_on_it get pulsing indicator.
+ * 3. Review (purple)
+ * 4. Done (green)
+ * 5. Overtime (amber) -- (in_progress OR working_on_it) AND overdue
+ * 6. Over Deadline (red) -- to_do AND overdue
+ */
+type KanbanColumn = 'to_do' | 'in_progress' | 'review' | 'done' | 'overtime' | 'over_deadline';
 
 interface ColumnDef {
   id: KanbanColumn;
@@ -26,7 +35,8 @@ interface ColumnDef {
 
 const COLUMNS: ColumnDef[] = [
   { id: 'to_do', label: 'To Do', borderColor: 'border-t-gray-400', headerBg: 'bg-gray-50', headerText: 'text-gray-700' },
-  { id: 'working_on_it', label: 'Working On It', borderColor: 'border-t-blue-500', headerBg: 'bg-blue-50', headerText: 'text-blue-700' },
+  { id: 'in_progress', label: 'In Progress', borderColor: 'border-t-blue-500', headerBg: 'bg-blue-50', headerText: 'text-blue-700' },
+  { id: 'review', label: 'Review', borderColor: 'border-t-purple-500', headerBg: 'bg-purple-50', headerText: 'text-purple-700' },
   { id: 'done', label: 'Done', borderColor: 'border-t-green-500', headerBg: 'bg-green-50', headerText: 'text-green-700' },
   { id: 'overtime', label: 'Overtime', borderColor: 'border-t-amber-500', headerBg: 'bg-amber-50', headerText: 'text-amber-700', icon: 'warning' },
   { id: 'over_deadline', label: 'Over Deadline', borderColor: 'border-t-red-500', headerBg: 'bg-red-50', headerText: 'text-red-700', icon: 'alert' },
@@ -61,7 +71,8 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTime
   const grouped = useMemo(() => {
     const map: Record<KanbanColumn, Task[]> = {
       to_do: [],
-      working_on_it: [],
+      in_progress: [],
+      review: [],
       done: [],
       overtime: [],
       over_deadline: [],
@@ -70,12 +81,16 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTime
     for (const task of tasks) {
       if (task.status === 'done') {
         map.done.push(task);
-      } else if (task.status === 'working_on_it' && isOverdue(task)) {
+      } else if (task.status === 'review') {
+        map.review.push(task);
+      } else if ((task.status === 'working_on_it' || task.status === 'in_progress') && isOverdue(task)) {
         map.overtime.push(task);
       } else if (task.status === 'to_do' && isOverdue(task)) {
         map.over_deadline.push(task);
-      } else if (task.status === 'working_on_it') {
-        map.working_on_it.push(task);
+      } else if (task.status === 'working_on_it' || task.status === 'in_progress') {
+        // Both in_progress and working_on_it go to the "In Progress" column
+        // working_on_it cards will show a pulsing green dot via KanbanCard
+        map.in_progress.push(task);
       } else {
         map.to_do.push(task);
       }
@@ -90,7 +105,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTime
   }, [tasks]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" role="region" aria-label="Kanban board">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" role="region" aria-label="Kanban board">
       {COLUMNS.map((col) => {
         const colTasks = grouped[col.id];
         return (

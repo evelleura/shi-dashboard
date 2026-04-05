@@ -22,13 +22,13 @@ function formatDate(dateStr: string): string {
 }
 
 function getTaskUrgency(task: Task): 'overtime' | 'over_deadline' | null {
-  if (task.status === 'done' || !task.due_date) return null;
+  if (task.status === 'done' || task.status === 'review' || !task.due_date) return null;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const due = new Date(task.due_date);
   due.setHours(0, 0, 0, 0);
   if (due >= today) return null;
-  if (task.status === 'working_on_it') return 'overtime';
+  if (task.status === 'working_on_it' || task.status === 'in_progress') return 'overtime';
   if (task.status === 'to_do') return 'over_deadline';
   return null;
 }
@@ -77,7 +77,7 @@ export default function TaskTable({
           cmp = a.name.localeCompare(b.name);
           break;
         case 'status': {
-          const order: Record<string, number> = { working_on_it: 0, to_do: 1, done: 2 };
+          const order: Record<string, number> = { working_on_it: 0, in_progress: 1, review: 2, to_do: 3, done: 4 };
           cmp = (order[a.status] ?? 9) - (order[b.status] ?? 9);
           break;
         }
@@ -152,6 +152,8 @@ export default function TaskTable({
                 ? 'bg-amber-50/50 hover:bg-amber-50'
                 : task.is_tracking
                 ? 'bg-green-50/30 hover:bg-green-50'
+                : task.status === 'review'
+                ? 'bg-purple-50/30 hover:bg-purple-50'
                 : 'hover:bg-gray-50';
 
               return (

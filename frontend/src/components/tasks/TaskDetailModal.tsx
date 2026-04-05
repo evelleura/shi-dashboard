@@ -78,8 +78,8 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
   if (!task) return null;
 
   const isTechnician = userRole === 'technician';
-  const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
-  const isOvertime = isOverdue && task.status === 'working_on_it';
+  const isOverdue = task.due_date && task.status !== 'done' && task.status !== 'review' && new Date(task.due_date) < new Date();
+  const isOvertime = isOverdue && (task.status === 'working_on_it' || task.status === 'in_progress');
   const isOverDeadline = isOverdue && task.status === 'to_do';
 
   const evidenceCount = task.evidence_count ?? 0;
