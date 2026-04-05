@@ -29,6 +29,8 @@ import type {
   EarnedValueData,
   TechnicianDashboardData,
   TaskStatus,
+  ProjectHealth,
+  HealthStatus,
 } from '../types';
 
 const api = axios.create({
@@ -127,8 +129,33 @@ export const getProjects = async (): Promise<Project[]> => {
 };
 
 export const getProject = async (id: number): Promise<ProjectWithDetail> => {
-  const res = await api.get<ApiResponse<ProjectWithDetail>>(`/projects/${id}`);
-  return res.data.data!;
+  const res = await api.get<ApiResponse<Record<string, unknown>>>(`/projects/${id}`);
+  const raw = res.data.data!;
+
+  // Backend returns health fields flat on the object (spi_value, health_status, etc.)
+  // Transform into nested ProjectWithDetail.health structure
+  const hasHealth = raw.spi_value != null || raw.total_tasks != null;
+  const health: ProjectHealth | undefined = hasHealth
+    ? {
+        project_id: id,
+        spi_value: Number(raw.spi_value) || 0,
+        status: (raw.health_status ?? 'green') as HealthStatus,
+        deviation_percent: Number(raw.deviation_percent) || 0,
+        actual_progress: Number(raw.actual_progress) || 0,
+        planned_progress: Number(raw.planned_progress) || 0,
+        total_tasks: Number(raw.total_tasks) || 0,
+        completed_tasks: Number(raw.completed_tasks) || 0,
+        working_tasks: Number(raw.working_tasks) || 0,
+        overtime_tasks: Number(raw.overtime_tasks) || 0,
+        overdue_tasks: Number(raw.overdue_tasks) || 0,
+        last_updated: (raw.health_last_updated as string) ?? '',
+      }
+    : undefined;
+
+  return {
+    ...raw as unknown as ProjectWithDetail,
+    health,
+  };
 };
 
 export const createProject = async (data: CreateProjectData): Promise<Project> => {

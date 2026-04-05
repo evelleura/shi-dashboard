@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProject, useAssignTechnician, useUnassignTechnician } from '../hooks/useProjects';
 import { useChangeTaskStatus, useCreateTask } from '../hooks/useTasks';
+import { useStartTimer, useStopTimer } from '../hooks/useActivities';
 import { useTechnicians } from '../hooks/useDashboard';
 import StatusBadge from '../components/ui/StatusBadge';
 import ProgressBar from '../components/ui/ProgressBar';
@@ -16,6 +17,7 @@ import BudgetTable from '../components/projects/BudgetTable';
 import EarnedValueChart from '../components/charts/EarnedValueChart';
 import EvidenceGallery from '../components/evidence/EvidenceGallery';
 import EvidenceUploader from '../components/evidence/EvidenceUploader';
+import { formatTimeSpent } from '../components/tasks/TaskTimer';
 import type { Task, TaskStatus, CreateTaskData } from '../types';
 import { useAuth } from '../hooks/useAuth';
 
@@ -23,6 +25,34 @@ type TabId = 'tasks' | 'budget' | 'materials' | 'evidence' | 'charts';
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () => void; isLoading: boolean }) {
+  return (
+    <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-3">
+      <span className="relative flex h-3 w-3 shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-green-600 font-medium">Currently working on</p>
+        <p className="text-sm font-semibold text-green-900 truncate">{task.name}</p>
+      </div>
+      <p className="text-lg font-mono font-bold text-green-700">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
+      <button
+        onClick={onStop}
+        disabled={isLoading}
+        className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+        aria-label="Stop timer"
+      >
+        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+          <rect x="6" y="4" width="4" height="16" rx="1" />
+          <rect x="14" y="4" width="4" height="16" rx="1" />
+        </svg>
+        Stop
+      </button>
+    </div>
+  );
 }
 
 export default function ProjectDetailPage() {
@@ -36,6 +66,8 @@ export default function ProjectDetailPage() {
   const createTask = useCreateTask();
   const assignTech = useAssignTechnician();
   const unassignTech = useUnassignTechnician();
+  const startTimer = useStartTimer();
+  const stopTimer = useStopTimer();
 
   const [activeTab, setActiveTab] = useState<TabId>('tasks');
   const [taskView, setTaskView] = useState<'kanban' | 'table'>('kanban');
@@ -45,7 +77,9 @@ export default function ProjectDetailPage() {
   const [assignUserId, setAssignUserId] = useState('');
   const [selectedEvidenceTaskId, setSelectedEvidenceTaskId] = useState<number | null>(null);
 
-  const isManager = user?.role === 'manager' || user?.role === 'admin';
+  const userRole = user?.role;
+  const isManager = userRole === 'manager' || userRole === 'admin';
+  const isTechnician = userRole === 'technician';
 
   if (isLoading) {
     return (
@@ -80,13 +114,33 @@ export default function ProjectDetailPage() {
     setShowAssign(false);
   };
 
-  const tabs: { id: TabId; label: string; count?: number }[] = [
+  // Timer handlers (same pattern as TechnicianTasksPage)
+  const handleTimerStart = (taskId: number) => {
+    startTimer.mutate({ taskId, projectId });
+  };
+
+  const handleTimerStop = (taskId: number) => {
+    stopTimer.mutate({ taskId, projectId });
+  };
+
+  const timerLoadingId = startTimer.isPending
+    ? startTimer.variables?.taskId
+    : stopTimer.isPending
+    ? stopTimer.variables?.taskId
+    : undefined;
+
+  // Find actively tracked task for the banner
+  const activeTask = (project.tasks ?? []).find((t) => t.is_tracking);
+
+  // Filter tabs based on role -- technicians should NOT see Budget
+  const allTabs: { id: TabId; label: string; count?: number }[] = [
     { id: 'tasks', label: 'Tasks', count: project.tasks?.length ?? 0 },
     { id: 'budget', label: 'Budget', count: project.budget_items?.length ?? 0 },
     { id: 'materials', label: 'Materials', count: project.materials?.length ?? 0 },
     { id: 'evidence', label: 'Evidence' },
     { id: 'charts', label: 'Charts' },
   ];
+  const tabs = isTechnician ? allTabs.filter((t) => t.id !== 'budget') : allTabs;
 
   // Available technicians for assignment (not yet assigned)
   const assignedIds = new Set((project.assigned_technicians ?? []).map((t) => t.id));
@@ -113,7 +167,8 @@ export default function ProjectDetailPage() {
             <p className="text-xs text-gray-400 mt-1">
               {formatDate(project.start_date)} -- {formatDate(project.end_date)} ({project.duration} days)
               &nbsp;| Phase: <span className="font-medium">{project.phase === 'survey' ? 'Survey' : 'Execution'}</span>
-              {Number(project.project_value) > 0 && (
+              {/* Hide project value from technicians */}
+              {!isTechnician && Number(project.project_value) > 0 && (
                 <> | Value: Rp {Number(project.project_value).toLocaleString('id-ID')}</>
               )}
             </p>
@@ -231,6 +286,15 @@ export default function ProjectDetailPage() {
       <div role="tabpanel">
         {activeTab === 'tasks' && (
           <div className="space-y-4">
+            {/* Active task banner */}
+            {activeTask && (
+              <ActiveTaskBanner
+                task={activeTask}
+                onStop={() => handleTimerStop(activeTask.id)}
+                isLoading={!!timerLoadingId}
+              />
+            )}
+
             <div className="flex items-center justify-between">
               <ViewToggle view={taskView} onChange={setTaskView} />
               {isManager && (
@@ -247,16 +311,22 @@ export default function ProjectDetailPage() {
                 tasks={project.tasks ?? []}
                 onStatusChange={handleStatusChange}
                 onTaskClick={setSelectedTask}
+                onTimerStart={handleTimerStart}
+                onTimerStop={handleTimerStop}
                 changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
-                userRole={user?.role}
+                timerLoadingId={timerLoadingId}
+                userRole={userRole}
               />
             ) : (
               <TaskTable
                 tasks={project.tasks ?? []}
                 onStatusChange={handleStatusChange}
                 onTaskClick={setSelectedTask}
+                onTimerStart={handleTimerStart}
+                onTimerStop={handleTimerStop}
                 changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
-                userRole={user?.role}
+                timerLoadingId={timerLoadingId}
+                userRole={userRole}
               />
             )}
           </div>
@@ -332,7 +402,7 @@ export default function ProjectDetailPage() {
         onClose={() => setSelectedTask(null)}
         onStatusChange={handleStatusChange}
         isChanging={changeStatus.isPending}
-        userRole={user?.role}
+        userRole={userRole}
       />
 
       {/* Create Task Modal */}

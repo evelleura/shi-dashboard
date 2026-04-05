@@ -265,6 +265,34 @@ router.post(
         return;
       }
 
+      // ENFORCE: Only ONE task can be tracked at a time per user.
+      // Stop any currently tracking task first.
+      const currentlyTracking = await query<{ id: number; timer_started_at: Date; project_id: number }>(
+        `SELECT id, timer_started_at, project_id FROM tasks
+         WHERE assigned_to = $1 AND is_tracking = true AND id != $2`,
+        [req.user!.userId, taskId]
+      );
+
+      for (const running of currentlyTracking.rows) {
+        // Stop the running task
+        await query(
+          `UPDATE tasks SET
+            is_tracking = false,
+            time_spent_seconds = time_spent_seconds + EXTRACT(EPOCH FROM (NOW() - timer_started_at))::int,
+            timer_started_at = NULL,
+            updated_at = NOW()
+          WHERE id = $1`,
+          [running.id]
+        );
+        const stoppedTask = await query<{ time_spent_seconds: number }>('SELECT time_spent_seconds FROM tasks WHERE id = $1', [running.id]);
+        const stoppedMins = Math.round((stoppedTask.rows[0]?.time_spent_seconds ?? 0) / 60);
+        await query(
+          `INSERT INTO task_activities (task_id, user_id, message, activity_type)
+           VALUES ($1, $2, $3, 'pause')`,
+          [running.id, req.user!.userId, `Auto-paused (switched task, ${stoppedMins} min total)`]
+        );
+      }
+
       // Determine activity type: start_work if fresh, resume if has prior time
       const activityType = task.time_spent_seconds > 0 ? 'resume' : 'start_work';
       const activityMessage = task.time_spent_seconds > 0 ? 'Resumed working' : 'Started working';

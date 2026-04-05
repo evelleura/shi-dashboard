@@ -6,7 +6,10 @@ interface Props {
   tasks: Task[];
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   onTaskClick?: (task: Task) => void;
+  onTimerStart?: (taskId: number) => void;
+  onTimerStop?: (taskId: number) => void;
   changingTaskId?: number;
+  timerLoadingId?: number;
   userRole?: UserRole;
 }
 
@@ -54,7 +57,7 @@ function AlertIcon() {
   );
 }
 
-export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changingTaskId, userRole }: Props) {
+export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTimerStart, onTimerStop, changingTaskId, timerLoadingId, userRole }: Props) {
   const grouped = useMemo(() => {
     const map: Record<KanbanColumn, Task[]> = {
       to_do: [],
@@ -119,7 +122,10 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changi
                     task={task}
                     onStatusChange={onStatusChange}
                     onClick={onTaskClick}
+                    onTimerStart={onTimerStart}
+                    onTimerStop={onTimerStop}
                     isChanging={changingTaskId === task.id}
+                    isTimerLoading={timerLoadingId === task.id}
                     userRole={userRole}
                     columnId={col.id}
                   />

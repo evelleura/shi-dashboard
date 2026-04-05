@@ -1,16 +1,48 @@
 import { useState } from 'react';
 import { useTechnicianDashboard } from '../hooks/useDashboard';
 import { useChangeTaskStatus } from '../hooks/useTasks';
+import { useStartTimer, useStopTimer } from '../hooks/useActivities';
 import { useAuth } from '../hooks/useAuth';
 import KanbanBoard from '../components/tasks/KanbanBoard';
 import TaskTable from '../components/tasks/TaskTable';
 import TaskDetailModal from '../components/tasks/TaskDetailModal';
 import ViewToggle from '../components/tasks/ViewToggle';
+import { formatTimeSpent } from '../components/tasks/TaskTimer';
 import type { Task, TaskStatus } from '../types';
+
+function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () => void; isLoading: boolean }) {
+  return (
+    <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-3">
+      <span className="relative flex h-3 w-3 shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-green-600 font-medium">Currently working on</p>
+        <p className="text-sm font-semibold text-green-900 truncate">{task.name}</p>
+        {task.project_name && <p className="text-xs text-green-600">{task.project_name}</p>}
+      </div>
+      <p className="text-lg font-mono font-bold text-green-700">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
+      <button
+        onClick={onStop}
+        disabled={isLoading}
+        className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+      >
+        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+          <rect x="6" y="4" width="4" height="16" rx="1" />
+          <rect x="14" y="4" width="4" height="16" rx="1" />
+        </svg>
+        Stop
+      </button>
+    </div>
+  );
+}
 
 export default function TechnicianTasksPage() {
   const { data, isLoading, isError, refetch } = useTechnicianDashboard();
   const changeStatus = useChangeTaskStatus();
+  const startTimer = useStartTimer();
+  const stopTimer = useStopTimer();
   const { user } = useAuth();
 
   const [taskView, setTaskView] = useState<'kanban' | 'table'>('kanban');
@@ -40,8 +72,31 @@ export default function TechnicianTasksPage() {
     }
   };
 
+  const activeTask = data.recent_tasks.find((t) => t.is_tracking);
+
+  const handleTimerStart = (id: number) => {
+    const t = data.recent_tasks.find((x) => x.id === id);
+    if (t) startTimer.mutate({ taskId: id, projectId: t.project_id });
+  };
+
+  const handleTimerStop = (id: number) => {
+    const t = data.recent_tasks.find((x) => x.id === id);
+    if (t) stopTimer.mutate({ taskId: id, projectId: t.project_id });
+  };
+
+  const timerLoading = startTimer.isPending ? startTimer.variables?.taskId : stopTimer.isPending ? stopTimer.variables?.taskId : undefined;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Currently Working On banner */}
+      {activeTask && (
+        <ActiveTaskBanner
+          task={activeTask}
+          onStop={() => handleTimerStop(activeTask.id)}
+          isLoading={!!timerLoading}
+        />
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">My Tasks</h1>
@@ -65,7 +120,10 @@ export default function TechnicianTasksPage() {
           tasks={data.recent_tasks}
           onStatusChange={handleStatusChange}
           onTaskClick={setSelectedTask}
+          onTimerStart={handleTimerStart}
+          onTimerStop={handleTimerStop}
           changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
+          timerLoadingId={timerLoading}
           userRole={user?.role}
         />
       ) : (
@@ -73,7 +131,10 @@ export default function TechnicianTasksPage() {
           tasks={data.recent_tasks}
           onStatusChange={handleStatusChange}
           onTaskClick={setSelectedTask}
+          onTimerStart={handleTimerStart}
+          onTimerStop={handleTimerStop}
           changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
+          timerLoadingId={timerLoading}
           showProject
           userRole={user?.role}
         />
