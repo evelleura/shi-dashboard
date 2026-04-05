@@ -6,6 +6,8 @@ export type HealthStatus = 'green' | 'amber' | 'red';
 export type TaskStatus = 'to_do' | 'working_on_it' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
 export type ActivityType = 'arrival' | 'start_work' | 'pause' | 'resume' | 'note' | 'photo' | 'complete';
+export type EscalationStatus = 'open' | 'in_review' | 'resolved';
+export type EscalationPriority = 'low' | 'medium' | 'high' | 'critical';
 
 // === Entity Interfaces ===
 
@@ -101,6 +103,30 @@ export interface TaskActivity {
   file_type?: string;
   file_size: number;
   created_at: Date;
+}
+
+export interface Escalation {
+  id: number;
+  task_id: number;
+  project_id: number;
+  reported_by: number;
+  reporter_name?: string;
+  task_name?: string;
+  project_name?: string;
+  title: string;
+  description: string;
+  status: EscalationStatus;
+  priority: EscalationPriority;
+  file_path?: string;
+  file_name?: string;
+  file_type?: string;
+  file_size?: number;
+  resolved_by?: number;
+  resolver_name?: string;
+  resolved_at?: string;
+  resolution_notes?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Material {

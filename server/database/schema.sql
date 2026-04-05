@@ -238,6 +238,40 @@ CREATE INDEX IF NOT EXISTS idx_activities_task ON task_activities(task_id);
 CREATE INDEX IF NOT EXISTS idx_activities_user ON task_activities(user_id);
 
 -- ============================================================
+-- Escalations table (field problem reports)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS escalations (
+  id SERIAL PRIMARY KEY,
+  task_id INT NOT NULL,
+  project_id INT NOT NULL,
+  reported_by INT NOT NULL,
+  title VARCHAR(500) NOT NULL,
+  description TEXT NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'open',
+  priority VARCHAR(50) NOT NULL DEFAULT 'medium',
+  file_path VARCHAR(1000),
+  file_name VARCHAR(500),
+  file_type VARCHAR(50),
+  file_size INT DEFAULT 0,
+  resolved_by INT,
+  resolved_at TIMESTAMP,
+  resolution_notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+  FOREIGN KEY (reported_by) REFERENCES users(id),
+  FOREIGN KEY (resolved_by) REFERENCES users(id),
+  CONSTRAINT escalation_status_check CHECK (status IN ('open', 'in_review', 'resolved')),
+  CONSTRAINT escalation_priority_check CHECK (priority IN ('low', 'medium', 'high', 'critical'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_escalations_task ON escalations(task_id);
+CREATE INDEX IF NOT EXISTS idx_escalations_project ON escalations(project_id);
+CREATE INDEX IF NOT EXISTS idx_escalations_status ON escalations(status);
+CREATE INDEX IF NOT EXISTS idx_escalations_reported_by ON escalations(reported_by);
+
+-- ============================================================
 -- Seed admin user (password: password123)
 -- ============================================================
 INSERT INTO users (name, email, role, password_hash)

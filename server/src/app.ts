@@ -15,6 +15,7 @@ import evidenceRouter from './routes/evidence';
 import materialsRouter from './routes/materials';
 import budgetRouter from './routes/budget';
 import activitiesRouter from './routes/activities';
+import escalationsRouter from './routes/escalations';
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use('/api/evidence', evidenceRouter);
 app.use('/api/materials', materialsRouter);
 app.use('/api/budget', budgetRouter);
 app.use('/api/activities', activitiesRouter);
+app.use('/api/escalations', escalationsRouter);
 
 // Health check
 app.get('/health', (_req, res) => {

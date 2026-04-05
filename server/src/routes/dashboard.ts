@@ -101,8 +101,17 @@ router.get('/', authenticate, authorize('manager', 'admin'), async (_req: AuthRe
       LIMIT 20`
     );
 
+    // Escalation counts for manager dashboard
+    const escalationSummary = await query(
+      `SELECT
+        COUNT(*) FILTER (WHERE status = 'open')::int AS open,
+        COUNT(*) FILTER (WHERE status = 'in_review')::int AS in_review
+      FROM escalations`
+    );
+
     const stats = statsResult.rows[0] as Record<string, unknown>;
     const taskStats = taskStatsResult.rows[0] as Record<string, unknown>;
+    const escStats = escalationSummary.rows[0] as Record<string, unknown>;
 
     res.json({
       success: true,
@@ -114,6 +123,8 @@ router.get('/', authenticate, authorize('manager', 'admin'), async (_req: AuthRe
           completed_tasks: taskStats.completed_tasks,
           working_tasks: taskStats.working_tasks,
           overtime_tasks: taskStats.overtime_tasks,
+          open_escalations: escStats.open,
+          in_review_escalations: escStats.in_review,
         },
         recent_activity: recentResult.rows,
       },
@@ -451,12 +462,42 @@ router.get('/technician', authenticate, async (req: AuthRequest, res: Response) 
       [userId]
     );
 
+    // Completed/on-hold/cancelled projects for history
+    const completedProjects = await query(
+      `SELECT
+        p.id, p.name, p.phase, p.start_date, p.end_date, p.status,
+        c.name AS client_name, c.address AS client_address,
+        COUNT(t.id) FILTER (WHERE t.assigned_to = $1)::int AS my_task_count,
+        COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'done')::int AS my_completed
+      FROM projects p
+      JOIN project_assignments pa ON pa.project_id = p.id AND pa.user_id = $1
+      LEFT JOIN clients c ON c.id = p.client_id
+      LEFT JOIN tasks t ON t.project_id = p.id
+      WHERE p.status IN ('completed', 'on-hold', 'cancelled')
+      GROUP BY p.id, p.name, p.phase, p.start_date, p.end_date, p.status,
+        c.name, c.address
+      ORDER BY p.updated_at DESC`,
+      [userId]
+    );
+
+    // Escalation summary for this technician
+    const myEscalations = await query(
+      `SELECT
+        COUNT(*) FILTER (WHERE status = 'open')::int AS open,
+        COUNT(*) FILTER (WHERE status = 'in_review')::int AS in_review,
+        COUNT(*) FILTER (WHERE status = 'resolved')::int AS resolved
+      FROM escalations WHERE reported_by = $1`,
+      [userId]
+    );
+
     res.json({
       success: true,
       data: {
         my_tasks: taskSummary.rows[0],
         assigned_projects: assignedProjects.rows,
+        completed_projects: completedProjects.rows,
         recent_tasks: recentTasks.rows,
+        escalation_summary: myEscalations.rows[0],
       },
     });
   } catch (err) {

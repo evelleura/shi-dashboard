@@ -1115,3 +1115,80 @@ FROM tasks t, users u,
 WHERE t.name = 'Penarikan kabel data'
   AND t.project_id = (SELECT id FROM projects WHERE name = 'Smart Building - Kantor Dishub Yogyakarta')
   AND u.email = 'reza@shi.co.id';
+
+-- ============================================================
+-- Escalation entries
+-- ============================================================
+
+-- P1: gateway IoT firmware issue (resolved)
+INSERT INTO escalations (task_id, project_id, reported_by, title, description, status, priority, created_at)
+SELECT
+  (SELECT id FROM tasks WHERE name = 'Setup gateway IoT' AND project_id = p.id),
+  p.id,
+  (SELECT id FROM users WHERE email = 'siti@shi.co.id'),
+  'Gateway IoT firmware tidak kompatibel',
+  'Firmware gateway Tuya versi terbaru tidak kompatibel dengan smart switch yang sudah terpasang. Perlu downgrade firmware atau ganti model gateway.',
+  'resolved', 'high',
+  CURRENT_TIMESTAMP - INTERVAL '8 days'
+FROM projects p WHERE p.name = 'Smart Home IoT - Perumahan Citra Raya';
+
+-- P3: material belum datang (open, critical)
+INSERT INTO escalations (task_id, project_id, reported_by, title, description, status, priority, created_at)
+SELECT
+  (SELECT id FROM tasks WHERE name = 'Instalasi smart curtain & AC' AND project_id = p.id),
+  p.id,
+  (SELECT id FROM users WHERE email = 'siti@shi.co.id'),
+  'Motor curtain tidak sesuai spek',
+  'Motor curtain yang dikirim supplier tidak cocok dengan rel yang sudah terpasang. Butuh adapter custom atau ganti model motor. Deadline mendekat.',
+  'open', 'critical',
+  CURRENT_TIMESTAMP - INTERVAL '3 days'
+FROM projects p WHERE p.name = 'Smart Home Automation - Villa Kaliurang';
+
+-- P3: lighting issue (in_review)
+INSERT INTO escalations (task_id, project_id, reported_by, title, description, status, priority, created_at)
+SELECT
+  (SELECT id FROM tasks WHERE name = 'Instalasi lighting automation' AND project_id = p.id),
+  p.id,
+  (SELECT id FROM users WHERE email = 'siti@shi.co.id'),
+  'Dimmer tidak support lampu LED klien',
+  'Dimmer yang kita pasang tidak kompatibel dengan lampu LED merk Philips yang sudah ada di villa. Flickering saat di-dim. Perlu ganti dimmer atau minta klien ganti lampu.',
+  'in_review', 'medium',
+  CURRENT_TIMESTAMP - INTERVAL '1 day'
+FROM projects p WHERE p.name = 'Smart Home Automation - Villa Kaliurang';
+
+-- P11: fire alarm panel issue (open)
+INSERT INTO escalations (task_id, project_id, reported_by, title, description, status, priority, created_at)
+SELECT
+  (SELECT id FROM tasks WHERE name = 'Instalasi panel & detector gedung A' AND project_id = p.id),
+  p.id,
+  (SELECT id FROM users WHERE email = 'yoga@shi.co.id'),
+  'Panel fire alarm zone 3 error',
+  'Panel Notifier di gedung A zone 3 menunjukkan ground fault. Sudah dicek kabel, kemungkinan smoke detector rusak. Butuh penggantian detector.',
+  'open', 'high',
+  CURRENT_TIMESTAMP - INTERVAL '2 days'
+FROM projects p WHERE p.name = 'Fire Alarm System - Kampus UTY';
+
+-- P13: weather delay (resolved)
+INSERT INTO escalations (task_id, project_id, reported_by, title, description, status, priority, created_at)
+SELECT
+  (SELECT id FROM tasks WHERE name = 'Instalasi sensor energi batch 2 (24 panel)' AND project_id = p.id),
+  p.id,
+  (SELECT id FROM users WHERE email = 'yoga@shi.co.id'),
+  'Hujan deras 3 hari berturut-turut',
+  'Tidak bisa kerja di atap pabrik karena hujan deras selama 3 hari. Sensor batch 2 tertunda. Mohon perpanjangan deadline.',
+  'resolved', 'medium',
+  CURRENT_TIMESTAMP - INTERVAL '10 days'
+FROM projects p WHERE p.name = 'Solar Panel Monitoring - Sinar Mas';
+
+-- Update resolved escalations with resolution details
+UPDATE escalations SET
+  resolved_by = (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
+  resolved_at = CURRENT_TIMESTAMP - INTERVAL '5 days',
+  resolution_notes = 'Sudah koordinasi dengan supplier, firmware downgrade berhasil. Gateway berfungsi normal.'
+WHERE title = 'Gateway IoT firmware tidak kompatibel';
+
+UPDATE escalations SET
+  resolved_by = (SELECT id FROM users WHERE email = 'hendro@shi.co.id'),
+  resolved_at = CURRENT_TIMESTAMP - INTERVAL '7 days',
+  resolution_notes = 'Deadline diperpanjang 5 hari. Cuaca sudah membaik, lanjutkan instalasi.'
+WHERE title = 'Hujan deras 3 hari berturut-turut';
