@@ -57,8 +57,10 @@ router.get('/', authenticate, authorize('manager', 'admin'), async (_req: AuthRe
       `SELECT
         COUNT(*)::int AS total_tasks,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS completed_tasks,
+        COUNT(*) FILTER (WHERE t.status = 'in_progress')::int AS in_progress_tasks,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working_tasks,
-        COUNT(*) FILTER (WHERE t.status = 'working_on_it' AND t.due_date < CURRENT_DATE)::int AS overtime_tasks
+        COUNT(*) FILTER (WHERE t.status = 'review')::int AS review_tasks,
+        COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress') AND t.due_date < CURRENT_DATE)::int AS overtime_tasks
       FROM tasks t
       JOIN projects p ON p.id = t.project_id
       WHERE p.status = 'active'`
@@ -121,7 +123,9 @@ router.get('/', authenticate, authorize('manager', 'admin'), async (_req: AuthRe
           ...stats,
           total_tasks: taskStats.total_tasks,
           completed_tasks: taskStats.completed_tasks,
+          in_progress_tasks: taskStats.in_progress_tasks,
           working_tasks: taskStats.working_tasks,
+          review_tasks: taskStats.review_tasks,
           overtime_tasks: taskStats.overtime_tasks,
           open_escalations: escStats.open,
           in_review_escalations: escStats.in_review,
@@ -147,7 +151,7 @@ router.get('/charts/tasks-by-status', authenticate, authorize('manager', 'admin'
       WHERE p.status = 'active'
       GROUP BY t.status
       ORDER BY
-        CASE t.status WHEN 'done' THEN 1 WHEN 'working_on_it' THEN 2 WHEN 'to_do' THEN 3 END`
+        CASE t.status WHEN 'done' THEN 1 WHEN 'review' THEN 2 WHEN 'working_on_it' THEN 3 WHEN 'in_progress' THEN 4 WHEN 'to_do' THEN 5 END`
     );
 
     const total = result.rows.reduce((sum, r) => sum + parseInt(String((r as Record<string, unknown>).count)), 0);
@@ -178,8 +182,10 @@ router.get('/charts/tasks-by-owner', authenticate, authorize('manager', 'admin')
         u.name,
         COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS done,
+        COUNT(*) FILTER (WHERE t.status = 'review')::int AS review,
         COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working,
-        COUNT(*) FILTER (WHERE t.status = 'working_on_it' AND t.due_date < CURRENT_DATE)::int AS overtime,
+        COUNT(*) FILTER (WHERE t.status = 'in_progress')::int AS in_progress,
+        COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress') AND t.due_date < CURRENT_DATE)::int AS overtime,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do
       FROM tasks t
       JOIN users u ON u.id = t.assigned_to
@@ -203,7 +209,7 @@ router.get('/charts/overdue-tasks', authenticate, authorize('manager', 'admin'),
       `SELECT
         p.id AS project_id,
         p.name AS project_name,
-        COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS overdue_working,
+        COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress'))::int AS overdue_working,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS overdue_todo
       FROM tasks t
       JOIN projects p ON p.id = t.project_id

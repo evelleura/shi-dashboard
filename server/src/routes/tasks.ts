@@ -5,13 +5,17 @@ import { recalculateSPI } from '../services/spiCalculator';
 
 const router = Router();
 
-const VALID_STATUSES = ['to_do', 'working_on_it', 'done'];
+const VALID_STATUSES = ['to_do', 'in_progress', 'working_on_it', 'review', 'done'];
 
-// Valid status transitions: from -> [allowed targets]
+// Valid status transitions for technicians.
+// Note: working_on_it is SET by timer start, not by manual status change.
+// Technicians should NOT be able to manually select working_on_it from dropdown.
 const STATUS_TRANSITIONS: Record<string, string[]> = {
-  to_do: ['working_on_it'],
-  working_on_it: ['done', 'to_do'],
-  done: ['working_on_it'],
+  to_do: ['in_progress'],           // technician can start (manually, without timer)
+  in_progress: ['to_do', 'review'], // technician can reset or submit for review
+  working_on_it: ['in_progress'],   // technician can only pause (timer handles this)
+  review: ['in_progress'],          // technician can pull back from review
+  done: [],                         // technician cannot change done tasks
 };
 
 // Managers can reset any task to any status

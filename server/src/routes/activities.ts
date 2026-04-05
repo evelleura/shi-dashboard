@@ -260,6 +260,12 @@ router.post(
         return;
       }
 
+      // Cannot start timer on reviewed or done tasks
+      if (task.status === 'review' || task.status === 'done') {
+        res.status(400).json({ success: false, error: 'Cannot start timer on reviewed/done task' });
+        return;
+      }
+
       if (task.is_tracking) {
         res.status(409).json({ success: false, error: 'Timer is already running on this task' });
         return;
@@ -274,12 +280,13 @@ router.post(
       );
 
       for (const running of currentlyTracking.rows) {
-        // Stop the running task
+        // Stop the running task and set status to in_progress (paused)
         await query(
           `UPDATE tasks SET
             is_tracking = false,
             time_spent_seconds = time_spent_seconds + EXTRACT(EPOCH FROM (NOW() - timer_started_at))::int,
             timer_started_at = NULL,
+            status = 'in_progress',
             updated_at = NOW()
           WHERE id = $1`,
           [running.id]
@@ -297,8 +304,8 @@ router.post(
       const activityType = task.time_spent_seconds > 0 ? 'resume' : 'start_work';
       const activityMessage = task.time_spent_seconds > 0 ? 'Resumed working' : 'Started working';
 
-      // Auto-set status to working_on_it if currently to_do
-      const newStatus = task.status === 'to_do' ? 'working_on_it' : task.status;
+      // Auto-set status to working_on_it if currently to_do or in_progress
+      const newStatus = (task.status === 'to_do' || task.status === 'in_progress') ? 'working_on_it' : task.status;
 
       const updateResult = await query(
         `UPDATE tasks SET
@@ -370,12 +377,13 @@ router.post(
         return;
       }
 
-      // Calculate elapsed seconds and update task
+      // Calculate elapsed seconds and update task; set status to in_progress (paused)
       const updateResult = await query(
         `UPDATE tasks SET
           is_tracking = false,
           time_spent_seconds = time_spent_seconds + EXTRACT(EPOCH FROM (NOW() - timer_started_at))::int,
           timer_started_at = NULL,
+          status = 'in_progress',
           updated_at = NOW()
         WHERE id = $1
         RETURNING *`,

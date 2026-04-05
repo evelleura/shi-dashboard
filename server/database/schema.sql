@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
   FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (created_by) REFERENCES users(id),
-  CONSTRAINT task_status_check CHECK (status IN ('to_do', 'working_on_it', 'done'))
+  CONSTRAINT task_status_check CHECK (status IN ('to_do', 'in_progress', 'working_on_it', 'review', 'done'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id);
