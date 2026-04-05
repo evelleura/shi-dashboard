@@ -11,6 +11,8 @@ import ClientsPage from './pages/ClientsPage';
 import TechnicianDashboard from './pages/TechnicianDashboard';
 import TechnicianProjectsPage from './pages/TechnicianProjectsPage';
 import TechnicianTasksPage from './pages/TechnicianTasksPage';
+import TechnicianEscalationsPage from './pages/TechnicianEscalationsPage';
+import EscalationsPage from './pages/EscalationsPage';
 import Layout from './components/ui/Layout';
 import type { UserRole } from './types';
 
@@ -84,6 +86,14 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/escalations"
+            element={
+              <ProtectedRoute roles={['manager', 'admin']}>
+                <EscalationsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Project detail -- accessible by all authenticated users (technicians view their assigned projects) */}
           <Route
@@ -117,6 +127,14 @@ export default function App() {
             element={
               <ProtectedRoute roles={['technician', 'admin']}>
                 <TechnicianTasksPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-escalations"
+            element={
+              <ProtectedRoute roles={['technician', 'admin']}>
+                <TechnicianEscalationsPage />
               </ProtectedRoute>
             }
           />

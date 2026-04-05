@@ -12,6 +12,8 @@ import type {
   TaskActivity,
   Material,
   BudgetItem,
+  Escalation,
+  EscalationSummary,
   CreateProjectData,
   UpdateProjectData,
   CreateTaskData,
@@ -331,6 +333,35 @@ export const getEarnedValue = async (projectId: number): Promise<EarnedValueData
 
 export const getTechnicianDashboard = async (): Promise<TechnicianDashboardData> => {
   const res = await api.get<ApiResponse<TechnicianDashboardData>>('/dashboard/technician');
+  return res.data.data!;
+};
+
+// ==================== Escalations ====================
+
+export const getEscalations = async (params?: { status?: string; project_id?: number }): Promise<Escalation[]> => {
+  const res = await api.get<ApiResponse<Escalation[]>>('/escalations', { params });
+  return res.data.data!;
+};
+
+export const getEscalationSummary = async (): Promise<EscalationSummary> => {
+  const res = await api.get<ApiResponse<EscalationSummary>>('/escalations/summary');
+  return res.data.data!;
+};
+
+export const createEscalation = async (data: FormData): Promise<Escalation> => {
+  const res = await api.post<ApiResponse<Escalation>>('/escalations', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data.data!;
+};
+
+export const reviewEscalation = async (id: number): Promise<Escalation> => {
+  const res = await api.patch<ApiResponse<Escalation>>(`/escalations/${id}/review`);
+  return res.data.data!;
+};
+
+export const resolveEscalation = async (id: number, resolution_notes: string): Promise<Escalation> => {
+  const res = await api.patch<ApiResponse<Escalation>>(`/escalations/${id}/resolve`, { resolution_notes });
   return res.data.data!;
 };
 

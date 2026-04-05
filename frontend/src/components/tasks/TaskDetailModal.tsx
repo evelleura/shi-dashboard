@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Modal from '../ui/Modal';
 import TaskStatusSelect from './TaskStatusSelect';
@@ -7,8 +7,9 @@ import EvidenceGallery from '../evidence/EvidenceGallery';
 import ActivityFeed from './ActivityFeed';
 import TaskTimer from './TaskTimer';
 import { useStartTimer, useStopTimer } from '../../hooks/useActivities';
+import { useCreateEscalation } from '../../hooks/useEscalations';
 import { getProjectMaterials } from '../../services/api';
-import type { Task, TaskStatus, UserRole, Material } from '../../types';
+import type { Task, TaskStatus, UserRole, Material, EscalationPriority } from '../../types';
 
 type Section = 'details' | 'evidence' | 'activity' | 'materials';
 
@@ -35,6 +36,36 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
 
   const startTimerMutation = useStartTimer();
   const stopTimerMutation = useStopTimer();
+  const createEscalationMutation = useCreateEscalation();
+
+  const [showEscalationForm, setShowEscalationForm] = useState(false);
+  const [escTitle, setEscTitle] = useState('');
+  const [escDescription, setEscDescription] = useState('');
+  const [escPriority, setEscPriority] = useState<EscalationPriority>('medium');
+  const [escFile, setEscFile] = useState<File | null>(null);
+  const escFileRef = useRef<HTMLInputElement>(null);
+
+  const resetEscalationForm = () => {
+    setEscTitle('');
+    setEscDescription('');
+    setEscPriority('medium');
+    setEscFile(null);
+    if (escFileRef.current) escFileRef.current.value = '';
+    setShowEscalationForm(false);
+  };
+
+  const handleEscalationSubmit = () => {
+    if (!task || !escTitle.trim() || !escDescription.trim()) return;
+    const formData = new FormData();
+    formData.append('task_id', String(task.id));
+    formData.append('title', escTitle.trim());
+    formData.append('description', escDescription.trim());
+    formData.append('priority', escPriority);
+    if (escFile) formData.append('file', escFile);
+    createEscalationMutation.mutate(formData, {
+      onSuccess: () => resetEscalationForm(),
+    });
+  };
 
   // Fetch project materials for the Materials tab
   const { data: materials = [], isLoading: materialsLoading } = useQuery({
@@ -97,8 +128,99 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
             {isOverDeadline && (
               <span className="text-xs text-red-700 bg-red-100 px-2 py-0.5 rounded-full font-medium">Over Deadline</span>
             )}
+            {/* Escalate button -- technician only, task not done */}
+            {isTechnician && task.status !== 'done' && (
+              <button
+                onClick={() => setShowEscalationForm(true)}
+                className="ml-auto text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1"
+                aria-label="Escalate this task"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                Escalate
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Escalation Form (inline) */}
+        {showEscalationForm && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3" role="form" aria-label="Escalation form">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold text-red-700">Report an Issue</h4>
+              <button onClick={resetEscalationForm} className="text-gray-400 hover:text-gray-600 text-xs" aria-label="Cancel escalation">Cancel</button>
+            </div>
+            <div>
+              <label htmlFor="esc-title" className="block text-xs font-medium text-gray-700 mb-1">Title <span className="text-red-500">*</span></label>
+              <input
+                id="esc-title"
+                type="text"
+                value={escTitle}
+                onChange={(e) => setEscTitle(e.target.value)}
+                placeholder="Brief summary of the issue"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="esc-desc" className="block text-xs font-medium text-gray-700 mb-1">Description <span className="text-red-500">*</span></label>
+              <textarea
+                id="esc-desc"
+                value={escDescription}
+                onChange={(e) => setEscDescription(e.target.value)}
+                placeholder="Describe the issue in detail..."
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                required
+              />
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label htmlFor="esc-priority" className="block text-xs font-medium text-gray-700 mb-1">Priority</label>
+                <select
+                  id="esc-priority"
+                  value={escPriority}
+                  onChange={(e) => setEscPriority(e.target.value as EscalationPriority)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <label htmlFor="esc-file" className="block text-xs font-medium text-gray-700 mb-1">Attachment (optional)</label>
+                <input
+                  id="esc-file"
+                  ref={escFileRef}
+                  type="file"
+                  onChange={(e) => setEscFile(e.target.files?.[0] ?? null)}
+                  className="w-full text-sm text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={resetEscalationForm}
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEscalationSubmit}
+                disabled={!escTitle.trim() || !escDescription.trim() || createEscalationMutation.isPending}
+                className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {createEscalationMutation.isPending ? 'Submitting...' : 'Submit Escalation'}
+              </button>
+            </div>
+            {createEscalationMutation.isError && (
+              <p className="text-xs text-red-600">Failed to submit escalation. Please try again.</p>
+            )}
+          </div>
+        )}
 
         {/* Description */}
         {task.description && (

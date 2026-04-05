@@ -43,6 +43,8 @@ export default function TechnicianDashboard() {
   }
 
   const stats = data.my_tasks;
+  const openEscalations = data.escalation_summary?.open ?? 0;
+
   const statCards = [
     { label: 'Total Tasks', value: stats.total, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
     { label: 'To Do', value: stats.to_do, color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' },
@@ -61,6 +63,13 @@ export default function TechnicianDashboard() {
       color: stats.over_deadline > 0 ? 'text-red-600' : 'text-gray-600',
       bg: stats.over_deadline > 0 ? 'bg-red-50' : 'bg-gray-50',
       border: stats.over_deadline > 0 ? 'border-red-200' : 'border-gray-200',
+    },
+    {
+      label: 'Open Escalations',
+      value: openEscalations,
+      color: openEscalations > 0 ? 'text-red-600' : 'text-gray-600',
+      bg: openEscalations > 0 ? 'bg-red-50' : 'bg-gray-50',
+      border: openEscalations > 0 ? 'border-red-200' : 'border-gray-200',
     },
   ];
 
@@ -89,7 +98,7 @@ export default function TechnicianDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         {statCards.map((card) => (
           <div key={card.label} className={`${card.bg} border ${card.border} rounded-xl p-3 text-center`}>
             <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>

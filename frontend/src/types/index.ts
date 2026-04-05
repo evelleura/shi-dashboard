@@ -6,6 +6,8 @@ export type HealthStatus = 'green' | 'amber' | 'red';
 export type TaskStatus = 'to_do' | 'working_on_it' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
 export type ActivityType = 'arrival' | 'start_work' | 'pause' | 'resume' | 'note' | 'photo' | 'complete';
+export type EscalationStatus = 'open' | 'in_review' | 'resolved';
+export type EscalationPriority = 'low' | 'medium' | 'high' | 'critical';
 
 // === Entities ===
 
@@ -106,6 +108,37 @@ export interface TaskActivity {
   created_at: string;
 }
 
+export interface Escalation {
+  id: number;
+  task_id: number;
+  project_id: number;
+  reported_by: number;
+  reporter_name?: string;
+  task_name?: string;
+  project_name?: string;
+  title: string;
+  description: string;
+  status: EscalationStatus;
+  priority: EscalationPriority;
+  file_path?: string;
+  file_name?: string;
+  file_type?: string;
+  file_size?: number;
+  resolved_by?: number;
+  resolver_name?: string;
+  resolved_at?: string;
+  resolution_notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EscalationSummary {
+  open: number;
+  in_review: number;
+  resolved: number;
+  total?: number;
+}
+
 export interface Material {
   id: number;
   project_id: number;
@@ -159,6 +192,8 @@ export interface DashboardSummary {
   overtime_tasks: number;
   over_deadline_tasks: number;
   overdue_projects: number;
+  open_escalations?: number;
+  in_review_escalations?: number;
 }
 
 export interface DashboardProject extends Project {
@@ -274,6 +309,18 @@ export interface TechnicianDashboardData {
     my_completed: number;
   }[];
   recent_tasks: Task[];
+  completed_projects?: {
+    id: number;
+    name: string;
+    client_name?: string;
+    client_address?: string;
+    status: ProjectStatus;
+    phase: ProjectPhase;
+    health_status?: HealthStatus | null;
+    my_task_count: number;
+    my_completed: number;
+  }[];
+  escalation_summary?: EscalationSummary;
 }
 
 // === Form Data Types ===

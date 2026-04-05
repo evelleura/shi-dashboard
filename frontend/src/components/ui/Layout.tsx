@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useEscalationSummary } from '../../hooks/useEscalations';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -11,6 +12,7 @@ interface NavItem {
   to: string;
   label: string;
   icon: ReactNode;
+  badge?: number;
 }
 
 function DashboardIcon() {
@@ -45,10 +47,20 @@ function TasksIcon() {
   );
 }
 
+function EscalationsIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+    </svg>
+  );
+}
+
 export default function Layout({ children }: Props) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { data: escalationSummary } = useEscalationSummary();
+  const openEscalations = escalationSummary?.open ?? 0;
 
   const handleLogout = () => {
     logout();
@@ -62,11 +74,13 @@ export default function Layout({ children }: Props) {
         { to: '/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
         { to: '/projects', label: 'Projects', icon: <ProjectsIcon /> },
         { to: '/clients', label: 'Clients', icon: <ClientsIcon /> },
+        { to: '/escalations', label: 'Escalations', icon: <EscalationsIcon />, badge: openEscalations },
       ]
     : [
         { to: '/my-dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
         { to: '/my-projects', label: 'My Projects', icon: <ProjectsIcon /> },
         { to: '/my-tasks', label: 'My Tasks', icon: <TasksIcon /> },
+        { to: '/my-escalations', label: 'Escalations', icon: <EscalationsIcon />, badge: openEscalations },
       ];
 
   return (
@@ -109,6 +123,11 @@ export default function Layout({ children }: Props) {
               >
                 {item.icon}
                 {item.label}
+                {item.badge != null && item.badge > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center" aria-label={`${item.badge} open`}>
+                    {item.badge}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>
