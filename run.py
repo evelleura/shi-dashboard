@@ -55,9 +55,27 @@ def get_pg_download_info() -> tuple[str, str]:
 
 
 def pg_bin_path(name: str) -> Path:
-    """Returns path to a PG binary with platform-appropriate extension."""
+    """Returns path to a PG binary. Uses portable postgres/bin/ if present, else system PATH or Homebrew."""
     suffix = ".exe" if PLATFORM == "win32" else ""
-    return PG_BIN / f"{name}{suffix}"
+    portable = PG_BIN / f"{name}{suffix}"
+    if portable.exists():
+        return portable
+    system = shutil.which(name)
+    if system:
+        return Path(system)
+    if PLATFORM == "darwin":
+        import glob as _glob
+        for pattern in [
+            f"/opt/homebrew/Cellar/libpq/*/bin/{name}",
+            f"/opt/homebrew/opt/postgresql*/bin/{name}",
+            f"/opt/homebrew/Cellar/postgresql*/*/bin/{name}",
+            f"/usr/local/Cellar/libpq/*/bin/{name}",
+            f"/usr/local/opt/postgresql*/bin/{name}",
+        ]:
+            matches = sorted(_glob.glob(pattern))
+            if matches:
+                return Path(matches[-1])
+    return portable  # will fail with a clear error
 
 
 def pg_env() -> dict:
