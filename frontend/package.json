@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:setup": "npx tsx database/setup.ts",
-    "db:seed": "npx tsx database/setup.ts --seed"
+    "db:setup": "bunx tsx database/setup.ts",
+    "db:seed": "bunx tsx database/setup.ts --seed"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",

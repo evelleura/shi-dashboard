@@ -16,7 +16,15 @@
       "Bash(cp:*)",
       "Bash(npx next:*)",
       "Bash(python3 -m json.tool)",
-      "Bash(python3 -m json.tool package.json)"
+      "Bash(python3 -m json.tool package.json)",
+      "Bash(psql_bin=\"/opt/homebrew/Cellar/libpq/17.2/bin/psql\")",
+      "Bash($psql_bin -U postgres -p 5432 -c \"SHOW hba_file;\")",
+      "Bash(/Users/user/.bun/bin/bun --version)",
+      "Bash(/Users/user/.bun/bin/bun run:*)",
+      "Bash(/Users/user/.bun/bin/bun install:*)",
+      "Bash(python3 run.py --db-only --skip-db)",
+      "Bash(python3 -c ':*)",
+      "Bash(npx tsx:*)"
     ]
   }
 }

@@ -66,6 +66,7 @@ def pg_bin_path(name: str) -> Path:
     if PLATFORM == "darwin":
         import glob as _glob
         for pattern in [
+            f"/Library/PostgreSQL/*/bin/{name}",
             f"/opt/homebrew/Cellar/libpq/*/bin/{name}",
             f"/opt/homebrew/opt/postgresql*/bin/{name}",
             f"/opt/homebrew/Cellar/postgresql*/*/bin/{name}",
@@ -360,8 +361,22 @@ def install_deps(bun: str):
 
 def setup_db(bun: str, seed: bool = False):
     print("\n=== Schema ===")
-    cmd = [bun, "run", "db:seed"] if seed else [bun, "run", "db:setup"]
-    result = run(cmd, cwd=APP_DIR, check=False)
+    script = "database/setup.ts"
+    args = ["--seed"] if seed else []
+    # Use npx tsx directly to avoid bun's getcwd() issue on paths with spaces
+    npx = shutil.which("npx")
+    if npx:
+        cmd = [npx, "tsx", script] + args
+    else:
+        cmd = [bun, "x", "tsx", script] + args
+    result = subprocess.run(
+        cmd, cwd=str(APP_DIR), check=False,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+    )
+    # Filter out npm notice lines, print relevant output
+    for line in result.stdout.splitlines():
+        if not line.startswith("npm notice") and not line.startswith("npm warn exec"):
+            print(f"  {line}")
     if result.returncode != 0:
         print("[ERROR] Schema setup failed")
         sys.exit(1)
@@ -375,7 +390,10 @@ def start_services(bun: str):
     print("  App: http://localhost:3000")
     print("  Ctrl+C to stop\n")
 
-    app = subprocess.Popen([bun, "run", "dev"], cwd=APP_DIR)
+    # Use next binary directly to avoid bun run's getcwd() issue on paths with spaces
+    next_bin = APP_DIR / "node_modules" / ".bin" / "next"
+    cmd = [str(next_bin), "dev"] if next_bin.exists() else [bun, "run", "dev"]
+    app = subprocess.Popen(cmd, cwd=str(APP_DIR))
 
     def shutdown(signum=None, frame=None):
         print("\n\nShutting down...")
