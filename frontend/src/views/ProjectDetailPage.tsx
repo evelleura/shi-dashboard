@@ -57,7 +57,9 @@ function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () 
 
 export default function ProjectDetailPage() {
   const params = useParams();
-  const id = params?.id as string | undefined;
+  // Route is /projects/[id] via [...slug] catch-all: slug = ['projects', id]
+  const slug = params?.slug;
+  const id = Array.isArray(slug) ? slug[1] : (params?.id as string | undefined);
   const router = useRouter();
   const projectId = parseInt(id ?? '0');
   const { data: project, isLoading, isError } = useProject(projectId);
