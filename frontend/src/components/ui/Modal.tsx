@@ -12,8 +12,13 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
+  const prevOpenRef = useRef(false);
+
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      prevOpenRef.current = false;
+      return;
+    }
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -22,8 +27,11 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
     document.addEventListener('keydown', handleEscape);
     document.body.style.overflow = 'hidden';
 
-    // Focus trap: focus the dialog on open
-    dialogRef.current?.focus();
+    // Only focus the dialog on initial open, not on re-renders
+    if (!prevOpenRef.current) {
+      dialogRef.current?.focus();
+      prevOpenRef.current = true;
+    }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useProjects, useCreateProject } from '../hooks/useProjects';
@@ -6,10 +6,24 @@ import { useClients } from '../hooks/useClients';
 import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
 import ProjectForm from '../components/projects/ProjectForm';
+import DataTable, { type Column, type RowAge } from '../components/ui/DataTable';
 import type { DashboardProject, CreateProjectData } from '../types';
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function getProjectAge(p: DashboardProject): RowAge {
+  const created = p.created_at ? new Date(p.created_at).getTime() : 0;
+  const updated = p.updated_at ? new Date(p.updated_at).getTime() : created;
+  const latest = Math.max(created, updated);
+  const now = Date.now();
+  const hoursAgo = (now - latest) / (1000 * 60 * 60);
+  if (hoursAgo < 24) return 'new';
+  if (hoursAgo < 24 * 7) return 'recent';
+  // Stale: no tasks completed and older than 14 days
+  if (hoursAgo > 24 * 14 && p.completed_tasks === 0 && p.total_tasks > 0) return 'stale';
+  return 'normal';
 }
 
 export default function ProjectsPage() {
@@ -21,12 +35,103 @@ export default function ProjectsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filtered = (projects as DashboardProject[]).filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.client_name ?? '').toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filtered = useMemo(() =>
+    (projects as DashboardProject[]).filter((p) => {
+      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
+        (p.client_name ?? '').toLowerCase().includes(search.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    }),
+  [projects, search, statusFilter]);
+
+  const columns: Column<DashboardProject>[] = useMemo(() => [
+    {
+      key: 'project_code',
+      label: 'ID',
+      render: (p) => <span className="text-xs font-mono font-semibold text-gray-500">{p.project_code}</span>,
+      sortValue: (p) => p.project_code,
+      exportValue: (p) => p.project_code,
+      headerClass: 'w-24',
+    },
+    {
+      key: 'name',
+      label: 'Project',
+      render: (p) => (
+        <div>
+          <Link href={`/projects/${p.id}`} className="font-medium text-sm text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+            {p.name}
+          </Link>
+          {p.description && <p className="text-xs text-gray-400 truncate max-w-xs">{p.description}</p>}
+        </div>
+      ),
+      sortValue: (p) => p.name.toLowerCase(),
+      exportValue: (p) => p.name,
+    },
+    {
+      key: 'client_name',
+      label: 'Client',
+      render: (p) => <span className="text-sm text-gray-600">{p.client_name ?? '--'}</span>,
+      sortValue: (p) => (p.client_name ?? '').toLowerCase(),
+      exportValue: (p) => p.client_name ?? '',
+    },
+    {
+      key: 'phase',
+      label: 'Phase',
+      render: (p) => (
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+          p.phase === 'survey' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
+        }`}>
+          {p.phase === 'survey' ? 'Survey' : 'Execution'}
+        </span>
+      ),
+      sortValue: (p) => p.phase,
+      exportValue: (p) => p.phase === 'survey' ? 'Survey' : 'Execution',
+    },
+    {
+      key: 'health_status',
+      label: 'Health',
+      render: (p) => <StatusBadge status={p.health_status ?? null} />,
+      sortValue: (p) => {
+        const order: Record<string, number> = { red: 0, amber: 1, green: 2 };
+        return order[p.health_status ?? ''] ?? 3;
+      },
+      exportValue: (p) => p.health_status ?? 'N/A',
+    },
+    {
+      key: 'spi_value',
+      label: 'SPI',
+      align: 'right' as const,
+      render: (p) => <span className="text-sm text-gray-700">{p.spi_value != null ? Number(p.spi_value).toFixed(3) : '--'}</span>,
+      sortValue: (p) => p.spi_value ?? -1,
+      exportValue: (p) => p.spi_value != null ? Number(p.spi_value).toFixed(3) : '',
+    },
+    {
+      key: 'tasks',
+      label: 'Tasks',
+      render: (p) => <span className="text-sm text-gray-600">{p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '--'}</span>,
+      sortValue: (p) => p.total_tasks > 0 ? p.completed_tasks / p.total_tasks : -1,
+      exportValue: (p) => p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '',
+    },
+    {
+      key: 'timeline',
+      label: 'Timeline',
+      render: (p) => <span className="text-xs text-gray-500">{formatDate(p.start_date)} -- {formatDate(p.end_date)}</span>,
+      sortValue: (p) => p.start_date,
+      exportValue: (p) => `${formatDate(p.start_date)} - ${formatDate(p.end_date)}`,
+    },
+    {
+      key: 'project_value',
+      label: 'Value',
+      align: 'right' as const,
+      render: (p) => (
+        <span className="text-sm text-gray-600">
+          {Number(p.project_value) > 0 ? `Rp ${Number(p.project_value).toLocaleString('id-ID')}` : '--'}
+        </span>
+      ),
+      sortValue: (p) => Number(p.project_value) || 0,
+      exportValue: (p) => Number(p.project_value) || 0,
+    },
+  ], []);
 
   const handleCreate = async (data: CreateProjectData) => {
     await createMutation.mutateAsync(data);
@@ -81,80 +186,17 @@ export default function ProjectsPage() {
         </select>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200" role="table">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phase</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Health</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SPI</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tasks</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Timeline</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Value</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-sm text-gray-400">
-                    No projects found.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((p) => {
-                  const dp = p as DashboardProject;
-                  const tasksDone = dp.total_tasks > 0
-                    ? `${dp.completed_tasks}/${dp.total_tasks}`
-                    : '--';
-                  return (
-                    <tr
-                      key={p.id}
-                      className="hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => router.push(`/projects/${p.id}`)}
-                    >
-                      <td className="px-4 py-3">
-                        <Link href={`/projects/${p.id}`} className="font-medium text-sm text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
-                          {p.name}
-                        </Link>
-                        {p.description && (
-                          <p className="text-xs text-gray-400 truncate max-w-xs">{p.description}</p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{p.client_name ?? '--'}</td>
-                      <td className="px-4 py-3">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          p.phase === 'survey' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
-                        }`}>
-                          {p.phase === 'survey' ? 'Survey' : 'Execution'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusBadge status={dp.health_status ?? null} />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
-                        {dp.spi_value != null ? Number(dp.spi_value).toFixed(3) : '--'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{tasksDone}</td>
-                      <td className="px-4 py-3 text-xs text-gray-500">
-                        {formatDate(p.start_date)} -- {formatDate(p.end_date)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {Number(p.project_value) > 0
-                          ? `Rp ${Number(p.project_value).toLocaleString('id-ID')}`
-                          : '--'}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DataTable<DashboardProject>
+        columns={columns}
+        data={filtered}
+        rowKey={(p) => p.id}
+        rowAge={getProjectAge}
+        onRowClick={(p) => router.push(`/projects/${p.id}`)}
+        defaultSortKey="project_code"
+        defaultSortDesc={true}
+        exportFileName="projects"
+        emptyMessage="No projects found."
+      />
 
       {/* Create Project Modal */}
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create New Project" maxWidth="max-w-xl">

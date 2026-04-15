@@ -1,7 +1,13 @@
 import { Router, Response } from 'express';
+import crypto from 'crypto';
 import { query, getClient } from '../utils/db';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { recalculateSPI } from '../services/spiCalculator';
+
+function generateProjectCode(): string {
+  // 8-char alphanumeric: e.g. "A3F7K9M2"
+  return crypto.randomBytes(4).toString('hex').toUpperCase();
+}
 
 const router = Router();
 
@@ -10,7 +16,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const result = await query(
       `SELECT
-        p.id, p.name, p.description, p.client_id, p.start_date, p.end_date,
+        p.id, p.project_code, p.name, p.description, p.client_id, p.start_date, p.end_date,
         p.duration, p.status, p.phase, p.project_value, p.survey_approved,
         p.target_description, p.created_at, p.updated_at,
         c.name AS client_name,
@@ -173,13 +179,15 @@ router.post(
     const projectPhase = phase === 'execution' ? 'execution' : 'survey';
 
     try {
+      const projectCode = generateProjectCode();
       const result = await query(
         `INSERT INTO projects
-          (name, description, client_id, start_date, end_date, status, phase,
+          (project_code, name, description, client_id, start_date, end_date, status, phase,
            project_value, target_description, created_by)
-         VALUES ($1, $2, $3, $4, $5, 'active', $6, $7, $8, $9)
+         VALUES ($1, $2, $3, $4, $5, $6, 'active', $7, $8, $9, $10)
          RETURNING *`,
         [
+          projectCode,
           name, description || null, client_id || null,
           start_date, end_date, projectPhase,
           project_value || 0, target_description || null,

@@ -82,9 +82,10 @@ ON CONFLICT DO NOTHING;
 --   P9: Active/Execution, GREEN health (large project, many tasks)
 --   P10: Active/Execution, AMBER health (small project, near deadline)
 
-INSERT INTO projects (name, description, client_id, start_date, end_date, status, phase, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
+INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
 -- P1: RED - Behind schedule, 60-day window, overtime tasks
 (
+  'SHI-0001',
   'Smart Home IoT - Perumahan Citra Raya',
   'Instalasi sistem smart home lengkap di 10 unit rumah kawasan Citra Raya',
   (SELECT id FROM clients WHERE name = 'PT Citra Raya Development'),
@@ -97,6 +98,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P2: GREEN - On track, good progress
 (
+  'SHI-0002',
   'CCTV & Security System - Kantor BPD DIY',
   'Pemasangan 32 kamera CCTV dan access control di kantor BPD DIY',
   (SELECT id FROM clients WHERE name = 'Bank BPD DIY'),
@@ -109,6 +111,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P3: RED - Critical, deadline very close, many overtime
 (
+  'SHI-0003',
   'Smart Home Automation - Villa Kaliurang',
   'Home automation system lengkap di villa premium Kaliurang',
   (SELECT id FROM clients WHERE name = 'Bp. Haryanto'),
@@ -121,6 +124,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P4: AMBER - Warning zone, slightly behind
 (
+  'SHI-0004',
   'IoT Sensor Network - Gudang Logistik',
   'Jaringan sensor IoT untuk monitoring 3 gudang logistik',
   (SELECT id FROM clients WHERE name = 'PT Logistik Nusantara'),
@@ -133,6 +137,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P5: SURVEY phase - not approved yet
 (
+  'SHI-0005',
   'Smart Lighting - Hotel Melia',
   'Sistem smart lighting untuk Hotel Melia Yogyakarta (120 kamar + publik)',
   (SELECT id FROM clients WHERE name = 'Hotel Melia Yogyakarta'),
@@ -143,6 +148,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P6: SURVEY approved, waiting to move to execution
 (
+  'SHI-0006',
   'Monitoring Suhu Ruang RS PKU',
   'Monitoring suhu real-time ruang operasi dan farmasi RS PKU',
   (SELECT id FROM clients WHERE name = 'RS PKU Muhammadiyah'),
@@ -155,6 +161,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P7: COMPLETED project (historical data)
 (
+  'SHI-0007',
   'Smart Traffic Light - Simpang Tiga Janti',
   'Instalasi smart traffic monitoring di persimpangan Janti',
   (SELECT id FROM clients WHERE name = 'Pemkot Yogyakarta - Dinas Perhubungan'),
@@ -167,6 +174,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P8: ON-HOLD (paused midway)
 (
+  'SHI-0008',
   'Smart Home - Rumah Ibu Ratna',
   'Instalasi smart home sederhana di rumah tinggal',
   (SELECT id FROM clients WHERE name = 'Ibu Ratna Dewi'),
@@ -179,6 +187,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P9: GREEN - Large project, many tasks, very on track
 (
+  'SHI-0009',
   'Smart Building - Kantor Dishub Yogyakarta',
   'Sistem smart building terintegrasi untuk kantor Dinas Perhubungan',
   (SELECT id FROM clients WHERE name = 'Pemkot Yogyakarta - Dinas Perhubungan'),
@@ -191,6 +200,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P10: AMBER - Small project, near deadline
 (
+  'SHI-0010',
   'CCTV Gudang Farmasi RS PKU',
   'Pemasangan CCTV di area farmasi dan gudang obat RS PKU',
   (SELECT id FROM clients WHERE name = 'RS PKU Muhammadiyah'),
@@ -643,9 +653,10 @@ ON CONFLICT DO NOTHING;
 --   P14: Active/Survey, no SPI (smart villa Suryo)
 --   P15: Cancelled project (intercom Citra Raya)
 
-INSERT INTO projects (name, description, client_id, start_date, end_date, status, phase, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
+INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
 -- P11: AMBER - Fire Alarm UTY, slightly behind
 (
+  'SHI-0011',
   'Fire Alarm System - Kampus UTY',
   'Instalasi fire alarm system di 3 gedung kampus (Gedung A, B, C)',
   (SELECT id FROM clients WHERE name = 'Universitas Teknologi Yogyakarta'),
@@ -658,6 +669,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P12: GREEN - Smart Parking Matahari, well on track
 (
+  'SHI-0012',
   'Smart Parking System - Mall Matahari',
   'Smart parking system 3 lantai mall Matahari Yogyakarta',
   (SELECT id FROM clients WHERE name = 'PT Matahari Retail Yogyakarta'),
@@ -670,6 +682,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P13: AMBER - Solar Panel Sinar Mas, behind due to weather
 (
+  'SHI-0013',
   'Solar Panel Monitoring - Sinar Mas',
   'Monitoring 48 panel surya di atap pabrik PT Sinar Mas Agro',
   (SELECT id FROM clients WHERE name = 'PT Sinar Mas Agro'),
@@ -682,6 +695,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P14: SURVEY - Smart Villa Suryo, not approved
 (
+  'SHI-0014',
   'Smart Villa Premium - Bp. Suryo',
   'Full automation villa 2 lantai Bp. Suryo Prabowo',
   (SELECT id FROM clients WHERE name = 'Bp. Suryo Prabowo'),
@@ -692,6 +706,7 @@ INSERT INTO projects (name, description, client_id, start_date, end_date, status
 ),
 -- P15: CANCELLED - Intercom Citra Raya
 (
+  'SHI-0015',
   'Intercom System - Perumahan Citra Raya',
   'Sistem intercom IP 20 unit rumah di cluster baru Citra Raya',
   (SELECT id FROM clients WHERE name = 'PT Citra Raya Development'),

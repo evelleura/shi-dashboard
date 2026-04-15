@@ -24,7 +24,10 @@
       "Bash(/Users/user/.bun/bin/bun install:*)",
       "Bash(python3 run.py --db-only --skip-db)",
       "Bash(python3 -c ':*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(brew install:*)",
+      "Bash(pdftotext:*)",
+      "Read(//private/tmp/**)"
     ]
   }
 }

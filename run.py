@@ -80,13 +80,17 @@ def pg_bin_path(name: str) -> Path:
 
 
 def pg_env() -> dict:
-    """Returns environment dict with library paths set for PG binaries."""
+    """Returns environment dict with library paths and password set for PG binaries."""
     env = os.environ.copy()
     lib_dir = str(PG_DIR / "lib")
     if PLATFORM == "darwin":
         env["DYLD_LIBRARY_PATH"] = lib_dir
     elif PLATFORM == "linux":
         env["LD_LIBRARY_PATH"] = lib_dir
+    # Pass DB password so CLI tools (psql, createdb, dropdb) don't prompt
+    env_vars = read_env()
+    if env_vars.get("DB_PASSWORD"):
+        env["PGPASSWORD"] = env_vars["DB_PASSWORD"]
     return env
 
 
@@ -315,6 +319,7 @@ def ensure_postgres():
 
     if pg_ready():
         print("[OK] Already running")
+        create_database()
         return
 
     if not pg_installed():
@@ -330,11 +335,18 @@ def reset_database():
     env_vars = read_env()
     dbname = env_vars.get("DB_NAME", "shi_dashboard")
     port = env_vars.get("DB_PORT", "5432")
+    psql = str(pg_bin_path("psql"))
     print(f"\n=== Resetting database '{dbname}' ===")
+    # Terminate active connections then drop via psql (dropdb fails if connections exist)
     subprocess.run(
-        [str(pg_bin_path("dropdb")), "-U", "postgres", "-p", port, "--if-exists", dbname],
-        capture_output=True,
-        env=pg_env(),
+        [psql, "-U", "postgres", "-p", port, "-d", "postgres", "-c",
+         f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{dbname}' AND pid <> pg_backend_pid();"],
+        capture_output=True, env=pg_env(),
+    )
+    subprocess.run(
+        [psql, "-U", "postgres", "-p", port, "-d", "postgres", "-c",
+         f"DROP DATABASE IF EXISTS \"{dbname}\";"],
+        capture_output=True, env=pg_env(),
     )
     run(
         [str(pg_bin_path("createdb")), "-U", "postgres", "-p", port, dbname],

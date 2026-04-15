@@ -34,6 +34,7 @@ export interface Client {
 
 export interface Project {
   id: number;
+  project_code: string;
   name: string;
   description?: string;
   client_id?: number;

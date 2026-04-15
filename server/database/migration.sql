@@ -167,4 +167,26 @@ ALTER TABLE project_health ADD COLUMN IF NOT EXISTS overdue_tasks INT DEFAULT 0;
 -- ============================================================
 UPDATE projects SET phase = 'execution', survey_approved = TRUE WHERE phase IS NULL OR phase = 'survey';
 
+-- ============================================================
+-- 10. Add project_code column (random string ID for display)
+-- ============================================================
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS project_code VARCHAR(12);
+
+-- Backfill existing projects with random codes
+UPDATE projects SET project_code = UPPER(SUBSTR(MD5(RANDOM()::TEXT), 1, 8))
+  WHERE project_code IS NULL;
+
+-- Now make it NOT NULL and UNIQUE
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE constraint_name = 'projects_project_code_key' AND table_name = 'projects'
+  ) THEN
+    ALTER TABLE projects ALTER COLUMN project_code SET NOT NULL;
+    ALTER TABLE projects ADD CONSTRAINT projects_project_code_key UNIQUE (project_code);
+  END IF;
+END
+$$;
+
 COMMIT;

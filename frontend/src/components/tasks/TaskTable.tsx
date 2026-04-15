@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import * as XLSX from 'xlsx';
 import type { Task, TaskStatus, UserRole } from '../../types';
 import TaskStatusSelect from './TaskStatusSelect';
 import { formatTimeSpent } from './TaskTimer';
@@ -15,7 +16,8 @@ interface Props {
   userRole?: UserRole;
 }
 
-type SortKey = 'name' | 'status' | 'assigned_to_name' | 'due_date' | 'time';
+type SortKey = 'name' | 'status' | 'assigned_to_name' | 'due_date' | 'time' | 'created_at';
+type RowAge = 'new' | 'recent' | 'normal' | 'stale';
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -32,6 +34,26 @@ function getTaskUrgency(task: Task): 'overtime' | 'over_deadline' | null {
   if (task.status === 'to_do') return 'over_deadline';
   return null;
 }
+
+function getTaskAge(task: Task): RowAge {
+  const created = task.created_at ? new Date(task.created_at).getTime() : 0;
+  const updated = task.updated_at ? new Date(task.updated_at).getTime() : created;
+  const latest = Math.max(created, updated);
+  const now = Date.now();
+  const hoursAgo = (now - latest) / (1000 * 60 * 60);
+  if (hoursAgo < 24) return 'new';
+  if (hoursAgo < 24 * 7) return 'recent';
+  // Stale: to_do status and not updated in 14+ days
+  if (hoursAgo > 24 * 14 && task.status === 'to_do') return 'stale';
+  return 'normal';
+}
+
+const AGE_BORDER: Record<RowAge, string> = {
+  new:    'border-l-4 border-l-blue-400',
+  recent: 'border-l-4 border-l-emerald-300',
+  normal: '',
+  stale:  'border-l-4 border-l-gray-300',
+};
 
 function getElapsedSeconds(task: Task): number {
   const base = Number(task.time_spent_seconds) || 0;
@@ -62,12 +84,24 @@ function LiveTime({ task }: { task: Task }) {
   );
 }
 
+const AGE_LEGEND: { key: RowAge; label: string; dot: string }[] = [
+  { key: 'new',    label: 'New (< 24h)',   dot: 'bg-blue-400' },
+  { key: 'recent', label: 'Recent (< 7d)', dot: 'bg-emerald-300' },
+  { key: 'normal', label: 'Normal',        dot: 'bg-gray-400' },
+  { key: 'stale',  label: 'Stale (no progress)', dot: 'bg-gray-300' },
+];
+
+const PAGE_SIZES = [10, 25, 50];
+
 export default function TaskTable({
   tasks, onStatusChange, onTaskClick, onTimerStart, onTimerStop,
   changingTaskId, timerLoadingId, showProject = false, userRole,
 }: Props) {
-  const [sortKey, setSortKey] = useState<SortKey>('sort_order' as SortKey);
-  const [sortAsc, setSortAsc] = useState(true);
+  const [sortKey, setSortKey] = useState<SortKey>('created_at');
+  const [sortDesc, setSortDesc] = useState(true);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
   const sorted = useMemo(() => {
     const copy = [...tasks];
     copy.sort((a, b) => {
@@ -90,29 +124,59 @@ export default function TaskTable({
         case 'time':
           cmp = (Number(a.time_spent_seconds) || 0) - (Number(b.time_spent_seconds) || 0);
           break;
+        case 'created_at':
+          cmp = (a.created_at ?? '').localeCompare(b.created_at ?? '');
+          break;
         default:
           cmp = a.sort_order - b.sort_order;
       }
-      return sortAsc ? cmp : -cmp;
+      return sortDesc ? -cmp : cmp;
     });
     return copy;
-  }, [tasks, sortKey, sortAsc]);
+  }, [tasks, sortKey, sortDesc]);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const paginated = useMemo(
+    () => sorted.slice(safePage * pageSize, safePage * pageSize + pageSize),
+    [sorted, safePage, pageSize],
+  );
 
   const handleSort = (key: SortKey) => {
-    if (sortKey === key) setSortAsc(!sortAsc);
-    else { setSortKey(key); setSortAsc(true); }
+    if (sortKey === key) setSortDesc(!sortDesc);
+    else { setSortKey(key); setSortDesc(true); }
+    setPage(0);
   };
+
+  const handleExport = useCallback(() => {
+    const rows = sorted.map((t) => ({
+      'Task': t.name,
+      'Description': t.description ?? '',
+      ...(showProject ? { 'Project': t.project_name ?? '' } : {}),
+      'Status': t.status,
+      'Assignee': t.assigned_to_name ?? '',
+      'Due Date': t.due_date ? formatDate(t.due_date) : '',
+      'Est. Hours': t.estimated_hours ?? '',
+      'Time Spent': formatTimeSpent(Number(t.time_spent_seconds) || 0),
+      'Evidence': t.evidence_count ?? 0,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+    XLSX.writeFile(wb, 'tasks.xlsx');
+  }, [sorted, showProject]);
 
   const SortHeader = ({ label, field, className = '' }: { label: string; field: SortKey; className?: string }) => (
     <th
       className={`px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none ${className}`}
       onClick={() => handleSort(field)}
       role="columnheader"
-      aria-sort={sortKey === field ? (sortAsc ? 'ascending' : 'descending') : 'none'}
+      aria-sort={sortKey === field ? (sortDesc ? 'descending' : 'ascending') : 'none'}
     >
       <span className="flex items-center gap-1">
         {label}
-        {sortKey === field && <span className="text-blue-500">{sortAsc ? '\u2191' : '\u2193'}</span>}
+        {sortKey === field && <span className="text-blue-500">{sortDesc ? '\u2193' : '\u2191'}</span>}
       </span>
     </th>
   );
@@ -123,6 +187,31 @@ export default function TaskTable({
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex items-center gap-3 text-xs text-gray-500">
+          <span>{sorted.length} task{sorted.length !== 1 ? 's' : ''}</span>
+          <div className="hidden sm:flex items-center gap-3">
+            <span className="text-gray-300">|</span>
+            {AGE_LEGEND.map((l) => (
+              <span key={l.key} className="flex items-center gap-1">
+                <span className={`inline-block w-2 h-2 rounded-full ${l.dot}`} />
+                {l.label}
+              </span>
+            ))}
+          </div>
+        </div>
+        <button
+          onClick={handleExport}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg px-3 py-1.5 transition-colors"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export Excel
+        </button>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200" role="table">
           <thead className="bg-gray-50">
@@ -142,11 +231,14 @@ export default function TaskTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {sorted.map((task) => {
+            {paginated.map((task) => {
               const urgency = getTaskUrgency(task);
+              const age = getTaskAge(task);
               const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
               const isTimerLoading = timerLoadingId === task.id;
-              const rowBg = urgency === 'over_deadline'
+
+              // Urgency colors take priority, then age border
+              const urgencyBg = urgency === 'over_deadline'
                 ? 'bg-red-50/50 hover:bg-red-50'
                 : urgency === 'overtime'
                 ? 'bg-amber-50/50 hover:bg-amber-50'
@@ -154,10 +246,14 @@ export default function TaskTable({
                 ? 'bg-green-50/30 hover:bg-green-50'
                 : task.status === 'review'
                 ? 'bg-purple-50/30 hover:bg-purple-50'
+                : age === 'stale'
+                ? 'bg-gray-50/60 hover:bg-gray-100'
                 : 'hover:bg-gray-50';
 
+              const ageBorder = !urgency ? AGE_BORDER[age] : '';
+
               return (
-                <tr key={task.id} className={`${rowBg} transition-colors`}>
+                <tr key={task.id} className={`${urgencyBg} ${ageBorder} transition-colors`}>
                   {/* Play/Pause button */}
                   <td className="px-2 py-2 text-center" onClick={(e) => e.stopPropagation()}>
                     {task.status !== 'done' && onTimerStart && onTimerStop ? (
@@ -203,7 +299,7 @@ export default function TaskTable({
                         </span>
                       )}
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{task.name}</p>
+                        <p className={`text-sm font-medium truncate ${age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-900'}`}>{task.name}</p>
                         {task.description && (
                           <p className="text-xs text-gray-400 truncate max-w-xs">{task.description}</p>
                         )}
@@ -213,6 +309,9 @@ export default function TaskTable({
                       )}
                       {urgency === 'over_deadline' && (
                         <span className="shrink-0 text-[10px] font-medium text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full">OD</span>
+                      )}
+                      {age === 'new' && !urgency && (
+                        <span className="shrink-0 text-[10px] font-medium text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full">NEW</span>
                       )}
                     </div>
                   </td>
@@ -234,20 +333,20 @@ export default function TaskTable({
                   </td>
 
                   {/* Assignee */}
-                  <td className="px-3 py-2.5 text-sm text-gray-600 cursor-pointer" onClick={() => onTaskClick?.(task)}>
+                  <td className={`px-3 py-2.5 text-sm cursor-pointer ${age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-600'}`} onClick={() => onTaskClick?.(task)}>
                     {task.assigned_to_name ?? <span className="text-gray-300">--</span>}
                   </td>
 
                   {/* Due date */}
                   <td
-                    className={`px-3 py-2.5 text-sm cursor-pointer ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-600'}`}
+                    className={`px-3 py-2.5 text-sm cursor-pointer ${isOverdue ? 'text-red-500 font-medium' : age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-600'}`}
                     onClick={() => onTaskClick?.(task)}
                   >
                     {task.due_date ? formatDate(task.due_date) : '--'}
                   </td>
 
                   {/* Estimated hours */}
-                  <td className="px-3 py-2.5 text-xs text-gray-500 cursor-pointer" onClick={() => onTaskClick?.(task)}>
+                  <td className={`px-3 py-2.5 text-xs cursor-pointer ${age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-500'}`} onClick={() => onTaskClick?.(task)}>
                     {task.estimated_hours ? `${task.estimated_hours}h` : '--'}
                   </td>
 
@@ -275,6 +374,58 @@ export default function TaskTable({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {sorted.length > PAGE_SIZES[0] && (
+        <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-100 bg-gray-50/50 text-xs text-gray-500">
+          <div className="flex items-center gap-2">
+            <span>Show</span>
+            <select
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
+              className="border border-gray-300 rounded px-1.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              {PAGE_SIZES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+            <span>per page</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage(0)}
+              disabled={safePage === 0}
+              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              &laquo;
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={safePage === 0}
+              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              &lsaquo;
+            </button>
+            <span className="px-2 py-1 font-medium">
+              {safePage + 1} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={safePage >= totalPages - 1}
+              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              &rsaquo;
+            </button>
+            <button
+              onClick={() => setPage(totalPages - 1)}
+              disabled={safePage >= totalPages - 1}
+              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              &raquo;
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

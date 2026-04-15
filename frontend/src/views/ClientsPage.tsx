@@ -1,9 +1,22 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useClients, useCreateClient, useDeleteClient } from '../hooks/useClients';
 import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import EmptyState from '../components/ui/EmptyState';
-import type { CreateClientData } from '../types';
+import DataTable, { type Column, type RowAge } from '../components/ui/DataTable';
+import type { Client, CreateClientData } from '../types';
+
+function getClientAge(c: Client): RowAge {
+  const created = c.created_at ? new Date(c.created_at).getTime() : 0;
+  const updated = c.updated_at ? new Date(c.updated_at).getTime() : created;
+  const latest = Math.max(created, updated);
+  const now = Date.now();
+  const hoursAgo = (now - latest) / (1000 * 60 * 60);
+  if (hoursAgo < 24) return 'new';
+  if (hoursAgo < 24 * 7) return 'recent';
+  if (hoursAgo > 24 * 30 && (c.project_count ?? 0) === 0) return 'stale';
+  return 'normal';
+}
 
 export default function ClientsPage() {
   const { data: clients = [], isLoading, isError } = useClients();
@@ -22,10 +35,62 @@ export default function ClientsPage() {
     notes: '',
   });
 
-  const filtered = clients.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    (c.email ?? '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = useMemo(() =>
+    clients.filter((c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      (c.email ?? '').toLowerCase().includes(search.toLowerCase())
+    ),
+  [clients, search]);
+
+  const columns: Column<Client>[] = useMemo(() => [
+    {
+      key: 'name',
+      label: 'Name',
+      render: (c) => (
+        <div>
+          <p className="text-sm font-medium text-gray-900">{c.name}</p>
+          {c.notes && <p className="text-xs text-gray-400 truncate max-w-xs">{c.notes}</p>}
+        </div>
+      ),
+      sortValue: (c) => c.name.toLowerCase(),
+      exportValue: (c) => c.name,
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      render: (c) => <span className="text-sm text-gray-600">{c.email ?? '--'}</span>,
+      sortValue: (c) => (c.email ?? '').toLowerCase(),
+      exportValue: (c) => c.email ?? '',
+    },
+    {
+      key: 'phone',
+      label: 'Phone',
+      render: (c) => <span className="text-sm text-gray-600">{c.phone ?? '--'}</span>,
+      exportValue: (c) => c.phone ?? '',
+    },
+    {
+      key: 'project_count',
+      label: 'Projects',
+      align: 'center' as const,
+      render: (c) => <span className="text-sm text-gray-600">{c.project_count ?? 0}</span>,
+      sortValue: (c) => c.project_count ?? 0,
+      exportValue: (c) => c.project_count ?? 0,
+    },
+    {
+      key: 'address',
+      label: 'Address',
+      render: (c) => <span className="text-xs text-gray-500 max-w-xs truncate block">{c.address ?? '--'}</span>,
+      exportValue: (c) => c.address ?? '',
+      cellClass: 'max-w-xs',
+    },
+    // Export-only columns
+    {
+      key: 'notes',
+      label: 'Notes',
+      exportOnly: true,
+      exportValue: (c) => c.notes ?? '',
+    },
+  ], []);
 
   const handleCreate = async () => {
     if (!form.name.trim()) return;
@@ -80,52 +145,36 @@ export default function ClientsPage() {
         aria-label="Search clients"
       />
 
-      {filtered.length === 0 ? (
+      {filtered.length === 0 && clients.length === 0 ? (
         <EmptyState
           title="No clients found"
           description="Add your first client to get started."
           action={{ label: '+ New Client', onClick: () => setShowCreate(true) }}
         />
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200" role="table">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Projects</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
-                <th className="px-4 py-3 w-16"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filtered.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">
-                    <p className="text-sm font-medium text-gray-900">{c.name}</p>
-                    {c.notes && <p className="text-xs text-gray-400 truncate max-w-xs">{c.notes}</p>}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{c.email ?? '--'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{c.phone ?? '--'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{c.project_count ?? 0}</td>
-                  <td className="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{c.address ?? '--'}</td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => setDeleteId(c.id)}
-                      className="text-red-400 hover:text-red-600 transition-colors"
-                      aria-label={`Delete ${c.name}`}
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable<Client>
+          columns={columns}
+          data={filtered}
+          rowKey={(c) => c.id}
+          rowAge={getClientAge}
+          defaultSortKey="created_at"
+          defaultSortDesc={true}
+          exportFileName="clients"
+          emptyMessage="No clients match your search."
+          actionColumn={{
+            render: (c) => (
+              <button
+                onClick={() => setDeleteId(c.id)}
+                className="text-red-400 hover:text-red-600 transition-colors"
+                aria-label={`Delete ${c.name}`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            ),
+          }}
+        />
       )}
 
       {/* Create Client Modal */}

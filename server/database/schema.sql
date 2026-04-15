@@ -38,6 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_clients_created_by ON clients(created_by);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS projects (
   id SERIAL PRIMARY KEY,
+  project_code VARCHAR(12) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
   description TEXT,
   client_id INT,

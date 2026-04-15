@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
 import { query, getClient } from '@/lib/db';
 import { recalculateSPI } from '@/lib/spiCalculator';
+
+function generateProjectCode(): string {
+  return crypto.randomBytes(4).toString('hex').toUpperCase();
+}
 
 export async function listProjects(request: NextRequest) {
   const auth = authenticateRequest(request);
@@ -9,7 +14,7 @@ export async function listProjects(request: NextRequest) {
 
   try {
     const result = await query(
-      `SELECT p.id, p.name, p.description, p.client_id, p.start_date, p.end_date,
+      `SELECT p.id, p.project_code, p.name, p.description, p.client_id, p.start_date, p.end_date,
         p.duration, p.status, p.phase, p.project_value, p.survey_approved,
         p.target_description, p.created_at, p.updated_at,
         c.name AS client_name,
@@ -62,11 +67,12 @@ export async function createProject(request: NextRequest) {
   }
 
   try {
+    const projectCode = generateProjectCode();
     const result = await query(
-      `INSERT INTO projects (name, description, client_id, start_date, end_date, status, phase,
+      `INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase,
          project_value, target_description, created_by)
-       VALUES ($1, $2, $3, $4, $5, 'active', $6, $7, $8, $9) RETURNING *`,
-      [name, description || null, client_id || null, start_date, end_date,
+       VALUES ($1, $2, $3, $4, $5, $6, 'active', $7, $8, $9, $10) RETURNING *`,
+      [projectCode, name, description || null, client_id || null, start_date, end_date,
        phase === 'execution' ? 'execution' : 'survey', project_value || 0, target_description || null, auth.user.userId]
     );
     const project = result.rows[0] as { id: number };
