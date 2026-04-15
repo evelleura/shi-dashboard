@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-15T12:00:00.000Z" agent="5.0" version="24.0.0" type="device">
+  <diagram id="statechart-diagram" name="Task State Machine Diagram">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Task Lifecycle State Machine" style="text;html=1;fontSize=18;fontStyle=1;align=center" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Initial State (filled circle) -->
+        <mxCell id="initial" value="" style="ellipse;html=1;shape=ellipse;perimeter=ellipsePerimeter;whiteSpace=wrap;filled=1;fillColor=000000;strokeColor=000000;strokeWidth=3" vertex="1" parent="1">
+          <mxGeometry x="150" y="180" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- TO_DO State -->
+        <mxCell id="todo" value="TO_DO" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#ffffcc;strokeWidth=2;strokeColor=ff9933" vertex="1" parent="1">
+          <mxGeometry x="300" y="150" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Entry action for TO_DO -->
+        <mxCell id="todo-entry" value="entry / Task created&#10;initialize assigned_to" style="text;html=1;fontSize=11;align=center;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="310" y="160" width="120" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- WORKING_ON_IT State -->
+        <mxCell id="working" value="WORKING_ON_IT" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#fff4e6;strokeWidth=2;strokeColor=ff9933" vertex="1" parent="1">
+          <mxGeometry x="650" y="150" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Entry action for WORKING -->
+        <mxCell id="working-entry" value="entry / Log start time&#10;update_status_at" style="text;html=1;fontSize=11;align=center;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="660" y="160" width="120" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- DONE State -->
+        <mxCell id="done" value="DONE" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#c8e6c9;strokeWidth=2;strokeColor=4caf50" vertex="1" parent="1">
+          <mxGeometry x="650" y="350" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Entry action for DONE -->
+        <mxCell id="done-entry" value="entry / Mark completion_at&#10;Trigger dashboard refresh" style="text;html=1;fontSize=11;align=center;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="660" y="360" width="120" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Final State (circle in circle) -->
+        <mxCell id="final" value="" style="ellipse;html=1;shape=ellipse;perimeter=ellipsePerimeter;whiteSpace=wrap;filled=0;fillColor=ffffff;strokeColor=000000;strokeWidth=3" vertex="1" parent="1">
+          <mxGeometry x="445" y="505" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="final-inner" value="" style="ellipse;html=1;shape=ellipse;perimeter=ellipsePerimeter;whiteSpace=wrap;filled=1;fillColor=000000;strokeColor=000000;strokeWidth=1" vertex="1" parent="1">
+          <mxGeometry x="455" y="515" width="10" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- Transition: Initial -> TO_DO -->
+        <mxCell id="trans1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;strokeWidth=2" edge="1" parent="1" source="initial" target="todo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Transition: TO_DO -> WORKING_ON_IT (Technician starts work) -->
+        <mxCell id="trans2" value="on_startWork()&#10;[by: Technician]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;strokeWidth=2" edge="1" parent="1" source="todo" target="working">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="370" y="230" as="sourcePoint" />
+            <mxPoint x="730" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Label for transition -->
+        <mxCell id="trans2-label" value="Technician updates status" style="text;html=1;fontSize=10;align=center;backgroundColor=ffffff" vertex="1" parent="1">
+          <mxGeometry x="480" y="210" width="90" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Transition: WORKING_ON_IT -> DONE (Manager approves) -->
+        <mxCell id="trans3" value="on_approveDone()&#10;[by: Manager]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;strokeWidth=2;startArrow=none" edge="1" parent="1" source="working" target="done">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="230" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Label for transition -->
+        <mxCell id="trans3-label" value="Manager approves&#ncompletion" style="text;html=1;fontSize=10;align=center;backgroundColor=ffffff" vertex="1" parent="1">
+          <mxGeometry x="770" y="260" width="90" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Transition: DONE -> End State -->
+        <mxCell id="trans4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;strokeWidth=2" edge="1" parent="1" source="done" target="final">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- COMPUTED OVERLAY STATES -->
+        <!-- OVERTIME Guard (Orange overlay) -->
+        <mxCell id="guard-title" value="Computed Overlay States (NOT stored in DB)" style="text;html=1;fontSize=12;fontStyle=1;align=center;backgroundColor=#fff3e0" vertex="1" parent="1">
+          <mxGeometry x="150" y="420" width="250" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- OVERTIME Guard -->
+        <mxCell id="overtime" value="OVERTIME" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;fillColor=#ffe0b2;strokeWidth=2;strokeColor=ff6f00;dashed=1;dashPattern=5 5" vertex="1" parent="1">
+          <mxGeometry x="150" y="460" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- OVERTIME Label -->
+        <mxCell id="overtime-label" value="Guard: status=WORKING&#n&amp;&amp; due_date &lt; TODAY&#n&#10;Visual: Orange/Red highlight" style="text;html=1;fontSize=9;align=center;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="160" y="475" width="110" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- OVER_DEADLINE Guard -->
+        <mxCell id="overdeadline" value="OVER_DEADLINE" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;fillColor=#ffcdd2;strokeWidth=2;strokeColor=c62828;dashed=1;dashPattern=5 5" vertex="1" parent="1">
+          <mxGeometry x="320" y="460" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- OVER_DEADLINE Label -->
+        <mxCell id="overdeadline-label" value="Guard: status=TO_DO&#n&amp;&amp; due_date &lt; TODAY&#n&#10;Visual: Red highlight" style="text;html=1;fontSize=9;align=center;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="330" y="475" width="110" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Dashboard Refresh trigger -->
+        <mxCell id="dashboard-title" value="Real-time Dashboard Integration" style="text;html=1;fontSize=12;fontStyle=1;align=center;backgroundColor=#e3f2fd;fillColor=#e3f2fd" vertex="1" parent="1">
+          <mxGeometry x="650" y="460" width="200" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- Dashboard update info -->
+        <mxCell id="dashboard-info" value="✓ Chart data auto-refresh via TanStack Query&#10;✓ Dashboard re-sorts projects by urgency&#10;✓ Alert notifications sent to Manager" style="text;html=1;fontSize=10;align=left;verticalAlign=top;backgroundColor=#e3f2fd" vertex="1" parent="1">
+          <mxGeometry x="650" y="490" width="250" height="50" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

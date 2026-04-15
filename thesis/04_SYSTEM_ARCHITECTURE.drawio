@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-15T12:00:00.000Z" agent="5.0" version="24.0.0" type="device">
+  <diagram id="architecture-diagram" name="System Architecture Diagram">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" background="ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="SHI Dashboard - System Architecture" style="text;html=1;fontSize=18;fontStyle=1;align=center" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="800" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- PRESENTATION LAYER -->
+        <mxCell id="pres-container" value="PRESENTATION LAYER" style="swimlane;fontStyle=1;align=center;verticalAlign=top;strokeColor=0066cc;fillColor=#cce5ff;collapsible=0" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="1300" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- Manager Dashboard -->
+        <mxCell id="mgr-dash" value="Manager Dashboard&#10;(React + Recharts)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b3e5fc;strokeWidth=2;fontSize=11;fontStyle=1" vertex="1" parent="pres-container">
+          <mxGeometry x="50" y="40" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="mgr-dash-items" value="• Project health pie chart&#10;• Tasks by status bar chart&#10;• Overdue tasks timeline&#10;• Budget variance report" style="text;html=1;fontSize=9;align=left;verticalAlign=top" vertex="1" parent="pres-container">
+          <mxGeometry x="60" y="60" width="130" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Technician Dashboard -->
+        <mxCell id="tech-dash" value="Technician Dashboard&#10;(React + Kanban)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b3e5fc;strokeWidth=2;fontSize=11;fontStyle=1" vertex="1" parent="pres-container">
+          <mxGeometry x="250" y="40" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="tech-dash-items" value="• Task Kanban board&#10;• Task table with filters&#10;• Evidence upload modal&#10;• My performance stats" style="text;html=1;fontSize=9;align=left;verticalAlign=top" vertex="1" parent="pres-container">
+          <mxGeometry x="260" y="60" width="130" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Project Management -->
+        <mxCell id="proj-mgmt" value="Project Management&#10;(React Forms)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b3e5fc;strokeWidth=2;fontSize=11;fontStyle=1" vertex="1" parent="pres-container">
+          <mxGeometry x="450" y="40" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="proj-mgmt-items" value="• Create/Edit projects&#10;• Manage clients&#10;• Assign technicians&#10;• Materials &amp; budget forms" style="text;html=1;fontSize=9;align=left;verticalAlign=top" vertex="1" parent="pres-container">
+          <mxGeometry x="460" y="60" width="130" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Admin Panel -->
+        <mxCell id="admin-panel" value="Admin Panel&#10;(React + User Mgmt)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b3e5fc;strokeWidth=2;fontSize=11;fontStyle=1" vertex="1" parent="pres-container">
+          <mxGeometry x="650" y="40" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-items" value="• User CRUD &amp; roles&#10;• System settings&#10;• Audit logs&#10;• Access control" style="text;html=1;fontSize=9;align=left;verticalAlign=top" vertex="1" parent="pres-container">
+          <mxGeometry x="660" y="60" width="130" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- API Client -->
+        <mxCell id="api-client" value="API Client Layer&#10;(TanStack Query + Axios)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeWidth=2;fontSize=11;fontStyle=1;strokeColor=f9a825" vertex="1" parent="pres-container">
+          <mxGeometry x="1000" y="80" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="api-client-items" value="✓ Real-time data sync&#10;✓ Automatic cache mgmt&#10;✓ Request deduplication&#10;✓ Error handling" style="text;html=1;fontSize=9;align=left;verticalAlign=top" vertex="1" parent="pres-container">
+          <mxGeometry x="1010" y="95" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Tech Stack Details -->
+        <mxCell id="stack-front" value="Frontend Stack:" style="text;html=1;fontSize=10;fontStyle=1;align=left" vertex="1" parent="pres-container">
+          <mxGeometry x="50" y="160" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="stack-front-items" value="React 19 • Vite • Tailwind CSS v4 • TypeScript • Recharts 3" style="text;html=1;fontSize=9;align=left;fontFamily=monospace;backgroundColor=#f0f0f0" vertex="1" parent="pres-container">
+          <mxGeometry x="160" y="160" width="400" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- API LAYER -->
+        <mxCell id="api-container" value="API LAYER (Next.js)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;strokeColor=00cc00;fillColor=#ccffcc;collapsible=0" vertex="1" parent="1">
+          <mxGeometry x="50" y="360" width="1300" height="250" as="geometry" />
+        </cell>
+
+        <!-- API Endpoints Groups -->
+        <mxCell id="auth-api" value="Auth Endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="api-container">
+          <mxGeometry x="60" y="30" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-api-items" value="POST /auth/login&#10;POST /auth/register&#10;GET /auth/logout" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="api-container">
+          <mxGeometry x="70" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="proj-api" value="Project Endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="api-container">
+          <mxGeometry x="200" y="30" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="proj-api-items" value="GET /projects&#10;POST /projects&#10;PATCH /projects/:id&#10;DELETE /projects/:id" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="api-container">
+          <mxGeometry x="210" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="task-api" value="Task Endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="api-container">
+          <mxGeometry x="340" y="30" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="task-api-items" value="GET /tasks&#10;POST /tasks&#10;PATCH /tasks/:id/status&#10;DELETE /tasks/:id" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="api-container">
+          <mxGeometry x="350" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dash-api" value="Dashboard Endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="api-container">
+          <mxGeometry x="480" y="30" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="dash-api-items" value="GET /dashboard&#10;GET /dashboard/charts/*&#10;(8 chart endpoints)" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="api-container">
+          <mxGeometry x="490" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="evid-api" value="Evidence Endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="api-container">
+          <mxGeometry x="620" y="30" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="evid-api-items" value="POST /evidence/upload&#10;GET /evidence/:id&#10;DELETE /evidence/:id" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="api-container">
+          <mxGeometry x="630" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="other-api" value="Other Endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="api-container">
+          <mxGeometry x="760" y="30" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="other-api-items" value="Clients (5 endpoints)&#10;Materials (4 endpoints)&#10;Budget (4 endpoints)" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="api-container">
+          <mxGeometry x="770" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- API Dispatcher -->
+        <mxCell id="dispatcher" value="API Dispatcher&#10;(/api/[...route])" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeWidth=2;fontSize=10;fontStyle=1;strokeColor=f9a825" vertex="1" parent="api-container">
+          <mxGeometry x="920" y="50" width="130" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Business Logic -->
+        <mxCell id="logic-title" value="Business Logic Handlers" style="text;html=1;fontSize=10;fontStyle=1;align=center;backgroundColor=#f0f0f0" vertex="1" parent="api-container">
+          <mxGeometry x="60" y="140" width="1200" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="handlers" value="✓ SPI Calculation&#10;✓ Health Status (RAG)&#10;✓ Project Assignments&#10;✓ Task Evidence Mgmt&#10;✓ Data Validation&#10;✓ Auth &amp; Permissions" style="text;html=1;fontSize=9;align=left;backgroundColor=#f0f0f0;fillColor=#f0f0f0" vertex="1" parent="api-container">
+          <mxGeometry x="60" y="165" width="1200" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- DATABASE LAYER -->
+        <mxCell id="db-container" value="DATABASE LAYER (PostgreSQL)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;strokeColor=cc0000;fillColor=#ffcccc;collapsible=0" vertex="1" parent="1">
+          <mxGeometry x="50" y="650" width="1300" height="240" as="geometry" />
+        </mxCell>
+
+        <!-- Database Tables -->
+        <mxCell id="users-db" value="users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="db-container">
+          <mxGeometry x="60" y="30" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="users-db-cols" value="id, email, name&#10;role, password_hash" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="db-container">
+          <mxGeometry x="70" y="50" width="70" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="projects-db" value="projects" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="db-container">
+          <mxGeometry x="170" y="30" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="projects-db-cols" value="id, project_code&#10;name, client_id&#10;dates, phase" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="db-container">
+          <mxGeometry x="180" y="50" width="70" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tasks-db" value="tasks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="db-container">
+          <mxGeometry x="280" y="30" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tasks-db-cols" value="id, project_id&#10;assigned_to, status&#10;due_date, sort_order" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="db-container">
+          <mxGeometry x="290" y="50" width="70" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="health-db" value="project_health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="db-container">
+          <mxGeometry x="390" y="30" width="100" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="health-db-cols" value="spi_value, status&#10;(green|amber|red)&#10;last_updated" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="db-container">
+          <mxGeometry x="395" y="50" width="90" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="other-db" value="Other Tables" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="db-container">
+          <mxGeometry x="520" y="30" width="100" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="other-db-items" value="clients, daily_reports&#10;task_evidence, materials&#10;budget_items, assignments" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="db-container">
+          <mxGeometry x="525" y="50" width="90" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Storage -->
+        <mxCell id="storage" value="File Storage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeWidth=2;fontSize=10;fontStyle=1" vertex="1" parent="db-container">
+          <mxGeometry x="650" y="30" width="100" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="storage-items" value="Evidence uploads&#10;(photos, documents)&#10;Local disk: /uploads" style="text;html=1;fontSize=8;align=center;fontFamily=monospace" vertex="1" parent="db-container">
+          <mxGeometry x="655" y="50" width="90" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Database Details -->
+        <mxCell id="db-details" value="PostgreSQL Configuration:" style="text;html=1;fontSize=10;fontStyle=1;align=left" vertex="1" parent="db-container">
+          <mxGeometry x="60" y="120" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="db-detail-items" value="• Connection pool: pg (Node.js driver)&#10;• Parameterized queries (injection protection)&#10;• Portable binary auto-download &amp; setup&#10;• 10 normalized tables with FK constraints&#10;• Indexes on project_id, user_id, dates&#10;• Initial seed data: 15 projects (SHI-0001 to SHI-0015)" style="text;html=1;fontSize=9;align=left;fontFamily=monospace;backgroundColor=#f0f0f0;fillColor=#f0f0f0" vertex="1" parent="db-container">
+          <mxGeometry x="60" y="145" width="1200" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- CONNECTIONS -->
+        <!-- Presentation to API -->
+        <mxCell id="conn1" value="HTTP/HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;startArrow=classic;strokeWidth=2;strokeColor=0066cc" edge="1" parent="1" source="api-client" target="dispatcher">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="900" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- API to Database -->
+        <mxCell id="conn2" value="SQL Queries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;startArrow=classic;strokeWidth=2;strokeColor=cc0000" edge="1" parent="1" source="dispatcher" target="projects-db">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="610" as="targetPoint" />
+          </mxGeometry>
+        </cell>
+
+        <!-- Key Features Box -->
+        <mxCell id="features-box" value="Key Features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeWidth=2;fontSize=11;fontStyle=1;align=center" vertex="1" parent="1">
+          <mxGeometry x="80" y="920" width="1240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="features" value="✓ Real-time dashboard with auto-refresh  ✓ SPI calculation on task status change  ✓ Role-based access control (3 roles)  ✓ Multi-chart analytics (8 types)  ✓ Evidence upload &amp; tracking  ✓ Scalable to 100+ projects" style="text;html=1;fontSize=9;align=center" vertex="1" parent="1">
+          <mxGeometry x="90" y="930" width="1220" height="40" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
