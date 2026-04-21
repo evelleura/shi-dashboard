@@ -1,328 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" modified="2026-04-15T12:00:00.000Z" agent="5.0" version="24.0.0" type="device">
-  <diagram id="deployment-diagram" name="Deployment Architecture">
-    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" background="ffffff" math="0" shadow="0">
+  <diagram id="deployment-diagram" name="Deployment Diagram">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <!-- Title -->
-        <mxCell id="title" value="&lt;b&gt;Deployment Diagram — SHI Dashboard System&lt;/b&gt;" style="text;html=1;fontSize=20;align=center;verticalAlign=middle" vertex="1" parent="1">
-          <mxGeometry x="400" y="20" width="800" height="40" as="geometry" />
+        <!-- ================================================================== -->
+        <!-- TOP TIER: Client Machine -->
+        <!-- ================================================================== -->
+        <mxCell id="client-node" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;device&amp;raquo;&lt;/font&gt;&#xa;&lt;b&gt;Mesin Klien&lt;/b&gt;" style="shape=mxgraph.sysml.package;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=11;verticalAlign=top;spacingTop=5;align=center;labelX=120;tabWidth=150;tabHeight=30;" vertex="1" parent="1">
+          <mxGeometry x="400" y="30" width="500" height="250" as="geometry" />
+        </mxCell>
+
+        <!-- Browser execution environment -->
+        <mxCell id="browser-env" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;execution environment&amp;raquo;&lt;/font&gt;&#xa;&lt;b&gt;Web Browser&lt;/b&gt;" style="shape=mxgraph.sysml.package;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;verticalAlign=top;spacingTop=5;align=center;labelX=100;tabWidth=130;tabHeight=25;" vertex="1" parent="1">
+          <mxGeometry x="440" y="80" width="420" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- Components inside browser -->
+        <mxCell id="comp-react" value="React 19 SPA" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="125" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-tanstack" value="TanStack Query 5" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="165" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-recharts" value="Recharts 3" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="205" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-tailwind" value="Tailwind CSS v4" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="125" width="170" height="30" as="geometry" />
         </mxCell>
 
         <!-- ================================================================== -->
-        <!-- NODE 1: Client Browser -->
+        <!-- MIDDLE TIER: Application Server -->
         <!-- ================================================================== -->
-        <mxCell id="client-node" value="&lt;b&gt;&amp;laquo;device&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Client Machine&lt;/b&gt;&#10;(Desktop / Laptop / Mobile)" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;spacingTop=5;size=20;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="80" y="100" width="340" height="400" as="geometry" />
+        <mxCell id="app-node" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;device&amp;raquo;&lt;/font&gt;&#xa;&lt;b&gt;Server Aplikasi&lt;/b&gt;" style="shape=mxgraph.sysml.package;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=11;verticalAlign=top;spacingTop=5;align=center;labelX=120;tabWidth=150;tabHeight=30;" vertex="1" parent="1">
+          <mxGeometry x="400" y="370" width="500" height="280" as="geometry" />
         </mxCell>
 
-        <!-- Browser -->
-        <mxCell id="browser" value="&lt;b&gt;&amp;laquo;execution environment&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Web Browser&lt;/b&gt;&#10;(Chrome / Firefox / Safari)" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;verticalAlign=top;spacingTop=3;size=15;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="110" y="175" width="280" height="300" as="geometry" />
+        <!-- Next.js execution environment -->
+        <mxCell id="nextjs-env" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;execution environment&amp;raquo;&lt;/font&gt;&#xa;&lt;b&gt;Next.js 15 (Node.js 20+)&lt;/b&gt;" style="shape=mxgraph.sysml.package;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;verticalAlign=top;spacingTop=5;align=center;labelX=100;tabWidth=160;tabHeight=25;" vertex="1" parent="1">
+          <mxGeometry x="440" y="420" width="420" height="210" as="geometry" />
         </mxCell>
 
-        <!-- React App Component -->
-        <mxCell id="react-app" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;React 19 SPA&lt;/b&gt;" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="140" y="240" width="220" height="50" as="geometry" />
+        <!-- Components inside app server -->
+        <mxCell id="comp-dispatcher" value="API Dispatcher" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="465" width="170" height="30" as="geometry" />
         </mxCell>
-
-        <!-- TanStack Query -->
-        <mxCell id="tanstack" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;TanStack Query 5&lt;/b&gt;&#10;(Cache &amp; State Manager)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="140" y="310" width="220" height="55" as="geometry" />
+        <mxCell id="comp-auth" value="Auth Handler (JWT)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="505" width="170" height="30" as="geometry" />
         </mxCell>
-
-        <!-- Recharts -->
-        <mxCell id="recharts" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Recharts 3&lt;/b&gt;&#10;(8 Chart Types)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="140" y="385" width="220" height="55" as="geometry" />
+        <mxCell id="comp-handlers" value="Resource Handlers" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="545" width="170" height="30" as="geometry" />
         </mxCell>
-
-        <!-- Tailwind label -->
-        <mxCell id="tailwind-label" value="Tailwind CSS v4 + Vite + TypeScript" style="text;html=1;fontSize=9;align=center;fontStyle=2;fontColor=#666666" vertex="1" parent="1">
-          <mxGeometry x="150" y="450" width="200" height="20" as="geometry" />
+        <mxCell id="comp-spi" value="Mesin SPI" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="465" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-pool" value="Pool Koneksi pg" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="505" width="170" height="30" as="geometry" />
         </mxCell>
 
         <!-- ================================================================== -->
-        <!-- NODE 2: Web Server (Next.js) -->
+        <!-- BOTTOM TIER: Database Server (left) -->
         <!-- ================================================================== -->
-        <mxCell id="web-server" value="&lt;b&gt;&amp;laquo;device&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Application Server&lt;/b&gt;&#10;(Node.js Runtime)" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;spacingTop=5;size=20;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="580" y="100" width="400" height="500" as="geometry" />
+        <mxCell id="db-node" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;device&amp;raquo;&lt;/font&gt;&#xa;&lt;b&gt;Server Database&lt;/b&gt;" style="shape=mxgraph.sysml.package;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=11;verticalAlign=top;spacingTop=5;align=center;labelX=90;tabWidth=130;tabHeight=30;" vertex="1" parent="1">
+          <mxGeometry x="250" y="750" width="300" height="170" as="geometry" />
         </mxCell>
 
-        <!-- Next.js Server -->
-        <mxCell id="nextjs" value="&lt;b&gt;&amp;laquo;execution environment&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Next.js 15 Server&lt;/b&gt;&#10;(SSR + API Routes)" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;verticalAlign=top;spacingTop=3;size=15;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="610" y="175" width="340" height="400" as="geometry" />
+        <mxCell id="comp-pg" value="PostgreSQL 17.5" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="810" width="170" height="30" as="geometry" />
         </mxCell>
-
-        <!-- API Dispatcher -->
-        <mxCell id="dispatcher" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;API Dispatcher&lt;/b&gt;&#10;/api/[...route]/route.ts" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="640" y="240" width="280" height="55" as="geometry" />
+        <mxCell id="comp-db" value="shi_dashboard" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="850" width="170" height="30" as="geometry" />
         </mxCell>
-
-        <!-- Auth Handler -->
-        <mxCell id="auth-handler" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Auth Handler&lt;/b&gt;&#10;JWT + bcrypt" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="640" y="310" width="130" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Resource Handlers -->
-        <mxCell id="resource-handlers" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Resource Handlers&lt;/b&gt;&#10;(52 API Endpoints)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="790" y="310" width="130" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- SPI Engine -->
-        <mxCell id="spi-engine" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;SPI Calculation Engine&lt;/b&gt;&#10;EV/PV → Green/Amber/Red" style="shape=component;whiteSpace=wrap;html=1;fillColor=#e6d0de;strokeColor=#996185;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="640" y="385" width="280" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Database Pool -->
-        <mxCell id="db-pool" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;pg Connection Pool&lt;/b&gt;&#10;Parameterized Queries" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="640" y="460" width="280" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Tech stack label -->
-        <mxCell id="server-label" value="TypeScript + Node.js 20+" style="text;html=1;fontSize=9;align=center;fontStyle=2;fontColor=#666666" vertex="1" parent="1">
-          <mxGeometry x="700" y="530" width="160" height="20" as="geometry" />
+        <mxCell id="comp-tables" value="10 Tabel" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="890" width="170" height="30" as="geometry" />
         </mxCell>
 
         <!-- ================================================================== -->
-        <!-- NODE 3: Database Server -->
+        <!-- BOTTOM TIER: File Storage (right) -->
         <!-- ================================================================== -->
-        <mxCell id="db-server" value="&lt;b&gt;&amp;laquo;device&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Database Server&lt;/b&gt;&#10;(PostgreSQL 17)" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;verticalAlign=top;spacingTop=5;size=20;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="1130" y="100" width="380" height="300" as="geometry" />
+        <mxCell id="storage-node" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;device&amp;raquo;&lt;/font&gt;&#xa;&lt;b&gt;Penyimpanan File&lt;/b&gt;" style="shape=mxgraph.sysml.package;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=11;verticalAlign=top;spacingTop=5;align=center;labelX=90;tabWidth=130;tabHeight=30;" vertex="1" parent="1">
+          <mxGeometry x="700" y="750" width="300" height="170" as="geometry" />
         </mxCell>
 
-        <!-- PostgreSQL Instance -->
-        <mxCell id="pg-instance" value="&lt;b&gt;&amp;laquo;execution environment&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;PostgreSQL 17.5&lt;/b&gt;&#10;(Portable Binary)" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;verticalAlign=top;spacingTop=3;size=15;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="1160" y="175" width="320" height="200" as="geometry" />
+        <mxCell id="comp-uploads" value="/uploads/" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="730" y="810" width="170" height="30" as="geometry" />
         </mxCell>
-
-        <!-- Database Tables -->
-        <mxCell id="db-tables" value="&lt;b&gt;&amp;laquo;artifact&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;shi_dashboard&lt;/b&gt;&#10;10 Tables" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;verticalAlign=middle;align=center" vertex="1" parent="1">
-          <mxGeometry x="1195" y="250" width="120" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- Table list -->
-        <mxCell id="table-list" value="users, clients, projects&#10;tasks, project_health&#10;project_assignments&#10;task_evidence, materials&#10;budget_items, daily_reports" style="text;html=1;fontSize=8;align=left;fontFamily=monospace;fillColor=#fff2cc;strokeColor=#d6b656;rounded=1;spacing=4" vertex="1" parent="1">
-          <mxGeometry x="1340" y="245" width="120" height="90" as="geometry" />
-        </mxCell>
-
-        <!-- ================================================================== -->
-        <!-- NODE 4: File Storage -->
-        <!-- ================================================================== -->
-        <mxCell id="storage-node" value="&lt;b&gt;&amp;laquo;device&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;File Storage&lt;/b&gt;&#10;(Local Disk)" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;spacingTop=5;size=20;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="1130" y="460" width="380" height="200" as="geometry" />
-        </mxCell>
-
-        <!-- Uploads directory -->
-        <mxCell id="uploads-dir" value="&lt;b&gt;&amp;laquo;artifact&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;/uploads/&lt;/b&gt;&#10;Evidence Files" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=middle;align=center;tabWidth=50;tabHeight=15;tabPosition=left" vertex="1" parent="1">
-          <mxGeometry x="1165" y="530" width="140" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- File types -->
-        <mxCell id="file-types" value="Supported formats:&#10;• Photos (JPG, PNG)&#10;• Documents (PDF)&#10;• Screenshots&#10;&#10;Organized by:&#10;/uploads/{taskId}/{filename}" style="text;html=1;fontSize=8;align=left;fontFamily=monospace;fillColor=#fff2cc;strokeColor=#d6b656;rounded=1;spacing=4" vertex="1" parent="1">
-          <mxGeometry x="1330" y="520" width="160" height="100" as="geometry" />
-        </mxCell>
-
-        <!-- ================================================================== -->
-        <!-- NODE 5: Dev Tools (bottom) -->
-        <!-- ================================================================== -->
-        <mxCell id="devtools-node" value="&lt;b&gt;&amp;laquo;device&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Development Environment&lt;/b&gt;" style="shape=mxgraph.uml25.node;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;spacingTop=5;size=20;rounded=1" vertex="1" parent="1">
-          <mxGeometry x="80" y="570" width="340" height="250" as="geometry" />
-        </mxCell>
-
-        <!-- run.py -->
-        <mxCell id="runpy" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;run.py&lt;/b&gt;&#10;Build &amp; Run Script" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="110" y="640" width="130" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Bun -->
-        <mxCell id="bun" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Bun&lt;/b&gt;&#10;Package Manager" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="260" y="640" width="130" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Setup script -->
-        <mxCell id="setup" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;database/setup.ts&lt;/b&gt;&#10;Schema + Seed" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="110" y="720" width="130" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Portable PG -->
-        <mxCell id="portable-pg" value="&lt;b&gt;&amp;laquo;component&amp;raquo;&lt;/b&gt;&#10;&lt;b&gt;Portable PostgreSQL&lt;/b&gt;&#10;Auto-download &amp; setup" style="shape=component;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;verticalAlign=top;align=center" vertex="1" parent="1">
-          <mxGeometry x="260" y="720" width="130" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Dev label -->
-        <mxCell id="dev-label" value="Zero-dependency setup: python run.py" style="text;html=1;fontSize=9;align=center;fontStyle=2;fontColor=#666666" vertex="1" parent="1">
-          <mxGeometry x="140" y="790" width="230" height="20" as="geometry" />
+        <mxCell id="comp-evidence" value="Bukti Pekerjaan" style="shape=component;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="730" y="850" width="170" height="30" as="geometry" />
         </mxCell>
 
         <!-- ================================================================== -->
         <!-- CONNECTIONS -->
         <!-- ================================================================== -->
 
-        <!-- Client ←→ Web Server: HTTPS -->
-        <mxCell id="conn1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#0066cc;endArrow=block;startArrow=block;endFill=1;startFill=1" edge="1" parent="1" source="browser" target="nextjs">
+        <!-- Client <-> App Server -->
+        <mxCell id="conn1" style="endArrow=block;startArrow=block;endFill=1;startFill=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="client-node" target="app-node">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="conn1-label" value="&lt;b&gt;HTTPS / REST API&lt;/b&gt;&#10;JSON payloads&#10;JWT Bearer Token" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=9;fillColor=#ffffff;strokeColor=#0066cc;rounded=1;spacing=3" vertex="1" connectable="0" parent="conn1">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
+        <mxCell id="conn1-label" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;protocol&amp;raquo; HTTPS / REST API&#xa;JSON + JWT Bearer Token&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;labelBorderColor=#000000;" vertex="1" connectable="0" parent="conn1">
+          <mxGeometry x="0" relative="1" as="geometry"><mxPoint x="130" y="0" as="offset" /></mxGeometry>
         </mxCell>
 
-        <!-- Web Server ←→ Database: SQL -->
-        <mxCell id="conn2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#d79b00;endArrow=block;startArrow=block;endFill=1;startFill=1" edge="1" parent="1" source="db-pool" target="db-tables">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1050" y="490" />
-              <mxPoint x="1050" y="290" />
-            </Array>
-          </mxGeometry>
+        <!-- App Server <-> Database -->
+        <mxCell id="conn2" style="endArrow=block;startArrow=block;endFill=1;startFill=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;html=1;exitX=0.3;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="app-node" target="db-node">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="conn2-label" value="&lt;b&gt;TCP/IP (port 5432)&lt;/b&gt;&#10;Parameterized SQL&#10;Connection Pool" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=9;fillColor=#ffffff;strokeColor=#d79b00;rounded=1;spacing=3" vertex="1" connectable="0" parent="conn2">
-          <mxGeometry x="-0.2" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
+        <mxCell id="conn2-label" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;protocol&amp;raquo; TCP/IP&#xa;SQL Parameterized (port 5432)&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;labelBorderColor=#000000;" vertex="1" connectable="0" parent="conn2">
+          <mxGeometry x="0" relative="1" as="geometry"><mxPoint x="-100" y="0" as="offset" /></mxGeometry>
         </mxCell>
 
-        <!-- Web Server ←→ File Storage: File I/O -->
-        <mxCell id="conn3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#b85450;endArrow=block;startArrow=block;endFill=1;startFill=1" edge="1" parent="1" source="resource-handlers" target="uploads-dir">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1060" y="340" />
-              <mxPoint x="1060" y="570" />
-            </Array>
-          </mxGeometry>
+        <!-- App Server <-> File Storage -->
+        <mxCell id="conn3" style="endArrow=block;startArrow=block;endFill=1;startFill=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;html=1;exitX=0.7;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="app-node" target="storage-node">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="conn3-label" value="&lt;b&gt;File I/O&lt;/b&gt;&#10;multer upload&#10;fs read/write" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=9;fillColor=#ffffff;strokeColor=#b85450;rounded=1;spacing=3" vertex="1" connectable="0" parent="conn3">
-          <mxGeometry x="0.3" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Dev Tools → Web Server -->
-        <mxCell id="conn4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9673a6;endArrow=open;startArrow=none;dashed=1;dashPattern=5 5" edge="1" parent="1" source="runpy" target="nextjs">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="175" y="550" />
-              <mxPoint x="540" y="550" />
-              <mxPoint x="540" y="375" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="conn4-label" value="&lt;i&gt;starts&lt;/i&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#9673a6" vertex="1" connectable="0" parent="conn4">
-          <mxGeometry x="-0.3" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Dev Tools → Database -->
-        <mxCell id="conn5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9673a6;endArrow=open;startArrow=none;dashed=1;dashPattern=5 5" edge="1" parent="1" source="portable-pg" target="pg-instance">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="500" y="750" />
-              <mxPoint x="500" y="880" />
-              <mxPoint x="1320" y="880" />
-              <mxPoint x="1320" y="375" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="conn5-label" value="&lt;i&gt;provisions&lt;/i&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#9673a6" vertex="1" connectable="0" parent="conn5">
-          <mxGeometry x="0.2" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
+        <mxCell id="conn3-label" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;laquo;protocol&amp;raquo; File I/O&#xa;multer upload&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;labelBorderColor=#000000;" vertex="1" connectable="0" parent="conn3">
+          <mxGeometry x="0" relative="1" as="geometry"><mxPoint x="100" y="0" as="offset" /></mxGeometry>
         </mxCell>
 
         <!-- ================================================================== -->
-        <!-- LEGEND -->
+        <!-- NOTE BOX -->
         <!-- ================================================================== -->
-        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1" vertex="1" parent="1">
-          <mxGeometry x="580" y="690" width="380" height="150" as="geometry" />
-        </mxCell>
-        <mxCell id="legend-title" value="&lt;b&gt;Legend&lt;/b&gt;" style="text;html=1;fontSize=12;align=center;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="720" y="695" width="100" height="20" as="geometry" />
-        </mxCell>
-
-        <!-- Legend items -->
-        <mxCell id="leg1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf" vertex="1" parent="1">
-          <mxGeometry x="600" y="720" width="20" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="leg1-text" value="Client / Frontend" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="625" y="718" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" vertex="1" parent="1">
-          <mxGeometry x="600" y="742" width="20" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="leg2-text" value="Application Server" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="625" y="740" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00" vertex="1" parent="1">
-          <mxGeometry x="600" y="764" width="20" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="leg3-text" value="Database Server" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="625" y="762" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450" vertex="1" parent="1">
-          <mxGeometry x="600" y="786" width="20" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="leg4-text" value="File Storage" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="625" y="784" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6" vertex="1" parent="1">
-          <mxGeometry x="600" y="808" width="20" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="leg5-text" value="Development Tools" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="625" y="806" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <!-- Connection types in legend -->
-        <mxCell id="leg6" value="" style="endArrow=block;startArrow=block;endFill=1;startFill=1;strokeWidth=2;strokeColor=#0066cc" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="770" y="728" as="sourcePoint" />
-            <mxPoint x="820" y="728" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="leg6-text" value="HTTPS / REST" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="825" y="720" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg7" value="" style="endArrow=block;startArrow=block;endFill=1;startFill=1;strokeWidth=2;strokeColor=#d79b00" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="770" y="750" as="sourcePoint" />
-            <mxPoint x="820" y="750" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="leg7-text" value="SQL / TCP" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="825" y="742" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg8" value="" style="endArrow=block;startArrow=block;endFill=1;startFill=1;strokeWidth=2;strokeColor=#b85450" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="770" y="772" as="sourcePoint" />
-            <mxPoint x="820" y="772" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="leg8-text" value="File I/O" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="825" y="764" width="100" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg9" value="" style="endArrow=open;startArrow=none;dashed=1;dashPattern=5 5;strokeWidth=2;strokeColor=#9673a6" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="770" y="794" as="sourcePoint" />
-            <mxPoint x="820" y="794" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="leg9-text" value="Provisions / Starts" style="text;html=1;fontSize=9;align=left" vertex="1" parent="1">
-          <mxGeometry x="825" y="786" width="110" height="18" as="geometry" />
-        </mxCell>
-
-        <!-- Deployment Note -->
-        <mxCell id="deploy-note" value="&lt;b&gt;Deployment Modes:&lt;/b&gt;&#10;• &lt;b&gt;Development:&lt;/b&gt; All nodes on localhost (python run.py)&#10;• &lt;b&gt;Staging:&lt;/b&gt; Separate servers, same network&#10;• &lt;b&gt;Production:&lt;/b&gt; Load-balanced, replicated DB, backups&#10;&#10;&lt;b&gt;Key Properties:&lt;/b&gt;&#10;• Zero-dependency setup (portable PostgreSQL auto-download)&#10;• Cross-platform: Windows, macOS, Linux&#10;• All API traffic authenticated via JWT&#10;• SQL injection protected via parameterized queries&#10;• File uploads stored on local disk (not cloud)" style="shape=note;whiteSpace=wrap;html=1;size=14;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;spacing=5;rounded=0" vertex="1" parent="1">
-          <mxGeometry x="580" y="860" width="380" height="190" as="geometry" />
+        <mxCell id="note" value="Mode Deployment:&#xa;  - Development: Semua node di localhost (python run.py)&#xa;  - Staging: Server terpisah, jaringan yang sama&#xa;  - Produksi: Load-balanced, database direplikasi" style="shape=note;whiteSpace=wrap;html=0;size=14;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;align=left;verticalAlign=top;spacingLeft=8;spacingTop=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="250" y="970" width="440" height="90" as="geometry" />
         </mxCell>
 
       </root>

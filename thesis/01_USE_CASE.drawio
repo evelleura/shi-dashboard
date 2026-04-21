@@ -1,155 +1,238 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" modified="2026-04-15T12:00:00.000Z" agent="5.0" version="24.0.0" type="device">
-  <diagram id="use-case-diagram" name="Use Case Diagram - SHI Dashboard">
-    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="ffffff" math="0" shadow="0">
+  <diagram id="use-case-diagram" name="Use Case Diagram">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- System Boundary -->
-        <mxCell id="system" value="SHI Dashboard System" style="rounded=1;fontSize=16;fontStyle=1;strokeWidth=2;strokeColor=000000" vertex="1" parent="1">
-          <mxGeometry x="300" y="100" width="700" height="600" as="geometry" />
+        <mxCell id="system" value="Sistem Dashboard Manajemen Proyek PT SHI" style="shape=mxgraph.sysml.package;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=12;fontStyle=1;align=center;verticalAlign=top;spacingTop=5;labelPosition=center;verticalLabelPosition=top;tabWidth=350;tabHeight=20" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="900" height="980" as="geometry" />
         </mxCell>
 
-        <!-- Actors -->
-        <!-- Technician Actor -->
-        <mxCell id="actor1" value="Technician" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;align=center;outlineConnect=ish" vertex="1" parent="1">
-          <mxGeometry x="80" y="200" width="40" height="80" as="geometry" />
+        <!-- ======================== -->
+        <!-- ACTORS -->
+        <!-- ======================== -->
+
+        <!-- Actor: Teknisi (left side) -->
+        <mxCell id="actor-teknisi" value="Teknisi" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="120" y="350" width="30" height="60" as="geometry" />
         </mxCell>
 
-        <!-- Manager Actor -->
-        <mxCell id="actor2" value="Manager" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;align=center;outlineConnect=ish" vertex="1" parent="1">
-          <mxGeometry x="980" y="200" width="40" height="80" as="geometry" />
+        <!-- Actor: Manajer Proyek (right side) -->
+        <mxCell id="actor-manajer" value="Manajer Proyek" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="1380" y="280" width="30" height="60" as="geometry" />
         </mxCell>
 
-        <!-- Admin Actor -->
-        <mxCell id="actor3" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;align=center;outlineConnect=ish" vertex="1" parent="1">
-          <mxGeometry x="1050" y="450" width="40" height="80" as="geometry" />
+        <!-- Actor: Admin (far right) -->
+        <mxCell id="actor-admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="1380" y="730" width="30" height="60" as="geometry" />
         </mxCell>
 
-        <!-- Technician Use Cases -->
-        <mxCell id="uc1" value="Login" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="350" y="150" width="100" height="50" as="geometry" />
+        <!-- ======================== -->
+        <!-- USE CASES - Shared -->
+        <!-- ======================== -->
+
+        <!-- UC1: Login (shared - center top) -->
+        <mxCell id="uc1" value="UC1: Login" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="680" y="70" width="140" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc2" value="Submit Daily Report" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="350" y="230" width="100" height="50" as="geometry" />
+        <!-- UC6: Logout (shared - center bottom) -->
+        <mxCell id="uc6" value="UC6: Logout" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="680" y="940" width="140" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc3" value="Upload Evidence" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="500" y="270" width="100" height="50" as="geometry" />
+        <!-- ======================== -->
+        <!-- USE CASES - Teknisi -->
+        <!-- ======================== -->
+
+        <!-- UC2: Lihat Tugas -->
+        <mxCell id="uc2" value="UC2: Lihat Tugas&#xa;(Kanban/Tabel)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="400" y="200" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc4" value="View Tasks (Kanban)" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="350" y="310" width="100" height="50" as="geometry" />
+        <!-- UC3: Ubah Status Tugas -->
+        <mxCell id="uc3" value="UC3: Ubah Status Tugas" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="400" y="310" width="160" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc5" value="Update Task Status" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="500" y="350" width="100" height="50" as="geometry" />
+        <!-- UC4: Unggah Bukti Pekerjaan -->
+        <mxCell id="uc4" value="UC4: Unggah Bukti&#xa;Pekerjaan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="640" y="310" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc6" value="View Personal Dashboard" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="350" y="390" width="100" height="50" as="geometry" />
+        <!-- UC5: Lihat Dashboard Pribadi -->
+        <mxCell id="uc5" value="UC5: Lihat Dashboard&#xa;Pribadi" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="400" y="420" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <!-- Manager Use Cases -->
-        <mxCell id="uc7" value="View Project Dashboard" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="700" y="150" width="100" height="50" as="geometry" />
+        <!-- ======================== -->
+        <!-- USE CASES - Manajer -->
+        <!-- ======================== -->
+
+        <!-- UC7: Lihat Dashboard Proyek -->
+        <mxCell id="uc7" value="UC7: Lihat Dashboard&#xa;Proyek" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="150" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc8" value="Monitor EWS Alerts" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="700" y="230" width="100" height="50" as="geometry" />
+        <!-- UC8: Kelola Data Klien -->
+        <mxCell id="uc8" value="UC8: Kelola Data Klien" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="230" width="160" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc9" value="Manage Projects" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="700" y="310" width="100" height="50" as="geometry" />
+        <!-- UC9: Kelola Data Proyek -->
+        <mxCell id="uc9" value="UC9: Kelola Data Proyek" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="310" width="160" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc10" value="Manage Clients" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="700" y="390" width="100" height="50" as="geometry" />
+        <!-- UC10: Kelola Tugas -->
+        <mxCell id="uc10" value="UC10: Kelola Tugas" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="390" width="160" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc11" value="Manage Tasks" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="700" y="470" width="100" height="50" as="geometry" />
+        <!-- UC11: Approve Tugas Selesai -->
+        <mxCell id="uc11" value="UC11: Approve Tugas&#xa;Selesai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="470" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc12" value="Approve Task Completion" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="850" y="310" width="100" height="50" as="geometry" />
+        <!-- UC12: Kelola Anggaran -->
+        <mxCell id="uc12" value="UC12: Kelola Anggaran" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="555" width="160" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc13" value="Manage Budget" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="850" y="390" width="100" height="50" as="geometry" />
+        <!-- UC13: Kelola Material -->
+        <mxCell id="uc13" value="UC13: Kelola Material" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="635" width="160" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc14" value="View Analytics Reports" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="850" y="470" width="100" height="50" as="geometry" />
+        <!-- UC14: Lihat Laporan & Grafik -->
+        <mxCell id="uc14" value="UC14: Lihat Laporan&#xa;&amp; Grafik" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="715" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <!-- Admin Use Cases -->
-        <mxCell id="uc15" value="Manage Users" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="850" y="550" width="100" height="50" as="geometry" />
+        <!-- UC15: Kelola Penugasan Teknisi -->
+        <mxCell id="uc15" value="UC15: Kelola Penugasan&#xa;Teknisi" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="920" y="800" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <mxCell id="uc16" value="System Settings" style="ellipse;whiteSpace=wrap;html=1" vertex="1" parent="1">
-          <mxGeometry x="750" y="550" width="100" height="50" as="geometry" />
+        <!-- ======================== -->
+        <!-- USE CASES - Admin -->
+        <!-- ======================== -->
+
+        <!-- UC16: Kelola Data Pengguna -->
+        <mxCell id="uc16" value="UC16: Kelola Data&#xa;Pengguna" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="700" y="620" width="160" height="55" as="geometry" />
         </mxCell>
 
-        <!-- Associations -->
-        <!-- Technician associations -->
-        <mxCell id="edge1" value="" style="endArrow=none" edge="1" parent="1" source="actor1" target="uc1">
+        <!-- UC17: Pengaturan Sistem -->
+        <mxCell id="uc17" value="UC17: Pengaturan Sistem" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="700" y="720" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- UC18: Lihat Semua Data -->
+        <mxCell id="uc18" value="UC18: Lihat Semua Data" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="700" y="820" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- EWS Alert (for extend) -->
+        <mxCell id="ews" value="EWS Alert&#xa;Notification" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="700" y="150" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ======================== -->
+        <!-- ASSOCIATIONS - Teknisi -->
+        <!-- ======================== -->
+
+        <mxCell id="e-t-uc1" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-teknisi" target="uc1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge2" value="" style="endArrow=none" edge="1" parent="1" source="actor1" target="uc2">
+        <mxCell id="e-t-uc2" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-teknisi" target="uc2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge3" value="" style="endArrow=none" edge="1" parent="1" source="actor1" target="uc4">
+        <mxCell id="e-t-uc3" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-teknisi" target="uc3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge4" value="" style="endArrow=none" edge="1" parent="1" source="actor1" target="uc5">
+        <mxCell id="e-t-uc5" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-teknisi" target="uc5">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge5" value="" style="endArrow=none" edge="1" parent="1" source="actor1" target="uc6">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- Include: Daily Report includes Upload Evidence -->
-        <mxCell id="include1" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=3 3" edge="1" parent="1" source="uc2" target="uc3">
+        <mxCell id="e-t-uc6" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-teknisi" target="uc6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- Manager associations -->
-        <mxCell id="edge6" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc7">
+        <!-- ======================== -->
+        <!-- ASSOCIATIONS - Manajer -->
+        <!-- ======================== -->
+
+        <mxCell id="e-m-uc1" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge7" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc8">
+        <mxCell id="e-m-uc7" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge8" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc9">
+        <mxCell id="e-m-uc8" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge9" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc10">
+        <mxCell id="e-m-uc9" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc9">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge10" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc11">
+        <mxCell id="e-m-uc10" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge11" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc12">
+        <mxCell id="e-m-uc11" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc11">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge12" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc13">
+        <mxCell id="e-m-uc12" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc12">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge13" value="" style="endArrow=none" edge="1" parent="1" source="actor2" target="uc14">
+        <mxCell id="e-m-uc13" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-m-uc14" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-m-uc15" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-m-uc6" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-manajer" target="uc6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- Admin associations -->
-        <mxCell id="edge14" value="" style="endArrow=none" edge="1" parent="1" source="actor3" target="uc15">
+        <!-- ======================== -->
+        <!-- ASSOCIATIONS - Admin -->
+        <!-- ======================== -->
+
+        <mxCell id="e-a-uc1" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-admin" target="uc1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge15" value="" style="endArrow=none" edge="1" parent="1" source="actor3" target="uc16">
+        <mxCell id="e-a-uc16" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-admin" target="uc16">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="e-a-uc17" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-admin" target="uc17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-a-uc18" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-admin" target="uc18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-a-uc6" style="endArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000" edge="1" parent="1" source="actor-admin" target="uc6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ======================== -->
+        <!-- INCLUDE / EXTEND -->
+        <!-- ======================== -->
+
+        <!-- UC3 include UC4 -->
+        <mxCell id="include-uc3-uc4" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;&amp;laquo;include&amp;raquo;&lt;/font&gt;" style="endArrow=open;endSize=8;dashed=1;dashPattern=8 4;strokeColor=#000000;strokeWidth=1;fontColor=#000000;html=1" edge="1" parent="1" source="uc3" target="uc4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- UC7 extend EWS Alert -->
+        <mxCell id="extend-uc7-ews" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;&amp;laquo;extend&amp;raquo;&lt;/font&gt;" style="endArrow=open;endSize=8;dashed=1;dashPattern=8 4;strokeColor=#000000;strokeWidth=1;fontColor=#000000;html=1" edge="1" parent="1" source="ews" target="uc7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
       </root>
     </mxGraphModel>
   </diagram>

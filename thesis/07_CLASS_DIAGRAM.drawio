@@ -1,301 +1,292 @@
-<mxfile host="app.diagrams.net" modified="2026-04-15T00:00:00.000Z" agent="Claude Code" version="24.0.0" type="device">
-  <diagram id="class-diagram-1" name="Class Diagram">
-    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-15T12:00:00.000Z" agent="5.0" version="24.0.0" type="device">
+  <diagram id="class-diagram" name="Class Diagram">
+    <mxGraphModel dx="1800" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1600" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <mxCell id="user-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;User&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ email: string&lt;br/&gt;+ name: string&lt;br/&gt;+ role: &amp;#39;technician&amp;#39; | &amp;#39;manager&amp;#39; | &amp;#39;admin&amp;#39;&lt;br/&gt;- password_hash: string&lt;br/&gt;+ created_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ authenticate(email, password): boolean&lt;br/&gt;+ hasPermission(action): boolean&lt;br/&gt;+ getAssignedProjects(): Project[]&lt;br/&gt;+ hashPassword(plain): string&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="30" y="30" width="310" height="250" as="geometry" />
+        <!-- CLASS 1: User -->
+        <mxCell id="user-class" value="User" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="260" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="user-attrs" value="+ id: integer&#xa;+ email: string&#xa;+ name: string&#xa;+ role: string&#xa;- password_hash: string&#xa;+ created_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="user-class">
+          <mxGeometry y="26" width="260" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="user-methods" value="+ authenticate(): boolean&#xa;+ hasPermission(): boolean&#xa;+ getAssignedProjects(): Project[]&#xa;+ hashPassword(): string" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="user-class">
+          <mxGeometry y="120" width="260" height="80" as="geometry" />
         </mxCell>
 
-        <mxCell id="client-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Client&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ name: string&lt;br/&gt;+ address: string&lt;br/&gt;+ phone: string&lt;br/&gt;+ email: string&lt;br/&gt;+ notes: string&lt;br/&gt;+ created_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ getProjects(): Project[]&lt;br/&gt;+ validate(): boolean&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="580" y="30" width="260" height="230" as="geometry" />
+        <!-- CLASS 2: Client -->
+        <mxCell id="client-class" value="Client" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="350" width="260" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="client-attrs" value="+ id: integer&#xa;+ name: string&#xa;+ address: string&#xa;+ phone: string&#xa;+ email: string&#xa;+ notes: string&#xa;+ created_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="client-class">
+          <mxGeometry y="26" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="client-methods" value="+ getProjects(): Project[]&#xa;+ validate(): boolean" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="client-class">
+          <mxGeometry y="136" width="260" height="54" as="geometry" />
         </mxCell>
 
-        <mxCell id="project-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Project&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ project_code: string&lt;br/&gt;+ name: string&lt;br/&gt;+ description: string&lt;br/&gt;+ client_id: number&lt;br/&gt;+ start_date: Date&lt;br/&gt;+ end_date: Date&lt;br/&gt;+ status: &amp;#39;planning&amp;#39; | &amp;#39;in_progress&amp;#39; | &amp;#39;completed&amp;#39; | &amp;#39;on_hold&amp;#39;&lt;br/&gt;+ project_value: number&lt;br/&gt;+ phase: &amp;#39;survey&amp;#39; | &amp;#39;execution&amp;#39;&lt;br/&gt;+ survey_approved: boolean&lt;br/&gt;+ created_by: number&lt;br/&gt;+ created_at: Date&lt;br/&gt;+ updated_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ calculateSPI(): number&lt;br/&gt;+ getHealthStatus(): &amp;#39;green&amp;#39; | &amp;#39;amber&amp;#39; | &amp;#39;red&amp;#39;&lt;br/&gt;+ getTasks(): Task[]&lt;br/&gt;+ getAssignments(): ProjectAssignment[]&lt;br/&gt;+ getMaterials(): Material[]&lt;br/&gt;+ getBudgetItems(): BudgetItem[]&lt;br/&gt;+ approveSurvey(): void&lt;br/&gt;+ rejectSurvey(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="500" y="340" width="380" height="420" as="geometry" />
+        <!-- CLASS 3: Project -->
+        <mxCell id="project-class" value="Project" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="50" width="320" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="project-attrs" value="+ id: integer&#xa;+ project_code: string&#xa;+ name: string&#xa;+ description: string&#xa;+ client_id: integer&#xa;+ start_date: date&#xa;+ end_date: date&#xa;+ status: string&#xa;+ project_value: decimal&#xa;+ phase: string&#xa;+ survey_approved: boolean&#xa;+ created_by: integer&#xa;+ created_at: timestamp&#xa;+ updated_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="project-class">
+          <mxGeometry y="26" width="320" height="204" as="geometry" />
+        </mxCell>
+        <mxCell id="project-methods" value="+ calculateSPI(): number&#xa;+ getHealthStatus(): string&#xa;+ getTasks(): Task[]&#xa;+ getAssignments(): ProjectAssignment[]&#xa;+ getMaterials(): Material[]&#xa;+ getBudgetItems(): BudgetItem[]&#xa;+ approveSurvey(): void&#xa;+ rejectSurvey(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="project-class">
+          <mxGeometry y="230" width="320" height="130" as="geometry" />
         </mxCell>
 
-        <mxCell id="task-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Task&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ project_id: number&lt;br/&gt;+ title: string&lt;br/&gt;+ description: string&lt;br/&gt;+ assigned_to: number&lt;br/&gt;+ status: &amp;#39;to_do&amp;#39; | &amp;#39;working_on_it&amp;#39; | &amp;#39;done&amp;#39;&lt;br/&gt;+ due_date: Date&lt;br/&gt;+ sort_order: number&lt;br/&gt;+ created_at: Date&lt;br/&gt;+ updated_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ isOvertime(): boolean&lt;br/&gt;+ isOverDeadline(): boolean&lt;br/&gt;+ canMarkDone(userRole): boolean&lt;br/&gt;+ getEvidence(): TaskEvidence[]&lt;br/&gt;+ changeStatus(newStatus, userRole): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="1050" y="30" width="330" height="320" as="geometry" />
+        <!-- CLASS 4: Task -->
+        <mxCell id="task-class" value="Task" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="50" width="280" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="task-attrs" value="+ id: integer&#xa;+ project_id: integer&#xa;+ title: string&#xa;+ description: string&#xa;+ assigned_to: integer&#xa;+ status: string&#xa;+ due_date: date&#xa;+ sort_order: integer&#xa;+ created_at: timestamp&#xa;+ updated_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="task-class">
+          <mxGeometry y="26" width="280" height="154" as="geometry" />
+        </mxCell>
+        <mxCell id="task-methods" value="+ isOvertime(): boolean&#xa;+ isOverDeadline(): boolean&#xa;+ canMarkDone(): boolean&#xa;+ getEvidence(): TaskEvidence[]&#xa;+ changeStatus(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="task-class">
+          <mxGeometry y="180" width="280" height="100" as="geometry" />
         </mxCell>
 
-        <mxCell id="health-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;ProjectHealth&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ project_id: number&lt;br/&gt;+ spi_value: number&lt;br/&gt;+ status: &amp;#39;green&amp;#39; | &amp;#39;amber&amp;#39; | &amp;#39;red&amp;#39;&lt;br/&gt;+ deviation_percent: number&lt;br/&gt;+ actual_progress: number&lt;br/&gt;+ planned_progress: number&lt;br/&gt;+ total_tasks: number&lt;br/&gt;+ completed_tasks: number&lt;br/&gt;+ last_updated: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ recalculate(): void&lt;br/&gt;+ getRAGIndicator(): string&lt;br/&gt;+ getDeviationPercentage(): number&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="540" y="830" width="300" height="290" as="geometry" />
+        <!-- CLASS 5: ProjectHealth -->
+        <mxCell id="health-class" value="ProjectHealth" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="500" width="320" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="health-attrs" value="+ project_id: integer&#xa;+ spi_value: decimal&#xa;+ status: string&#xa;+ deviation_percent: decimal&#xa;+ actual_progress: decimal&#xa;+ planned_progress: decimal&#xa;+ total_tasks: integer&#xa;+ completed_tasks: integer&#xa;+ last_updated: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="health-class">
+          <mxGeometry y="26" width="320" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="health-methods" value="+ recalculate(): void&#xa;+ getRAGIndicator(): string&#xa;+ getDeviationPercentage(): number" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="health-class">
+          <mxGeometry y="170" width="320" height="90" as="geometry" />
         </mxCell>
 
-        <mxCell id="assignment-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;ProjectAssignment&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ project_id: number&lt;br/&gt;+ user_id: number&lt;br/&gt;+ role: string&lt;br/&gt;+ assigned_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ assign(): void&lt;br/&gt;+ unassign(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="100" y="400" width="260" height="190" as="geometry" />
+        <!-- CLASS 6: ProjectAssignment -->
+        <mxCell id="assignment-class" value="ProjectAssignment" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="650" width="260" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-attrs" value="+ id: integer&#xa;+ project_id: integer&#xa;+ user_id: integer&#xa;+ role: string&#xa;+ assigned_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="assignment-class">
+          <mxGeometry y="26" width="260" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-methods" value="+ assign(): void&#xa;+ unassign(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="assignment-class">
+          <mxGeometry y="110" width="260" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="evidence-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;TaskEvidence&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ task_id: number&lt;br/&gt;+ file_path: string&lt;br/&gt;+ file_name: string&lt;br/&gt;+ file_type: string&lt;br/&gt;+ file_size: number&lt;br/&gt;+ uploaded_by: number&lt;br/&gt;+ created_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ upload(file): void&lt;br/&gt;+ download(): Buffer&lt;br/&gt;+ delete(): void&lt;br/&gt;+ validate(): boolean&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="1100" y="430" width="280" height="290" as="geometry" />
+        <!-- CLASS 7: TaskEvidence -->
+        <mxCell id="evidence-class" value="TaskEvidence" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="420" width="280" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="evidence-attrs" value="+ id: integer&#xa;+ task_id: integer&#xa;+ file_path: string&#xa;+ file_name: string&#xa;+ file_type: string&#xa;+ file_size: integer&#xa;+ uploaded_by: integer&#xa;+ created_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="evidence-class">
+          <mxGeometry y="26" width="280" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="evidence-methods" value="+ upload(): void&#xa;+ download(): Buffer&#xa;+ delete(): void&#xa;+ validate(): boolean" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="evidence-class">
+          <mxGeometry y="150" width="280" height="80" as="geometry" />
         </mxCell>
 
-        <mxCell id="material-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Material&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ project_id: number&lt;br/&gt;+ name: string&lt;br/&gt;+ quantity: number&lt;br/&gt;+ unit: string&lt;br/&gt;+ unit_price: number&lt;br/&gt;+ notes: string&lt;br/&gt;+ created_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ getTotalPrice(): number&lt;br/&gt;+ validate(): boolean&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="30" y="710" width="260" height="250" as="geometry" />
+        <!-- CLASS 8: Material -->
+        <mxCell id="material-class" value="Material" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="50" width="260" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="material-attrs" value="+ id: integer&#xa;+ project_id: integer&#xa;+ name: string&#xa;+ quantity: decimal&#xa;+ unit: string&#xa;+ unit_price: decimal&#xa;+ notes: string&#xa;+ created_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="material-class">
+          <mxGeometry y="26" width="260" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="material-methods" value="+ getTotalPrice(): number&#xa;+ validate(): boolean" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="material-class">
+          <mxGeometry y="150" width="260" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="budget-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;BudgetItem&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ project_id: number&lt;br/&gt;+ description: string&lt;br/&gt;+ category: string&lt;br/&gt;+ amount: number&lt;br/&gt;+ notes: string&lt;br/&gt;+ created_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ validate(): boolean&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="30" y="1020" width="260" height="210" as="geometry" />
+        <!-- CLASS 9: BudgetItem -->
+        <mxCell id="budget-class" value="BudgetItem" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="350" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="budget-attrs" value="+ id: integer&#xa;+ project_id: integer&#xa;+ description: string&#xa;+ category: string&#xa;+ amount: decimal&#xa;+ notes: string&#xa;+ created_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="budget-class">
+          <mxGeometry y="26" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="budget-methods" value="+ validate(): boolean" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="budget-class">
+          <mxGeometry y="136" width="260" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="report-class" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;DailyReport&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ id: number&lt;br/&gt;+ project_id: number&lt;br/&gt;+ task_id: number | null&lt;br/&gt;+ report_date: Date&lt;br/&gt;+ progress_percentage: number&lt;br/&gt;+ constraints: string&lt;br/&gt;+ notes: string&lt;br/&gt;+ created_by: number&lt;br/&gt;+ created_at: Date&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;text-align:left;&quot;&gt;+ validate(): boolean&lt;br/&gt;+ triggerSPICalculation(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="1050" y="830" width="300" height="270" as="geometry" />
+        <!-- CLASS 10: DailyReport -->
+        <mxCell id="report-class" value="DailyReport" style="swimlane;fontStyle=1;align=center;startSize=26;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;html=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="620" width="280" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="report-attrs" value="+ id: integer&#xa;+ project_id: integer&#xa;+ task_id: integer&#xa;+ report_date: date&#xa;+ progress_percentage: decimal&#xa;+ constraints: string&#xa;+ notes: string&#xa;+ created_by: integer&#xa;+ created_at: timestamp" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="report-class">
+          <mxGeometry y="26" width="280" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="report-methods" value="+ validate(): boolean&#xa;+ triggerSPICalculation(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;html=0;whiteSpace=wrap;" vertex="1" parent="report-class">
+          <mxGeometry y="170" width="280" height="80" as="geometry" />
         </mxCell>
 
-        <mxCell id="rel-client-project" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;startSize=14;" edge="1" parent="1" source="client-class" target="project-class">
+        <!-- REL 1: Client to Project (composition, filled diamond) -->
+        <mxCell id="rel1" style="endArrow=none;startArrow=diamondThin;startFill=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" edge="1" parent="1" source="client-class" target="project-class">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rel-client-project-label" value="has projects" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-client-project">
-          <mxGeometry x="-0.1" y="0" relative="1" as="geometry">
-            <mxPoint x="-60" y="0" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel1-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel1">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint x="-5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel-client-project-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-client-project">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="-15" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-client-project-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-client-project">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="-15" y="0" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel1-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel1">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint x="5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
 
-        <mxCell id="rel-project-task" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;startSize=14;" edge="1" parent="1" source="project-class" target="task-class">
+        <!-- REL 2: Project to Task (composition) -->
+        <mxCell id="rel2" style="endArrow=none;startArrow=diamondThin;startFill=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.4;entryDx=0;entryDy=0;" edge="1" parent="1" source="project-class" target="task-class">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rel-project-task-label" value="contains tasks" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-project-task">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-15" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel2-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel2">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint x="-5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel-project-task-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-task">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-project-task-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-task">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel2-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel2">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint x="5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
 
-        <mxCell id="rel-project-health" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;startSize=14;" edge="1" parent="1" source="project-class" target="health-class">
+        <!-- REL 3: Project to ProjectHealth (composition) -->
+        <mxCell id="rel3" style="endArrow=none;startArrow=diamondThin;startFill=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="project-class" target="health-class">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rel-project-health-label" value="has health" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-project-health">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="-50" y="0" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel3-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel3">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint x="-12" y="0" as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel-project-health-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-health">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="-15" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-project-health-card2" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-health">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="-15" y="0" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel3-tgt" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel3">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint x="-12" y="0" as="offset" /></mxGeometry>
         </mxCell>
 
-        <mxCell id="rel-project-material" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;startSize=14;" edge="1" parent="1" source="project-class" target="material-class">
+        <!-- REL 4: Task to TaskEvidence (composition) -->
+        <mxCell id="rel4" style="endArrow=none;startArrow=diamondThin;startFill=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="task-class" target="evidence-class">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rel-project-material-label" value="uses materials" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-project-material">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-15" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel4-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel4">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint x="-12" y="0" as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel-project-material-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-material">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-project-material-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-material">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel4-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel4">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint x="-15" y="0" as="offset" /></mxGeometry>
         </mxCell>
 
-        <mxCell id="rel-project-budget" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=0;exitY=0.9;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;startSize=14;" edge="1" parent="1" source="project-class" target="budget-class">
+        <!-- REL 5: Project to Material (aggregation, hollow diamond) -->
+        <mxCell id="rel5" style="endArrow=none;startArrow=diamondThin;startFill=0;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="project-class" target="material-class">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="400" y="718" />
-              <mxPoint x="400" y="980" />
-              <mxPoint x="160" y="980" />
+              <mxPoint x="900" y="230" />
+              <mxPoint x="900" y="30" />
+              <mxPoint x="1380" y="30" />
+              <mxPoint x="1380" y="155" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel-project-budget-label" value="has budget" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-project-budget">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="-50" y="0" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel5-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel5">
+          <mxGeometry x="-0.9" relative="1" as="geometry"><mxPoint x="-5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel-project-budget-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-budget">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-project-budget-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-budget">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel5-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel5">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint x="5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
 
-        <mxCell id="rel-project-report" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;startSize=14;" edge="1" parent="1" source="project-class" target="report-class">
+        <!-- REL 6: Project to BudgetItem (aggregation) -->
+        <mxCell id="rel6" style="endArrow=none;startArrow=diamondThin;startFill=0;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=1;exitY=0.65;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="project-class" target="budget-class">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="980" y="697" />
-              <mxPoint x="1200" y="697" />
+              <mxPoint x="920" y="284" />
+              <mxPoint x="920" y="440" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel-project-report-label" value="has reports" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-project-report">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-15" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel6-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel6">
+          <mxGeometry x="-0.9" relative="1" as="geometry"><mxPoint x="-5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel-project-report-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-report">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-project-report-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-report">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel6-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel6">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint x="5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
 
-        <mxCell id="rel-user-assignment" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="assignment-class">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-user-assignment-label" value="assigned via" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-user-assignment">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="-55" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-user-assignment-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-assignment">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="12" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-user-assignment-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-assignment">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="12" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <mxCell id="rel-project-assignment" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=0;exitY=0.3;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="project-class" target="assignment-class">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-project-assignment-label" value="assigned via" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-project-assignment">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-15" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-project-assignment-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-assignment">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-project-assignment-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-project-assignment">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <mxCell id="rel-task-evidence" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;startSize=14;" edge="1" parent="1" source="task-class" target="evidence-class">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-task-evidence-label" value="has evidence" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-task-evidence">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="-60" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-task-evidence-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-task-evidence">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="12" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-task-evidence-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-task-evidence">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="12" y="0" as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <mxCell id="rel-user-task" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;dashed=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="task-class">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-user-task-label" value="assigned to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-user-task">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-15" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-user-task-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-task">
-          <mxGeometry x="-0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-user-task-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-task">
-          <mxGeometry x="0.85" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <mxCell id="rel-user-report" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;dashed=1;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="report-class">
+        <!-- REL 7: Project to DailyReport (aggregation) -->
+        <mxCell id="rel7" style="endArrow=none;startArrow=diamondThin;startFill=0;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="project-class" target="report-class">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="370" y="230" />
-              <mxPoint x="370" y="310" />
-              <mxPoint x="450" y="310" />
-              <mxPoint x="450" y="1140" />
-              <mxPoint x="990" y="1140" />
-              <mxPoint x="990" y="965" />
+              <mxPoint x="940" y="356" />
+              <mxPoint x="940" y="745" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel-user-report-label" value="created by" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-user-report">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-15" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel7-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel7">
+          <mxGeometry x="-0.9" relative="1" as="geometry"><mxPoint x="-5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel-user-report-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-report">
-          <mxGeometry x="-0.9" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel-user-report-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-report">
-          <mxGeometry x="0.9" y="0" relative="1" as="geometry">
-            <mxPoint x="0" y="-12" as="offset" />
-          </mxGeometry>
+        <mxCell id="rel7-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel7">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint x="5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
 
-        <mxCell id="rel-user-evidence" value="" style="endArrow=open;endFill=0;endSize=12;html=1;rounded=0;dashed=1;exitX=1;exitY=0.6;exitDx=0;exitDy=0;entryX=1;entryY=0.15;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="evidence-class">
+        <!-- REL 8: User to ProjectAssignment (association) -->
+        <mxCell id="rel8" style="endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="assignment-class">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel8-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel8">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint x="-12" y="0" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel8-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel8">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint x="-15" y="0" as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- REL 9: Project to ProjectAssignment (association) -->
+        <mxCell id="rel9" style="endArrow=none;startArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;exitX=0;exitY=0.85;exitDx=0;exitDy=0;entryX=1;entryY=0.4;entryDx=0;entryDy=0;" edge="1" parent="1" source="project-class" target="assignment-class">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1480" y="180" />
-              <mxPoint x="1480" y="474" />
+              <mxPoint x="430" y="356" />
+              <mxPoint x="430" y="714" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel-user-evidence-label" value="uploaded by" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="rel-user-evidence">
-          <mxGeometry x="0" y="0" relative="1" as="geometry">
-            <mxPoint x="15" y="0" as="offset" />
+        <mxCell id="rel9-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel9">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint x="-12" y="0" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel9-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel9">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint x="12" y="0" as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- REL 10: User to Task (dependency, dashed) -->
+        <mxCell id="rel10" style="endArrow=open;endFill=0;startArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;dashed=1;dashPattern=8 4;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="task-class">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="100" />
+              <mxPoint x="400" y="20" />
+              <mxPoint x="960" y="20" />
+              <mxPoint x="960" y="106" />
+            </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel-user-evidence-card1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-evidence">
-          <mxGeometry x="-0.9" y="0" relative="1" as="geometry">
-            <mxPoint x="12" y="0" as="offset" />
+        <mxCell id="rel10-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel10">
+          <mxGeometry x="-0.9" relative="1" as="geometry"><mxPoint x="-5" y="-12" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel10-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel10">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint x="5" y="-12" as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- REL 11: User to DailyReport (dependency, dashed) -->
+        <mxCell id="rel11" style="endArrow=open;endFill=0;startArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;dashed=1;dashPattern=8 4;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="report-class">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="20" y="200" />
+              <mxPoint x="20" y="900" />
+              <mxPoint x="1400" y="900" />
+              <mxPoint x="1400" y="695" />
+            </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel-user-evidence-card2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=1;" vertex="1" connectable="0" parent="rel-user-evidence">
-          <mxGeometry x="0.9" y="0" relative="1" as="geometry">
-            <mxPoint x="12" y="0" as="offset" />
+        <mxCell id="rel11-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel11">
+          <mxGeometry x="-0.9" relative="1" as="geometry"><mxPoint x="12" y="0" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel11-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel11">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint x="12" y="0" as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- REL 12: User to TaskEvidence (dependency, dashed) -->
+        <mxCell id="rel12" style="endArrow=open;endFill=0;startArrow=none;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=9;html=1;dashed=1;dashPattern=8 4;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-class" target="evidence-class">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380" y="200" />
+              <mxPoint x="380" y="581" />
+            </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="rel12-src" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel12">
+          <mxGeometry x="-0.9" relative="1" as="geometry"><mxPoint x="-5" y="-12" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel12-tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontColor=#000000;fontSize=9;" vertex="1" connectable="0" parent="rel12">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint x="5" y="-12" as="offset" /></mxGeometry>
         </mxCell>
 
       </root>
