@@ -33,19 +33,19 @@ export default function KanbanCard({
     : isOvertimeColumn
     ? 'border-amber-300 bg-amber-50/30'
     : task.is_tracking
-    ? 'border-green-400 bg-green-50/20'
+    ? 'border-green-400 bg-green-50/20 dark:bg-green-900/20'
     : isReview
-    ? 'border-purple-300 bg-purple-50/20'
+    ? 'border-purple-300 bg-purple-50/20 dark:bg-purple-900/20'
     : isOverdue
-    ? 'border-red-300'
-    : 'border-gray-200';
+    ? 'border-red-300 dark:border-red-700'
+    : 'border-gray-200 dark:border-gray-700';
 
   const timeSpent = Number(task.time_spent_seconds) || 0;
   const showTimer = task.status !== 'done' && (onTimerStart || onTimerStop);
 
   return (
     <div
-      className={`bg-white rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow ${borderClass}`}
+      className={`bg-white dark:bg-gray-800 rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow ${borderClass}`}
       role="listitem"
       aria-label={`Task: ${task.name}`}
     >
@@ -92,7 +92,7 @@ export default function KanbanCard({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
               </span>
             )}
-            <h4 className="text-sm font-medium text-gray-900 line-clamp-2">{task.name}</h4>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-2">{task.name}</h4>
           </div>
         </div>
 
@@ -109,48 +109,46 @@ export default function KanbanCard({
 
       {/* Assignee */}
       {task.assigned_to_name && (
-        <p className="text-xs text-gray-500 mb-1.5 cursor-pointer" onClick={() => onClick?.(task)}>
-          <span className="inline-block w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold leading-5 text-center mr-1 align-middle">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 cursor-pointer" onClick={() => onClick?.(task)}>
+          <span className="inline-block w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold leading-5 text-center mr-1 align-middle">
             {task.assigned_to_name.charAt(0).toUpperCase()}
           </span>
           {task.assigned_to_name}
         </p>
       )}
 
-      {/* Due date + time + status */}
-      <div className="flex items-center justify-between mt-2 cursor-pointer" onClick={() => onClick?.(task)}>
-        <div className="flex items-center gap-2">
-          {task.due_date ? (
-            <span className={`text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
-              {isOverdue ? 'Overdue: ' : 'Due: '}
-              {formatDate(task.due_date)}
-            </span>
-          ) : (
-            <span className="text-xs text-gray-300">No due date</span>
-          )}
-          {/* Elapsed time */}
-          {timeSpent > 0 && (
-            <span className={`text-[10px] flex items-center gap-0.5 ${task.is_tracking ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {formatTimeSpent(timeSpent)}
-            </span>
-          )}
-        </div>
-        <div onClick={(e) => e.stopPropagation()} role="presentation">
-          <TaskStatusSelect
-            value={task.status}
-            onChange={(newStatus) => onStatusChange(task.id, newStatus)}
-            disabled={isChanging}
-            size="sm"
-            userRole={userRole}
-          />
-        </div>
+      {/* Due date + time */}
+      <div className="flex items-center gap-2 mt-2 cursor-pointer" onClick={() => onClick?.(task)}>
+        {task.due_date ? (
+          <span className={`text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+            {isOverdue ? 'Overdue: ' : 'Due: '}
+            {formatDate(task.due_date)}
+          </span>
+        ) : (
+          <span className="text-xs text-gray-300 dark:text-gray-600">No due date</span>
+        )}
+        {timeSpent > 0 && (
+          <span className={`text-[10px] flex items-center gap-0.5 ${task.is_tracking ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {formatTimeSpent(timeSpent)}
+          </span>
+        )}
+      </div>
+      {/* Status select - own row */}
+      <div className="mt-1.5" onClick={(e) => e.stopPropagation()} role="presentation">
+        <TaskStatusSelect
+          value={task.status}
+          onChange={(newStatus) => onStatusChange(task.id, newStatus)}
+          disabled={isChanging}
+          size="sm"
+          userRole={userRole}
+        />
       </div>
 
       {!isTechnician && task.budget > 0 && (
-        <p className="text-[10px] text-gray-400 mt-1.5">
+        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5">
           Budget: Rp {Number(task.budget).toLocaleString('id-ID')}
         </p>
       )}

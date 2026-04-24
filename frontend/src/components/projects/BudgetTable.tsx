@@ -109,7 +109,7 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
 
   const SortHeader = ({ label, field, className = '' }: { label: string; field: SortKey; className?: string }) => (
     <th
-      className={`py-2 px-2 text-xs font-medium text-gray-500 cursor-pointer hover:text-gray-700 select-none ${className}`}
+      className={`py-2 px-2 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 select-none ${className}`}
       onClick={() => handleSort(field)}
     >
       <span className="inline-flex items-center gap-1">
@@ -122,7 +122,7 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900">Budget (RAB)</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Budget (RAB)</h3>
         <div className="flex items-center gap-2">
           {budgetItems.length > 0 && (
             <button
@@ -148,16 +148,16 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-blue-50 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-500">Planned</p>
+        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Planned</p>
           <p className="text-sm font-bold text-blue-600">Rp {totalPlanned.toLocaleString('id-ID')}</p>
         </div>
-        <div className="bg-green-50 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-500">Actual</p>
+        <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-3 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Actual</p>
           <p className="text-sm font-bold text-green-600">Rp {totalActual.toLocaleString('id-ID')}</p>
         </div>
-        <div className={`rounded-lg p-3 text-center ${variance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-          <p className="text-xs text-gray-500">Variance</p>
+        <div className={`rounded-lg p-3 text-center ${variance >= 0 ? 'bg-green-50 dark:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/30'}`}>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Variance</p>
           <p className={`text-sm font-bold ${variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {variance >= 0 ? '+' : ''}Rp {variance.toLocaleString('id-ID')}
           </p>
@@ -165,20 +165,20 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
       </div>
 
       {showAdd && (
-        <div className="bg-gray-50 rounded-lg p-3 mb-3 space-y-2">
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 mb-3 space-y-2">
           <input
             type="text"
             value={form.category}
             onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
             placeholder="Category (e.g. Material, Labor, Transport)"
-            className="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             value={form.description}
             onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
             placeholder="Description (optional)"
-            className="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="flex gap-2 items-center">
             <input
@@ -187,9 +187,9 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
               onChange={(e) => setForm((p) => ({ ...p, amount: e.target.value }))}
               placeholder="Amount (Rp)"
               min={0}
-              className="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <label className="flex items-center gap-1.5 text-sm text-gray-700 shrink-0">
+            <label className="flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300 shrink-0">
               <input
                 type="checkbox"
                 checked={form.is_actual}
@@ -210,13 +210,13 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
       )}
 
       {budgetItems.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-4">No budget items recorded</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No budget items recorded</p>
       ) : (
         <>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm" role="table">
               <thead>
-                <tr className="border-b border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-700">
                   <SortHeader label="Category" field="category" className="text-left" />
                   <SortHeader label="Description" field="description" className="text-left" />
                   <SortHeader label="Type" field="type" className="text-left" />
@@ -228,17 +228,17 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
                 {paginated.map((b) => {
                   const age = getBudgetAge(b);
                   return (
-                    <tr key={b.id} className={`border-b border-gray-100 ${AGE_BORDER[age]}`}>
-                      <td className="py-2 px-2 text-gray-700">{b.category}</td>
-                      <td className="py-2 px-2 text-gray-500 text-xs">{b.description ?? '--'}</td>
+                    <tr key={b.id} className={`border-b border-gray-100 dark:border-gray-700 ${AGE_BORDER[age]}`}>
+                      <td className="py-2 px-2 text-gray-700 dark:text-gray-300">{b.category}</td>
+                      <td className="py-2 px-2 text-gray-500 dark:text-gray-400 text-xs">{b.description ?? '--'}</td>
                       <td className="py-2 px-2">
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          b.is_actual ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                          b.is_actual ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                         }`}>
                           {b.is_actual ? 'Actual' : 'Planned'}
                         </span>
                       </td>
-                      <td className="py-2 px-2 text-gray-900 font-medium text-right">
+                      <td className="py-2 px-2 text-gray-900 dark:text-gray-100 font-medium text-right">
                         Rp {Number(b.amount).toLocaleString('id-ID')}
                       </td>
                       {canEdit && (
@@ -263,23 +263,23 @@ export default function BudgetTable({ projectId, budgetItems, canEdit }: Props) 
 
           {/* Pagination */}
           {sorted.length > PAGE_SIZES[0] && (
-            <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-2 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-2 text-xs text-gray-500 dark:text-gray-400">
               <div className="flex items-center gap-2">
                 <span>Show</span>
                 <select
                   value={pageSize}
                   onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-                  className="border border-gray-300 rounded px-1.5 py-1 text-xs"
+                  className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs"
                 >
                   {PAGE_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => setPage(0)} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&laquo;</button>
-                <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&lsaquo;</button>
+                <button onClick={() => setPage(0)} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&laquo;</button>
+                <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&lsaquo;</button>
                 <span className="px-2 py-1 font-medium">{safePage + 1} / {totalPages}</span>
-                <button onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&rsaquo;</button>
-                <button onClick={() => setPage(totalPages - 1)} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&raquo;</button>
+                <button onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&rsaquo;</button>
+                <button onClick={() => setPage(totalPages - 1)} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&raquo;</button>
               </div>
             </div>
           )}

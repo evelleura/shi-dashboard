@@ -101,7 +101,7 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
 
   const SortHeader = ({ label, field, className = '' }: { label: string; field: SortKey; className?: string }) => (
     <th
-      className={`py-2 px-2 text-xs font-medium text-gray-500 cursor-pointer hover:text-gray-700 select-none ${className}`}
+      className={`py-2 px-2 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 select-none ${className}`}
       onClick={() => handleSort(field)}
     >
       <span className="inline-flex items-center gap-1">
@@ -114,7 +114,7 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
           Materials ({materials.length})
         </h3>
         <div className="flex items-center gap-2">
@@ -141,13 +141,13 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
       </div>
 
       {showAdd && (
-        <div className="bg-gray-50 rounded-lg p-3 mb-3 space-y-2">
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 mb-3 space-y-2">
           <input
             type="text"
             value={form.name}
             onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             placeholder="Material name"
-            className="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="grid grid-cols-3 gap-2">
             <input
@@ -157,14 +157,14 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
               placeholder="Qty"
               min={0}
               step={0.1}
-              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
               value={form.unit}
               onChange={(e) => setForm((p) => ({ ...p, unit: e.target.value }))}
               placeholder="Unit"
-              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="number"
@@ -172,7 +172,7 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
               onChange={(e) => setForm((p) => ({ ...p, unit_price: e.target.value }))}
               placeholder="Unit price"
               min={0}
-              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <button
@@ -186,16 +186,16 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
       )}
 
       {materials.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-4">No materials recorded</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No materials recorded</p>
       ) : (
         <>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm" role="table">
               <thead>
-                <tr className="border-b border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-700">
                   <SortHeader label="Name" field="name" className="text-left" />
                   <SortHeader label="Qty" field="quantity" className="text-right" />
-                  <th className="py-2 px-2 text-left text-xs font-medium text-gray-500">Unit</th>
+                  <th className="py-2 px-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Unit</th>
                   <SortHeader label="Unit Price" field="unit_price" className="text-right" />
                   <SortHeader label="Total" field="total_price" className="text-right" />
                   {canEdit && <th className="py-2 px-2 w-8"></th>}
@@ -205,12 +205,12 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
                 {paginated.map((m) => {
                   const age = getMaterialAge(m);
                   return (
-                    <tr key={m.id} className={`border-b border-gray-100 ${AGE_BORDER[age]}`}>
-                      <td className="py-2 px-2 text-gray-700">{m.name}</td>
-                      <td className="py-2 px-2 text-gray-600 text-right">{Number(m.quantity)}</td>
-                      <td className="py-2 px-2 text-gray-600">{m.unit}</td>
-                      <td className="py-2 px-2 text-gray-600 text-right">Rp {Number(m.unit_price).toLocaleString('id-ID')}</td>
-                      <td className="py-2 px-2 text-gray-900 font-medium text-right">Rp {Number(m.total_price).toLocaleString('id-ID')}</td>
+                    <tr key={m.id} className={`border-b border-gray-100 dark:border-gray-700 ${AGE_BORDER[age]}`}>
+                      <td className="py-2 px-2 text-gray-700 dark:text-gray-300">{m.name}</td>
+                      <td className="py-2 px-2 text-gray-600 dark:text-gray-400 text-right">{Number(m.quantity)}</td>
+                      <td className="py-2 px-2 text-gray-600 dark:text-gray-400">{m.unit}</td>
+                      <td className="py-2 px-2 text-gray-600 dark:text-gray-400 text-right">Rp {Number(m.unit_price).toLocaleString('id-ID')}</td>
+                      <td className="py-2 px-2 text-gray-900 dark:text-gray-100 font-medium text-right">Rp {Number(m.total_price).toLocaleString('id-ID')}</td>
                       {canEdit && (
                         <td className="py-2 px-2">
                           <button
@@ -229,9 +229,9 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
                 })}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-gray-300">
-                  <td colSpan={4} className="py-2 px-2 text-right font-semibold text-gray-700">Total</td>
-                  <td className="py-2 px-2 text-right font-bold text-gray-900">
+                <tr className="border-t-2 border-gray-300 dark:border-gray-600">
+                  <td colSpan={4} className="py-2 px-2 text-right font-semibold text-gray-700 dark:text-gray-300">Total</td>
+                  <td className="py-2 px-2 text-right font-bold text-gray-900 dark:text-gray-100">
                     Rp {totalValue.toLocaleString('id-ID')}
                   </td>
                   {canEdit && <td></td>}
@@ -242,23 +242,23 @@ export default function MaterialsList({ projectId, materials, canEdit }: Props) 
 
           {/* Pagination */}
           {sorted.length > PAGE_SIZES[0] && (
-            <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-2 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-2 text-xs text-gray-500 dark:text-gray-400">
               <div className="flex items-center gap-2">
                 <span>Show</span>
                 <select
                   value={pageSize}
                   onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-                  className="border border-gray-300 rounded px-1.5 py-1 text-xs"
+                  className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs"
                 >
                   {PAGE_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => setPage(0)} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&laquo;</button>
-                <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&lsaquo;</button>
+                <button onClick={() => setPage(0)} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&laquo;</button>
+                <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&lsaquo;</button>
                 <span className="px-2 py-1 font-medium">{safePage + 1} / {totalPages}</span>
-                <button onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&rsaquo;</button>
-                <button onClick={() => setPage(totalPages - 1)} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40">&raquo;</button>
+                <button onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&rsaquo;</button>
+                <button onClick={() => setPage(totalPages - 1)} disabled={safePage >= totalPages - 1} className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40">&raquo;</button>
               </div>
             </div>
           )}

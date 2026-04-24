@@ -29,20 +29,20 @@ function formatDate(d: string) {
 
 function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () => void; isLoading: boolean }) {
   return (
-    <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-3">
+    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-3">
       <span className="relative flex h-3 w-3 shrink-0">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-green-600 font-medium">Currently working on</p>
-        <p className="text-sm font-semibold text-green-900 truncate">{task.name}</p>
+        <p className="text-xs text-green-600 dark:text-green-400 font-medium">Currently working on</p>
+        <p className="text-sm font-semibold text-green-900 dark:text-green-100 truncate">{task.name}</p>
       </div>
-      <p className="text-lg font-mono font-bold text-green-700">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
+      <p className="text-lg font-mono font-bold text-green-700 dark:text-green-400">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
       <button
         onClick={onStop}
         disabled={isLoading}
-        className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+        className="px-3 py-1.5 bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
         aria-label="Stop timer"
       >
         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -162,12 +162,12 @@ export default function ProjectDetailPage() {
         </button>
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{project.name}</h1>
             {project.client_name && (
-              <p className="text-sm text-blue-500 mt-0.5">Client: {project.client_name}</p>
+              <p className="text-sm text-blue-500 dark:text-blue-400 mt-0.5">Client: {project.client_name}</p>
             )}
-            {project.description && <p className="text-sm text-gray-500 mt-1">{project.description}</p>}
-            <p className="text-xs text-gray-400 mt-1">
+            {project.description && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{project.description}</p>}
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
               {formatDate(project.start_date)} -- {formatDate(project.end_date)} ({project.duration} days)
               &nbsp;| Phase: <span className="font-medium">{project.phase === 'survey' ? 'Survey' : 'Execution'}</span>
               {/* Hide project value from technicians */}
@@ -193,15 +193,15 @@ export default function ProjectDetailPage() {
           { label: 'Overtime', value: project.health?.overtime_tasks ?? 0, color: (project.health?.overtime_tasks ?? 0) > 0 ? 'text-amber-600' : 'text-gray-600' },
           { label: 'Overdue', value: project.health?.overdue_tasks ?? 0, color: (project.health?.overdue_tasks ?? 0) > 0 ? 'text-orange-600' : 'text-gray-600' },
         ].map((m) => (
-          <div key={m.label} className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-            <p className="text-xs text-gray-400">{m.label}</p>
+          <div key={m.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 text-center">
+            <p className="text-xs text-gray-400 dark:text-gray-500">{m.label}</p>
             <p className={`text-xl font-bold mt-0.5 ${m.color}`}>{m.value}</p>
           </div>
         ))}
       </div>
 
       {/* Progress bar */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <ProgressBar
           actual={project.health?.actual_progress ?? 0}
           planned={project.health?.planned_progress ?? 0}
@@ -209,9 +209,9 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Assigned technicians */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-gray-900">Assigned Technicians</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Assigned Technicians</h3>
           {isManager && (
             <button onClick={() => setShowAssign(!showAssign)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
               {showAssign ? 'Cancel' : '+ Assign'}
@@ -223,7 +223,7 @@ export default function ProjectDetailPage() {
             <select
               value={assignUserId}
               onChange={(e) => setAssignUserId(e.target.value)}
-              className="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select technician...</option>
               {availableTechs.map((t) => (
@@ -241,7 +241,7 @@ export default function ProjectDetailPage() {
         )}
         <div className="flex flex-wrap gap-2">
           {(project.assigned_technicians ?? []).length === 0 ? (
-            <p className="text-sm text-gray-400">No technicians assigned</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">No technicians assigned</p>
           ) : (
             project.assigned_technicians.map((tech) => (
               <span key={tech.id} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
@@ -262,7 +262,7 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex gap-1 -mb-px" role="tablist" aria-label="Project detail tabs">
           {tabs.map((tab) => (
             <button
@@ -272,13 +272,13 @@ export default function ProjectDetailPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               {tab.label}
               {tab.count !== undefined && (
-                <span className="ml-1.5 text-xs text-gray-400">({tab.count})</span>
+                <span className="ml-1.5 text-xs text-gray-400 dark:text-gray-500">({tab.count})</span>
               )}
             </button>
           ))}
@@ -336,7 +336,7 @@ export default function ProjectDetailPage() {
         )}
 
         {activeTab === 'budget' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <BudgetTable
               projectId={projectId}
               budgetItems={project.budget_items ?? []}
@@ -346,7 +346,7 @@ export default function ProjectDetailPage() {
         )}
 
         {activeTab === 'materials' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <MaterialsList
               projectId={projectId}
               materials={project.materials ?? []}
@@ -358,14 +358,14 @@ export default function ProjectDetailPage() {
         {activeTab === 'evidence' && (
           <div className="space-y-4">
             {(project.tasks ?? []).length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">Create tasks first to upload evidence.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Create tasks first to upload evidence.</p>
             ) : (
               (project.tasks ?? []).map((t) => (
-                <div key={t.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between">
+                <div key={t.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-gray-900">{t.name}</h3>
-                      <span className="text-xs text-gray-400">({t.evidence_count ?? 0} files)</span>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t.name}</h3>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">({t.evidence_count ?? 0} files)</span>
                     </div>
                   </div>
                   <div className="p-4 space-y-3">

@@ -62,13 +62,13 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm" role="alert">
+        <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm" role="alert">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="proj-name" className="block text-sm font-medium text-gray-700 mb-1">Project Name *</label>
+        <label htmlFor="proj-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Name *</label>
         <input
           id="proj-name"
           type="text"
@@ -77,18 +77,18 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           onChange={handleChange}
           required
           placeholder="e.g. Smart Home IoT Installation - Citra Raya"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="proj-client" className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+        <label htmlFor="proj-client" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client</label>
         <select
           id="proj-client"
           name="client_id"
           value={form.client_id}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">-- Select Client --</option>
           {clients.map((c) => (
@@ -98,7 +98,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
       </div>
 
       <div>
-        <label htmlFor="proj-desc" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label htmlFor="proj-desc" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
         <textarea
           id="proj-desc"
           name="description"
@@ -106,13 +106,13 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           onChange={handleChange}
           rows={2}
           placeholder="Brief project description..."
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="proj-start" className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+          <label htmlFor="proj-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date *</label>
           <input
             id="proj-start"
             type="date"
@@ -120,11 +120,11 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
             value={form.start_date}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div>
-          <label htmlFor="proj-end" className="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+          <label htmlFor="proj-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date *</label>
           <input
             id="proj-end"
             type="date"
@@ -133,13 +133,13 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
             onChange={handleChange}
             required
             min={form.start_date}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="proj-value" className="block text-sm font-medium text-gray-700 mb-1">Project Value (Rp)</label>
+        <label htmlFor="proj-value" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Value (Rp)</label>
         <input
           id="proj-value"
           type="number"
@@ -149,12 +149,12 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           min={0}
           step={100000}
           placeholder="e.g. 50000000"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="proj-target" className="block text-sm font-medium text-gray-700 mb-1">Target / Goal Description</label>
+        <label htmlFor="proj-target" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target / Goal Description</label>
         <textarea
           id="proj-target"
           name="target_description"
@@ -162,7 +162,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           onChange={handleChange}
           rows={2}
           placeholder="What is the target outcome for this project?"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
 
@@ -170,7 +170,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+          className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           Cancel
         </button>

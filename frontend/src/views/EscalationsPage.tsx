@@ -4,10 +4,10 @@ import Modal from '../components/ui/Modal';
 import type { Escalation, EscalationPriority, EscalationStatus } from '../types';
 
 const PRIORITY_CONFIG: Record<EscalationPriority, { bg: string; text: string; label: string }> = {
-  critical: { bg: 'bg-red-50', text: 'text-red-700', label: 'Critical' },
-  high: { bg: 'bg-orange-50', text: 'text-orange-700', label: 'High' },
-  medium: { bg: 'bg-yellow-50', text: 'text-yellow-700', label: 'Medium' },
-  low: { bg: 'bg-gray-50', text: 'text-gray-600', label: 'Low' },
+  critical: { bg: 'bg-red-50 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400', label: 'Critical' },
+  high: { bg: 'bg-orange-50 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400', label: 'High' },
+  medium: { bg: 'bg-yellow-50 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-400', label: 'Medium' },
+  low: { bg: 'bg-gray-50 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400', label: 'Low' },
 };
 
 const STATUS_CONFIG: Record<EscalationStatus, { bg: string; text: string; label: string }> = {
@@ -105,28 +105,28 @@ export default function EscalationsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Escalation Management</h1>
-        <p className="text-sm text-gray-500">Review and resolve escalations from field technicians</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Escalation Management</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Review and resolve escalations from field technicians</p>
       </div>
 
       {/* Summary cards */}
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-red-600">{summary.open}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Open</p>
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-red-600 dark:text-red-400">{summary.open}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Open</p>
           </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-amber-600">{summary.in_review}</p>
-            <p className="text-xs text-gray-500 mt-0.5">In Review</p>
+          <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{summary.in_review}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">In Review</p>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-green-600">{summary.resolved}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Resolved</p>
+          <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{summary.resolved}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Resolved</p>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-blue-600">{summary.total ?? 0}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Total</p>
+          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{summary.total ?? 0}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Total</p>
           </div>
         </div>
       )}
@@ -151,7 +151,7 @@ export default function EscalationsPage() {
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   filterStatus === status
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 {labels[status]} {counts[status] != null ? `(${counts[status]})` : ''}
@@ -160,12 +160,12 @@ export default function EscalationsPage() {
           })}
         </div>
         <div className="flex items-center gap-2">
-          <label htmlFor="sort-select" className="text-xs text-gray-500">Sort by:</label>
+          <label htmlFor="sort-select" className="text-xs text-gray-500 dark:text-gray-400">Sort by:</label>
           <select
             id="sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortField)}
-            className="text-xs border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="priority">Priority</option>
             <option value="date">Date</option>
@@ -175,11 +175,11 @@ export default function EscalationsPage() {
 
       {/* Escalation list */}
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <svg className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="mt-4 text-sm text-gray-500">No escalations found.</p>
+          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">No escalations found.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -206,13 +206,13 @@ export default function EscalationsPage() {
       >
         <div className="space-y-4">
           {resolveModal && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm font-medium text-gray-900">{resolveModal.title}</p>
-              <p className="text-xs text-gray-500 mt-1">{resolveModal.project_name} -- {resolveModal.task_name}</p>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{resolveModal.title}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{resolveModal.project_name} -- {resolveModal.task_name}</p>
             </div>
           )}
           <div>
-            <label htmlFor="resolution-notes" className="block text-xs font-medium text-gray-700 mb-1">
+            <label htmlFor="resolution-notes" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               Resolution Notes <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -221,14 +221,14 @@ export default function EscalationsPage() {
               onChange={(e) => setResolutionNotes(e.target.value)}
               placeholder="Describe how this issue was resolved..."
               rows={4}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
               required
             />
           </div>
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setResolveModal(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
             >
               Cancel
             </button>
@@ -269,28 +269,28 @@ function ManagerEscalationCard({
   const borderColor = PRIORITY_BORDER[escalation.priority];
 
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 border-l-4 ${borderColor} overflow-hidden`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 border-l-4 ${borderColor} overflow-hidden`}>
       <button
         onClick={onToggle}
-        className="w-full text-left p-4 hover:bg-gray-50 transition-colors"
+        className="w-full text-left p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         aria-expanded={expanded}
         aria-label={`${escalation.title} - ${sc.label} - ${pc.label} priority`}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-gray-900 truncate">{escalation.title}</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{escalation.title}</h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-xs text-gray-500">by {escalation.reporter_name ?? 'Unknown'}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">by {escalation.reporter_name ?? 'Unknown'}</span>
               {escalation.project_name && (
                 <>
-                  <span className="text-gray-300">|</span>
-                  <span className="text-xs text-gray-500">{escalation.project_name}</span>
+                  <span className="text-gray-300 dark:text-gray-600">|</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{escalation.project_name}</span>
                 </>
               )}
               {escalation.task_name && (
                 <>
-                  <span className="text-gray-300">|</span>
-                  <span className="text-xs text-gray-500">{escalation.task_name}</span>
+                  <span className="text-gray-300 dark:text-gray-600">|</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{escalation.task_name}</span>
                 </>
               )}
             </div>
@@ -304,29 +304,29 @@ function ManagerEscalationCard({
             </span>
           </div>
         </div>
-        <p className="text-xs text-gray-400 mt-2">{formatDate(escalation.created_at)}</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{formatDate(escalation.created_at)}</p>
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
+        <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-700 pt-3 space-y-3">
           <div>
-            <p className="text-xs font-medium text-gray-500 mb-1">Description</p>
-            <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 whitespace-pre-wrap">{escalation.description}</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 whitespace-pre-wrap">{escalation.description}</p>
           </div>
 
           {escalation.file_name && (
             <div>
-              <p className="text-xs font-medium text-gray-500 mb-1">Attachment</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Attachment</p>
               <p className="text-sm text-blue-600">{escalation.file_name}</p>
             </div>
           )}
 
           {/* Resolution details (for resolved escalations) */}
           {escalation.status === 'resolved' && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <p className="text-xs font-medium text-green-700 mb-1">Resolution</p>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{escalation.resolution_notes ?? 'No notes provided'}</p>
-              <p className="text-xs text-gray-400 mt-2">
+            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-3">
+              <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">Resolution</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{escalation.resolution_notes ?? 'No notes provided'}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                 Resolved by {escalation.resolver_name ?? 'Unknown'} on {escalation.resolved_at ? formatDateTime(escalation.resolved_at) : '--'}
               </p>
             </div>
@@ -338,7 +338,7 @@ function ManagerEscalationCard({
               <button
                 onClick={() => onReview(escalation.id)}
                 disabled={isReviewing}
-                className="px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 disabled:opacity-50 transition-colors"
+                className="px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 disabled:opacity-50 transition-colors"
               >
                 {isReviewing ? 'Reviewing...' : 'Start Review'}
               </button>
@@ -346,7 +346,7 @@ function ManagerEscalationCard({
             {escalation.status === 'in_review' && (
               <button
                 onClick={() => onResolve(escalation)}
-                className="px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                className="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
               >
                 Resolve
               </button>

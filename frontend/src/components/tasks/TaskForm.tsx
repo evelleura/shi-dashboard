@@ -60,13 +60,13 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm" role="alert">
+        <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm" role="alert">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="task-name" className="block text-sm font-medium text-gray-700 mb-1">Task Name *</label>
+        <label htmlFor="task-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Task Name *</label>
         <input
           id="task-name"
           type="text"
@@ -75,12 +75,12 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
           onChange={handleChange}
           required
           placeholder="e.g. Install CCTV Camera - Ruang Tamu"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="task-desc" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label htmlFor="task-desc" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
         <textarea
           id="task-desc"
           name="description"
@@ -88,19 +88,19 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
           onChange={handleChange}
           rows={2}
           placeholder="Brief task description..."
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="task-assignee" className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
+          <label htmlFor="task-assignee" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assign To</label>
           <select
             id="task-assignee"
             name="assigned_to"
             value={form.assigned_to}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Unassigned</option>
             {technicians.map((t) => (
@@ -109,20 +109,20 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
           </select>
         </div>
         <div>
-          <label htmlFor="task-due" className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+          <label htmlFor="task-due" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Due Date</label>
           <input
             id="task-due"
             type="date"
             name="due_date"
             value={form.due_date}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="task-budget" className="block text-sm font-medium text-gray-700 mb-1">Budget (Rp)</label>
+        <label htmlFor="task-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Budget (Rp)</label>
         <input
           id="task-budget"
           type="number"
@@ -132,12 +132,12 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
           min={0}
           step={1000}
           placeholder="0"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="task-notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+        <label htmlFor="task-notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
         <textarea
           id="task-notes"
           name="notes"
@@ -145,7 +145,7 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
           onChange={handleChange}
           rows={2}
           placeholder="Additional notes..."
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
 
@@ -158,14 +158,14 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
           onChange={handleChange}
           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
-        <label htmlFor="is-survey" className="text-sm text-gray-700">This is a survey task</label>
+        <label htmlFor="is-survey" className="text-sm text-gray-700 dark:text-gray-300">This is a survey task</label>
       </div>
 
       <div className="flex gap-3 pt-2">
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+          className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           Cancel
         </button>

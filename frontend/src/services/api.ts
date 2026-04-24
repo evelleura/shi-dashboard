@@ -31,6 +31,15 @@ import type {
   TaskStatus,
   ProjectHealth,
   HealthStatus,
+  DateRange,
+  SearchResult,
+  ProjectCategoryData,
+  TechnicianWorkloadData,
+  SPITrendData,
+  RecentActivityItem,
+  TechProductivityData,
+  TechTimeSpentData,
+  AuditLogResponse,
 } from '../types';
 
 const api = axios.create({
@@ -363,6 +372,53 @@ export const getTechnicianDashboard = async (): Promise<TechnicianDashboardData>
   return res.data.data!;
 };
 
+export const globalSearch = async (q: string): Promise<SearchResult[]> => {
+  const res = await api.get<ApiResponse<SearchResult[]>>('/dashboard/search', { params: { q } });
+  return res.data.data!;
+};
+
+export const getProjectCategories = async (params?: DateRange): Promise<ProjectCategoryData[]> => {
+  const res = await api.get<ApiResponse<ProjectCategoryData[]>>('/dashboard/charts/project-categories', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
+  return res.data.data!;
+};
+
+export const getTechnicianWorkload = async (params?: DateRange): Promise<TechnicianWorkloadData[]> => {
+  const res = await api.get<ApiResponse<TechnicianWorkloadData[]>>('/dashboard/charts/technician-workload', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
+  return res.data.data!;
+};
+
+export const getSPITrend = async (params?: DateRange): Promise<SPITrendData[]> => {
+  const res = await api.get<ApiResponse<SPITrendData[]>>('/dashboard/charts/spi-trend', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
+  return res.data.data!;
+};
+
+export const getRecentActivity = async (params?: { limit?: number } & Partial<DateRange>): Promise<RecentActivityItem[]> => {
+  const res = await api.get<ApiResponse<RecentActivityItem[]>>('/dashboard/charts/recent-activity', {
+    params: params ? { start_date: params.start, end_date: params.end, limit: params.limit } : undefined,
+  });
+  return res.data.data!;
+};
+
+export const getTechnicianProductivity = async (params?: DateRange): Promise<TechProductivityData[]> => {
+  const res = await api.get<ApiResponse<TechProductivityData[]>>('/dashboard/technician/productivity', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
+  return res.data.data!;
+};
+
+export const getTechnicianTimeSpent = async (params?: DateRange): Promise<TechTimeSpentData[]> => {
+  const res = await api.get<ApiResponse<TechTimeSpentData[]>>('/dashboard/technician/time-spent', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
+  return res.data.data!;
+};
+
 // ==================== Escalations ====================
 
 export const getEscalations = async (params?: { status?: string; project_id?: number }): Promise<Escalation[]> => {
@@ -390,6 +446,33 @@ export const reviewEscalation = async (id: number): Promise<Escalation> => {
 export const resolveEscalation = async (id: number, resolution_notes: string): Promise<Escalation> => {
   const res = await api.patch<ApiResponse<Escalation>>(`/escalations/${id}/resolve`, { resolution_notes });
   return res.data.data!;
+};
+
+// ==================== Audit ====================
+
+export const getAuditLogs = async (params?: { entity_type?: string; entity_id?: number; limit?: number; offset?: number }): Promise<AuditLogResponse> => {
+  const res = await api.get<ApiResponse<AuditLogResponse>>('/audit', { params });
+  return res.data.data!;
+};
+
+// ==================== User Management ====================
+
+export const createUser = async (data: { name: string; email: string; password: string; role: string }): Promise<User> => {
+  const res = await api.post<ApiResponse<User>>('/users', data);
+  return res.data.data!;
+};
+
+export const updateUser = async (id: number, data: { name?: string; email?: string; role?: string }): Promise<User> => {
+  const res = await api.patch<ApiResponse<User>>(`/users/${id}`, data);
+  return res.data.data!;
+};
+
+export const deleteUser = async (id: number): Promise<void> => {
+  await api.delete(`/users/${id}`);
+};
+
+export const resetUserPassword = async (id: number, password: string): Promise<void> => {
+  await api.post(`/users/${id}/reset-password`, { password });
 };
 
 export default api;

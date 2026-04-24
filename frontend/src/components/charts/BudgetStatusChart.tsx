@@ -13,8 +13,8 @@ export default function BudgetStatusChart() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Budget Status</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Budget Status</h3>
         <div className="flex items-center justify-center h-56">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
         </div>
@@ -26,16 +26,16 @@ export default function BudgetStatusChart() {
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Budget Status</h3>
-        <p className="text-sm text-gray-400 text-center py-8">No budget data available</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Budget Status</h3>
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No budget data available</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h3 className="text-sm font-semibold text-gray-900 mb-4">Budget: Planned vs Actual</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Budget: Planned vs Actual</h3>
       <ResponsiveContainer width="100%" height={240}>
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

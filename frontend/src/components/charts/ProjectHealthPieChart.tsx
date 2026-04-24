@@ -22,16 +22,16 @@ export default function ProjectHealthPieChart({ summary }: Props) {
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Project Health Distribution</h3>
-        <p className="text-sm text-gray-400 text-center py-8">No project data available</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Health Distribution</h3>
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No project data available</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h3 className="text-sm font-semibold text-gray-900 mb-4">Project Health Distribution</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Health Distribution</h3>
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie

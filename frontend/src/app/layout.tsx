@@ -7,9 +7,15 @@ export const metadata: Metadata = {
   description: 'PT Smart Home Inovasi - Project Management Dashboard',
 };
 
+// Inline script to prevent flash of wrong theme (runs before React hydrates)
+const themeScript = `(function(){try{var t=localStorage.getItem('shi-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>

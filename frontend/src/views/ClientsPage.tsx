@@ -48,8 +48,8 @@ export default function ClientsPage() {
       label: 'Name',
       render: (c) => (
         <div>
-          <p className="text-sm font-medium text-gray-900">{c.name}</p>
-          {c.notes && <p className="text-xs text-gray-400 truncate max-w-xs">{c.notes}</p>}
+          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{c.name}</p>
+          {c.notes && <p className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-xs">{c.notes}</p>}
         </div>
       ),
       sortValue: (c) => c.name.toLowerCase(),
@@ -58,28 +58,28 @@ export default function ClientsPage() {
     {
       key: 'email',
       label: 'Email',
-      render: (c) => <span className="text-sm text-gray-600">{c.email ?? '--'}</span>,
+      render: (c) => <span className="text-sm text-gray-600 dark:text-gray-400">{c.email ?? '--'}</span>,
       sortValue: (c) => (c.email ?? '').toLowerCase(),
       exportValue: (c) => c.email ?? '',
     },
     {
       key: 'phone',
       label: 'Phone',
-      render: (c) => <span className="text-sm text-gray-600">{c.phone ?? '--'}</span>,
+      render: (c) => <span className="text-sm text-gray-600 dark:text-gray-400">{c.phone ?? '--'}</span>,
       exportValue: (c) => c.phone ?? '',
     },
     {
       key: 'project_count',
       label: 'Projects',
       align: 'center' as const,
-      render: (c) => <span className="text-sm text-gray-600">{c.project_count ?? 0}</span>,
+      render: (c) => <span className="text-sm text-gray-600 dark:text-gray-400">{c.project_count ?? 0}</span>,
       sortValue: (c) => c.project_count ?? 0,
       exportValue: (c) => c.project_count ?? 0,
     },
     {
       key: 'address',
       label: 'Address',
-      render: (c) => <span className="text-xs text-gray-500 max-w-xs truncate block">{c.address ?? '--'}</span>,
+      render: (c) => <span className="text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate block">{c.address ?? '--'}</span>,
       exportValue: (c) => c.address ?? '',
       cellClass: 'max-w-xs',
     },
@@ -127,7 +127,7 @@ export default function ClientsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Clients</h1>
         <button
           onClick={() => setShowCreate(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
@@ -141,7 +141,7 @@ export default function ClientsPage() {
         placeholder="Search clients..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full sm:w-72 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full sm:w-72 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         aria-label="Search clients"
       />
 
@@ -181,7 +181,7 @@ export default function ClientsPage() {
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Add New Client">
         <div className="space-y-4">
           <div>
-            <label htmlFor="client-name" className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+            <label htmlFor="client-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
             <input
               id="client-name"
               type="text"
@@ -189,58 +189,58 @@ export default function ClientsPage() {
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
               required
               placeholder="Client name"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label htmlFor="client-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label htmlFor="client-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
             <input
               id="client-email"
               type="email"
               value={form.email ?? ''}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
               placeholder="client@example.com"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label htmlFor="client-phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label htmlFor="client-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
             <input
               id="client-phone"
               type="text"
               value={form.phone ?? ''}
               onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
               placeholder="+62812xxxx"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label htmlFor="client-address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <label htmlFor="client-address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
             <textarea
               id="client-address"
               value={form.address ?? ''}
               onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
               rows={2}
               placeholder="Client address..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
           <div>
-            <label htmlFor="client-notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label htmlFor="client-notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
             <textarea
               id="client-notes"
               value={form.notes ?? ''}
               onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
               rows={2}
               placeholder="Additional notes..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={() => setShowCreate(false)}
-              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+              className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               Cancel
             </button>

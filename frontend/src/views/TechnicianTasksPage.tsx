@@ -12,21 +12,21 @@ import type { Task, TaskStatus } from '../types';
 
 function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () => void; isLoading: boolean }) {
   return (
-    <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-3">
+    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-3">
       <span className="relative flex h-3 w-3 shrink-0">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-green-600 font-medium">Currently working on</p>
-        <p className="text-sm font-semibold text-green-900 truncate">{task.name}</p>
-        {task.project_name && <p className="text-xs text-green-600">{task.project_name}</p>}
+        <p className="text-xs text-green-600 dark:text-green-400 font-medium">Currently working on</p>
+        <p className="text-sm font-semibold text-green-900 dark:text-green-100 truncate">{task.name}</p>
+        {task.project_name && <p className="text-xs text-green-600 dark:text-green-400">{task.project_name}</p>}
       </div>
-      <p className="text-lg font-mono font-bold text-green-700">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
+      <p className="text-lg font-mono font-bold text-green-700 dark:text-green-400">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
       <button
         onClick={onStop}
         disabled={isLoading}
-        className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+        className="px-3 py-1.5 bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
       >
         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
           <rect x="6" y="4" width="4" height="16" rx="1" />
@@ -99,8 +99,8 @@ export default function TechnicianTasksPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Tasks</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Tasks</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {data.recent_tasks.length} task{data.recent_tasks.length !== 1 ? 's' : ''} assigned to you
           </p>
         </div>
@@ -108,12 +108,12 @@ export default function TechnicianTasksPage() {
       </div>
 
       {data.recent_tasks.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <svg className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
-          <p className="mt-4 text-sm text-gray-500">No tasks assigned to you yet.</p>
-          <p className="text-xs text-gray-400 mt-1">Tasks will appear here once your manager assigns them.</p>
+          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">No tasks assigned to you yet.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Tasks will appear here once your manager assigns them.</p>
         </div>
       ) : taskView === 'kanban' ? (
         <KanbanBoard

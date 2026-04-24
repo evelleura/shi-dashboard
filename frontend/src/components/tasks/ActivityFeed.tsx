@@ -73,10 +73,10 @@ function ActivityItem({ activity }: { activity: TaskActivity }) {
     <div className="flex gap-3 py-2" role="listitem">
       {/* Avatar with activity type color ring */}
       <div className="relative shrink-0">
-        <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 text-xs font-bold flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-bold flex items-center justify-center">
           {initial}
         </div>
-        <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ${color} flex items-center justify-center ring-2 ring-white`}>
+        <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ${color} flex items-center justify-center ring-2 ring-white dark:ring-gray-800`}>
           <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d={iconPath} />
           </svg>
@@ -86,12 +86,12 @@ function ActivityItem({ activity }: { activity: TaskActivity }) {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-1.5 flex-wrap">
-          <span className="text-xs font-semibold text-gray-900">{activity.user_name ?? 'User'}</span>
+          <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">{activity.user_name ?? 'User'}</span>
           <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full text-white ${color}`}>
             {label}
           </span>
         </div>
-        <p className="text-sm text-gray-700 mt-0.5 break-words">{activity.message}</p>
+        <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5 break-words">{activity.message}</p>
 
         {/* Photo thumbnail */}
         {activity.file_path && isImage && (
@@ -104,7 +104,7 @@ function ActivityItem({ activity }: { activity: TaskActivity }) {
             <img
               src={`/api/activities/${activity.id}/file`}
               alt={activity.file_name ?? 'Activity photo'}
-              className="max-w-[200px] max-h-[150px] rounded-lg border border-gray-200 object-cover hover:opacity-90 transition-opacity"
+              className="max-w-[200px] max-h-[150px] rounded-lg border border-gray-200 dark:border-gray-700 object-cover hover:opacity-90 transition-opacity"
               loading="lazy"
             />
           </a>
@@ -125,7 +125,7 @@ function ActivityItem({ activity }: { activity: TaskActivity }) {
           </a>
         )}
 
-        <p className="text-[10px] text-gray-400 mt-0.5">{formatActivityTime(activity.created_at)}</p>
+        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{formatActivityTime(activity.created_at)}</p>
       </div>
     </div>
   );
@@ -186,17 +186,17 @@ export default function ActivityFeed({ taskId }: Props) {
     <div className="flex flex-col">
       {/* Activity list */}
       <div
-        className="max-h-[300px] overflow-y-auto divide-y divide-gray-100 px-1"
+        className="max-h-[300px] overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700 px-1"
         role="list"
         aria-label="Activity feed"
       >
         {activities.length === 0 ? (
           <div className="text-center py-8">
-            <svg className="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <p className="text-sm text-gray-400">No activity yet</p>
-            <p className="text-xs text-gray-300 mt-0.5">Post a note or log your arrival</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">No activity yet</p>
+            <p className="text-xs text-gray-300 dark:text-gray-600 mt-0.5">Post a note or log your arrival</p>
           </div>
         ) : (
           activities.map((activity) => (
@@ -207,14 +207,14 @@ export default function ActivityFeed({ taskId }: Props) {
       </div>
 
       {/* Input form */}
-      <form onSubmit={handleSubmit} className="mt-3 border-t border-gray-200 pt-3">
+      <form onSubmit={handleSubmit} className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
         {/* File preview */}
         {file && (
-          <div className="flex items-center gap-2 mb-2 bg-gray-50 rounded-lg px-2 py-1.5">
+          <div className="flex items-center gap-2 mb-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg px-2 py-1.5">
             <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
             </svg>
-            <span className="text-xs text-gray-600 truncate flex-1">{file.name}</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400 truncate flex-1">{file.name}</span>
             <button
               type="button"
               onClick={() => { setFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
@@ -233,7 +233,7 @@ export default function ActivityFeed({ taskId }: Props) {
           <select
             value={activityType}
             onChange={(e) => setActivityType(e.target.value as ActivityType)}
-            className="text-xs border border-gray-300 rounded-md px-2 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0"
+            className="text-xs border border-gray-300 dark:border-gray-600 rounded-md px-2 py-2 bg-white dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0"
             aria-label="Activity type"
           >
             {TYPE_OPTIONS.map((opt) => (
@@ -247,7 +247,7 @@ export default function ActivityFeed({ taskId }: Props) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Activity message"
           />
 

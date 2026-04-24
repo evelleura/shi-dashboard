@@ -59,7 +59,7 @@ export default function TaskTimer({ task, onStart, onStop, isLoading }: Props) {
         : 'bg-green-500';
 
   return (
-    <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-3 py-2">
+    <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg px-3 py-2">
       {/* Play/Pause button */}
       <button
         onClick={handleClick}
@@ -96,7 +96,7 @@ export default function TaskTimer({ task, onStart, onStop, isLoading }: Props) {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
             </span>
           )}
-          <span className="text-lg font-mono font-semibold text-gray-900">
+          <span className="text-lg font-mono font-semibold text-gray-900 dark:text-gray-100">
             {formatTimeSpent(elapsed)}
           </span>
           {task.is_tracking && (
@@ -107,11 +107,11 @@ export default function TaskTimer({ task, onStart, onStop, isLoading }: Props) {
         {/* Estimated hours comparison bar */}
         {estimatedSeconds > 0 && (
           <div className="mt-1">
-            <div className="flex justify-between text-[10px] text-gray-400 mb-0.5">
+            <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mb-0.5">
               <span>Est: {task.estimated_hours}h</span>
               <span>{Math.round(progressPercent)}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-1.5">
+            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
               <div
                 className={`${progressColor} h-1.5 rounded-full transition-all duration-500`}
                 style={{ width: `${Math.min(progressPercent, 100)}%` }}

@@ -52,7 +52,7 @@ export default function EvidenceGallery({ taskId, canDelete = false }: Props) {
 
   if (evidence.length === 0) {
     return (
-      <p className="text-sm text-gray-400 text-center py-4">No evidence files uploaded</p>
+      <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No evidence files uploaded</p>
     );
   }
 
@@ -61,9 +61,9 @@ export default function EvidenceGallery({ taskId, canDelete = false }: Props) {
       {evidence.map((ev: TaskEvidence) => {
         const iconPath = TYPE_ICONS[ev.file_type] ?? TYPE_ICONS.other;
         return (
-          <div key={ev.id} className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div key={ev.id} className="flex items-start gap-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d={iconPath} />
               </svg>
             </div>
@@ -76,13 +76,13 @@ export default function EvidenceGallery({ taskId, canDelete = false }: Props) {
               >
                 {ev.file_name}
               </a>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-gray-500">
                 {formatFileSize(ev.file_size)} -- {ev.file_type} -- {ev.uploaded_by_name ?? 'Unknown'}
               </p>
               {ev.description && (
-                <p className="text-xs text-gray-500 mt-0.5">{ev.description}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{ev.description}</p>
               )}
-              <p className="text-[10px] text-gray-300 mt-0.5">
+              <p className="text-[10px] text-gray-300 dark:text-gray-600 mt-0.5">
                 {ev.uploaded_at ? formatDate(ev.uploaded_at) : ''}
               </p>
             </div>

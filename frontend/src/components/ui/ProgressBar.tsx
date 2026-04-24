@@ -18,15 +18,15 @@ export default function ProgressBar({ actual, planned, showLabels = true }: Prop
   return (
     <div className="space-y-1">
       {showLabels && (
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>Progress</span>
           <span>{clampedActual.toFixed(1)}% / {clampedPlanned.toFixed(1)}%</span>
         </div>
       )}
-      <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
+      <div className="relative h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         {/* Planned (baseline indicator) */}
         <div
-          className="absolute top-0 left-0 h-full bg-gray-300 rounded-full"
+          className="absolute top-0 left-0 h-full bg-gray-300 dark:bg-gray-600 rounded-full"
           style={{ width: `${clampedPlanned}%` }}
         />
         {/* Actual */}
@@ -38,7 +38,7 @@ export default function ProgressBar({ actual, planned, showLabels = true }: Prop
       {showLabels && (
         <div className="flex justify-between text-xs">
           <span className={actualColor.replace('bg-', 'text-')}>Actual: {clampedActual.toFixed(1)}%</span>
-          <span className="text-gray-400">Plan: {clampedPlanned.toFixed(1)}%</span>
+          <span className="text-gray-400 dark:text-gray-500">Plan: {clampedPlanned.toFixed(1)}%</span>
         </div>
       )}
     </div>

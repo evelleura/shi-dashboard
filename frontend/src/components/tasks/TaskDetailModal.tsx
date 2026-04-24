@@ -110,7 +110,7 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
       <div className="space-y-4">
         {/* Title + badges */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{task.name}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{task.name}</h3>
           <div className="flex items-center gap-2 flex-wrap">
             <TaskStatusSelect
               value={task.status}
@@ -160,43 +160,43 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
 
         {/* Escalation Form (inline) */}
         {showEscalationForm && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3" role="form" aria-label="Escalation form">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-4 space-y-3" role="form" aria-label="Escalation form">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-red-700">Report an Issue</h4>
-              <button onClick={resetEscalationForm} className="text-gray-400 hover:text-gray-600 text-xs" aria-label="Cancel escalation">Cancel</button>
+              <h4 className="text-sm font-semibold text-red-700 dark:text-red-400">Report an Issue</h4>
+              <button onClick={resetEscalationForm} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs" aria-label="Cancel escalation">Cancel</button>
             </div>
             <div>
-              <label htmlFor="esc-title" className="block text-xs font-medium text-gray-700 mb-1">Title <span className="text-red-500">*</span></label>
+              <label htmlFor="esc-title" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Title <span className="text-red-500">*</span></label>
               <input
                 id="esc-title"
                 type="text"
                 value={escTitle}
                 onChange={(e) => setEscTitle(e.target.value)}
                 placeholder="Brief summary of the issue"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 required
               />
             </div>
             <div>
-              <label htmlFor="esc-desc" className="block text-xs font-medium text-gray-700 mb-1">Description <span className="text-red-500">*</span></label>
+              <label htmlFor="esc-desc" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Description <span className="text-red-500">*</span></label>
               <textarea
                 id="esc-desc"
                 value={escDescription}
                 onChange={(e) => setEscDescription(e.target.value)}
                 placeholder="Describe the issue in detail..."
                 rows={3}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                 required
               />
             </div>
             <div className="flex gap-3">
               <div className="flex-1">
-                <label htmlFor="esc-priority" className="block text-xs font-medium text-gray-700 mb-1">Priority</label>
+                <label htmlFor="esc-priority" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
                 <select
                   id="esc-priority"
                   value={escPriority}
                   onChange={(e) => setEscPriority(e.target.value as EscalationPriority)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -205,20 +205,20 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
                 </select>
               </div>
               <div className="flex-1">
-                <label htmlFor="esc-file" className="block text-xs font-medium text-gray-700 mb-1">Attachment (optional)</label>
+                <label htmlFor="esc-file" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Attachment (optional)</label>
                 <input
                   id="esc-file"
                   ref={escFileRef}
                   type="file"
                   onChange={(e) => setEscFile(e.target.files?.[0] ?? null)}
-                  className="w-full text-sm text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                  className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-200 dark:hover:file:bg-gray-600"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2">
               <button
                 onClick={resetEscalationForm}
-                className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
               >
                 Cancel
               </button>
@@ -239,32 +239,32 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
         {/* Description */}
         {task.description && (
           <div>
-            <p className="text-xs font-medium text-gray-500 mb-1">Description</p>
-            <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{task.description}</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">{task.description}</p>
           </div>
         )}
 
         {/* Info grid */}
         <div className={`grid ${isTechnician ? 'grid-cols-2' : 'grid-cols-2'} gap-3`}>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Assignee</p>
-            <p className="text-sm font-medium text-gray-900">{task.assigned_to_name ?? 'Unassigned'}</p>
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Assignee</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.assigned_to_name ?? 'Unassigned'}</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Project</p>
-            <p className="text-sm font-medium text-gray-900">{task.project_name ?? '--'}</p>
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Project</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.project_name ?? '--'}</p>
           </div>
-          <div className={`rounded-lg p-3 ${isOverdue ? 'bg-red-50' : 'bg-gray-50'}`}>
-            <p className="text-xs text-gray-500">Due Date</p>
-            <p className={`text-sm font-medium ${isOverdue ? 'text-red-600' : 'text-gray-900'}`}>
+          <div className={`rounded-lg p-3 ${isOverdue ? 'bg-red-50 dark:bg-red-900/30' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Due Date</p>
+            <p className={`text-sm font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}`}>
               {task.due_date ? formatDate(task.due_date) : 'No due date'}
               {isOverdue && ' (overdue)'}
             </p>
           </div>
           {!isTechnician && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-xs text-gray-500">Budget</p>
-              <p className="text-sm font-medium text-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Budget</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {Number(task.budget) > 0 ? formatCurrency(Number(task.budget)) : '--'}
               </p>
             </div>
@@ -274,14 +274,14 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
         {/* Notes */}
         {task.notes && (
           <div>
-            <p className="text-xs font-medium text-gray-500 mb-1">Notes</p>
-            <p className="text-sm text-gray-700 bg-yellow-50 border border-yellow-200 rounded-lg p-3">{task.notes}</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notes</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">{task.notes}</p>
           </div>
         )}
 
         {/* Section tabs */}
-        <div className="border-t border-gray-200 pt-3">
-          <div className="flex gap-4 border-b border-gray-200 overflow-x-auto" role="tablist" aria-label="Task detail tabs">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+          <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 overflow-x-auto" role="tablist" aria-label="Task detail tabs">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -290,7 +290,7 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
                 className={`pb-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-1.5 whitespace-nowrap ${
                   activeSection === tab.id
                     ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-400 hover:text-gray-600'
+                    : 'border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                 }`}
                 onClick={() => setActiveSection(tab.id)}
               >
@@ -306,15 +306,15 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
           {activeSection === 'details' && (
             <div className="pt-3 space-y-3">
               {(task.timeline_start || task.timeline_end) && (
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-xs text-gray-500 mb-1">Timeline</p>
-                  <p className="text-sm text-gray-700">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Timeline</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     {task.timeline_start ? formatDate(task.timeline_start) : '?'} -- {task.timeline_end ? formatDate(task.timeline_end) : '?'}
                   </p>
                 </div>
               )}
 
-              <div className="text-xs text-gray-400 space-y-1">
+              <div className="text-xs text-gray-400 dark:text-gray-500 space-y-1">
                 {task.created_at && <p>Created: {formatDate(task.created_at)}</p>}
                 {task.updated_at && <p>Last updated: {formatDate(task.updated_at)}</p>}
               </div>
@@ -353,7 +353,7 @@ export default function TaskDetailModal({ task, open, onClose, onStatusChange, i
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
                 </div>
               ) : materials.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-6">No materials recorded for this project</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-6">No materials recorded for this project</p>
               ) : (
                 <MaterialsReadOnly materials={materials} />
               )}
@@ -370,18 +370,18 @@ function MaterialsReadOnly({ materials }: { materials: Material[] }) {
     <div className="overflow-x-auto">
       <table className="min-w-full text-sm" role="table">
         <thead>
-          <tr className="border-b border-gray-200">
-            <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">Name</th>
-            <th className="text-right py-2 px-2 text-xs font-medium text-gray-500">Qty</th>
-            <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">Unit</th>
+          <tr className="border-b border-gray-200 dark:border-gray-700">
+            <th className="text-left py-2 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">Name</th>
+            <th className="text-right py-2 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">Qty</th>
+            <th className="text-left py-2 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">Unit</th>
           </tr>
         </thead>
         <tbody>
           {materials.map((m) => (
-            <tr key={m.id} className="border-b border-gray-100">
-              <td className="py-2 px-2 text-gray-700">{m.name}</td>
-              <td className="py-2 px-2 text-gray-600 text-right">{Number(m.quantity)}</td>
-              <td className="py-2 px-2 text-gray-600">{m.unit}</td>
+            <tr key={m.id} className="border-b border-gray-100 dark:border-gray-700">
+              <td className="py-2 px-2 text-gray-700 dark:text-gray-300">{m.name}</td>
+              <td className="py-2 px-2 text-gray-600 dark:text-gray-400 text-right">{Number(m.quantity)}</td>
+              <td className="py-2 px-2 text-gray-600 dark:text-gray-400">{m.unit}</td>
             </tr>
           ))}
         </tbody>

@@ -27,7 +27,18 @@
       "Bash(npx tsx:*)",
       "Bash(brew install:*)",
       "Bash(pdftotext:*)",
-      "Read(//private/tmp/**)"
+      "Read(//private/tmp/**)",
+      "Bash(xmllint --noout \"/Users/user/Documents/COLLEGE/Mata Kuliah/8/Tugas Akhir/coding/project_ta_dian_putri_iswandi/thesis/05_ACTIVITY_DIAGRAM.drawio\")",
+      "Bash(xmllint:*)",
+      "Bash(pdftoppm -v)",
+      "Read(//opt/homebrew/Cellar/poppler/26.04.0/bin/**)",
+      "Bash(pdftoppm:*)",
+      "Bash(ls:*)",
+      "Bash(brew --version)",
+      "Bash(brew list:*)",
+      "Bash(php -v)",
+      "Bash(pg_isready -h 127.0.0.1 -p 5432)",
+      "Bash(psql -h 127.0.0.1 -p 5432 -U postgres -d shi_dashboard_new -c \"SELECT current_database\\(\\), version\\(\\);\")"
     ]
   }
 }

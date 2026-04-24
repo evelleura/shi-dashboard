@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
 import { useEscalationSummary } from '../../hooks/useEscalations';
+import GlobalSearchBar from './GlobalSearchBar';
+import NotificationBell from './NotificationBell';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -56,13 +59,52 @@ function EscalationsIcon() {
   );
 }
 
+function ReportsIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
+
+function TimelineIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10M4 18h14" />
+    </svg>
+  );
+}
+
+function AuditIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function UsersIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+  );
+}
+
 export default function Layout({ children }: Props) {
   const { user, logout } = useAuth();
+  const { theme, toggle, isDark } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data: escalationSummary } = useEscalationSummary();
   const openEscalations = escalationSummary?.open ?? 0;
+
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -75,8 +117,16 @@ export default function Layout({ children }: Props) {
     ? [
         { to: '/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
         { to: '/projects', label: 'Projects', icon: <ProjectsIcon /> },
+        { to: '/timeline', label: 'Timeline', icon: <TimelineIcon /> },
         { to: '/clients', label: 'Clients', icon: <ClientsIcon /> },
+        { to: '/reports', label: 'Reports', icon: <ReportsIcon /> },
         { to: '/escalations', label: 'Escalations', icon: <EscalationsIcon />, badge: openEscalations },
+        ...(user?.role === 'admin'
+          ? [
+              { to: '/users', label: 'Users', icon: <UsersIcon /> },
+              { to: '/audit-log', label: 'Activity Log', icon: <AuditIcon /> },
+            ]
+          : []),
       ]
     : [
         { to: '/my-dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
@@ -86,17 +136,17 @@ export default function Layout({ children }: Props) {
       ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-56 bg-slate-900 transform transition-transform duration-200 lg:translate-x-0 lg:static lg:inset-auto ${
+        className={`fixed inset-y-0 left-0 z-50 w-56 bg-slate-900 transform transition-transform duration-200 lg:translate-x-0 overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Main navigation"
       >
         <div className="flex flex-col h-full">
           {/* Brand */}
-          <div className="px-4 py-4 border-b border-slate-800">
+          <div className="px-4 py-4 border-b border-slate-800 dark:border-gray-800">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                 <span className="text-white font-bold text-xs">SHI</span>
@@ -136,16 +186,36 @@ export default function Layout({ children }: Props) {
           </nav>
 
           {/* User info + logout */}
-          <div className="px-3 py-4 border-t border-slate-800">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white text-xs font-bold">
+          <div className="px-3 py-4 border-t border-slate-800 dark:border-gray-800">
+            <Link
+              href="/profile"
+              onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-2 mb-3 hover:bg-slate-800 rounded-lg px-1 py-1 -mx-1 transition-colors"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 {user?.name?.charAt(0)?.toUpperCase() ?? '?'}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white text-xs font-medium truncate">{user?.name}</p>
                 <p className="text-slate-400 text-[10px] capitalize">{user?.role}</p>
               </div>
-            </div>
+            </Link>
+            <button
+              onClick={toggle}
+              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors mb-2"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? (
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+              {isDark ? 'Light Mode' : 'Dark Mode'}
+            </button>
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
@@ -169,24 +239,47 @@ export default function Layout({ children }: Props) {
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-56">
         {/* Top bar (mobile menu + breadcrumb) */}
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
           <div className="flex items-center justify-between h-12 px-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700"
+              className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               aria-label="Open sidebar"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div className="hidden lg:block" />
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span>{user?.name}</span>
-              <span className="text-gray-300">|</span>
-              <span className="capitalize">{user?.role}</span>
+            <div className="hidden lg:flex flex-1 justify-center px-4">
+              <GlobalSearchBar />
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.location.reload()}
+                className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Reload page"
+                title="Reload page"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 font-mono tabular-nums">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{now.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <span className="text-gray-300 dark:text-gray-600">|</span>
+                <span>{now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+              </div>
+              {isManager && <NotificationBell />}
+              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <span>{user?.name}</span>
+                <span className="text-gray-300 dark:text-gray-600">|</span>
+                <span className="capitalize">{user?.role}</span>
+              </div>
             </div>
           </div>
         </header>

@@ -5,15 +5,15 @@ interface Props {
 
 export default function ViewToggle({ view, onChange }: Props) {
   return (
-    <div className="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50" role="radiogroup" aria-label="View toggle">
+    <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-50 dark:bg-gray-800" role="radiogroup" aria-label="View toggle">
       <button
         role="radio"
         aria-checked={view === 'kanban'}
         onClick={() => onChange('kanban')}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
           view === 'kanban'
-            ? 'bg-white text-blue-600 shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
+            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
         }`}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -27,8 +27,8 @@ export default function ViewToggle({ view, onChange }: Props) {
         onClick={() => onChange('table')}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
           view === 'table'
-            ? 'bg-white text-blue-600 shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
+            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
         }`}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

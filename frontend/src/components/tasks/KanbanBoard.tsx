@@ -34,12 +34,12 @@ interface ColumnDef {
 }
 
 const COLUMNS: ColumnDef[] = [
-  { id: 'to_do', label: 'To Do', borderColor: 'border-t-gray-400', headerBg: 'bg-gray-50', headerText: 'text-gray-700' },
-  { id: 'in_progress', label: 'In Progress', borderColor: 'border-t-blue-500', headerBg: 'bg-blue-50', headerText: 'text-blue-700' },
-  { id: 'review', label: 'Review', borderColor: 'border-t-purple-500', headerBg: 'bg-purple-50', headerText: 'text-purple-700' },
-  { id: 'done', label: 'Done', borderColor: 'border-t-green-500', headerBg: 'bg-green-50', headerText: 'text-green-700' },
-  { id: 'overtime', label: 'Overtime', borderColor: 'border-t-amber-500', headerBg: 'bg-amber-50', headerText: 'text-amber-700', icon: 'warning' },
-  { id: 'over_deadline', label: 'Over Deadline', borderColor: 'border-t-red-500', headerBg: 'bg-red-50', headerText: 'text-red-700', icon: 'alert' },
+  { id: 'to_do', label: 'To Do', borderColor: 'border-t-gray-400', headerBg: 'bg-gray-50 dark:bg-gray-700', headerText: 'text-gray-700 dark:text-gray-300' },
+  { id: 'in_progress', label: 'In Progress', borderColor: 'border-t-blue-500', headerBg: 'bg-blue-50 dark:bg-blue-900/30', headerText: 'text-blue-700 dark:text-blue-400' },
+  { id: 'review', label: 'Review', borderColor: 'border-t-purple-500', headerBg: 'bg-purple-50 dark:bg-purple-900/30', headerText: 'text-purple-700 dark:text-purple-400' },
+  { id: 'done', label: 'Done', borderColor: 'border-t-green-500', headerBg: 'bg-green-50 dark:bg-green-900/30', headerText: 'text-green-700 dark:text-green-400' },
+  { id: 'overtime', label: 'Overtime', borderColor: 'border-t-amber-500', headerBg: 'bg-amber-50 dark:bg-amber-900/30', headerText: 'text-amber-700 dark:text-amber-400', icon: 'warning' },
+  { id: 'over_deadline', label: 'Over Deadline', borderColor: 'border-t-red-500', headerBg: 'bg-red-50 dark:bg-red-900/30', headerText: 'text-red-700 dark:text-red-400', icon: 'alert' },
 ];
 
 function isOverdue(task: Task): boolean {
@@ -111,7 +111,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTime
         return (
           <div
             key={col.id}
-            className={`rounded-xl border border-gray-200 border-t-4 ${col.borderColor} min-h-[200px] flex flex-col`}
+            className={`rounded-xl border border-gray-200 dark:border-gray-700 border-t-4 ${col.borderColor} min-h-[200px] flex flex-col`}
           >
             <div className={`${col.headerBg} px-3 py-2.5 rounded-t-lg`}>
               <div className="flex items-center justify-between">
@@ -120,7 +120,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTime
                   {col.icon === 'alert' && <AlertIcon />}
                   <h3 className={`text-sm font-semibold ${col.headerText}`}>{col.label}</h3>
                 </div>
-                <span className="text-xs font-medium text-gray-500 bg-white rounded-full px-2 py-0.5">
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-full px-2 py-0.5">
                   {colTasks.length}
                 </span>
               </div>
@@ -128,7 +128,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTime
             <div className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[60vh]">
               {colTasks.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-xs text-gray-400">No tasks</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">No tasks</p>
                 </div>
               ) : (
                 colTasks.map((task) => (

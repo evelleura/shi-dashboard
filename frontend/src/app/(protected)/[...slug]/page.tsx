@@ -11,6 +11,11 @@ import TechnicianDashboard from '@/views/TechnicianDashboard';
 import TechnicianProjectsPage from '@/views/TechnicianProjectsPage';
 import TechnicianTasksPage from '@/views/TechnicianTasksPage';
 import TechnicianEscalationsPage from '@/views/TechnicianEscalationsPage';
+import AuditLogPage from '@/views/AuditLogPage';
+import UserManagementPage from '@/views/UserManagementPage';
+import ProjectTimelinePage from '@/views/ProjectTimelinePage';
+import ReportsPage from '@/views/ReportsPage';
+import ProfilePage from '@/views/ProfilePage';
 
 type Props = { params: Promise<{ slug: string[] }> };
 
@@ -27,6 +32,11 @@ export default function ProtectedPage({ params }: Props) {
   if (section === 'my-projects')   return <TechnicianProjectsPage />;
   if (section === 'my-tasks')      return <TechnicianTasksPage />;
   if (section === 'my-escalations') return <TechnicianEscalationsPage />;
+  if (section === 'audit-log')     return <AuditLogPage />;
+  if (section === 'users')         return <UserManagementPage />;
+  if (section === 'timeline')      return <ProjectTimelinePage />;
+  if (section === 'reports')       return <ReportsPage />;
+  if (section === 'profile')       return <ProfilePage />;
 
   return notFound();
 }

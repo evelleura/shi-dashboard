@@ -20,12 +20,19 @@
  * Evidence:    POST /api/evidence/upload      GET /api/evidence/task/:taskId
  *              DELETE /api/evidence/:id       GET /api/evidence/:id/download
  * Dashboard:   GET /api/dashboard             GET /api/dashboard/technician
+ *              GET /api/dashboard/search?q=&limit=
  *              GET /api/dashboard/charts/budget-status
  *              GET /api/dashboard/charts/overdue-tasks
  *              GET /api/dashboard/charts/tasks-by-due-date
  *              GET /api/dashboard/charts/tasks-by-owner
  *              GET /api/dashboard/charts/tasks-by-status
  *              GET /api/dashboard/charts/earned-value/:projectId
+ *              GET /api/dashboard/charts/project-categories
+ *              GET /api/dashboard/charts/technician-workload
+ *              GET /api/dashboard/charts/spi-trend
+ *              GET /api/dashboard/charts/recent-activity
+ *              GET /api/dashboard/technician/productivity
+ *              GET /api/dashboard/technician/time-spent
  * Materials:   POST /api/materials            PATCH/DELETE /api/materials/:id
  *              GET /api/materials/project/:projectId
  * Budget:      POST /api/budget               PATCH/DELETE /api/budget/:id
@@ -52,6 +59,7 @@ import * as materials from '@/lib/handlers/materials';
 import * as budget from '@/lib/handlers/budget';
 import * as escalations from '@/lib/handlers/escalations';
 import * as activities from '@/lib/handlers/activities';
+import * as audit from '@/lib/handlers/audit';
 
 type Context = { params: Promise<{ route: string[] }> };
 
@@ -78,19 +86,30 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
   // ── Users ─────────────────────────────────────────────────────────────────
   if (r0 === 'users') {
     if (!r1) {
-      if (method === 'GET') return users.listUsers(request);
+      if (method === 'GET')  return users.listUsers(request);
+      if (method === 'POST') return users.createUser(request);
       return methodNotAllowed();
     }
     if (r1 === 'me' && !r2) {
-      if (method === 'GET') return users.getMe(request);
+      if (method === 'GET')   return users.getMe(request);
+      if (method === 'PATCH') return users.updateMe(request);
       return methodNotAllowed();
     }
     if (r1 === 'me' && r2 === 'projects') {
       if (method === 'GET') return users.getMyProjects(request);
       return methodNotAllowed();
     }
+    if (r1 === 'me' && r2 === 'change-password' && method === 'POST') {
+      return users.changeMyPassword(request);
+    }
     if (r1 === 'technicians') {
       if (method === 'GET') return users.listTechnicians(request);
+      return methodNotAllowed();
+    }
+    if (r1 && r2 === 'reset-password' && method === 'POST') return users.resetUserPassword(request, r1);
+    if (r1 && !r2) {
+      if (method === 'PATCH')  return users.updateUser(request, r1);
+      if (method === 'DELETE') return users.deleteUser(request, r1);
       return methodNotAllowed();
     }
     return notFound();
@@ -183,17 +202,24 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       if (method === 'GET') return dashboard.getDashboard(request);
       return methodNotAllowed();
     }
-    if (r1 === 'technician') {
+    if (r1 === 'search' && method === 'GET') return dashboard.globalSearch(request);
+    if (r1 === 'technician' && r2 === 'productivity' && method === 'GET') return dashboard.technicianProductivity(request);
+    if (r1 === 'technician' && r2 === 'time-spent'   && method === 'GET') return dashboard.technicianTimeSpent(request);
+    if (r1 === 'technician' && !r2) {
       if (method === 'GET') return dashboard.getTechnicianDashboard(request);
       return methodNotAllowed();
     }
     if (r1 === 'charts' && r2) {
-      if (r2 === 'budget-status'    && method === 'GET') return dashboard.chartBudgetStatus(request);
-      if (r2 === 'overdue-tasks'    && method === 'GET') return dashboard.chartOverdueTasks(request);
-      if (r2 === 'tasks-by-due-date'&& method === 'GET') return dashboard.chartTasksByDueDate(request);
-      if (r2 === 'tasks-by-owner'   && method === 'GET') return dashboard.chartTasksByOwner(request);
-      if (r2 === 'tasks-by-status'  && method === 'GET') return dashboard.chartTasksByStatus(request);
-      if (r2 === 'earned-value' && r3 && method === 'GET') return dashboard.chartEarnedValue(request, r3);
+      if (r2 === 'budget-status'       && method === 'GET') return dashboard.chartBudgetStatus(request);
+      if (r2 === 'overdue-tasks'       && method === 'GET') return dashboard.chartOverdueTasks(request);
+      if (r2 === 'tasks-by-due-date'   && method === 'GET') return dashboard.chartTasksByDueDate(request);
+      if (r2 === 'tasks-by-owner'      && method === 'GET') return dashboard.chartTasksByOwner(request);
+      if (r2 === 'tasks-by-status'     && method === 'GET') return dashboard.chartTasksByStatus(request);
+      if (r2 === 'earned-value' && r3  && method === 'GET') return dashboard.chartEarnedValue(request, r3);
+      if (r2 === 'project-categories'  && method === 'GET') return dashboard.chartProjectCategories(request);
+      if (r2 === 'technician-workload' && method === 'GET') return dashboard.chartTechnicianWorkload(request);
+      if (r2 === 'spi-trend'           && method === 'GET') return dashboard.chartSPITrend(request);
+      if (r2 === 'recent-activity'     && method === 'GET') return dashboard.chartRecentActivity(request);
       return notFound();
     }
     return notFound();
@@ -274,6 +300,15 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     }
     if (r1 === 'task' && r2 && r3 === 'timer' && r4 === 'stop' && method === 'POST') {
       return activities.stopTimer(request, r2);
+    }
+    return notFound();
+  }
+
+  // ── Audit ──────────────────────────────────────────────────────────────────
+  if (r0 === 'audit') {
+    if (!r1) {
+      if (method === 'GET') return audit.listAuditLogs(request);
+      return methodNotAllowed();
     }
     return notFound();
   }

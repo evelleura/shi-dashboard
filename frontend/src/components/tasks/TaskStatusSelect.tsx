@@ -9,11 +9,11 @@ interface Props {
 }
 
 const STATUS_CONFIG: Record<TaskStatus, { label: string; bg: string; text: string; ring: string }> = {
-  to_do: { label: 'To Do', bg: 'bg-gray-100', text: 'text-gray-700', ring: 'ring-gray-300' },
-  in_progress: { label: 'In Progress', bg: 'bg-blue-100', text: 'text-blue-700', ring: 'ring-blue-300' },
-  working_on_it: { label: 'Working On It', bg: 'bg-green-100', text: 'text-green-700', ring: 'ring-green-300' },
-  review: { label: 'Review', bg: 'bg-purple-100', text: 'text-purple-700', ring: 'ring-purple-300' },
-  done: { label: 'Done', bg: 'bg-emerald-100', text: 'text-emerald-700', ring: 'ring-emerald-300' },
+  to_do: { label: 'To Do', bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-700 dark:text-gray-300', ring: 'ring-gray-300 dark:ring-gray-600' },
+  in_progress: { label: 'In Progress', bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400', ring: 'ring-blue-300 dark:ring-blue-700' },
+  working_on_it: { label: 'Working On It', bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400', ring: 'ring-green-300 dark:ring-green-700' },
+  review: { label: 'Review', bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-400', ring: 'ring-purple-300 dark:ring-purple-700' },
+  done: { label: 'Done', bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400', ring: 'ring-emerald-300 dark:ring-emerald-700' },
 };
 
 export function getStatusConfig(status: TaskStatus) {
@@ -69,7 +69,7 @@ export default function TaskStatusSelect({ value, onChange, disabled = false, si
       value={value}
       onChange={(e) => onChange(e.target.value as TaskStatus)}
       disabled={disabled || isReadOnly}
-      className={`rounded-full font-medium border-0 ring-1 ${config.ring} ${config.bg} ${config.text} ${sizeClass} cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed appearance-none pr-6`}
+      className={`rounded-lg font-medium border-0 ring-1 ${config.ring} ${config.bg} ${config.text} ${sizeClass} cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed appearance-none pr-6 w-full max-w-[140px]`}
       aria-label="Change task status"
       style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E")`,

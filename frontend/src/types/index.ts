@@ -427,3 +427,80 @@ export interface LoginResponse {
   token: string;
   user: User;
 }
+
+// === Date Range Filter ===
+export interface DateRange {
+  start: string; // YYYY-MM-DD
+  end: string;   // YYYY-MM-DD
+}
+
+// === Global Search ===
+export interface SearchResult {
+  type: 'project' | 'task' | 'client';
+  id: number;
+  name: string;
+  subtitle?: string;
+  url: string;
+}
+
+// === New Chart Data Types ===
+export interface ProjectCategoryData {
+  phase: string;
+  count: number;
+}
+
+export interface TechnicianWorkloadData {
+  user_id: number;
+  name: string;
+  total: number;
+  done: number;
+  in_progress: number;
+  overtime: number;
+}
+
+export interface SPITrendData {
+  week_start: string;
+  avg_spi: number;
+  project_count: number;
+}
+
+export interface RecentActivityItem {
+  type: string;
+  item_name: string;
+  project_name: string;
+  project_id: number;
+  user_name: string;
+  activity_at: string;
+  detail?: string;
+}
+
+export interface TechProductivityData {
+  week_start: string;
+  completed: number;
+}
+
+export interface TechTimeSpentData {
+  project_id: number;
+  project_name: string;
+  hours: number;
+}
+
+// === Audit Log ===
+export interface AuditLogEntry {
+  id: number;
+  entity_type: string;
+  entity_id: number;
+  entity_name: string;
+  action: string;
+  field_name: string | null;
+  old_value: string | null;
+  new_value: string | null;
+  changed_by: number;
+  changed_by_name: string;
+  created_at: string;
+}
+
+export interface AuditLogResponse {
+  logs: AuditLogEntry[];
+  total: number;
+}

@@ -360,3 +360,348 @@ export async function chartEarnedValue(request: NextRequest, projectId: string) 
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function globalSearch(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const { searchParams } = request.nextUrl;
+  const q = searchParams.get('q')?.trim() ?? '';
+  const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') ?? '10') || 10));
+
+  if (!q) return NextResponse.json({ success: true, data: [] });
+
+  const term = `%${q}%`;
+  const { role, userId } = auth.user;
+
+  try {
+    if (role === 'manager' || role === 'admin') {
+      const [projectRows, taskRows, clientRows] = await Promise.all([
+        query<{ id: number; name: string; project_code: string | null; status: string }>(
+          `SELECT id, name, project_code, status FROM projects
+           WHERE name ILIKE $1 OR project_code ILIKE $1
+           ORDER BY name ASC LIMIT $2`,
+          [term, limit]
+        ),
+        query<{ id: number; name: string; project_id: number; project_name: string; status: string }>(
+          `SELECT t.id, t.name, t.project_id, p.name AS project_name, t.status
+           FROM tasks t JOIN projects p ON p.id = t.project_id
+           WHERE t.name ILIKE $1
+           ORDER BY t.name ASC LIMIT $2`,
+          [term, limit]
+        ),
+        query<{ id: number; name: string; email: string | null }>(
+          `SELECT id, name, email FROM clients WHERE name ILIKE $1 OR email ILIKE $1 ORDER BY name ASC LIMIT $2`,
+          [term, limit]
+        ),
+      ]);
+
+      const results: Array<{ type: string; id: number; name: string; subtitle: string; url: string }> = [
+        ...projectRows.rows.map((r) => ({
+          type: 'project',
+          id: r.id,
+          name: r.name,
+          subtitle: r.project_code ? `${r.project_code} · ${r.status}` : r.status,
+          url: `/projects/${r.id}`,
+        })),
+        ...taskRows.rows.map((r) => ({
+          type: 'task',
+          id: r.id,
+          name: r.name,
+          subtitle: `${r.project_name} · ${r.status}`,
+          url: `/projects/${r.project_id}?task=${r.id}`,
+        })),
+        ...clientRows.rows.map((r) => ({
+          type: 'client',
+          id: r.id,
+          name: r.name,
+          subtitle: r.email ?? '',
+          url: `/clients/${r.id}`,
+        })),
+      ];
+
+      return NextResponse.json({ success: true, data: results });
+    }
+
+    // Technician: own tasks + assigned projects only
+    const [taskRows, projectRows] = await Promise.all([
+      query<{ id: number; name: string; project_id: number; project_name: string; status: string }>(
+        `SELECT t.id, t.name, t.project_id, p.name AS project_name, t.status
+         FROM tasks t JOIN projects p ON p.id = t.project_id
+         WHERE t.assigned_to = $1 AND t.name ILIKE $2
+         ORDER BY t.name ASC LIMIT $3`,
+        [userId, term, limit]
+      ),
+      query<{ id: number; name: string; status: string }>(
+        `SELECT p.id, p.name, p.status
+         FROM projects p JOIN project_assignments pa ON pa.project_id = p.id
+         WHERE pa.user_id = $1 AND p.name ILIKE $2
+         ORDER BY p.name ASC LIMIT $3`,
+        [userId, term, limit]
+      ),
+    ]);
+
+    const results: Array<{ type: string; id: number; name: string; subtitle: string; url: string }> = [
+      ...taskRows.rows.map((r) => ({
+        type: 'task',
+        id: r.id,
+        name: r.name,
+        subtitle: `${r.project_name} · ${r.status}`,
+        url: `/technician/projects/${r.project_id}?task=${r.id}`,
+      })),
+      ...projectRows.rows.map((r) => ({
+        type: 'project',
+        id: r.id,
+        name: r.name,
+        subtitle: r.status,
+        url: `/technician/projects/${r.id}`,
+      })),
+    ];
+
+    return NextResponse.json({ success: true, data: results });
+  } catch (err) {
+    console.error('Global search error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function chartProjectCategories(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
+  if (roleCheck) return roleCheck;
+
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
+  try {
+    const params: string[] = [];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND start_date <= $2 AND end_date >= $1`;
+    }
+
+    const result = await query(
+      `SELECT phase, COUNT(*)::int AS count
+       FROM projects
+       WHERE status = 'active'${dateClause}
+       GROUP BY phase`,
+      params
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Project categories chart error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function chartTechnicianWorkload(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
+  if (roleCheck) return roleCheck;
+
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
+  try {
+    const params: string[] = [];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND t.due_date BETWEEN $1 AND $2`;
+    }
+
+    const result = await query(
+      `SELECT u.id AS user_id, u.name,
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE t.status = 'done')::int AS done,
+        COUNT(*) FILTER (WHERE t.status IN ('in_progress', 'working_on_it'))::int AS in_progress,
+        COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress') AND t.due_date < CURRENT_DATE)::int AS overtime
+       FROM tasks t
+       JOIN users u ON u.id = t.assigned_to
+       JOIN projects p ON p.id = t.project_id
+       WHERE p.status = 'active'${dateClause}
+       GROUP BY u.id, u.name
+       ORDER BY total DESC`,
+      params
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Technician workload chart error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function chartSPITrend(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
+  if (roleCheck) return roleCheck;
+
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
+  try {
+    const params: string[] = [];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND ph.last_updated BETWEEN $1 AND $2`;
+    }
+
+    const result = await query(
+      `SELECT DATE_TRUNC('week', ph.last_updated)::date AS week_start,
+        ROUND(AVG(ph.spi_value)::numeric, 4) AS avg_spi,
+        COUNT(*)::int AS project_count
+       FROM project_health ph
+       JOIN projects p ON p.id = ph.project_id
+       WHERE p.status = 'active'${dateClause}
+       GROUP BY DATE_TRUNC('week', ph.last_updated)
+       ORDER BY week_start ASC`,
+      params
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('SPI trend chart error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function chartRecentActivity(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
+  if (roleCheck) return roleCheck;
+
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+  const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') ?? '20') || 20));
+
+  try {
+    let dateClause: string;
+    const params: (string | number)[] = [limit];
+
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = `activity_at BETWEEN $2 AND $3`;
+    } else {
+      dateClause = `activity_at >= CURRENT_DATE - INTERVAL '30 days'`;
+    }
+
+    const result = await query(
+      `SELECT * FROM (
+        (SELECT 'task_created' AS type, t.name AS item_name, p.name AS project_name,
+            p.id AS project_id, u.name AS user_name, t.created_at AS activity_at, t.status AS detail
+          FROM tasks t
+          JOIN projects p ON p.id = t.project_id
+          LEFT JOIN users u ON u.id = t.assigned_to
+          ORDER BY t.created_at DESC LIMIT 50)
+        UNION ALL
+        (SELECT 'task_updated' AS type, t.name AS item_name, p.name AS project_name,
+            p.id AS project_id, u.name AS user_name, t.updated_at AS activity_at, t.status AS detail
+          FROM tasks t
+          JOIN projects p ON p.id = t.project_id
+          LEFT JOIN users u ON u.id = t.assigned_to
+          WHERE t.updated_at <> t.created_at
+          ORDER BY t.updated_at DESC LIMIT 50)
+        UNION ALL
+        (SELECT 'escalation_opened' AS type, e.title AS item_name, p.name AS project_name,
+            p.id AS project_id, u.name AS user_name, e.created_at AS activity_at, e.status AS detail
+          FROM escalations e
+          JOIN projects p ON p.id = e.project_id
+          JOIN users u ON u.id = e.reported_by
+          ORDER BY e.created_at DESC LIMIT 50)
+        UNION ALL
+        (SELECT 'report_submitted' AS type, 'Daily Report' AS item_name, p.name AS project_name,
+            p.id AS project_id, u.name AS user_name, dr.created_at AS activity_at,
+            dr.progress_percentage::text AS detail
+          FROM daily_reports dr
+          JOIN projects p ON p.id = dr.project_id
+          JOIN users u ON u.id = dr.created_by
+          ORDER BY dr.created_at DESC LIMIT 50)
+      ) combined
+      WHERE ${dateClause}
+      ORDER BY activity_at DESC
+      LIMIT $1`,
+      params
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Recent activity chart error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function technicianProductivity(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+  const { userId } = auth.user;
+
+  try {
+    const params: (string | number)[] = [userId];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND t.updated_at BETWEEN $2 AND $3`;
+    }
+
+    const result = await query(
+      `SELECT DATE_TRUNC('week', t.updated_at)::date AS week_start,
+        COUNT(*)::int AS completed
+       FROM tasks t
+       JOIN projects p ON p.id = t.project_id
+       WHERE t.assigned_to = $1 AND t.status = 'done'${dateClause}
+       GROUP BY DATE_TRUNC('week', t.updated_at)
+       ORDER BY week_start ASC`,
+      params
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Technician productivity error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function technicianTimeSpent(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+  const { userId } = auth.user;
+
+  try {
+    const params: (string | number)[] = [userId];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND t.updated_at BETWEEN $2 AND $3`;
+    }
+
+    const result = await query(
+      `SELECT p.id AS project_id, p.name AS project_name,
+        ROUND(COALESCE(SUM(t.time_spent_seconds), 0) / 3600.0, 1) AS hours
+       FROM tasks t
+       JOIN projects p ON p.id = t.project_id
+       WHERE t.assigned_to = $1 AND t.time_spent_seconds > 0${dateClause}
+       GROUP BY p.id, p.name
+       ORDER BY hours DESC`,
+      params
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Technician time spent error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}

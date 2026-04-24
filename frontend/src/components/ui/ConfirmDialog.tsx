@@ -32,13 +32,13 @@ export default function ConfirmDialog({
 
   return (
     <Modal open={open} onClose={onClose} title={title} maxWidth="max-w-md">
-      <p className="text-sm text-gray-600 mb-6">{message}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">{message}</p>
       <div className="flex gap-3 justify-end">
         <button
           type="button"
           onClick={onClose}
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50"
+          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50"
         >
           {cancelLabel}
         </button>

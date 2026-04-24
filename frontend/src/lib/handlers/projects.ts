@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
 import { query, getClient } from '@/lib/db';
 import { recalculateSPI } from '@/lib/spiCalculator';
+import { logChange } from './audit';
 
-function generateProjectCode(): string {
-  return crypto.randomBytes(4).toString('hex').toUpperCase();
+async function generateProjectCode(): Promise<string> {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const prefix = `SHI-${yy}${mm}`;
+
+  // Find the highest sequence number for this month
+  const result = await query<{ max_seq: string }>(
+    `SELECT MAX(SUBSTRING(project_code FROM $1))::int AS max_seq
+     FROM projects WHERE project_code LIKE $2`,
+    [`^${prefix}(\\d+)$`, `${prefix}%`]
+  );
+  const nextSeq = ((result.rows[0]?.max_seq as unknown as number) || 0) + 1;
+  return `${prefix}${String(nextSeq).padStart(3, '0')}`;
 }
 
 export async function listProjects(request: NextRequest) {
@@ -67,7 +79,7 @@ export async function createProject(request: NextRequest) {
   }
 
   try {
-    const projectCode = generateProjectCode();
+    const projectCode = await generateProjectCode();
     const result = await query(
       `INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase,
          project_value, target_description, created_by)
@@ -75,8 +87,18 @@ export async function createProject(request: NextRequest) {
       [projectCode, name, description || null, client_id || null, start_date, end_date,
        phase === 'execution' ? 'execution' : 'survey', project_value || 0, target_description || null, auth.user.userId]
     );
-    const project = result.rows[0] as { id: number };
+    const project = result.rows[0] as { id: number; name: string };
     await recalculateSPI(project.id);
+    const creatorName = (await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string || 'Unknown';
+    await logChange({
+      entityType: 'project',
+      entityId: project.id,
+      entityName: project.name,
+      action: 'create',
+      changes: [{ field: '*', oldValue: null, newValue: project.name }],
+      userId: auth.user.userId,
+      userName: creatorName,
+    });
     return NextResponse.json({ success: true, data: project }, { status: 201 });
   } catch (err) {
     console.error('Create project error:', err);
@@ -199,6 +221,23 @@ export async function updateProject(request: NextRequest, id: string) {
       ]
     );
     if (start_date || end_date || status) await recalculateSPI(projectId);
+    const updated = result.rows[0] as Record<string, unknown>;
+    const userName = (await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string || 'Unknown';
+    const auditFields = ['name', 'description', 'status', 'client_id', 'start_date', 'end_date', 'project_value', 'target_description', 'phase'];
+    const changes = auditFields
+      .filter(f => String(updated[f] ?? '') !== String(row[f] ?? ''))
+      .map(f => ({ field: f, oldValue: String(row[f] ?? ''), newValue: String(updated[f] ?? '') }));
+    if (changes.length > 0) {
+      await logChange({
+        entityType: 'project',
+        entityId: projectId,
+        entityName: String(updated.name),
+        action: 'update',
+        changes,
+        userId: auth.user.userId,
+        userName,
+      });
+    }
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.error('Update project error:', err);
@@ -218,10 +257,25 @@ export async function deleteProject(request: NextRequest, id: string) {
   }
 
   try {
+    const existing = await query('SELECT id, name FROM projects WHERE id = $1', [projectId]);
+    if (existing.rowCount === 0) {
+      return NextResponse.json({ success: false, error: 'Project not found' }, { status: 404 });
+    }
+    const existingProject = existing.rows[0] as { id: number; name: string };
     const result = await query('DELETE FROM projects WHERE id = $1 RETURNING id', [projectId]);
     if (result.rowCount === 0) {
       return NextResponse.json({ success: false, error: 'Project not found' }, { status: 404 });
     }
+    const deleterName = (await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string || 'Unknown';
+    await logChange({
+      entityType: 'project',
+      entityId: projectId,
+      entityName: existingProject.name,
+      action: 'delete',
+      changes: [{ field: '*', oldValue: existingProject.name, newValue: null }],
+      userId: auth.user.userId,
+      userName: deleterName,
+    });
     return NextResponse.json({ success: true, message: 'Project deleted successfully' });
   } catch (err) {
     console.error('Delete project error:', err);

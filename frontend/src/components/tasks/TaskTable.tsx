@@ -78,7 +78,7 @@ function LiveTime({ task }: { task: Task }) {
   }
 
   return (
-    <span className={`font-mono text-xs ${task.is_tracking ? 'text-green-600 font-semibold' : 'text-gray-600'}`}>
+    <span className={`font-mono text-xs ${task.is_tracking ? 'text-green-600 font-semibold' : 'text-gray-600 dark:text-gray-400'}`}>
       {formatTimeSpent(elapsed)}
     </span>
   );
@@ -169,7 +169,7 @@ export default function TaskTable({
 
   const SortHeader = ({ label, field, className = '' }: { label: string; field: SortKey; className?: string }) => (
     <th
-      className={`px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none ${className}`}
+      className={`px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 select-none ${className}`}
       onClick={() => handleSort(field)}
       role="columnheader"
       aria-sort={sortKey === field ? (sortDesc ? 'descending' : 'ascending') : 'none'}
@@ -186,10 +186,10 @@ export default function TaskTable({
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-100 bg-gray-50/50">
-        <div className="flex items-center gap-3 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
+        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           <span>{sorted.length} task{sorted.length !== 1 ? 's' : ''}</span>
           <div className="hidden sm:flex items-center gap-3">
             <span className="text-gray-300">|</span>
@@ -203,7 +203,7 @@ export default function TaskTable({
         </div>
         <button
           onClick={handleExport}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg px-3 py-1.5 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 border border-green-200 dark:border-green-800 rounded-lg px-3 py-1.5 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -213,24 +213,24 @@ export default function TaskTable({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200" role="table">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" role="table">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               {/* Timer column */}
-              <th className="px-2 py-2.5 text-center text-xs font-medium text-gray-500 uppercase w-12" />
+              <th className="px-2 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12" />
               <SortHeader label="Task" field="name" />
               {showProject && (
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Project</th>
               )}
               <SortHeader label="Status" field="status" />
               <SortHeader label="Assignee" field="assigned_to_name" />
               <SortHeader label="Due Date" field="due_date" />
-              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Est.</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Est.</th>
               <SortHeader label="Time" field="time" />
-              <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 uppercase">Evidence</th>
+              <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Evidence</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {paginated.map((task) => {
               const urgency = getTaskUrgency(task);
               const age = getTaskAge(task);
@@ -239,16 +239,16 @@ export default function TaskTable({
 
               // Urgency colors take priority, then age border
               const urgencyBg = urgency === 'over_deadline'
-                ? 'bg-red-50/50 hover:bg-red-50'
+                ? 'bg-red-50/50 hover:bg-red-50 dark:bg-red-900/20 dark:hover:bg-red-900/30'
                 : urgency === 'overtime'
-                ? 'bg-amber-50/50 hover:bg-amber-50'
+                ? 'bg-amber-50/50 hover:bg-amber-50 dark:bg-amber-900/20 dark:hover:bg-amber-900/30'
                 : task.is_tracking
-                ? 'bg-green-50/30 hover:bg-green-50'
+                ? 'bg-green-50/30 hover:bg-green-50 dark:bg-green-900/20 dark:hover:bg-green-900/30'
                 : task.status === 'review'
-                ? 'bg-purple-50/30 hover:bg-purple-50'
+                ? 'bg-purple-50/30 hover:bg-purple-50 dark:bg-purple-900/20 dark:hover:bg-purple-900/30'
                 : age === 'stale'
-                ? 'bg-gray-50/60 hover:bg-gray-100'
-                : 'hover:bg-gray-50';
+                ? 'bg-gray-50/60 hover:bg-gray-100 dark:bg-gray-800/60 dark:hover:bg-gray-700'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-800';
 
               const ageBorder = !urgency ? AGE_BORDER[age] : '';
 
@@ -299,7 +299,7 @@ export default function TaskTable({
                         </span>
                       )}
                       <div className="min-w-0">
-                        <p className={`text-sm font-medium truncate ${age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-900'}`}>{task.name}</p>
+                        <p className={`text-sm font-medium truncate ${age === 'stale' && !urgency ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>{task.name}</p>
                         {task.description && (
                           <p className="text-xs text-gray-400 truncate max-w-xs">{task.description}</p>
                         )}
@@ -333,20 +333,20 @@ export default function TaskTable({
                   </td>
 
                   {/* Assignee */}
-                  <td className={`px-3 py-2.5 text-sm cursor-pointer ${age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-600'}`} onClick={() => onTaskClick?.(task)}>
+                  <td className={`px-3 py-2.5 text-sm cursor-pointer ${age === 'stale' && !urgency ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`} onClick={() => onTaskClick?.(task)}>
                     {task.assigned_to_name ?? <span className="text-gray-300">--</span>}
                   </td>
 
                   {/* Due date */}
                   <td
-                    className={`px-3 py-2.5 text-sm cursor-pointer ${isOverdue ? 'text-red-500 font-medium' : age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-600'}`}
+                    className={`px-3 py-2.5 text-sm cursor-pointer ${isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : age === 'stale' && !urgency ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}
                     onClick={() => onTaskClick?.(task)}
                   >
                     {task.due_date ? formatDate(task.due_date) : '--'}
                   </td>
 
                   {/* Estimated hours */}
-                  <td className={`px-3 py-2.5 text-xs cursor-pointer ${age === 'stale' && !urgency ? 'text-gray-400' : 'text-gray-500'}`} onClick={() => onTaskClick?.(task)}>
+                  <td className={`px-3 py-2.5 text-xs cursor-pointer ${age === 'stale' && !urgency ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'}`} onClick={() => onTaskClick?.(task)}>
                     {task.estimated_hours ? `${task.estimated_hours}h` : '--'}
                   </td>
 
@@ -356,7 +356,7 @@ export default function TaskTable({
                   </td>
 
                   {/* Evidence count */}
-                  <td className="px-3 py-2.5 text-sm text-gray-500 text-center cursor-pointer" onClick={() => onTaskClick?.(task)}>
+                  <td className="px-3 py-2.5 text-sm text-gray-500 dark:text-gray-400 text-center cursor-pointer" onClick={() => onTaskClick?.(task)}>
                     {(task.evidence_count ?? 0) > 0 ? (
                       <span className="inline-flex items-center gap-0.5 text-gray-500">
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -377,13 +377,13 @@ export default function TaskTable({
 
       {/* Pagination */}
       {sorted.length > PAGE_SIZES[0] && (
-        <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-100 bg-gray-50/50 text-xs text-gray-500">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <span>Show</span>
             <select
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-              className="border border-gray-300 rounded px-1.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               {PAGE_SIZES.map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -395,14 +395,14 @@ export default function TaskTable({
             <button
               onClick={() => setPage(0)}
               disabled={safePage === 0}
-              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               &laquo;
             </button>
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={safePage === 0}
-              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               &lsaquo;
             </button>
@@ -412,14 +412,14 @@ export default function TaskTable({
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage >= totalPages - 1}
-              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               &rsaquo;
             </button>
             <button
               onClick={() => setPage(totalPages - 1)}
               disabled={safePage >= totalPages - 1}
-              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               &raquo;
             </button>

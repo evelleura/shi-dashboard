@@ -38,6 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_clients_created_by ON clients(created_by);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS projects (
   id SERIAL PRIMARY KEY,
+  project_code VARCHAR(12) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
   description TEXT,
   client_id INT,
@@ -281,3 +282,24 @@ VALUES (
   'admin',
   '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'
 ) ON CONFLICT (email) DO NOTHING;
+
+-- ============================================================
+-- Audit Log table (tracks all changes by managers/admins)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS audit_log (
+  id SERIAL PRIMARY KEY,
+  entity_type VARCHAR(50) NOT NULL,   -- 'project', 'task', 'client', etc.
+  entity_id INT NOT NULL,
+  entity_name VARCHAR(255),           -- human-readable name at time of change
+  action VARCHAR(50) NOT NULL,        -- 'create', 'update', 'delete', 'status_change'
+  field_name VARCHAR(100),            -- which field changed (null for create/delete)
+  old_value TEXT,                     -- previous value
+  new_value TEXT,                     -- new value
+  changed_by INT NOT NULL,
+  changed_by_name VARCHAR(255),       -- denormalized for quick display
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (changed_by) REFERENCES users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(changed_by);
