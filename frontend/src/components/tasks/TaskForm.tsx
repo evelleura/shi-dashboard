@@ -121,6 +121,32 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label htmlFor="task-tl-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Schedule Start</label>
+          <input
+            id="task-tl-start"
+            type="date"
+            name="timeline_start"
+            value={form.timeline_start}
+            onChange={handleChange}
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="task-tl-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Schedule End</label>
+          <input
+            id="task-tl-end"
+            type="date"
+            name="timeline_end"
+            value={form.timeline_end}
+            onChange={handleChange}
+            min={form.timeline_start}
+            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+
       <div>
         <label htmlFor="task-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Budget (Rp)</label>
         <input

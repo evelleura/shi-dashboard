@@ -136,11 +136,115 @@ export async function listTechnicians(request: NextRequest) {
 
   try {
     const result = await query(
-      "SELECT id, name, email FROM users WHERE role = 'technician' ORDER BY name ASC"
+      `SELECT u.id, u.name, u.email, u.created_at,
+        COUNT(DISTINCT pa.project_id)::int AS project_count,
+        COUNT(DISTINCT t.id)::int AS total_tasks,
+        COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'done')::int AS completed_tasks,
+        COUNT(DISTINCT t.id) FILTER (WHERE t.status IN ('in_progress','working_on_it'))::int AS active_tasks,
+        COUNT(DISTINCT t.id) FILTER (WHERE t.due_date < CURRENT_DATE AND t.status != 'done')::int AS overdue_tasks,
+        COALESCE(SUM(t.time_spent_seconds), 0)::int AS total_time_seconds,
+        COUNT(DISTINCT te.id)::int AS evidence_count
+       FROM users u
+       LEFT JOIN project_assignments pa ON pa.user_id = u.id
+       LEFT JOIN tasks t ON t.assigned_to = u.id
+       LEFT JOIN task_evidence te ON te.uploaded_by = u.id
+       WHERE u.role = 'technician'
+       GROUP BY u.id, u.name, u.email, u.created_at
+       ORDER BY u.name ASC`
     );
     return NextResponse.json({ success: true, data: result.rows });
   } catch (err) {
     console.error('Get technicians error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function getTechnicianDetail(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['admin']);
+  if (roleCheck) return roleCheck;
+
+  const techId = parseInt(id);
+  if (isNaN(techId)) {
+    return NextResponse.json({ success: false, error: 'Invalid ID' }, { status: 400 });
+  }
+
+  try {
+    // Basic info
+    const userResult = await query(
+      "SELECT id, name, email, role, created_at FROM users WHERE id = $1 AND role = 'technician'",
+      [techId]
+    );
+    if (userResult.rowCount === 0) {
+      return NextResponse.json({ success: false, error: 'Technician not found' }, { status: 404 });
+    }
+    const technician = userResult.rows[0];
+
+    // Assigned projects with health
+    const projectsResult = await query(
+      `SELECT p.id, p.project_code, p.name, p.status, p.phase, p.start_date, p.end_date,
+              c.name AS client_name,
+              ph.spi_value, ph.status AS health_status,
+              COUNT(t.id)::int AS my_tasks,
+              COUNT(t.id) FILTER (WHERE t.status = 'done')::int AS my_completed
+       FROM project_assignments pa
+       JOIN projects p ON p.id = pa.project_id
+       LEFT JOIN clients c ON c.id = p.client_id
+       LEFT JOIN project_health ph ON ph.project_id = p.id
+       LEFT JOIN tasks t ON t.project_id = p.id AND t.assigned_to = $1
+       WHERE pa.user_id = $1
+       GROUP BY p.id, p.project_code, p.name, p.status, p.phase, p.start_date, p.end_date,
+                c.name, ph.spi_value, ph.status
+       ORDER BY p.status ASC, p.end_date ASC`,
+      [techId]
+    );
+
+    // Task breakdown
+    const taskStats = await query(
+      `SELECT
+         COUNT(*)::int AS total,
+         COUNT(*) FILTER (WHERE status = 'to_do')::int AS to_do,
+         COUNT(*) FILTER (WHERE status = 'in_progress')::int AS in_progress,
+         COUNT(*) FILTER (WHERE status = 'working_on_it')::int AS working_on_it,
+         COUNT(*) FILTER (WHERE status = 'review')::int AS review,
+         COUNT(*) FILTER (WHERE status = 'done')::int AS done,
+         COUNT(*) FILTER (WHERE status != 'done' AND due_date < CURRENT_DATE)::int AS overdue,
+         COALESCE(SUM(time_spent_seconds), 0)::int AS total_time_seconds
+       FROM tasks WHERE assigned_to = $1`,
+      [techId]
+    );
+
+    // Recent tasks (last 10)
+    const recentTasks = await query(
+      `SELECT t.id, t.name, t.status, t.due_date, t.time_spent_seconds, t.is_tracking,
+              p.name AS project_name, t.updated_at
+       FROM tasks t
+       JOIN projects p ON p.id = t.project_id
+       WHERE t.assigned_to = $1
+       ORDER BY t.updated_at DESC
+       LIMIT 10`,
+      [techId]
+    );
+
+    // Evidence count
+    const evidenceResult = await query(
+      `SELECT COUNT(*)::int AS total FROM task_evidence WHERE uploaded_by = $1`,
+      [techId]
+    );
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...technician,
+        projects: projectsResult.rows,
+        task_stats: taskStats.rows[0],
+        recent_tasks: recentTasks.rows,
+        evidence_count: evidenceResult.rows[0]?.total ?? 0,
+      },
+    });
+  } catch (err) {
+    console.error('Get technician detail error:', err);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

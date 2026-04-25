@@ -120,13 +120,17 @@ export default function ReportsPage() {
   const updateMutation = useUpdateProject();
   const router = useRouter();
   const [tab, setTab] = useState<ReportType>('summary');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Edit modal state
   const [editProject, setEditProject] = useState<DashboardProject | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', status: '', phase: '', project_value: '' });
+  const [editForm, setEditForm] = useState({ name: '', status: '', phase: '', category: '', project_value: '' });
 
-  const allProjects = projects as DashboardProject[];
+  const allProjects = (projects as DashboardProject[]).filter((p) => {
+    if (categoryFilter === 'all') return true;
+    return (p as unknown as Record<string, string>).category === categoryFilter;
+  });
 
   const openEdit = (p: DashboardProject) => {
     setEditProject(p);
@@ -134,6 +138,7 @@ export default function ReportsPage() {
       name: p.name,
       status: p.status,
       phase: p.phase,
+      category: (p as unknown as Record<string, string>).category ?? 'instalasi',
       project_value: String(Number(p.project_value) || 0),
     });
   };
@@ -144,6 +149,7 @@ export default function ReportsPage() {
     if (editForm.name !== editProject.name) data.name = editForm.name;
     if (editForm.status !== editProject.status) data.status = editForm.status as UpdateProjectData['status'];
     if (editForm.phase !== editProject.phase) data.phase = editForm.phase as UpdateProjectData['phase'];
+    if (editForm.category !== ((editProject as unknown as Record<string, string>).category ?? 'instalasi')) data.category = editForm.category as UpdateProjectData['category'];
     if (editForm.project_value !== String(Number(editProject.project_value) || 0)) data.project_value = Number(editForm.project_value);
     if (Object.keys(data).length > 0) {
       updateMutation.mutate({ id: editProject.id, data });
@@ -233,6 +239,28 @@ export default function ReportsPage() {
             <span className="hidden sm:inline">{t.label}</span>
           </button>
         ))}
+      </div>
+
+      {/* Category filter */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-gray-500 dark:text-gray-400">Category:</span>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Filter by category"
+        >
+          <option value="all">All Category</option>
+          <option value="instalasi">Instalasi</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="perbaikan">Perbaikan</option>
+          <option value="upgrade">Upgrade</option>
+          <option value="monitoring">Monitoring</option>
+          <option value="security">Security</option>
+          <option value="networking">Networking</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+        <span className="text-xs text-gray-400 dark:text-gray-500">{allProjects.length} project{allProjects.length !== 1 ? 's' : ''}</span>
       </div>
 
       {/* Report content */}

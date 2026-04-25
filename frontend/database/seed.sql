@@ -82,7 +82,7 @@ ON CONFLICT DO NOTHING;
 --   P9: Active/Execution, GREEN health (large project, many tasks)
 --   P10: Active/Execution, AMBER health (small project, near deadline)
 
-INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
+INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase, category, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
 -- P1: RED - Behind schedule, 60-day window, overtime tasks
 (
   'SHI-2601001',
@@ -90,7 +90,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Instalasi sistem smart home lengkap di 10 unit rumah kawasan Citra Raya',
   (SELECT id FROM clients WHERE name = 'PT Citra Raya Development'),
   CURRENT_DATE - INTERVAL '60 days', CURRENT_DATE + INTERVAL '30 days',
-  'active', 'execution', 150000000.00, TRUE,
+  'active', 'execution', 'instalasi', 150000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
   CURRENT_DATE - INTERVAL '58 days',
   'Smart lock, lighting control, CCTV terintegrasi untuk 10 unit rumah',
@@ -103,7 +103,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Pemasangan 32 kamera CCTV dan access control di kantor BPD DIY',
   (SELECT id FROM clients WHERE name = 'Bank BPD DIY'),
   CURRENT_DATE - INTERVAL '30 days', CURRENT_DATE + INTERVAL '60 days',
-  'active', 'execution', 85000000.00, TRUE,
+  'active', 'execution', 'security', 85000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
   CURRENT_DATE - INTERVAL '28 days',
   'Pemasangan 32 kamera CCTV, NVR, dan access control di 4 lantai kantor',
@@ -116,7 +116,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Home automation system lengkap di villa premium Kaliurang',
   (SELECT id FROM clients WHERE name = 'Bp. Haryanto'),
   CURRENT_DATE - INTERVAL '45 days', CURRENT_DATE + INTERVAL '15 days',
-  'active', 'execution', 45000000.00, TRUE,
+  'active', 'execution', 'instalasi', 45000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
   CURRENT_DATE - INTERVAL '43 days',
   'Automasi villa: lighting, curtain, AC, security dengan kontrol mobile',
@@ -129,7 +129,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Jaringan sensor IoT untuk monitoring 3 gudang logistik',
   (SELECT id FROM clients WHERE name = 'PT Logistik Nusantara'),
   CURRENT_DATE - INTERVAL '20 days', CURRENT_DATE + INTERVAL '40 days',
-  'active', 'execution', 65000000.00, TRUE,
+  'active', 'execution', 'monitoring', 65000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
   CURRENT_DATE - INTERVAL '18 days',
   'Sensor suhu, kelembaban, keamanan di 3 gudang + dashboard terpusat',
@@ -142,7 +142,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Sistem smart lighting untuk Hotel Melia Yogyakarta (120 kamar + publik)',
   (SELECT id FROM clients WHERE name = 'Hotel Melia Yogyakarta'),
   CURRENT_DATE - INTERVAL '10 days', CURRENT_DATE + INTERVAL '80 days',
-  'active', 'survey', 200000000.00, FALSE, NULL, NULL,
+  'active', 'survey', 'instalasi', 200000000.00, FALSE, NULL, NULL,
   'Smart lighting lobby, ballroom, koridor, 120 kamar hotel',
   (SELECT id FROM users WHERE email = 'diana@shi.co.id')
 ),
@@ -153,7 +153,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Monitoring suhu real-time ruang operasi dan farmasi RS PKU',
   (SELECT id FROM clients WHERE name = 'RS PKU Muhammadiyah'),
   CURRENT_DATE - INTERVAL '5 days', CURRENT_DATE + INTERVAL '55 days',
-  'active', 'survey', 35000000.00, TRUE,
+  'active', 'survey', 'monitoring', 35000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'diana@shi.co.id'),
   CURRENT_DATE - INTERVAL '1 day',
   'Sensor suhu + alarm di 4 ruang operasi, 2 ruang farmasi, 1 blood bank',
@@ -166,7 +166,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Instalasi smart traffic monitoring di persimpangan Janti',
   (SELECT id FROM clients WHERE name = 'Pemkot Yogyakarta - Dinas Perhubungan'),
   CURRENT_DATE - INTERVAL '120 days', CURRENT_DATE - INTERVAL '20 days',
-  'completed', 'execution', 95000000.00, TRUE,
+  'completed', 'execution', 'monitoring', 95000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
   CURRENT_DATE - INTERVAL '115 days',
   'CCTV monitoring lalu lintas + sensor counting kendaraan + dashboard',
@@ -179,7 +179,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Instalasi smart home sederhana di rumah tinggal',
   (SELECT id FROM clients WHERE name = 'Ibu Ratna Dewi'),
   CURRENT_DATE - INTERVAL '40 days', CURRENT_DATE + INTERVAL '20 days',
-  'on-hold', 'execution', 18000000.00, TRUE,
+  'on-hold', 'execution', 'instalasi', 18000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'diana@shi.co.id'),
   CURRENT_DATE - INTERVAL '38 days',
   'Smart lock + 4 smart switch + 2 CCTV + 1 gateway',
@@ -192,7 +192,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Sistem smart building terintegrasi untuk kantor Dinas Perhubungan',
   (SELECT id FROM clients WHERE name = 'Pemkot Yogyakarta - Dinas Perhubungan'),
   CURRENT_DATE - INTERVAL '40 days', CURRENT_DATE + INTERVAL '50 days',
-  'active', 'execution', 120000000.00, TRUE,
+  'active', 'execution', 'instalasi', 120000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
   CURRENT_DATE - INTERVAL '38 days',
   'Lighting automation, AC control, occupancy sensor, energy monitoring',
@@ -205,7 +205,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Pemasangan CCTV di area farmasi dan gudang obat RS PKU',
   (SELECT id FROM clients WHERE name = 'RS PKU Muhammadiyah'),
   CURRENT_DATE - INTERVAL '25 days', CURRENT_DATE + INTERVAL '5 days',
-  'active', 'execution', 22000000.00, TRUE,
+  'active', 'execution', 'security', 22000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'diana@shi.co.id'),
   CURRENT_DATE - INTERVAL '24 days',
   '8 kamera CCTV + NVR untuk monitoring gudang obat 24/7',
@@ -653,7 +653,7 @@ ON CONFLICT DO NOTHING;
 --   P14: Active/Survey, no SPI (smart villa Suryo)
 --   P15: Cancelled project (intercom Citra Raya)
 
-INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
+INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase, category, project_value, survey_approved, survey_approved_by, survey_approved_at, target_description, created_by) VALUES
 -- P11: AMBER - Fire Alarm UTY, slightly behind
 (
   'SHI-2603003',
@@ -661,7 +661,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Instalasi fire alarm system di 3 gedung kampus (Gedung A, B, C)',
   (SELECT id FROM clients WHERE name = 'Universitas Teknologi Yogyakarta'),
   CURRENT_DATE - INTERVAL '35 days', CURRENT_DATE + INTERVAL '25 days',
-  'active', 'execution', 75000000.00, TRUE,
+  'active', 'execution', 'security', 75000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'hendro@shi.co.id'),
   CURRENT_DATE - INTERVAL '33 days',
   'Instalasi fire alarm system di 3 gedung kampus (Gedung A, B, C) termasuk panel, smoke detector, manual call point, dan bell alarm',
@@ -674,7 +674,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Smart parking system 3 lantai mall Matahari Yogyakarta',
   (SELECT id FROM clients WHERE name = 'PT Matahari Retail Yogyakarta'),
   CURRENT_DATE - INTERVAL '25 days', CURRENT_DATE + INTERVAL '65 days',
-  'active', 'execution', 110000000.00, TRUE,
+  'active', 'execution', 'instalasi', 110000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'hendro@shi.co.id'),
   CURRENT_DATE - INTERVAL '23 days',
   'Smart parking system 3 lantai: barrier gate otomatis, sensor slot, kamera ANPR, payment terminal, dashboard occupancy',
@@ -687,7 +687,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Monitoring 48 panel surya di atap pabrik PT Sinar Mas Agro',
   (SELECT id FROM clients WHERE name = 'PT Sinar Mas Agro'),
   CURRENT_DATE - INTERVAL '30 days', CURRENT_DATE + INTERVAL '30 days',
-  'active', 'execution', 55000000.00, TRUE,
+  'active', 'execution', 'monitoring', 55000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'hendro@shi.co.id'),
   CURRENT_DATE - INTERVAL '28 days',
   'Monitoring 48 panel surya di atap pabrik: sensor energi, inverter monitoring, dashboard produksi listrik real-time',
@@ -700,7 +700,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Full automation villa 2 lantai Bp. Suryo Prabowo',
   (SELECT id FROM clients WHERE name = 'Bp. Suryo Prabowo'),
   CURRENT_DATE - INTERVAL '8 days', CURRENT_DATE + INTERVAL '82 days',
-  'active', 'survey', 180000000.00, FALSE, NULL, NULL,
+  'active', 'survey', 'instalasi', 180000000.00, FALSE, NULL, NULL,
   'Full automation villa 2 lantai: smart lighting, motorized curtain, multi-zone AC, home theater, outdoor CCTV, smart gate, pool automation',
   (SELECT id FROM users WHERE email = 'diana@shi.co.id')
 ),
@@ -711,7 +711,7 @@ INSERT INTO projects (project_code, name, description, client_id, start_date, en
   'Sistem intercom IP 20 unit rumah di cluster baru Citra Raya',
   (SELECT id FROM clients WHERE name = 'PT Citra Raya Development'),
   CURRENT_DATE - INTERVAL '50 days', CURRENT_DATE + INTERVAL '10 days',
-  'cancelled', 'execution', 28000000.00, TRUE,
+  'cancelled', 'execution', 'networking', 28000000.00, TRUE,
   (SELECT id FROM users WHERE email = 'budi@shi.co.id'),
   CURRENT_DATE - INTERVAL '48 days',
   'Sistem intercom IP 20 unit rumah di cluster baru Citra Raya',

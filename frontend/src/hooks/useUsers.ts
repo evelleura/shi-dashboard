@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUsers, createUser, updateUser, deleteUser, resetUserPassword } from '../services/api';
+import { getUsers, createUser, updateUser, deleteUser, resetUserPassword, getTechnicians, getTechnicianDetail } from '../services/api';
 
 export const USER_KEYS = {
   all: ['users'] as const,
+  technicians: ['technicians'] as const,
+  technicianDetail: (id: number) => ['technicians', id] as const,
 };
 
 export function useUsers() {
@@ -40,5 +42,23 @@ export function useDeleteUser() {
 export function useResetPassword() {
   return useMutation({
     mutationFn: ({ id, password }: { id: number; password: string }) => resetUserPassword(id, password),
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useTechnicianList(): ReturnType<typeof useQuery<any[]>> {
+  return useQuery({
+    queryKey: USER_KEYS.technicians,
+    queryFn: getTechnicians,
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useTechnicianDetail(id: number | null) {
+  return useQuery({
+    queryKey: USER_KEYS.technicianDetail(id!),
+    queryFn: () => getTechnicianDetail(id!),
+    enabled: id !== null,
+    staleTime: 1000 * 60 * 2,
   });
 }

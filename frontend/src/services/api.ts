@@ -94,9 +94,10 @@ export const getUsers = async (): Promise<User[]> => {
   return res.data.data!;
 };
 
-export const getTechnicians = async (): Promise<User[]> => {
-  const res = await api.get<ApiResponse<User[]>>('/users/technicians');
-  return res.data.data!;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getTechnicians = async (): Promise<any[]> => {
+  const res = await api.get('/users/technicians');
+  return res.data.data;
 };
 
 export const getMyProjects = async (): Promise<Project[]> => {
@@ -236,6 +237,12 @@ export const changeTaskStatus = async (id: number, status: TaskStatus): Promise<
 export const createBulkTasks = async (tasks: CreateTaskData[]): Promise<Task[]> => {
   const res = await api.post<ApiResponse<Task[]>>('/tasks/bulk', { tasks });
   return res.data.data!;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getScheduleTasks = async (): Promise<any[]> => {
+  const res = await api.get('/tasks/schedule');
+  return res.data.data;
 };
 
 // ==================== Evidence ====================
@@ -473,6 +480,12 @@ export const deleteUser = async (id: number): Promise<void> => {
 
 export const resetUserPassword = async (id: number, password: string): Promise<void> => {
   await api.post(`/users/${id}/reset-password`, { password });
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getTechnicianDetail = async (id: number): Promise<any> => {
+  const res = await api.get(`/users/technicians/${id}`);
+  return res.data.data;
 };
 
 export default api;

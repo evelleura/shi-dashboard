@@ -102,8 +102,12 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     if (r1 === 'me' && r2 === 'change-password' && method === 'POST') {
       return users.changeMyPassword(request);
     }
-    if (r1 === 'technicians') {
+    if (r1 === 'technicians' && !r2) {
       if (method === 'GET') return users.listTechnicians(request);
+      return methodNotAllowed();
+    }
+    if (r1 === 'technicians' && r2 && !r3) {
+      if (method === 'GET') return users.getTechnicianDetail(request, r2);
       return methodNotAllowed();
     }
     if (r1 && r2 === 'reset-password' && method === 'POST') return users.resetUserPassword(request, r1);
@@ -166,6 +170,7 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       return methodNotAllowed();
     }
     if (r1 === 'bulk' && method === 'POST') return tasks.bulkCreateTasks(request);
+    if (r1 === 'schedule' && method === 'GET') return tasks.getScheduleTasks(request);
     if (r1 === 'project' && r2) {
       if (method === 'GET') return tasks.getTasksByProject(request, r2);
       return methodNotAllowed();

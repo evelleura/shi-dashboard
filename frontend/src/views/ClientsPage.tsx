@@ -44,6 +44,14 @@ export default function ClientsPage() {
 
   const columns: Column<Client>[] = useMemo(() => [
     {
+      key: 'id',
+      label: 'ID',
+      defaultHidden: true,
+      render: (c) => <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{c.id}</span>,
+      sortValue: (c) => c.id,
+      exportValue: (c) => c.id,
+    },
+    {
       key: 'name',
       label: 'Name',
       render: (c) => (

@@ -2,6 +2,7 @@
 export type UserRole = 'technician' | 'manager' | 'admin';
 export type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'cancelled';
 export type ProjectPhase = 'survey' | 'execution';
+export type ProjectCategory = 'instalasi' | 'maintenance' | 'perbaikan' | 'upgrade' | 'monitoring' | 'security' | 'networking' | 'lainnya';
 export type HealthStatus = 'green' | 'amber' | 'red';
 export type TaskStatus = 'to_do' | 'in_progress' | 'working_on_it' | 'review' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
@@ -44,6 +45,7 @@ export interface Project {
   duration: number;
   status: ProjectStatus;
   phase: ProjectPhase;
+  category: ProjectCategory;
   project_value: number;
   survey_approved: boolean;
   survey_approved_by?: number;
@@ -340,6 +342,7 @@ export interface CreateProjectData {
   client_id?: number;
   start_date: string;
   end_date: string;
+  category?: ProjectCategory;
   project_value?: number;
   target_description?: string;
 }
@@ -352,6 +355,7 @@ export interface UpdateProjectData {
   end_date?: string;
   status?: ProjectStatus;
   phase?: ProjectPhase;
+  category?: ProjectCategory;
   project_value?: number;
   target_description?: string;
 }
@@ -445,7 +449,7 @@ export interface SearchResult {
 
 // === New Chart Data Types ===
 export interface ProjectCategoryData {
-  phase: string;
+  category: string;
   count: number;
 }
 

@@ -23,6 +23,8 @@ export interface Column<T> {
   cellClass?: string;
   /** If true, column is hidden in table but included in export */
   exportOnly?: boolean;
+  /** If true, column is hidden by default but can be toggled on */
+  defaultHidden?: boolean;
 }
 
 export interface DataTableProps<T> {
@@ -107,8 +109,39 @@ export default function DataTable<T>({
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(defaultPageSize);
 
-  // ── Visible columns (exclude exportOnly) ───────────────────────────────────
-  const visibleColumns = useMemo(() => columns.filter((c) => !c.exportOnly), [columns]);
+  // ── Column visibility state ───────────────────────────────────────────────
+  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => {
+    const set = new Set<string>();
+    for (const col of columns) {
+      if (col.defaultHidden) set.add(col.key);
+    }
+    return set;
+  });
+  const [showColumnMenu, setShowColumnMenu] = useState(false);
+
+  const toggleColumn = useCallback((key: string) => {
+    setHiddenKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
+  // All columns that can appear in the table (not export-only)
+  const toggleableColumns = useMemo(() => columns.filter((c) => !c.exportOnly), [columns]);
+
+  const showAllColumns = useCallback(() => setHiddenKeys(new Set()), []);
+  const hideOptionalColumns = useCallback(() => {
+    const set = new Set<string>();
+    for (const col of columns) {
+      if (col.defaultHidden) set.add(col.key);
+    }
+    setHiddenKeys(set);
+  }, [columns]);
+
+  // ── Visible columns (exclude exportOnly and user-hidden) ─��────────────���───
+  const visibleColumns = useMemo(() => columns.filter((c) => !c.exportOnly && !hiddenKeys.has(c.key)), [columns, hiddenKeys]);
 
   // ── Sorted data ────────────────────────────────────────────────────────────
   const sorted = useMemo(() => {
@@ -193,6 +226,58 @@ export default function DataTable<T>({
           )}
         </div>
         <div className="flex items-center gap-2">
+          {toggleableColumns.length > 1 && (
+            <div className="relative">
+              <button
+                onClick={() => setShowColumnMenu((v) => !v)}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 transition-colors"
+                aria-label="Toggle columns"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
+                </svg>
+                Columns
+                <span className="text-gray-400 dark:text-gray-500">{visibleColumns.length}/{toggleableColumns.length}</span>
+              </button>
+              {showColumnMenu && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowColumnMenu(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-[180px] max-h-[320px] overflow-y-auto">
+                    {/* Quick actions */}
+                    <div className="flex items-center gap-1 px-3 py-1.5 border-b border-gray-100 dark:border-gray-700">
+                      <button
+                        onClick={showAllColumns}
+                        className="text-[10px] font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        Show All
+                      </button>
+                      <span className="text-gray-300 dark:text-gray-600 text-[10px]">|</span>
+                      <button
+                        onClick={hideOptionalColumns}
+                        className="text-[10px] font-medium text-gray-500 dark:text-gray-400 hover:underline"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                    {toggleableColumns.map((col) => (
+                      <label
+                        key={col.key}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={!hiddenKeys.has(col.key)}
+                          onChange={() => toggleColumn(col.key)}
+                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 h-3.5 w-3.5"
+                        />
+                        {col.label}
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
           {showExport && sorted.length > 0 && (
             <button
               onClick={handleExport}

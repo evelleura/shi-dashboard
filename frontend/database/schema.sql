@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS projects (
   duration INT GENERATED ALWAYS AS (end_date - start_date) STORED,
   status VARCHAR(50) NOT NULL DEFAULT 'active',
   phase VARCHAR(50) NOT NULL DEFAULT 'survey',
+  category VARCHAR(50) NOT NULL DEFAULT 'instalasi',
   project_value DECIMAL(15,2) DEFAULT 0,
   survey_approved BOOLEAN DEFAULT FALSE,
   survey_approved_by INT,
@@ -60,12 +61,14 @@ CREATE TABLE IF NOT EXISTS projects (
   FOREIGN KEY (survey_approved_by) REFERENCES users(id),
   CONSTRAINT status_check CHECK (status IN ('active', 'completed', 'on-hold', 'cancelled')),
   CONSTRAINT phase_check CHECK (phase IN ('survey', 'execution')),
+  CONSTRAINT category_check CHECK (category IN ('instalasi', 'maintenance', 'perbaikan', 'upgrade', 'monitoring', 'security', 'networking', 'lainnya')),
   CONSTRAINT date_order CHECK (end_date > start_date)
 );
 
 CREATE INDEX IF NOT EXISTS idx_projects_client ON projects(client_id);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_projects_phase ON projects(phase);
+CREATE INDEX IF NOT EXISTS idx_projects_category ON projects(category);
 
 -- ============================================================
 -- Project technician assignments (many-to-many)

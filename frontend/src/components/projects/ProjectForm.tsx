@@ -17,6 +17,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
     client_id: initialData?.client_id ? String(initialData.client_id) : '',
     start_date: initialData?.start_date ?? '',
     end_date: initialData?.end_date ?? '',
+    category: initialData?.category ?? 'instalasi',
     project_value: initialData?.project_value ? String(initialData.project_value) : '',
     target_description: initialData?.target_description ?? '',
   });
@@ -51,6 +52,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
         client_id: form.client_id ? parseInt(form.client_id) : undefined,
         start_date: form.start_date,
         end_date: form.end_date,
+        category: form.category as CreateProjectData['category'],
         project_value: form.project_value ? parseFloat(form.project_value) : undefined,
         target_description: form.target_description.trim() || undefined,
       });
@@ -94,6 +96,26 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           {clients.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="proj-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+        <select
+          id="proj-category"
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="instalasi">Instalasi</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="perbaikan">Perbaikan</option>
+          <option value="upgrade">Upgrade</option>
+          <option value="monitoring">Monitoring</option>
+          <option value="security">Security</option>
+          <option value="networking">Networking</option>
+          <option value="lainnya">Lainnya</option>
         </select>
       </div>
 

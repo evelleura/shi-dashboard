@@ -348,3 +348,32 @@ export async function getTasksByProject(request: NextRequest, projectId: string)
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function getScheduleTasks(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
+  if (roleCheck) return roleCheck;
+
+  try {
+    const result = await query(
+      `SELECT t.id, t.name, t.status, t.due_date, t.timeline_start, t.timeline_end,
+              t.assigned_to, t.time_spent_seconds, t.is_tracking, t.sort_order,
+              u.name AS assigned_to_name,
+              p.id AS project_id, p.project_code, p.name AS project_name,
+              p.start_date AS project_start, p.end_date AS project_end,
+              p.category AS project_category, p.status AS project_status,
+              ph.status AS health_status
+       FROM tasks t
+       JOIN projects p ON p.id = t.project_id
+       LEFT JOIN users u ON u.id = t.assigned_to
+       LEFT JOIN project_health ph ON ph.project_id = p.id
+       WHERE p.status IN ('active', 'on-hold')
+       ORDER BY p.end_date ASC, t.sort_order ASC, t.due_date ASC NULLS LAST`
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Get schedule tasks error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}

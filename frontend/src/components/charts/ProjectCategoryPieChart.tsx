@@ -6,9 +6,15 @@ interface Props {
   dateRange?: DateRange;
 }
 
-const PHASE_CONFIG: Record<string, { label: string; color: string }> = {
-  survey: { label: 'Survey', color: '#a855f7' },
-  execution: { label: 'Execution', color: '#3b82f6' },
+const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
+  instalasi:   { label: 'Instalasi',   color: '#3b82f6' },
+  maintenance: { label: 'Maintenance', color: '#f59e0b' },
+  perbaikan:   { label: 'Perbaikan',   color: '#ef4444' },
+  upgrade:     { label: 'Upgrade',     color: '#8b5cf6' },
+  monitoring:  { label: 'Monitoring',  color: '#10b981' },
+  security:    { label: 'Security',    color: '#f97316' },
+  networking:  { label: 'Networking',  color: '#06b6d4' },
+  lainnya:     { label: 'Lainnya',     color: '#6b7280' },
 };
 
 function CardWrapper({ children, title }: { children: React.ReactNode; title: string }) {
@@ -25,7 +31,7 @@ export default function ProjectCategoryPieChart({ dateRange }: Props) {
 
   if (isLoading) {
     return (
-      <CardWrapper title="Projects by Phase">
+      <CardWrapper title="Projects by Category">
         <div className="flex items-center justify-center h-56">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" aria-label="Loading chart..." />
         </div>
@@ -33,22 +39,25 @@ export default function ProjectCategoryPieChart({ dateRange }: Props) {
     );
   }
 
-  const chartData = (rawData ?? []).map((d) => ({
-    name: PHASE_CONFIG[d.phase]?.label ?? d.phase,
-    value: d.count,
-    color: PHASE_CONFIG[d.phase]?.color ?? '#9ca3af',
-  })).filter((d) => d.value > 0);
+  const chartData = (rawData ?? []).map((d: { category?: string; phase?: string; count: number }) => {
+    const key = d.category ?? d.phase ?? 'lainnya';
+    return {
+      name: CATEGORY_CONFIG[key]?.label ?? key,
+      value: d.count,
+      color: CATEGORY_CONFIG[key]?.color ?? '#9ca3af',
+    };
+  }).filter((d: { value: number }) => d.value > 0);
 
   if (chartData.length === 0) {
     return (
-      <CardWrapper title="Projects by Phase">
+      <CardWrapper title="Projects by Category">
         <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No project data available</p>
       </CardWrapper>
     );
   }
 
   return (
-    <CardWrapper title="Projects by Phase">
+    <CardWrapper title="Projects by Category">
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie
@@ -61,7 +70,7 @@ export default function ProjectCategoryPieChart({ dateRange }: Props) {
             label={({ name, value }) => `${name}: ${value}`}
             labelLine={false}
           >
-            {chartData.map((entry) => (
+            {chartData.map((entry: { name: string; color: string }) => (
               <Cell key={entry.name} fill={entry.color} />
             ))}
           </Pie>

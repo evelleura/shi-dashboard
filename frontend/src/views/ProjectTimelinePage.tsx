@@ -28,12 +28,15 @@ export default function ProjectTimelinePage() {
   const { data: projects = [], isLoading, isError } = useProjects();
   const router = useRouter();
   const [filter, setFilter] = useState<string>('active');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'start' | 'end' | 'health'>('start');
 
   const filtered = useMemo(() => {
-    let list = (projects as DashboardProject[]).filter((p) =>
-      filter === 'all' ? true : p.status === filter
-    );
+    let list = (projects as DashboardProject[]).filter((p) => {
+      const matchStatus = filter === 'all' ? true : p.status === filter;
+      const matchCat = categoryFilter === 'all' ? true : (p as unknown as Record<string, string>).category === categoryFilter;
+      return matchStatus && matchCat;
+    });
     list = [...list].sort((a, b) => {
       if (sortBy === 'health') {
         const order: Record<string, number> = { red: 0, amber: 1, green: 2 };
@@ -43,7 +46,7 @@ export default function ProjectTimelinePage() {
       return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
     });
     return list;
-  }, [projects, filter, sortBy]);
+  }, [projects, filter, categoryFilter, sortBy]);
 
   // Calculate timeline range (min start to max end across all filtered projects)
   const timelineRange = useMemo(() => {
@@ -111,6 +114,21 @@ export default function ProjectTimelinePage() {
           <option value="completed">Completed</option>
           <option value="on-hold">On Hold</option>
           <option value="cancelled">Cancelled</option>
+        </select>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">All Category</option>
+          <option value="instalasi">Instalasi</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="perbaikan">Perbaikan</option>
+          <option value="upgrade">Upgrade</option>
+          <option value="monitoring">Monitoring</option>
+          <option value="security">Security</option>
+          <option value="networking">Networking</option>
+          <option value="lainnya">Lainnya</option>
         </select>
 
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">

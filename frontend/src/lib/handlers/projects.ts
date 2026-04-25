@@ -27,7 +27,7 @@ export async function listProjects(request: NextRequest) {
   try {
     const result = await query(
       `SELECT p.id, p.project_code, p.name, p.description, p.client_id, p.start_date, p.end_date,
-        p.duration, p.status, p.phase, p.project_value, p.survey_approved,
+        p.duration, p.status, p.phase, p.category, p.project_value, p.survey_approved,
         p.target_description, p.created_at, p.updated_at,
         c.name AS client_name,
         ph.spi_value, ph.status AS health_status, ph.deviation_percent,
@@ -63,7 +63,8 @@ export async function createProject(request: NextRequest) {
   if (roleCheck) return roleCheck;
 
   const body = await request.json();
-  const { name, description, client_id, start_date, end_date, project_value, target_description, phase } = body;
+  const { name, description, client_id, start_date, end_date, project_value, target_description, phase, category } = body;
+  const allowedCategories = ['instalasi', 'maintenance', 'perbaikan', 'upgrade', 'monitoring', 'security', 'networking', 'lainnya'];
 
   if (!name || !start_date || !end_date) {
     return NextResponse.json({ success: false, error: 'Name, start_date, and end_date are required' }, { status: 400 });
@@ -80,12 +81,13 @@ export async function createProject(request: NextRequest) {
 
   try {
     const projectCode = await generateProjectCode();
+    const validCategory = category && allowedCategories.includes(category) ? category : 'instalasi';
     const result = await query(
-      `INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase,
+      `INSERT INTO projects (project_code, name, description, client_id, start_date, end_date, status, phase, category,
          project_value, target_description, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, 'active', $7, $8, $9, $10) RETURNING *`,
+       VALUES ($1, $2, $3, $4, $5, $6, 'active', $7, $8, $9, $10, $11) RETURNING *`,
       [projectCode, name, description || null, client_id || null, start_date, end_date,
-       phase === 'execution' ? 'execution' : 'survey', project_value || 0, target_description || null, auth.user.userId]
+       phase === 'execution' ? 'execution' : 'survey', validCategory, project_value || 0, target_description || null, auth.user.userId]
     );
     const project = result.rows[0] as { id: number; name: string };
     await recalculateSPI(project.id);
@@ -187,9 +189,10 @@ export async function updateProject(request: NextRequest, id: string) {
   }
 
   const body = await request.json();
-  const { name, description, status, client_id, start_date, end_date, project_value, target_description, phase } = body;
+  const { name, description, status, client_id, start_date, end_date, project_value, target_description, phase, category } = body;
   const allowedStatuses = ['active', 'completed', 'on-hold', 'cancelled'];
   const allowedPhases = ['survey', 'execution'];
+  const allowedCats = ['instalasi', 'maintenance', 'perbaikan', 'upgrade', 'monitoring', 'security', 'networking', 'lainnya'];
 
   try {
     const current = await query('SELECT * FROM projects WHERE id = $1', [projectId]);
@@ -206,8 +209,8 @@ export async function updateProject(request: NextRequest, id: string) {
     }
     const result = await query(
       `UPDATE projects SET name=$1, description=$2, status=$3, client_id=$4,
-        start_date=$5, end_date=$6, project_value=$7, target_description=$8, phase=$9, updated_at=NOW()
-       WHERE id=$10 RETURNING *`,
+        start_date=$5, end_date=$6, project_value=$7, target_description=$8, phase=$9, category=$10, updated_at=NOW()
+       WHERE id=$11 RETURNING *`,
       [
         name !== undefined ? name : row.name,
         description !== undefined ? description : row.description,
@@ -217,13 +220,14 @@ export async function updateProject(request: NextRequest, id: string) {
         project_value !== undefined ? project_value : row.project_value,
         target_description !== undefined ? target_description : row.target_description,
         phase && allowedPhases.includes(phase) ? phase : row.phase,
+        category && allowedCats.includes(category) ? category : row.category,
         projectId,
       ]
     );
     if (start_date || end_date || status) await recalculateSPI(projectId);
     const updated = result.rows[0] as Record<string, unknown>;
     const userName = (await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string || 'Unknown';
-    const auditFields = ['name', 'description', 'status', 'client_id', 'start_date', 'end_date', 'project_value', 'target_description', 'phase'];
+    const auditFields = ['name', 'description', 'status', 'client_id', 'start_date', 'end_date', 'project_value', 'target_description', 'phase', 'category'];
     const changes = auditFields
       .filter(f => String(updated[f] ?? '') !== String(row[f] ?? ''))
       .map(f => ({ field: f, oldValue: String(row[f] ?? ''), newValue: String(updated[f] ?? '') }));

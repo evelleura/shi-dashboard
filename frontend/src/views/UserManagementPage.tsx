@@ -99,6 +99,14 @@ export default function UserManagementPage() {
   const columns: Column<User>[] = useMemo(
     () => [
       {
+        key: 'id',
+        label: 'ID',
+        defaultHidden: true,
+        render: (u) => <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{u.id}</span>,
+        sortValue: (u) => u.id,
+        exportValue: (u) => u.id,
+      },
+      {
         key: 'name',
         label: 'Name',
         render: (u) => (

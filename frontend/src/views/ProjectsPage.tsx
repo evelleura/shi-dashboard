@@ -51,6 +51,7 @@ export default function ProjectsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
 
   const startEdit = (id: number, field: string) => {
@@ -71,9 +72,10 @@ export default function ProjectsPage() {
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         (p.client_name ?? '').toLowerCase().includes(search.toLowerCase());
       const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesCategory = categoryFilter === 'all' || (p as unknown as Record<string, string>).category === categoryFilter;
+      return matchesSearch && matchesStatus && matchesCategory;
     }),
-  [projects, search, statusFilter]);
+  [projects, search, statusFilter, categoryFilter]);
 
   const columns: Column<DashboardProject>[] = useMemo(() => [
     {
@@ -141,6 +143,60 @@ export default function ProjectsPage() {
       ),
       sortValue: (p) => (p.client_name ?? '').toLowerCase(),
       exportValue: (p) => p.client_name ?? '',
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      render: (p) => {
+        const cat = (p as unknown as Record<string, string>).category ?? 'instalasi';
+        const isEditing = editingCell?.id === p.id && editingCell?.field === 'category';
+        if (isEditing) {
+          return (
+            <select
+              autoFocus
+              className="px-2 py-1 text-xs border border-blue-400 rounded bg-white dark:bg-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
+              defaultValue={cat}
+              onBlur={(e) => saveEdit(p.id, 'category', e.target.value)}
+              onChange={(e) => saveEdit(p.id, 'category', e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Escape') setEditingCell(null); }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <option value="instalasi">Instalasi</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="perbaikan">Perbaikan</option>
+              <option value="upgrade">Upgrade</option>
+              <option value="monitoring">Monitoring</option>
+              <option value="security">Security</option>
+              <option value="networking">Networking</option>
+              <option value="lainnya">Lainnya</option>
+            </select>
+          );
+        }
+        const catColors: Record<string, string> = {
+          instalasi: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+          maintenance: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
+          perbaikan: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+          upgrade: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
+          monitoring: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
+          security: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
+          networking: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400',
+          lainnya: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
+        };
+        return (
+          <div
+            className="group/cell flex items-center gap-1"
+            onDoubleClick={(e) => { e.stopPropagation(); startEdit(p.id, 'category'); }}
+            title="Double-click to edit"
+          >
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${catColors[cat] ?? catColors.lainnya}`}>
+              {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </span>
+            <PencilIcon />
+          </div>
+        );
+      },
+      sortValue: (p) => (p as unknown as Record<string, string>).category ?? '',
+      exportValue: (p) => (p as unknown as Record<string, string>).category ?? '',
     },
     {
       key: 'phase',
@@ -368,6 +424,22 @@ export default function ProjectsPage() {
           <option value="on-hold">On Hold</option>
           <option value="cancelled">Cancelled</option>
         </select>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Filter by category"
+        >
+          <option value="all">All Category</option>
+          <option value="instalasi">Instalasi</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="perbaikan">Perbaikan</option>
+          <option value="upgrade">Upgrade</option>
+          <option value="monitoring">Monitoring</option>
+          <option value="security">Security</option>
+          <option value="networking">Networking</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
         {updateMutation.isPending && (
           <span className="text-xs text-blue-500 dark:text-blue-400 flex items-center gap-1">
             <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none">
@@ -380,7 +452,7 @@ export default function ProjectsPage() {
       </div>
 
       <p className="text-xs text-gray-400 dark:text-gray-500 -mt-2">
-        Tip: Double-click a cell in the Name, Phase, Status, or Value column to edit inline.
+        Tip: Double-click a cell in Name, Category, Phase, Status, or Value to edit inline.
       </p>
 
       <DataTable<DashboardProject>

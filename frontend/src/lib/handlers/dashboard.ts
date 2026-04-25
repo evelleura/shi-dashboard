@@ -484,10 +484,11 @@ export async function chartProjectCategories(request: NextRequest) {
     }
 
     const result = await query(
-      `SELECT phase, COUNT(*)::int AS count
+      `SELECT category, COUNT(*)::int AS count
        FROM projects
        WHERE status = 'active'${dateClause}
-       GROUP BY phase`,
+       GROUP BY category
+       ORDER BY count DESC`,
       params
     );
     return NextResponse.json({ success: true, data: result.rows });
