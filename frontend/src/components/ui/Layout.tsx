@@ -3,9 +3,11 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useEscalationSummary } from '../../hooks/useEscalations';
 import GlobalSearchBar from './GlobalSearchBar';
 import NotificationBell from './NotificationBell';
+import { t } from '../../lib/i18n';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -107,9 +109,19 @@ function TechniciansIcon() {
   );
 }
 
+function SettingsIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
 export default function Layout({ children }: Props) {
   const { user, logout } = useAuth();
   const { theme, toggle, isDark } = useTheme();
+  const { language, toggle: toggleLanguage } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -131,26 +143,26 @@ export default function Layout({ children }: Props) {
 
   const navItems: NavItem[] = isManager
     ? [
-        { to: '/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-        { to: '/projects', label: 'Projects', icon: <ProjectsIcon /> },
-        { to: '/schedule', label: 'Schedule', icon: <ScheduleIcon /> },
-        { to: '/timeline', label: 'Timeline', icon: <TimelineIcon /> },
-        { to: '/clients', label: 'Clients', icon: <ClientsIcon /> },
-        { to: '/reports', label: 'Reports', icon: <ReportsIcon /> },
-        { to: '/escalations', label: 'Escalations', icon: <EscalationsIcon />, badge: openEscalations },
+        { to: '/dashboard', label: t('nav.dashboard', language), icon: <DashboardIcon /> },
+        { to: '/projects', label: t('nav.projects', language), icon: <ProjectsIcon /> },
+        { to: '/schedule', label: t('nav.schedule', language), icon: <ScheduleIcon /> },
+        { to: '/timeline', label: t('nav.timeline', language), icon: <TimelineIcon /> },
+        { to: '/clients', label: t('nav.clients', language), icon: <ClientsIcon /> },
+        { to: '/reports', label: t('nav.reports', language), icon: <ReportsIcon /> },
+        { to: '/escalations', label: t('nav.escalations', language), icon: <EscalationsIcon />, badge: openEscalations },
         ...(user?.role === 'admin'
           ? [
-              { to: '/technicians', label: 'Technicians', icon: <TechniciansIcon /> },
-              { to: '/users', label: 'Users', icon: <UsersIcon /> },
-              { to: '/audit-log', label: 'Activity Log', icon: <AuditIcon /> },
+              { to: '/technicians', label: t('nav.technicians', language), icon: <TechniciansIcon /> },
+              { to: '/users', label: t('nav.users', language), icon: <UsersIcon /> },
+              { to: '/audit-log', label: t('nav.audit_log', language), icon: <AuditIcon /> },
             ]
           : []),
       ]
     : [
-        { to: '/my-dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-        { to: '/my-projects', label: 'My Projects', icon: <ProjectsIcon /> },
-        { to: '/my-tasks', label: 'My Tasks', icon: <TasksIcon /> },
-        { to: '/my-escalations', label: 'Escalations', icon: <EscalationsIcon />, badge: openEscalations },
+        { to: '/my-dashboard', label: t('nav.my_dashboard', language), icon: <DashboardIcon /> },
+        { to: '/my-projects', label: t('nav.my_projects', language), icon: <ProjectsIcon /> },
+        { to: '/my-tasks', label: t('nav.my_tasks', language), icon: <TasksIcon /> },
+        { to: '/my-escalations', label: t('nav.my_escalations', language), icon: <EscalationsIcon />, badge: openEscalations },
       ];
 
   return (
@@ -201,6 +213,7 @@ export default function Layout({ children }: Props) {
                 </Link>
               );
             })}
+
           </nav>
 
           {/* User info + logout */}
@@ -218,22 +231,45 @@ export default function Layout({ children }: Props) {
                 <p className="text-slate-400 text-[10px] capitalize">{user?.role}</p>
               </div>
             </Link>
-            <button
-              onClick={toggle}
-              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors mb-2"
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            {/* Theme + language row */}
+            <div className="flex items-center gap-1 mb-2">
+              <button
+                onClick={toggle}
+                className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDark ? (
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                )}
+                {isDark ? t('settings.theme_light', language) : t('settings.theme_dark', language)}
+              </button>
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center justify-center px-2 py-1.5 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors border border-slate-700 hover:border-slate-600 min-w-[32px]"
+                aria-label={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
+                title={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
+              >
+                {language === 'id' ? 'ID' : 'EN'}
+              </button>
+            </div>
+            <Link
+              href="/settings"
+              onClick={() => setSidebarOpen(false)}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors ${
+                pathname === '/settings'
+                  ? 'text-white bg-slate-800'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
             >
-              {isDark ? (
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              ) : (
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              )}
-              {isDark ? 'Light Mode' : 'Dark Mode'}
-            </button>
+              <SettingsIcon />
+              {t('nav.settings', language)}
+            </Link>
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
@@ -241,7 +277,7 @@ export default function Layout({ children }: Props) {
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              Logout
+              {t('nav.logout', language)}
             </button>
           </div>
         </div>
@@ -288,9 +324,9 @@ export default function Layout({ children }: Props) {
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{now.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <span>{now.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 <span className="text-gray-300 dark:text-gray-600">|</span>
-                <span>{now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                <span>{now.toLocaleTimeString(language === 'id' ? 'id-ID' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
               </div>
               {isManager && <NotificationBell />}
               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">

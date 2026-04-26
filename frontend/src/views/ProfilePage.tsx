@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
+import { useLanguage } from '../hooks/useLanguage';
+import { t } from '../lib/i18n';
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const { theme, setTheme, isDark } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const { language } = useLanguage();
 
   const [nameForm, setNameForm] = useState({ name: user?.name ?? '', email: user?.email ?? '' });
   const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' });
@@ -20,9 +23,9 @@ export default function ProfilePage() {
     try {
       const api = (await import('../services/api')).default;
       await api.patch('/users/me', { name: nameForm.name.trim(), email: nameForm.email.trim() });
-      setNameMsg({ type: 'ok', text: 'Profile updated. Changes will reflect on next login.' });
+      setNameMsg({ type: 'ok', text: t('profile.updated_ok', language) });
     } catch {
-      setNameMsg({ type: 'err', text: 'Failed to update profile.' });
+      setNameMsg({ type: 'err', text: t('profile.updated_err', language) });
     } finally {
       setNameSaving(false);
     }
@@ -30,16 +33,16 @@ export default function ProfilePage() {
 
   const handlePasswordChange = async () => {
     setPwMsg(null);
-    if (pwForm.newPw.length < 6) { setPwMsg({ type: 'err', text: 'Password must be at least 6 characters.' }); return; }
-    if (pwForm.newPw !== pwForm.confirm) { setPwMsg({ type: 'err', text: 'Passwords do not match.' }); return; }
+    if (pwForm.newPw.length < 6) { setPwMsg({ type: 'err', text: t('profile.pw_too_short', language) }); return; }
+    if (pwForm.newPw !== pwForm.confirm) { setPwMsg({ type: 'err', text: t('profile.pw_mismatch', language) }); return; }
     setPwSaving(true);
     try {
       const api = (await import('../services/api')).default;
       await api.post('/users/me/change-password', { current_password: pwForm.current, new_password: pwForm.newPw });
       setPwForm({ current: '', newPw: '', confirm: '' });
-      setPwMsg({ type: 'ok', text: 'Password changed successfully.' });
+      setPwMsg({ type: 'ok', text: t('profile.pw_changed_ok', language) });
     } catch {
-      setPwMsg({ type: 'err', text: 'Failed to change password. Check your current password.' });
+      setPwMsg({ type: 'err', text: t('profile.pw_changed_err', language) });
     } finally {
       setPwSaving(false);
     }
@@ -53,11 +56,16 @@ export default function ProfilePage() {
 
   const inputClass = "w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
+  const themeOptions = [
+    { val: 'light' as const, label: t('profile.theme_light', language), icon: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z' },
+    { val: 'dark' as const, label: t('profile.theme_dark', language), icon: 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z' },
+  ] as const;
+
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Profile & Settings</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your account and preferences</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('profile.title', language)}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.subtitle', language)}</p>
       </div>
 
       {/* Profile card */}
@@ -75,10 +83,10 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Edit Profile</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('profile.edit', language)}</h3>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Name</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{t('label.name', language)}</label>
             <input
               type="text"
               value={nameForm.name}
@@ -87,7 +95,7 @@ export default function ProfilePage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Email</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{t('label.email', language)}</label>
             <input
               type="email"
               value={nameForm.email}
@@ -103,43 +111,43 @@ export default function ProfilePage() {
             disabled={nameSaving}
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
-            {nameSaving ? 'Saving...' : 'Save Changes'}
+            {nameSaving ? t('profile.saving', language) : t('profile.save_changes', language)}
           </button>
         </div>
       </div>
 
       {/* Change password */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Change Password</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('profile.change_password', language)}</h3>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Current Password</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{t('profile.current_password', language)}</label>
             <input
               type="password"
               value={pwForm.current}
               onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))}
               className={inputClass}
-              placeholder="Enter current password"
+              placeholder={t('profile.enter_current_pw', language)}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">New Password</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{t('profile.new_password', language)}</label>
             <input
               type="password"
               value={pwForm.newPw}
               onChange={(e) => setPwForm((f) => ({ ...f, newPw: e.target.value }))}
               className={inputClass}
-              placeholder="Min 6 characters"
+              placeholder={t('profile.min_6_chars', language)}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Confirm New Password</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{t('profile.confirm_password', language)}</label>
             <input
               type="password"
               value={pwForm.confirm}
               onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
               className={inputClass}
-              placeholder="Re-enter new password"
+              placeholder={t('profile.reenter_pw', language)}
             />
           </div>
           {pwMsg && (
@@ -150,17 +158,16 @@ export default function ProfilePage() {
             disabled={pwSaving || !pwForm.current || !pwForm.newPw || !pwForm.confirm}
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
-            {pwSaving ? 'Changing...' : 'Change Password'}
+            {pwSaving ? t('profile.changing', language) : t('profile.change_password', language)}
           </button>
         </div>
       </div>
 
       {/* Theme preference */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Appearance</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('profile.appearance', language)}</h3>
         <div className="flex gap-3">
-          {([['light', 'Light', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'],
-             ['dark', 'Dark', 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z']] as const).map(([val, label, icon]) => (
+          {themeOptions.map(({ val, label, icon }) => (
             <button
               key={val}
               onClick={() => setTheme(val)}

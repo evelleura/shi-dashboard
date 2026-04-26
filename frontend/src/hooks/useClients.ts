@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getClients, getClient, createClient, updateClient, deleteClient } from '../services/api';
+import { getClients, getClient, createClient, updateClient, deleteClient, uploadClientPhoto } from '../services/api';
 import type { CreateClientData } from '../types';
 
 export const CLIENT_KEYS = {
@@ -50,6 +50,17 @@ export function useDeleteClient() {
   return useMutation({
     mutationFn: (id: number) => deleteClient(id),
     onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: CLIENT_KEYS.all });
+    },
+  });
+}
+
+export function useUploadClientPhoto() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) => uploadClientPhoto(id, file),
+    onSuccess: (_data, { id }) => {
+      void qc.invalidateQueries({ queryKey: CLIENT_KEYS.detail(id) });
       void qc.invalidateQueries({ queryKey: CLIENT_KEYS.all });
     },
   });

@@ -17,6 +17,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  is_active: boolean;
   created_at?: string;
 }
 
@@ -27,6 +28,10 @@ export interface Client {
   phone?: string;
   email?: string;
   notes?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  photo_path?: string | null;
+  photo_name?: string | null;
   created_by: number;
   created_at?: string;
   updated_at?: string;
@@ -79,6 +84,8 @@ export interface Task {
   estimated_hours?: number;
   evidence_count?: number;
   activity_count?: number;
+  depends_on?: number | null;
+  depends_on_name?: string | null;
   created_by?: number;
   created_at?: string;
   updated_at?: string;
@@ -140,28 +147,6 @@ export interface EscalationSummary {
   in_review: number;
   resolved: number;
   total?: number;
-}
-
-export interface Material {
-  id: number;
-  project_id: number;
-  name: string;
-  quantity: number;
-  unit: string;
-  unit_price: number;
-  total_price: number;
-  notes?: string;
-  created_at?: string;
-}
-
-export interface BudgetItem {
-  id: number;
-  project_id: number;
-  category: string;
-  description?: string;
-  amount: number;
-  is_actual: boolean;
-  created_at?: string;
 }
 
 export interface ProjectHealth {
@@ -229,8 +214,6 @@ export interface ProjectWithDetail extends Project {
   health?: ProjectHealth;
   client?: Client;
   tasks: Task[];
-  materials: Material[];
-  budget_items: BudgetItem[];
   assigned_technicians: User[];
 }
 
@@ -277,13 +260,6 @@ export interface TasksByDueDateData {
   done: number;
   overtime: number;
   over_deadline: number;
-}
-
-export interface BudgetStatusData {
-  project_id: number;
-  name: string;
-  planned: number;
-  actual: number;
 }
 
 export interface EarnedValuePoint {
@@ -372,6 +348,7 @@ export interface CreateTaskData {
   budget?: number;
   sort_order?: number;
   is_survey_task?: boolean;
+  depends_on?: number | null;
 }
 
 export interface UpdateTaskData {
@@ -386,6 +363,16 @@ export interface UpdateTaskData {
   budget?: number;
   sort_order?: number;
   is_survey_task?: boolean;
+  depends_on?: number | null;
+}
+
+export interface ConflictingTask {
+  id: number;
+  name: string;
+  project_name: string;
+  timeline_start: string;
+  timeline_end: string;
+  assigned_to_name: string;
 }
 
 export interface CreateClientData {
@@ -394,23 +381,8 @@ export interface CreateClientData {
   phone?: string;
   email?: string;
   notes?: string;
-}
-
-export interface CreateMaterialData {
-  project_id: number;
-  name: string;
-  quantity: number;
-  unit?: string;
-  unit_price: number;
-  notes?: string;
-}
-
-export interface CreateBudgetItemData {
-  project_id: number;
-  category: string;
-  description?: string;
-  amount: number;
-  is_actual: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 // === API Types ===

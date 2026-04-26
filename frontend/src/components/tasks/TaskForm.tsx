@@ -1,15 +1,22 @@
-import { useState, type FormEvent } from 'react';
-import type { CreateTaskData, User } from '../../types';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { checkTechnicianConflicts } from '../../services/api';
+import { useLanguage } from '../../hooks/useLanguage';
+import { t } from '../../lib/i18n';
+import type { CreateTaskData, Task, User } from '../../types';
 
 interface Props {
   projectId: number;
   technicians: User[];
+  existingTasks?: Task[];
   onSubmit: (data: CreateTaskData) => Promise<void>;
   onCancel: () => void;
   isPending?: boolean;
+  projectPhase?: string;
 }
 
-export default function TaskForm({ projectId, technicians, onSubmit, onCancel, isPending }: Props) {
+export default function TaskForm({ projectId, technicians, existingTasks = [], onSubmit, onCancel, isPending, projectPhase }: Props) {
+  const { language } = useLanguage();
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -20,9 +27,12 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
     notes: '',
     budget: '',
     is_survey_task: false,
+    depends_on: '',
   });
 
   const [error, setError] = useState('');
+
+  const inputClass = "w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const target = e.target;
@@ -30,12 +40,30 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
     setForm((prev) => ({ ...prev, [target.name]: value }));
   };
 
+  // Conflict check: only when technician + both dates are set
+  const canCheckConflicts = !!form.assigned_to && !!form.timeline_start && !!form.timeline_end;
+  const { data: conflicts } = useQuery({
+    queryKey: ['conflicts', form.assigned_to, form.timeline_start, form.timeline_end],
+    queryFn: () => checkTechnicianConflicts({
+      technician_id: parseInt(form.assigned_to),
+      start: form.timeline_start,
+      end: form.timeline_end,
+    }),
+    enabled: canCheckConflicts,
+    staleTime: 1000 * 15,
+  });
+
+  // Reset conflict when inputs change
+  useEffect(() => {
+    if (!canCheckConflicts) return;
+  }, [form.assigned_to, form.timeline_start, form.timeline_end, canCheckConflicts]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (!form.name.trim()) {
-      setError('Task name is required.');
+      setError(t('task.name_required', language));
       return;
     }
 
@@ -51,9 +79,11 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
         notes: form.notes.trim() || undefined,
         budget: form.budget ? parseFloat(form.budget) : undefined,
         is_survey_task: form.is_survey_task,
+        depends_on: form.depends_on ? parseInt(form.depends_on) : null,
       });
-    } catch {
-      setError('Failed to create task. Please try again.');
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      setError(msg || t('task.create_error', language));
     }
   };
 
@@ -65,142 +95,92 @@ export default function TaskForm({ projectId, technicians, onSubmit, onCancel, i
         </div>
       )}
 
+      {conflicts && conflicts.length > 0 && (
+        <div className="p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg text-amber-700 dark:text-amber-400 text-sm" role="alert">
+          <p className="font-medium mb-1">{language === 'id' ? 'Peringatan: Teknisi sudah memiliki tugas di rentang waktu ini:' : 'Warning: Technician already has tasks in this time range:'}</p>
+          <ul className="list-disc pl-4 space-y-0.5">
+            {conflicts.map((c) => (
+              <li key={c.id}>{c.name} ({c.project_name})</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div>
-        <label htmlFor="task-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Task Name *</label>
-        <input
-          id="task-name"
-          type="text"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          placeholder="e.g. Install CCTV Camera - Ruang Tamu"
-          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <label htmlFor="task-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.name', language)} *</label>
+        <input id="task-name" type="text" name="name" value={form.name} onChange={handleChange} required placeholder={t('task.name_placeholder', language)} className={inputClass} />
       </div>
 
       <div>
-        <label htmlFor="task-desc" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-        <textarea
-          id="task-desc"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          rows={2}
-          placeholder="Brief task description..."
-          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-        />
+        <label htmlFor="task-desc" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.description', language)}</label>
+        <textarea id="task-desc" name="description" value={form.description} onChange={handleChange} rows={2} placeholder={t('task.description_placeholder', language)} className={`${inputClass} resize-none`} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="task-assignee" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assign To</label>
-          <select
-            id="task-assignee"
-            name="assigned_to"
-            value={form.assigned_to}
-            onChange={handleChange}
-            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Unassigned</option>
-            {technicians.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
+          <label htmlFor="task-assignee" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.assignee', language)}</label>
+          <select id="task-assignee" name="assigned_to" value={form.assigned_to} onChange={handleChange} className={inputClass}>
+            <option value="">{t('task.unassigned', language)}</option>
+            {technicians.map((tech) => (
+              <option key={tech.id} value={tech.id}>{tech.name}</option>
             ))}
           </select>
         </div>
         <div>
-          <label htmlFor="task-due" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Due Date</label>
-          <input
-            id="task-due"
-            type="date"
-            name="due_date"
-            value={form.due_date}
-            onChange={handleChange}
-            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <label htmlFor="task-due" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.due_date', language)}</label>
+          <input id="task-due" type="date" name="due_date" value={form.due_date} onChange={handleChange} className={inputClass} />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="task-tl-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Schedule Start</label>
-          <input
-            id="task-tl-start"
-            type="date"
-            name="timeline_start"
-            value={form.timeline_start}
-            onChange={handleChange}
-            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <label htmlFor="task-tl-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.timeline_start', language)}</label>
+          <input id="task-tl-start" type="date" name="timeline_start" value={form.timeline_start} onChange={handleChange} className={inputClass} />
         </div>
         <div>
-          <label htmlFor="task-tl-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Schedule End</label>
-          <input
-            id="task-tl-end"
-            type="date"
-            name="timeline_end"
-            value={form.timeline_end}
-            onChange={handleChange}
-            min={form.timeline_start}
-            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <label htmlFor="task-tl-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.timeline_end', language)}</label>
+          <input id="task-tl-end" type="date" name="timeline_end" value={form.timeline_end} onChange={handleChange} min={form.timeline_start} className={inputClass} />
         </div>
       </div>
 
+      {existingTasks.length > 0 && (
+        <div>
+          <label htmlFor="task-depends-on" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t('task.depends_on', language)}
+            <span className="text-xs text-gray-400 ml-1">{t('task.depends_on_hint', language)}</span>
+          </label>
+          <select id="task-depends-on" name="depends_on" value={form.depends_on} onChange={handleChange} className={inputClass}>
+            <option value="">{t('task.no_prerequisite', language)}</option>
+            {existingTasks.map((et) => (
+              <option key={et.id} value={et.id}>{et.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div>
-        <label htmlFor="task-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Budget (Rp)</label>
-        <input
-          id="task-budget"
-          type="number"
-          name="budget"
-          value={form.budget}
-          onChange={handleChange}
-          min={0}
-          step={1000}
-          placeholder="0"
-          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <label htmlFor="task-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.budget', language)}</label>
+        <input id="task-budget" type="number" name="budget" value={form.budget} onChange={handleChange} min={0} step={1000} placeholder="0" className={inputClass} />
       </div>
 
       <div>
-        <label htmlFor="task-notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-        <textarea
-          id="task-notes"
-          name="notes"
-          value={form.notes}
-          onChange={handleChange}
-          rows={2}
-          placeholder="Additional notes..."
-          className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-        />
+        <label htmlFor="task-notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.notes', language)}</label>
+        <textarea id="task-notes" name="notes" value={form.notes} onChange={handleChange} rows={2} placeholder={t('task.notes_placeholder', language)} className={`${inputClass} resize-none`} />
       </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="is-survey"
-          name="is_survey_task"
-          checked={form.is_survey_task}
-          onChange={handleChange}
-          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-        <label htmlFor="is-survey" className="text-sm text-gray-700 dark:text-gray-300">This is a survey task</label>
-      </div>
+      {projectPhase === 'survey' && (
+        <div className="flex items-center gap-2">
+          <input type="checkbox" id="is-survey" name="is_survey_task" checked={form.is_survey_task} onChange={handleChange} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+          <label htmlFor="is-survey" className="text-sm text-gray-700 dark:text-gray-300">{t('task.survey_task', language)}</label>
+        </div>
+      )}
 
       <div className="flex gap-3 pt-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-        >
-          Cancel
+        <button type="button" onClick={onCancel} className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          {t('action.cancel', language)}
         </button>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
-        >
-          {isPending ? 'Creating...' : 'Create Task'}
+        <button type="submit" disabled={isPending} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+          {isPending ? t('action.saving', language) : t('task.create_button', language)}
         </button>
       </div>
     </form>

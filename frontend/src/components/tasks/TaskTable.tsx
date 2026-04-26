@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 import type { Task, TaskStatus, UserRole } from '../../types';
 import TaskStatusSelect from './TaskStatusSelect';
 import { formatTimeSpent } from './TaskTimer';
+import { useLanguage } from '../../hooks/useLanguage';
+import { t } from '../../lib/i18n';
 
 interface Props {
   tasks: Task[];
@@ -19,8 +21,8 @@ interface Props {
 type SortKey = 'name' | 'status' | 'assigned_to_name' | 'due_date' | 'time' | 'created_at';
 type RowAge = 'new' | 'recent' | 'normal' | 'stale';
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+function formatDate(dateStr: string, lang: 'id' | 'en' = 'id'): string {
+  return new Date(dateStr).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function getTaskUrgency(task: Task): 'overtime' | 'over_deadline' | null {
@@ -97,6 +99,7 @@ export default function TaskTable({
   tasks, onStatusChange, onTaskClick, onTimerStart, onTimerStop,
   changingTaskId, timerLoadingId, showProject = false, userRole,
 }: Props) {
+  const { language } = useLanguage();
   const [sortKey, setSortKey] = useState<SortKey>('created_at');
   const [sortDesc, setSortDesc] = useState(true);
   const [page, setPage] = useState(0);
@@ -150,16 +153,16 @@ export default function TaskTable({
   };
 
   const handleExport = useCallback(() => {
-    const rows = sorted.map((t) => ({
-      'Task': t.name,
-      'Description': t.description ?? '',
-      ...(showProject ? { 'Project': t.project_name ?? '' } : {}),
-      'Status': t.status,
-      'Assignee': t.assigned_to_name ?? '',
-      'Due Date': t.due_date ? formatDate(t.due_date) : '',
-      'Est. Hours': t.estimated_hours ?? '',
-      'Time Spent': formatTimeSpent(Number(t.time_spent_seconds) || 0),
-      'Evidence': t.evidence_count ?? 0,
+    const rows = sorted.map((taskRow) => ({
+      'Task': taskRow.name,
+      'Description': taskRow.description ?? '',
+      ...(showProject ? { 'Project': taskRow.project_name ?? '' } : {}),
+      'Status': taskRow.status,
+      'Assignee': taskRow.assigned_to_name ?? '',
+      'Due Date': taskRow.due_date ? formatDate(taskRow.due_date, language) : '',
+      'Est. Hours': taskRow.estimated_hours ?? '',
+      'Time Spent': formatTimeSpent(Number(taskRow.time_spent_seconds) || 0),
+      'Evidence': taskRow.evidence_count ?? 0,
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -182,7 +185,7 @@ export default function TaskTable({
   );
 
   if (tasks.length === 0) {
-    return <div className="text-center py-12 text-gray-400 text-sm">No tasks found</div>;
+    return <div className="text-center py-12 text-gray-400 text-sm">{t('empty.no_tasks', language)}</div>;
   }
 
   return (
@@ -190,7 +193,7 @@ export default function TaskTable({
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-          <span>{sorted.length} task{sorted.length !== 1 ? 's' : ''}</span>
+          <span>{sorted.length} {t('schedule.tasks', language)}</span>
           <div className="hidden sm:flex items-center gap-3">
             <span className="text-gray-300">|</span>
             {AGE_LEGEND.map((l) => (
@@ -218,16 +221,16 @@ export default function TaskTable({
             <tr>
               {/* Timer column */}
               <th className="px-2 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12" />
-              <SortHeader label="Task" field="name" />
+              <SortHeader label={t('task.name', language)} field="name" />
               {showProject && (
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Project</th>
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('project.title', language)}</th>
               )}
-              <SortHeader label="Status" field="status" />
-              <SortHeader label="Assignee" field="assigned_to_name" />
-              <SortHeader label="Due Date" field="due_date" />
-              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Est.</th>
-              <SortHeader label="Time" field="time" />
-              <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Evidence</th>
+              <SortHeader label={t('label.status', language)} field="status" />
+              <SortHeader label={t('label.assignee', language)} field="assigned_to_name" />
+              <SortHeader label={t('label.due_date', language)} field="due_date" />
+              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{language === 'id' ? 'Est.' : 'Est.'}</th>
+              <SortHeader label={language === 'id' ? 'Waktu' : 'Time'} field="time" />
+              <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{language === 'id' ? 'Bukti' : 'Evidence'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -265,7 +268,7 @@ export default function TaskTable({
                             ? 'bg-amber-100 hover:bg-amber-200 text-amber-700'
                             : 'bg-green-100 hover:bg-green-200 text-green-700'
                         } disabled:opacity-50`}
-                        aria-label={task.is_tracking ? 'Stop timer' : 'Start timer'}
+                        aria-label={task.is_tracking ? (language === 'id' ? 'Hentikan timer' : 'Stop timer') : (language === 'id' ? 'Mulai timer' : 'Start timer')}
                       >
                         {isTimerLoading ? (
                           <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-current" />
@@ -342,7 +345,7 @@ export default function TaskTable({
                     className={`px-3 py-2.5 text-sm cursor-pointer ${isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : age === 'stale' && !urgency ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}
                     onClick={() => onTaskClick?.(task)}
                   >
-                    {task.due_date ? formatDate(task.due_date) : '--'}
+                    {task.due_date ? formatDate(task.due_date, language) : '--'}
                   </td>
 
                   {/* Estimated hours */}
@@ -379,7 +382,7 @@ export default function TaskTable({
       {sorted.length > PAGE_SIZES[0] && (
         <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <span>Show</span>
+            <span>{language === 'id' ? 'Tampilkan' : 'Show'}</span>
             <select
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
@@ -389,7 +392,7 @@ export default function TaskTable({
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
-            <span>per page</span>
+            <span>{language === 'id' ? 'per halaman' : 'per page'}</span>
           </div>
           <div className="flex items-center gap-1">
             <button

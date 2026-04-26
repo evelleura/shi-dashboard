@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUsers, createUser, updateUser, deleteUser, resetUserPassword, getTechnicians, getTechnicianDetail } from '../services/api';
+import { getUsers, createUser, updateUser, deleteUser, resetUserPassword, getTechnicians, getTechnicianDetail, deactivateUser, activateUser } from '../services/api';
 
 export const USER_KEYS = {
   all: ['users'] as const,
@@ -42,6 +42,22 @@ export function useDeleteUser() {
 export function useResetPassword() {
   return useMutation({
     mutationFn: ({ id, password }: { id: number; password: string }) => resetUserPassword(id, password),
+  });
+}
+
+export function useDeactivateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deactivateUser(id),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: USER_KEYS.all }); },
+  });
+}
+
+export function useActivateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => activateUser(id),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: USER_KEYS.all }); },
   });
 }
 

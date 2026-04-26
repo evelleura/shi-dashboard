@@ -10,8 +10,6 @@ import type {
   Task,
   TaskEvidence,
   TaskActivity,
-  Material,
-  BudgetItem,
   Escalation,
   EscalationSummary,
   CreateProjectData,
@@ -19,13 +17,10 @@ import type {
   CreateTaskData,
   UpdateTaskData,
   CreateClientData,
-  CreateMaterialData,
-  CreateBudgetItemData,
   TasksByStatusData,
   TasksByOwnerData,
   OverdueTaskData,
   TasksByDueDateData,
-  BudgetStatusData,
   EarnedValueData,
   TechnicianDashboardData,
   TaskStatus,
@@ -131,6 +126,15 @@ export const deleteClient = async (id: number): Promise<void> => {
   await api.delete(`/clients/${id}`);
 };
 
+export const uploadClientPhoto = async (id: number, file: File): Promise<Client> => {
+  const formData = new FormData();
+  formData.append('photo', file);
+  const res = await api.post<ApiResponse<Client>>(`/clients/${id}/photo`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data.data!;
+};
+
 // ==================== Projects ====================
 
 export const getProjects = async (): Promise<Project[]> => {
@@ -199,8 +203,8 @@ export const approveSurvey = async (projectId: number): Promise<void> => {
   await api.post(`/projects/${projectId}/approve-survey`);
 };
 
-export const rejectSurvey = async (projectId: number): Promise<void> => {
-  await api.post(`/projects/${projectId}/reject-survey`);
+export const rejectSurvey = async (projectId: number, reason?: string): Promise<void> => {
+  await api.post(`/projects/${projectId}/reject-survey`, reason ? { reason } : undefined);
 };
 
 // ==================== Tasks ====================
@@ -245,6 +249,16 @@ export const getScheduleTasks = async (): Promise<any[]> => {
   return res.data.data;
 };
 
+export const checkTechnicianConflicts = async (params: {
+  technician_id: number;
+  start: string;
+  end: string;
+  exclude_task_id?: number;
+}): Promise<import('../types').ConflictingTask[]> => {
+  const res = await api.get('/tasks/conflicts', { params });
+  return res.data.data;
+};
+
 // ==================== Evidence ====================
 
 export const uploadEvidence = async (taskId: number, file: File, fileType: string, description?: string): Promise<TaskEvidence> => {
@@ -270,48 +284,6 @@ export const deleteEvidence = async (id: number): Promise<void> => {
 };
 
 export const getEvidenceDownloadUrl = (id: number): string => `/api/evidence/${id}/download`;
-
-// ==================== Materials ====================
-
-export const getProjectMaterials = async (projectId: number): Promise<Material[]> => {
-  const res = await api.get<ApiResponse<{ materials: Material[]; totals: unknown }>>(`/materials/project/${projectId}`);
-  return res.data.data!.materials;
-};
-
-export const createMaterial = async (data: CreateMaterialData): Promise<Material> => {
-  const res = await api.post<ApiResponse<Material>>('/materials', data);
-  return res.data.data!;
-};
-
-export const updateMaterial = async (id: number, data: Partial<CreateMaterialData>): Promise<Material> => {
-  const res = await api.patch<ApiResponse<Material>>(`/materials/${id}`, data);
-  return res.data.data!;
-};
-
-export const deleteMaterial = async (id: number): Promise<void> => {
-  await api.delete(`/materials/${id}`);
-};
-
-// ==================== Budget ====================
-
-export const getProjectBudget = async (projectId: number): Promise<BudgetItem[]> => {
-  const res = await api.get<ApiResponse<BudgetItem[]>>(`/budget/project/${projectId}`);
-  return res.data.data!;
-};
-
-export const createBudgetItem = async (data: CreateBudgetItemData): Promise<BudgetItem> => {
-  const res = await api.post<ApiResponse<BudgetItem>>('/budget', data);
-  return res.data.data!;
-};
-
-export const updateBudgetItem = async (id: number, data: Partial<CreateBudgetItemData>): Promise<BudgetItem> => {
-  const res = await api.patch<ApiResponse<BudgetItem>>(`/budget/${id}`, data);
-  return res.data.data!;
-};
-
-export const deleteBudgetItem = async (id: number): Promise<void> => {
-  await api.delete(`/budget/${id}`);
-};
 
 // ==================== Activities ====================
 
@@ -364,10 +336,6 @@ export const getTasksByDueDate = async (): Promise<TasksByDueDateData[]> => {
   return res.data.data!;
 };
 
-export const getBudgetStatus = async (): Promise<BudgetStatusData[]> => {
-  const res = await api.get<ApiResponse<BudgetStatusData[]>>('/dashboard/charts/budget-status');
-  return res.data.data!;
-};
 
 export const getEarnedValue = async (projectId: number): Promise<EarnedValueData> => {
   const res = await api.get<ApiResponse<EarnedValueData>>(`/dashboard/charts/earned-value/${projectId}`);
@@ -480,6 +448,16 @@ export const deleteUser = async (id: number): Promise<void> => {
 
 export const resetUserPassword = async (id: number, password: string): Promise<void> => {
   await api.post(`/users/${id}/reset-password`, { password });
+};
+
+export const deactivateUser = async (id: number): Promise<{ message: string }> => {
+  const res = await api.post<ApiResponse<{ message: string }>>(`/users/${id}/deactivate`);
+  return res.data as unknown as { message: string };
+};
+
+export const activateUser = async (id: number): Promise<{ message: string }> => {
+  const res = await api.post<ApiResponse<{ message: string }>>(`/users/${id}/activate`);
+  return res.data as unknown as { message: string };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

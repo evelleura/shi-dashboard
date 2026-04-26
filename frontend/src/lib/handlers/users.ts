@@ -11,7 +11,7 @@ export async function listUsers(request: NextRequest) {
   if (roleCheck) return roleCheck;
 
   try {
-    const result = await query('SELECT id, name, email, role, created_at FROM users ORDER BY name ASC');
+    const result = await query('SELECT id, name, email, role, is_active, created_at FROM users ORDER BY name ASC');
     return NextResponse.json({ success: true, data: result.rows });
   } catch (err) {
     console.error('Get users error:', err);
@@ -445,6 +445,94 @@ export async function deleteUser(request: NextRequest, id: string) {
     return NextResponse.json({ success: true, message: 'User deleted successfully' });
   } catch (err) {
     console.error('Delete user error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function deactivateUser(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['admin']);
+  if (roleCheck) return roleCheck;
+
+  const userId = parseInt(id);
+  if (isNaN(userId)) {
+    return NextResponse.json({ success: false, error: 'Invalid user ID' }, { status: 400 });
+  }
+  if (userId === auth.user.userId) {
+    return NextResponse.json({ success: false, error: 'Tidak bisa menonaktifkan akun sendiri' }, { status: 400 });
+  }
+
+  try {
+    const current = await query('SELECT id, name, role FROM users WHERE id = $1', [userId]);
+    if (current.rowCount === 0) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+    const row = current.rows[0] as { id: number; name: string; role: string };
+
+    if (row.role === 'admin') {
+      const activeAdmins = await query(
+        "SELECT COUNT(*)::int AS cnt FROM users WHERE role = 'admin' AND is_active = TRUE AND id != $1",
+        [userId]
+      );
+      const cnt = (activeAdmins.rows[0] as { cnt: number }).cnt;
+      if (cnt === 0) {
+        return NextResponse.json({ success: false, error: 'Tidak bisa menonaktifkan admin terakhir yang aktif' }, { status: 400 });
+      }
+    }
+
+    await query('UPDATE users SET is_active = FALSE WHERE id = $1', [userId]);
+
+    const actorName = (await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string || 'Unknown';
+    await logChange({
+      entityType: 'user',
+      entityId: userId,
+      entityName: row.name,
+      action: 'update',
+      changes: [{ field: 'is_active', oldValue: 'true', newValue: 'false' }],
+      userId: auth.user.userId,
+      userName: actorName,
+    });
+    return NextResponse.json({ success: true, message: 'Pengguna dinonaktifkan' });
+  } catch (err) {
+    console.error('Deactivate user error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function activateUser(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['admin']);
+  if (roleCheck) return roleCheck;
+
+  const userId = parseInt(id);
+  if (isNaN(userId)) {
+    return NextResponse.json({ success: false, error: 'Invalid user ID' }, { status: 400 });
+  }
+
+  try {
+    const current = await query('SELECT id, name FROM users WHERE id = $1', [userId]);
+    if (current.rowCount === 0) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+    const row = current.rows[0] as { id: number; name: string };
+
+    await query('UPDATE users SET is_active = TRUE WHERE id = $1', [userId]);
+
+    const actorName = (await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string || 'Unknown';
+    await logChange({
+      entityType: 'user',
+      entityId: userId,
+      entityName: row.name,
+      action: 'update',
+      changes: [{ field: 'is_active', oldValue: 'false', newValue: 'true' }],
+      userId: auth.user.userId,
+      userName: actorName,
+    });
+    return NextResponse.json({ success: true, message: 'Pengguna diaktifkan' });
+  } catch (err) {
+    console.error('Activate user error:', err);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -3,6 +3,9 @@ import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { getScheduleTasks } from '../services/api';
 import { TaskStatusBadge } from '../components/tasks/TaskStatusSelect';
+import CalendarView from '../components/schedule/CalendarView';
+import { useLanguage } from '../hooks/useLanguage';
+import { t } from '../lib/i18n';
 import type { TaskStatus } from '../types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -46,8 +49,8 @@ function daysBetween(a: Date, b: Date): number {
   return Math.ceil((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+function formatDate(d: string, lang: 'id' | 'en' = 'id') {
+  return new Date(d).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { day: '2-digit', month: 'short' });
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -78,6 +81,7 @@ const CAT_BADGE: Record<string, string> = {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function SchedulePage() {
+  const { language } = useLanguage();
   const { data: tasks = [], isLoading, isError } = useQuery({
     queryKey: ['schedule-tasks'],
     queryFn: getScheduleTasks,
@@ -85,6 +89,7 @@ export default function SchedulePage() {
   });
   const router = useRouter();
 
+  const [viewMode, setViewMode] = useState<'gantt' | 'kalender'>('gantt');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [assigneeFilter, setAssigneeFilter] = useState<string>('all');
@@ -161,7 +166,7 @@ export default function SchedulePage() {
     while (cur <= timelineRange.max) {
       const offset = (daysBetween(timelineRange.min, cur) / timelineRange.days) * 100;
       markers.push({
-        label: cur.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }),
+        label: cur.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { month: 'short', year: '2-digit' }),
         offset: Math.max(0, Math.min(100, offset)),
       });
       cur.setMonth(cur.getMonth() + 1);
@@ -200,9 +205,34 @@ export default function SchedulePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Project Schedule</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Task-level scheduling across all active projects</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('schedule.title', language)}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('schedule.subtitle', language)}</p>
+        </div>
+        {/* View toggle */}
+        <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1 gap-1 shrink-0">
+          <button
+            onClick={() => setViewMode('gantt')}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              viewMode === 'gantt'
+                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            {t('schedule.gantt', language)}
+          </button>
+          <button
+            onClick={() => setViewMode('kalender')}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              viewMode === 'kalender'
+                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            {t('schedule.calendar', language)}
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -212,7 +242,7 @@ export default function SchedulePage() {
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Category</option>
+          <option value="all">{t('schedule.filter_category', language)}</option>
           <option value="instalasi">Instalasi</option>
           <option value="maintenance">Maintenance</option>
           <option value="perbaikan">Perbaikan</option>
@@ -227,7 +257,7 @@ export default function SchedulePage() {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Task Status</option>
+          <option value="all">{t('schedule.filter_status', language)}</option>
           <option value="to_do">To Do</option>
           <option value="in_progress">In Progress</option>
           <option value="working_on_it">Working On It</option>
@@ -239,34 +269,39 @@ export default function SchedulePage() {
           onChange={(e) => setAssigneeFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Technicians</option>
+          <option value="all">{t('schedule.filter_assignee', language)}</option>
           {assignees.map((a) => (
             <option key={a.id} value={a.id}>{a.name}</option>
           ))}
         </select>
         <div className="flex items-center gap-1 ml-auto">
-          <button onClick={expandAll} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">Expand All</button>
+          <button onClick={expandAll} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">{t('schedule.expand_all', language)}</button>
           <span className="text-gray-300 dark:text-gray-600 text-xs">|</span>
-          <button onClick={collapseAll} className="text-xs text-gray-500 dark:text-gray-400 hover:underline">Collapse All</button>
+          <button onClick={collapseAll} className="text-xs text-gray-500 dark:text-gray-400 hover:underline">{t('schedule.collapse_all', language)}</button>
         </div>
       </div>
 
       {/* Summary stats */}
       <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-        <span><strong className="text-gray-700 dark:text-gray-300">{groups.length}</strong> projects</span>
-        <span><strong className="text-gray-700 dark:text-gray-300">{totalTasks}</strong> tasks</span>
-        <span><strong className="text-emerald-600 dark:text-emerald-400">{scheduledTasks}</strong> scheduled</span>
+        <span><strong className="text-gray-700 dark:text-gray-300">{groups.length}</strong> {t('schedule.projects', language)}</span>
+        <span><strong className="text-gray-700 dark:text-gray-300">{totalTasks}</strong> {t('schedule.tasks', language)}</span>
+        <span><strong className="text-emerald-600 dark:text-emerald-400">{scheduledTasks}</strong> {t('schedule.scheduled', language)}</span>
         {unscheduledTasks > 0 && (
-          <span><strong className="text-amber-600 dark:text-amber-400">{unscheduledTasks}</strong> unscheduled</span>
+          <span><strong className="text-amber-600 dark:text-amber-400">{unscheduledTasks}</strong> {t('schedule.unscheduled', language)}</span>
         )}
       </div>
 
-      {/* Schedule content */}
-      {groups.length === 0 ? (
+      {/* Calendar view */}
+      {viewMode === 'kalender' && (
+        <CalendarView tasks={(tasks as ScheduleTask[])} />
+      )}
+
+      {/* Gantt view */}
+      {viewMode === 'gantt' && groups.length === 0 ? (
         <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-          <p className="text-sm">No tasks match the current filters.</p>
+          <p className="text-sm">{t('schedule.no_match', language)}</p>
         </div>
-      ) : (
+      ) : viewMode === 'gantt' ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           {groups.map((group) => {
             const isExpanded = expandedProjects.has(group.id);
@@ -303,8 +338,8 @@ export default function SchedulePage() {
                       )}
                     </div>
                     <div className="flex items-center gap-3 mt-0.5 text-[10px] text-gray-400 dark:text-gray-500">
-                      <span>{formatDate(group.start.toISOString())} - {formatDate(group.end.toISOString())}</span>
-                      <span>{doneCount}/{group.tasks.length} tasks done ({progress}%)</span>
+                      <span>{formatDate(group.start.toISOString(), language)} - {formatDate(group.end.toISOString(), language)}</span>
+                      <span>{doneCount}/{group.tasks.length} {t('schedule.tasks_done', language)} ({progress}%)</span>
                     </div>
                   </div>
 
@@ -402,17 +437,17 @@ export default function SchedulePage() {
                                   backgroundColor: STATUS_COLORS[task.status] ?? '#9ca3af',
                                   opacity: task.status === 'done' ? 0.6 : 1,
                                 }}
-                                title={`${task.name}${hasSchedule ? `\n${formatDate(task.timeline_start!)} - ${formatDate(task.timeline_end!)}` : task.due_date ? `\nDue: ${formatDate(task.due_date)}` : ''}`}
+                                title={`${task.name}${hasSchedule ? `\n${formatDate(task.timeline_start!, language)} - ${formatDate(task.timeline_end!, language)}` : task.due_date ? `\n${t('task.due', language)} ${formatDate(task.due_date, language)}` : ''}`}
                               >
                                 {barWidth > 4 && (
                                   <span className="truncate">
-                                    {hasSchedule ? `${formatDate(task.timeline_start!)} - ${formatDate(task.timeline_end!)}` : task.due_date ? `Due ${formatDate(task.due_date)}` : ''}
+                                    {hasSchedule ? `${formatDate(task.timeline_start!, language)} - ${formatDate(task.timeline_end!, language)}` : task.due_date ? `${t('task.due', language)} ${formatDate(task.due_date, language)}` : ''}
                                   </span>
                                 )}
                               </div>
                             ) : (
                               <div className="absolute top-3 left-1 right-1 h-4 flex items-center">
-                                <span className="text-[9px] text-gray-300 dark:text-gray-600 italic">No schedule set</span>
+                                <span className="text-[9px] text-gray-300 dark:text-gray-600 italic">{t('schedule.no_schedule', language)}</span>
                               </div>
                             )}
 
@@ -421,7 +456,7 @@ export default function SchedulePage() {
                               <div
                                 className="absolute top-1 w-0 h-0 border-l-[4px] border-r-[4px] border-b-[6px] border-l-transparent border-r-transparent border-b-red-500"
                                 style={{ left: `${(daysBetween(timelineRange.min, new Date(task.due_date)) / timelineRange.days) * 100}%`, transform: 'translateX(-50%)' }}
-                                title={`Overdue: ${formatDate(task.due_date)}`}
+                                title={`${t('task.overdue', language)}: ${formatDate(task.due_date, language)}`}
                               />
                             )}
                           </div>
@@ -434,11 +469,11 @@ export default function SchedulePage() {
             );
           })}
         </div>
-      )}
+      ) : null}
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-500 dark:text-gray-400">
-        <span className="font-medium text-gray-600 dark:text-gray-300">Legend:</span>
+        <span className="font-medium text-gray-600 dark:text-gray-300">{t('schedule.legend', language)}</span>
         {Object.entries(STATUS_COLORS).map(([status, color]) => (
           <span key={status} className="flex items-center gap-1">
             <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: color }} />
@@ -447,11 +482,11 @@ export default function SchedulePage() {
         ))}
         <span className="flex items-center gap-1">
           <span className="w-px h-3 bg-red-400" />
-          Today
+          {t('schedule.today', language)}
         </span>
         <span className="flex items-center gap-1">
           <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-b-[5px] border-l-transparent border-r-transparent border-b-red-500" />
-          Overdue
+          {t('schedule.overdue_legend', language)}
         </span>
       </div>
     </div>

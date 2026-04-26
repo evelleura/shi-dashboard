@@ -55,8 +55,6 @@ import * as projects from '@/lib/handlers/projects';
 import * as tasks from '@/lib/handlers/tasks';
 import * as evidence from '@/lib/handlers/evidence';
 import * as dashboard from '@/lib/handlers/dashboard';
-import * as materials from '@/lib/handlers/materials';
-import * as budget from '@/lib/handlers/budget';
 import * as escalations from '@/lib/handlers/escalations';
 import * as activities from '@/lib/handlers/activities';
 import * as audit from '@/lib/handlers/audit';
@@ -111,6 +109,8 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       return methodNotAllowed();
     }
     if (r1 && r2 === 'reset-password' && method === 'POST') return users.resetUserPassword(request, r1);
+    if (r1 && r2 === 'deactivate'    && method === 'POST') return users.deactivateUser(request, r1);
+    if (r1 && r2 === 'activate'      && method === 'POST') return users.activateUser(request, r1);
     if (r1 && !r2) {
       if (method === 'PATCH')  return users.updateUser(request, r1);
       if (method === 'DELETE') return users.deleteUser(request, r1);
@@ -126,6 +126,7 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       if (method === 'POST') return clients.createClient(request);
       return methodNotAllowed();
     }
+    if (r1 && r2 === 'photo' && method === 'POST') return clients.uploadClientPhoto(request, r1);
     if (r1 && !r2) {
       if (method === 'GET')    return clients.getClient(request, r1);
       if (method === 'PATCH')  return clients.updateClient(request, r1);
@@ -171,6 +172,7 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     }
     if (r1 === 'bulk' && method === 'POST') return tasks.bulkCreateTasks(request);
     if (r1 === 'schedule' && method === 'GET') return tasks.getScheduleTasks(request);
+    if (r1 === 'conflicts' && method === 'GET') return tasks.checkConflicts(request);
     if (r1 === 'project' && r2) {
       if (method === 'GET') return tasks.getTasksByProject(request, r2);
       return methodNotAllowed();
@@ -215,7 +217,6 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       return methodNotAllowed();
     }
     if (r1 === 'charts' && r2) {
-      if (r2 === 'budget-status'       && method === 'GET') return dashboard.chartBudgetStatus(request);
       if (r2 === 'overdue-tasks'       && method === 'GET') return dashboard.chartOverdueTasks(request);
       if (r2 === 'tasks-by-due-date'   && method === 'GET') return dashboard.chartTasksByDueDate(request);
       if (r2 === 'tasks-by-owner'      && method === 'GET') return dashboard.chartTasksByOwner(request);
@@ -226,42 +227,6 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       if (r2 === 'spi-trend'           && method === 'GET') return dashboard.chartSPITrend(request);
       if (r2 === 'recent-activity'     && method === 'GET') return dashboard.chartRecentActivity(request);
       return notFound();
-    }
-    return notFound();
-  }
-
-  // ── Materials ─────────────────────────────────────────────────────────────
-  if (r0 === 'materials') {
-    if (!r1) {
-      if (method === 'POST') return materials.createMaterial(request);
-      return methodNotAllowed();
-    }
-    if (r1 === 'project' && r2) {
-      if (method === 'GET') return materials.getMaterialsByProject(request, r2);
-      return methodNotAllowed();
-    }
-    if (r1 && !r2) {
-      if (method === 'PATCH')  return materials.updateMaterial(request, r1);
-      if (method === 'DELETE') return materials.deleteMaterial(request, r1);
-      return methodNotAllowed();
-    }
-    return notFound();
-  }
-
-  // ── Budget ────────────────────────────────────────────────────────────────
-  if (r0 === 'budget') {
-    if (!r1) {
-      if (method === 'POST') return budget.createBudgetItem(request);
-      return methodNotAllowed();
-    }
-    if (r1 === 'project' && r2) {
-      if (method === 'GET') return budget.getBudgetByProject(request, r2);
-      return methodNotAllowed();
-    }
-    if (r1 && !r2) {
-      if (method === 'PATCH')  return budget.updateBudgetItem(request, r1);
-      if (method === 'DELETE') return budget.deleteBudgetItem(request, r1);
-      return methodNotAllowed();
     }
     return notFound();
   }

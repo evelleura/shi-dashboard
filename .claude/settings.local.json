@@ -38,7 +38,12 @@
       "Bash(brew list:*)",
       "Bash(php -v)",
       "Bash(pg_isready -h 127.0.0.1 -p 5432)",
-      "Bash(psql -h 127.0.0.1 -p 5432 -U postgres -d shi_dashboard_new -c \"SELECT current_database\\(\\), version\\(\\);\")"
+      "Bash(psql -h 127.0.0.1 -p 5432 -U postgres -d shi_dashboard_new -c \"SELECT current_database\\(\\), version\\(\\);\")",
+      "Bash(PGPASSWORD=12345 psql *)",
+      "Bash(cat)",
+      "Read(//tmp/**)"
     ]
-  }
+  },
+  "spinnerTipsEnabled": false,
+  "prefersReducedMotion": true
 }

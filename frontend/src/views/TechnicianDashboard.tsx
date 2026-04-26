@@ -6,6 +6,8 @@ import TechQuickActionsBar from '../components/dashboard/TechQuickActionsBar';
 import DateRangePicker from '../components/ui/DateRangePicker';
 import TechProductivityChart from '../components/charts/TechProductivityChart';
 import TechTimeSpentChart from '../components/charts/TechTimeSpentChart';
+import { useLanguage } from '../hooks/useLanguage';
+import { t } from '../lib/i18n';
 import type { HealthStatus, DateRange } from '../types';
 
 const STATUS_COLORS = {
@@ -31,6 +33,7 @@ function HealthDot({ status }: { status?: HealthStatus | null }) {
 export default function TechnicianDashboard() {
   const { data, isLoading, isError, refetch } = useTechnicianDashboard();
   const router = useRouter();
+  const { language } = useLanguage();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const handleDateChange = useCallback((start: string, end: string) => {
@@ -48,8 +51,8 @@ export default function TechnicianDashboard() {
   if (isError || !data) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500 text-sm">Failed to load dashboard.</p>
-        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">Retry</button>
+        <p className="text-red-500 text-sm">{t('error.load_failed', language)}.</p>
+        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">{t('action.retry', language)}</button>
       </div>
     );
   }
@@ -61,33 +64,33 @@ export default function TechnicianDashboard() {
   const reviewCount = stats.review ?? 0;
 
   const statCards = [
-    { label: 'Total Tasks', value: stats.total, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-200 dark:border-blue-800' },
-    { label: 'To Do', value: stats.to_do, color: 'text-gray-600 dark:text-gray-400', bg: 'bg-gray-50 dark:bg-gray-800', border: 'border-gray-200 dark:border-gray-700' },
-    { label: 'In Progress', value: inProgressCount, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-200 dark:border-blue-800' },
+    { label: t('tech.total_tasks', language), value: stats.total, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-200 dark:border-blue-800' },
+    { label: t('tech.to_do', language), value: stats.to_do, color: 'text-gray-600 dark:text-gray-400', bg: 'bg-gray-50 dark:bg-gray-800', border: 'border-gray-200 dark:border-gray-700' },
+    { label: t('tech.in_progress', language), value: inProgressCount, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-200 dark:border-blue-800' },
     {
-      label: 'Review',
+      label: t('tech.review', language),
       value: reviewCount,
       color: reviewCount > 0 ? 'text-purple-600' : 'text-gray-600 dark:text-gray-400',
       bg: reviewCount > 0 ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-gray-50 dark:bg-gray-800',
       border: reviewCount > 0 ? 'border-purple-200 dark:border-purple-800' : 'border-gray-200 dark:border-gray-700',
     },
-    { label: 'Done', value: stats.done, color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-200 dark:border-green-800' },
+    { label: t('tech.done', language), value: stats.done, color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-200 dark:border-green-800' },
     {
-      label: 'Overtime',
+      label: t('tech.overtime', language),
       value: stats.overtime,
       color: stats.overtime > 0 ? 'text-amber-600' : 'text-gray-600 dark:text-gray-400',
       bg: stats.overtime > 0 ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-gray-50 dark:bg-gray-800',
       border: stats.overtime > 0 ? 'border-amber-200 dark:border-amber-800' : 'border-gray-200 dark:border-gray-700',
     },
     {
-      label: 'Over Deadline',
+      label: t('tech.over_deadline', language),
       value: stats.over_deadline,
       color: stats.over_deadline > 0 ? 'text-red-600' : 'text-gray-600 dark:text-gray-400',
       bg: stats.over_deadline > 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-800',
       border: stats.over_deadline > 0 ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-gray-700',
     },
     {
-      label: 'Open Escalations',
+      label: t('tech.open_escalations', language),
       value: openEscalations,
       color: openEscalations > 0 ? 'text-red-600' : 'text-gray-600 dark:text-gray-400',
       bg: openEscalations > 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-800',
@@ -96,13 +99,13 @@ export default function TechnicianDashboard() {
   ];
 
   const pieData = [
-    { name: 'To Do', value: stats.to_do, color: STATUS_COLORS.to_do },
-    { name: 'In Progress', value: stats.in_progress ?? 0, color: STATUS_COLORS.in_progress },
-    { name: 'Working On It', value: stats.working_on_it ?? 0, color: STATUS_COLORS.working_on_it },
-    { name: 'Review', value: stats.review ?? 0, color: STATUS_COLORS.review },
-    { name: 'Done', value: stats.done, color: STATUS_COLORS.done },
-    { name: 'Overtime', value: stats.overtime, color: STATUS_COLORS.overtime },
-    { name: 'Over Deadline', value: stats.over_deadline, color: STATUS_COLORS.over_deadline },
+    { name: t('tech.to_do', language), value: stats.to_do, color: STATUS_COLORS.to_do },
+    { name: t('tech.in_progress', language), value: stats.in_progress ?? 0, color: STATUS_COLORS.in_progress },
+    { name: t('status.working_on_it', language), value: stats.working_on_it ?? 0, color: STATUS_COLORS.working_on_it },
+    { name: t('tech.review', language), value: stats.review ?? 0, color: STATUS_COLORS.review },
+    { name: t('tech.done', language), value: stats.done, color: STATUS_COLORS.done },
+    { name: t('tech.overtime', language), value: stats.overtime, color: STATUS_COLORS.overtime },
+    { name: t('tech.over_deadline', language), value: stats.over_deadline, color: STATUS_COLORS.over_deadline },
   ].filter((d) => d.value > 0);
 
   const barData = data.assigned_projects.map((p) => ({
@@ -112,13 +115,16 @@ export default function TechnicianDashboard() {
     done: p.my_completed,
   }));
 
+  const totalTasksLabel = language === 'id' ? 'Total Tugas' : 'Total Tasks';
+  const completedLabel = language === 'id' ? 'Selesai' : 'Completed';
+
   return (
     <div className="space-y-6">
       {/* Header + Date Filter */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Dashboard</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Your task overview and assigned projects</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('tech.my_dashboard', language)}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('tech.task_overview', language)}</p>
         </div>
         <DateRangePicker
           startDate={dateRange?.start ?? ''}
@@ -143,9 +149,9 @@ export default function TechnicianDashboard() {
       {/* Charts Section -- existing charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Task Status Distribution</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('tech.task_status_chart', language)}</h3>
           {pieData.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No tasks yet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">{t('tech.no_tasks', language)}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
@@ -164,7 +170,7 @@ export default function TechnicianDashboard() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [String(value), 'Tasks']}
+                  formatter={(value) => [String(value), language === 'id' ? 'Tugas' : 'Tasks']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
                 />
                 <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
@@ -174,9 +180,9 @@ export default function TechnicianDashboard() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Tasks per Project</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('tech.tasks_per_project', language)}</h3>
           {barData.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No projects assigned yet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">{t('tech.no_projects', language)}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={barData} layout="vertical" margin={{ left: 10 }}>
@@ -185,11 +191,11 @@ export default function TechnicianDashboard() {
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={120} />
                 <Tooltip
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
-                  formatter={(value, name) => [String(value), name === 'tasks' ? 'Total Tasks' : 'Completed']}
+                  formatter={(value, name) => [String(value), name === 'tasks' ? totalTasksLabel : completedLabel]}
                 />
                 <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: '12px' }} />
-                <Bar dataKey="tasks" fill="#3b82f6" name="Total Tasks" radius={[0, 4, 4, 0]} />
-                <Bar dataKey="done" fill="#22c55e" name="Completed" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="tasks" fill="#3b82f6" name={totalTasksLabel} radius={[0, 4, 4, 0]} />
+                <Bar dataKey="done" fill="#22c55e" name={completedLabel} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -204,9 +210,9 @@ export default function TechnicianDashboard() {
 
       {/* Assigned Projects Cards */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Assigned Projects</h2>
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('tech.assigned_projects', language)}</h2>
         {data.assigned_projects.length === 0 ? (
-          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No projects assigned to you yet.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">{t('tech.no_projects', language)}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.assigned_projects.map((proj) => (
@@ -235,12 +241,12 @@ export default function TechnicianDashboard() {
                       ? 'bg-purple-100 text-purple-700'
                       : 'bg-blue-100 text-blue-700'
                   }`}>
-                    {proj.phase === 'survey' ? 'Survey' : 'Execution'}
+                    {proj.phase === 'survey' ? t('project.phase_survey', language) : t('project.phase_execution', language)}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                  <span>Tasks: {proj.my_completed}/{proj.my_task_count}</span>
+                  <span>{language === 'id' ? 'Tugas' : 'Tasks'}: {proj.my_completed}/{proj.my_task_count}</span>
                   <span>{proj.my_task_count > 0 ? Math.round((proj.my_completed / proj.my_task_count) * 100) : 0}%</span>
                 </div>
                 {proj.my_task_count > 0 && (

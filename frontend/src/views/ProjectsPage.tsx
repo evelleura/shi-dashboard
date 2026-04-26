@@ -7,10 +7,12 @@ import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
 import ProjectForm from '../components/projects/ProjectForm';
 import DataTable, { type Column, type RowAge } from '../components/ui/DataTable';
+import { useLanguage } from '../hooks/useLanguage';
+import { t } from '../lib/i18n';
 import type { DashboardProject, CreateProjectData } from '../types';
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+function formatDate(dateStr: string, locale: string) {
+  return new Date(dateStr).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function getProjectAge(p: DashboardProject): RowAge {
@@ -47,6 +49,9 @@ export default function ProjectsPage() {
   const createMutation = useCreateProject();
   const updateMutation = useUpdateProject();
   const router = useRouter();
+  const { language } = useLanguage();
+
+  const locale = language === 'id' ? 'id-ID' : 'en-US';
 
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState('');
@@ -92,7 +97,7 @@ export default function ProjectsPage() {
     },
     {
       key: 'name',
-      label: 'Project',
+      label: t('project.title', language),
       render: (p) => {
         const isEditing = editingCell?.id === p.id && editingCell?.field === 'name';
         if (isEditing) {
@@ -114,7 +119,7 @@ export default function ProjectsPage() {
           <div
             className="group/cell flex items-start gap-1"
             onDoubleClick={(e) => { e.stopPropagation(); startEdit(p.id, 'name'); }}
-            title="Double-click to edit"
+            title={language === 'id' ? 'Klik dua kali untuk edit' : 'Double-click to edit'}
           >
             <div className="min-w-0">
               <Link
@@ -137,7 +142,7 @@ export default function ProjectsPage() {
     },
     {
       key: 'client_name',
-      label: 'Client',
+      label: t('client.title', language),
       render: (p) => (
         <span className="text-sm text-gray-600 dark:text-gray-400">{p.client_name ?? '--'}</span>
       ),
@@ -146,7 +151,7 @@ export default function ProjectsPage() {
     },
     {
       key: 'category',
-      label: 'Category',
+      label: language === 'id' ? 'Kategori' : 'Category',
       render: (p) => {
         const cat = (p as unknown as Record<string, string>).category ?? 'instalasi';
         const isEditing = editingCell?.id === p.id && editingCell?.field === 'category';
@@ -186,7 +191,7 @@ export default function ProjectsPage() {
           <div
             className="group/cell flex items-center gap-1"
             onDoubleClick={(e) => { e.stopPropagation(); startEdit(p.id, 'category'); }}
-            title="Double-click to edit"
+            title={language === 'id' ? 'Klik dua kali untuk edit' : 'Double-click to edit'}
           >
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${catColors[cat] ?? catColors.lainnya}`}>
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -200,7 +205,7 @@ export default function ProjectsPage() {
     },
     {
       key: 'phase',
-      label: 'Phase',
+      label: language === 'id' ? 'Fase' : 'Phase',
       render: (p) => {
         const isEditing = editingCell?.id === p.id && editingCell?.field === 'phase';
         if (isEditing) {
@@ -214,8 +219,8 @@ export default function ProjectsPage() {
               onKeyDown={(e) => { if (e.key === 'Escape') setEditingCell(null); }}
               onClick={(e) => e.stopPropagation()}
             >
-              <option value="survey">Survey</option>
-              <option value="execution">Execution</option>
+              <option value="survey">{t('project.phase_survey', language)}</option>
+              <option value="execution">{t('project.phase_execution', language)}</option>
             </select>
           );
         }
@@ -223,23 +228,23 @@ export default function ProjectsPage() {
           <div
             className="group/cell flex items-center gap-1"
             onDoubleClick={(e) => { e.stopPropagation(); startEdit(p.id, 'phase'); }}
-            title="Double-click to edit"
+            title={language === 'id' ? 'Klik dua kali untuk edit' : 'Double-click to edit'}
           >
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
               p.phase === 'survey' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
             }`}>
-              {p.phase === 'survey' ? 'Survey' : 'Execution'}
+              {p.phase === 'survey' ? t('project.phase_survey', language) : t('project.phase_execution', language)}
             </span>
             <PencilIcon />
           </div>
         );
       },
       sortValue: (p) => p.phase,
-      exportValue: (p) => p.phase === 'survey' ? 'Survey' : 'Execution',
+      exportValue: (p) => p.phase === 'survey' ? t('project.phase_survey', language) : t('project.phase_execution', language),
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('label.status', language),
       render: (p) => {
         const isEditing = editingCell?.id === p.id && editingCell?.field === 'status';
         if (isEditing) {
@@ -253,10 +258,10 @@ export default function ProjectsPage() {
               onKeyDown={(e) => { if (e.key === 'Escape') setEditingCell(null); }}
               onClick={(e) => e.stopPropagation()}
             >
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="on-hold">On Hold</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="active">{t('status.active', language)}</option>
+              <option value="completed">{t('status.completed', language)}</option>
+              <option value="on-hold">{t('status.on_hold', language)}</option>
+              <option value="cancelled">{t('status.cancelled', language)}</option>
             </select>
           );
         }
@@ -266,14 +271,20 @@ export default function ProjectsPage() {
           'on-hold': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
           cancelled: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
         };
+        const statusLabel: Record<string, string> = {
+          active: t('status.active', language),
+          completed: t('status.completed', language),
+          'on-hold': t('status.on_hold', language),
+          cancelled: t('status.cancelled', language),
+        };
         return (
           <div
             className="group/cell flex items-center gap-1"
             onDoubleClick={(e) => { e.stopPropagation(); startEdit(p.id, 'status'); }}
-            title="Double-click to edit"
+            title={language === 'id' ? 'Klik dua kali untuk edit' : 'Double-click to edit'}
           >
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusStyles[p.status] ?? 'bg-gray-100 text-gray-600'}`}>
-              {p.status === 'on-hold' ? 'On Hold' : p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+              {statusLabel[p.status] ?? p.status}
             </span>
             <PencilIcon />
           </div>
@@ -284,7 +295,7 @@ export default function ProjectsPage() {
     },
     {
       key: 'health_status',
-      label: 'Health',
+      label: language === 'id' ? 'Kesehatan' : 'Health',
       render: (p) => <StatusBadge status={p.health_status ?? null} />,
       sortValue: (p) => {
         const order: Record<string, number> = { red: 0, amber: 1, green: 2 };
@@ -294,7 +305,7 @@ export default function ProjectsPage() {
     },
     {
       key: 'spi_value',
-      label: 'SPI',
+      label: t('dashboard.spi', language),
       align: 'right' as const,
       render: (p) => (
         <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -306,7 +317,7 @@ export default function ProjectsPage() {
     },
     {
       key: 'tasks',
-      label: 'Tasks',
+      label: t('task.title', language),
       render: (p) => (
         <span className="text-sm text-gray-600 dark:text-gray-400">
           {p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '--'}
@@ -317,18 +328,18 @@ export default function ProjectsPage() {
     },
     {
       key: 'timeline',
-      label: 'Timeline',
+      label: language === 'id' ? 'Timeline' : 'Timeline',
       render: (p) => (
         <span className="text-xs text-gray-500 dark:text-gray-400">
-          {formatDate(p.start_date)} -- {formatDate(p.end_date)}
+          {formatDate(p.start_date, locale)} -- {formatDate(p.end_date, locale)}
         </span>
       ),
       sortValue: (p) => p.start_date,
-      exportValue: (p) => `${formatDate(p.start_date)} - ${formatDate(p.end_date)}`,
+      exportValue: (p) => `${formatDate(p.start_date, locale)} - ${formatDate(p.end_date, locale)}`,
     },
     {
       key: 'project_value',
-      label: 'Value',
+      label: language === 'id' ? 'Nilai' : 'Value',
       align: 'right' as const,
       render: (p) => {
         const isEditing = editingCell?.id === p.id && editingCell?.field === 'project_value';
@@ -352,11 +363,11 @@ export default function ProjectsPage() {
           <div
             className="group/cell flex items-center justify-end gap-1"
             onDoubleClick={(e) => { e.stopPropagation(); startEdit(p.id, 'project_value'); }}
-            title="Double-click to edit"
+            title={language === 'id' ? 'Klik dua kali untuk edit' : 'Double-click to edit'}
           >
             <PencilIcon />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {Number(p.project_value) > 0 ? `Rp ${Number(p.project_value).toLocaleString('id-ID')}` : '--'}
+              {Number(p.project_value) > 0 ? `Rp ${Number(p.project_value).toLocaleString(locale)}` : '--'}
             </span>
           </div>
         );
@@ -365,7 +376,7 @@ export default function ProjectsPage() {
       exportValue: (p) => Number(p.project_value) || 0,
     },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [editingCell]);
+  ], [editingCell, language]);
 
   const handleCreate = async (data: CreateProjectData) => {
     await createMutation.mutateAsync(data);
@@ -387,18 +398,18 @@ export default function ProjectsPage() {
   }
 
   if (isError) {
-    return <p className="text-center text-red-500 text-sm py-16">Failed to load projects.</p>;
+    return <p className="text-center text-red-500 text-sm py-16">{t('projects.failed_load', language)}</p>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Projects</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('project.title', language)}</h1>
         <button
           onClick={() => setShowCreate(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
-          + New Project
+          {t('action.new_project', language)}
         </button>
       </div>
 
@@ -406,31 +417,31 @@ export default function ProjectsPage() {
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="search"
-          placeholder="Search projects or clients..."
+          placeholder={t('projects.search_placeholder', language)}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-72 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Search projects"
+          aria-label={t('action.search', language)}
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Filter by status"
+          aria-label={language === 'id' ? 'Filter berdasarkan status' : 'Filter by status'}
         >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-          <option value="on-hold">On Hold</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="all">{t('projects.all_status', language)}</option>
+          <option value="active">{t('status.active', language)}</option>
+          <option value="completed">{t('status.completed', language)}</option>
+          <option value="on-hold">{t('status.on_hold', language)}</option>
+          <option value="cancelled">{t('status.cancelled', language)}</option>
         </select>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Filter by category"
+          aria-label={language === 'id' ? 'Filter berdasarkan kategori' : 'Filter by category'}
         >
-          <option value="all">All Category</option>
+          <option value="all">{t('projects.all_category', language)}</option>
           <option value="instalasi">Instalasi</option>
           <option value="maintenance">Maintenance</option>
           <option value="perbaikan">Perbaikan</option>
@@ -446,13 +457,13 @@ export default function ProjectsPage() {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
             </svg>
-            Saving...
+            {t('action.saving', language)}
           </span>
         )}
       </div>
 
       <p className="text-xs text-gray-400 dark:text-gray-500 -mt-2">
-        Tip: Double-click a cell in Name, Category, Phase, Status, or Value to edit inline.
+        {t('projects.inline_edit_tip', language)}
       </p>
 
       <DataTable<DashboardProject>
@@ -464,11 +475,11 @@ export default function ProjectsPage() {
         defaultSortKey="project_code"
         defaultSortDesc={true}
         exportFileName="projects"
-        emptyMessage="No projects found."
+        emptyMessage={t('projects.no_found', language)}
       />
 
       {/* Create Project Modal */}
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create New Project" maxWidth="max-w-xl">
+      <Modal open={showCreate} onClose={() => setShowCreate(false)} title={t('projects.create_title', language)} maxWidth="max-w-xl">
         <ProjectForm
           clients={clients}
           onSubmit={handleCreate}

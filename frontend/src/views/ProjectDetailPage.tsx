@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useProject, useAssignTechnician, useUnassignTechnician } from '../hooks/useProjects';
+import { useProject, useAssignTechnician, useUnassignTechnician, useApproveSurvey, useRejectSurvey } from '../hooks/useProjects';
 import { useChangeTaskStatus, useCreateTask } from '../hooks/useTasks';
 import { useStartTimer, useStopTimer } from '../hooks/useActivities';
 import { useTechnicians } from '../hooks/useDashboard';
@@ -12,22 +12,23 @@ import TaskTable from '../components/tasks/TaskTable';
 import TaskDetailModal from '../components/tasks/TaskDetailModal';
 import TaskForm from '../components/tasks/TaskForm';
 import ViewToggle from '../components/tasks/ViewToggle';
-import MaterialsList from '../components/projects/MaterialsList';
-import BudgetTable from '../components/projects/BudgetTable';
 import EarnedValueChart from '../components/charts/EarnedValueChart';
 import EvidenceGallery from '../components/evidence/EvidenceGallery';
 import EvidenceUploader from '../components/evidence/EvidenceUploader';
 import { formatTimeSpent } from '../components/tasks/TaskTimer';
+import EntityActivityTimeline from '../components/ui/EntityActivityTimeline';
+import { useLanguage } from '../hooks/useLanguage';
+import { t } from '../lib/i18n';
 import type { Task, TaskStatus, CreateTaskData } from '../types';
 import { useAuth } from '../hooks/useAuth';
 
-type TabId = 'tasks' | 'budget' | 'materials' | 'evidence' | 'charts';
+type TabId = 'tasks' | 'evidence' | 'charts' | 'history';
 
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+function formatDate(d: string, locale: string) {
+  return new Date(d).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () => void; isLoading: boolean }) {
+function ActiveTaskBanner({ task, onStop, isLoading, language }: { task: Task; onStop: () => void; isLoading: boolean; language: string }) {
   return (
     <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-3">
       <span className="relative flex h-3 w-3 shrink-0">
@@ -35,7 +36,7 @@ function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () 
         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-green-600 dark:text-green-400 font-medium">Currently working on</p>
+        <p className="text-xs text-green-600 dark:text-green-400 font-medium">{t('project.currently_working', language as Parameters<typeof t>[1])}</p>
         <p className="text-sm font-semibold text-green-900 dark:text-green-100 truncate">{task.name}</p>
       </div>
       <p className="text-lg font-mono font-bold text-green-700 dark:text-green-400">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
@@ -49,7 +50,7 @@ function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () 
           <rect x="6" y="4" width="4" height="16" rx="1" />
           <rect x="14" y="4" width="4" height="16" rx="1" />
         </svg>
-        Stop
+        {t('project.stop', language as Parameters<typeof t>[1])}
       </button>
     </div>
   );
@@ -61,6 +62,8 @@ export default function ProjectDetailPage() {
   const slug = params?.slug;
   const id = Array.isArray(slug) ? slug[1] : (params?.id as string | undefined);
   const router = useRouter();
+  const { language } = useLanguage();
+  const locale = language === 'id' ? 'id-ID' : 'en-US';
   const projectId = parseInt(id ?? '0');
   const { data: project, isLoading, isError } = useProject(projectId);
   const { data: technicians = [] } = useTechnicians();
@@ -72,12 +75,17 @@ export default function ProjectDetailPage() {
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();
 
+  const approveSurveyMutation = useApproveSurvey();
+  const rejectSurveyMutation = useRejectSurvey();
+
   const [activeTab, setActiveTab] = useState<TabId>('tasks');
   const [taskView, setTaskView] = useState<'kanban' | 'table'>('kanban');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showAssign, setShowAssign] = useState(false);
   const [assignUserId, setAssignUserId] = useState('');
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
 
 
   const userRole = user?.role;
@@ -95,8 +103,8 @@ export default function ProjectDetailPage() {
   if (isError || !project) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500 text-sm">Project not found.</p>
-        <button onClick={() => router.back()} className="mt-2 text-blue-600 text-sm underline">Go Back</button>
+        <p className="text-red-500 text-sm">{t('project.not_found', language)}.</p>
+        <button onClick={() => router.back()} className="mt-2 text-blue-600 text-sm underline">{t('project.go_back', language)}</button>
       </div>
     );
   }
@@ -135,19 +143,28 @@ export default function ProjectDetailPage() {
   // Find actively tracked task for the banner
   const activeTask = (project.tasks ?? []).find((t) => t.is_tracking);
 
-  // Filter tabs based on role -- technicians should NOT see Budget
-  const allTabs: { id: TabId; label: string; count?: number }[] = [
-    { id: 'tasks', label: 'Tasks', count: project.tasks?.length ?? 0 },
-    { id: 'budget', label: 'Budget', count: project.budget_items?.length ?? 0 },
-    { id: 'materials', label: 'Materials', count: project.materials?.length ?? 0 },
-    { id: 'evidence', label: 'Evidence' },
-    { id: 'charts', label: 'Charts' },
+  const tabs: { id: TabId; label: string; count?: number }[] = [
+    { id: 'tasks', label: t('project.tab_tasks', language), count: project.tasks?.length ?? 0 },
+    { id: 'evidence', label: t('project.tab_evidence', language) },
+    { id: 'charts', label: t('project.tab_charts', language) },
+    { id: 'history', label: t('project.tab_history', language) },
   ];
-  const tabs = isTechnician ? allTabs.filter((t) => t.id !== 'budget') : allTabs;
 
   // Available technicians for assignment (not yet assigned)
-  const assignedIds = new Set((project.assigned_technicians ?? []).map((t) => t.id));
-  const availableTechs = technicians.filter((t) => !assignedIds.has(t.id));
+  const assignedIds = new Set((project.assigned_technicians ?? []).map((tech) => tech.id));
+  const availableTechs = technicians.filter((tech) => !assignedIds.has(tech.id));
+
+  const metrics = [
+    { label: t('project.metric_spi', language), value: project.health?.spi_value != null ? Number(project.health.spi_value).toFixed(3) : '--', color: 'text-blue-600' },
+    {
+      label: t('project.metric_deviation', language),
+      value: project.health?.deviation_percent != null ? `${project.health.deviation_percent >= 0 ? '+' : ''}${Number(project.health.deviation_percent).toFixed(1)}%` : '--',
+      color: (project.health?.deviation_percent ?? 0) >= 0 ? 'text-green-600' : 'text-red-600',
+    },
+    { label: t('project.metric_tasks_done', language), value: `${project.health?.completed_tasks ?? 0}/${project.health?.total_tasks ?? 0}`, color: 'text-gray-700' },
+    { label: t('project.metric_overtime', language), value: project.health?.overtime_tasks ?? 0, color: (project.health?.overtime_tasks ?? 0) > 0 ? 'text-amber-600' : 'text-gray-600' },
+    { label: t('project.metric_overdue', language), value: project.health?.overdue_tasks ?? 0, color: (project.health?.overdue_tasks ?? 0) > 0 ? 'text-orange-600' : 'text-gray-600' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -156,23 +173,23 @@ export default function ProjectDetailPage() {
         <button
           onClick={() => router.back()}
           className="text-sm text-blue-600 hover:underline mb-3 flex items-center gap-1"
-          aria-label="Go back"
+          aria-label={t('action.back', language)}
         >
-          &larr; Back
+          &larr; {t('action.back', language)}
         </button>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{project.name}</h1>
             {project.client_name && (
-              <p className="text-sm text-blue-500 dark:text-blue-400 mt-0.5">Client: {project.client_name}</p>
+              <p className="text-sm text-blue-500 dark:text-blue-400 mt-0.5">{t('project.client_label', language)} {project.client_name}</p>
             )}
             {project.description && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{project.description}</p>}
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              {formatDate(project.start_date)} -- {formatDate(project.end_date)} ({project.duration} days)
-              &nbsp;| Phase: <span className="font-medium">{project.phase === 'survey' ? 'Survey' : 'Execution'}</span>
+              {formatDate(project.start_date, locale)} -- {formatDate(project.end_date, locale)} ({project.duration} {t('project.days_label', language)})
+              &nbsp;| {t('project.phase_label', language)} <span className="font-medium">{project.phase === 'survey' ? t('project.phase_survey', language) : t('project.phase_execution', language)}</span>
               {/* Hide project value from technicians */}
               {!isTechnician && Number(project.project_value) > 0 && (
-                <> | Value: Rp {Number(project.project_value).toLocaleString('id-ID')}</>
+                <> | {t('project.value_label', language)} Rp {Number(project.project_value).toLocaleString(locale)}</>
               )}
             </p>
           </div>
@@ -180,19 +197,104 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
+      {/* Survey Status Banner */}
+      {project.phase === 'survey' && !project.survey_approved && isManager && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-xl p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-800 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-600">
+                  {t('project.fase_survey', language)}
+                </span>
+              </div>
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                {t('project.survey_banner', language)}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => approveSurveyMutation.mutate(project.id)}
+                disabled={approveSurveyMutation.isPending || rejectSurveyMutation.isPending}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-300 dark:disabled:bg-green-800 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                {t('project.approve_survey', language)}
+              </button>
+              <button
+                onClick={() => setShowRejectModal(true)}
+                disabled={approveSurveyMutation.isPending || rejectSurveyMutation.isPending}
+                className="inline-flex items-center gap-1.5 px-4 py-2 border border-red-400 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50 text-sm font-medium rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                {t('project.reject_survey', language)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {project.phase === 'survey' && project.survey_approved && (
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-700">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            {t('project.survey_approved', language)}
+            {project.survey_approved_at && (
+              <span className="font-normal text-green-600 dark:text-green-400">
+                &mdash; {t('project.survey_approved_on', language)} {new Date(project.survey_approved_at).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}
+              </span>
+            )}
+          </span>
+        </div>
+      )}
+
+      {/* Reject Survey Modal */}
+      {showRejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('project.survey_reject_title', language)}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('project.survey_reject_hint', language)}</p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={3}
+              placeholder={t('project.reject_reason', language)}
+              className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+            />
+            <div className="flex gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => { setShowRejectModal(false); setRejectReason(''); }}
+                className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                {t('action.cancel', language)}
+              </button>
+              <button
+                type="button"
+                disabled={rejectSurveyMutation.isPending}
+                onClick={() => {
+                  rejectSurveyMutation.mutate(
+                    { id: project.id, reason: rejectReason.trim() || undefined },
+                    { onSuccess: () => { setShowRejectModal(false); setRejectReason(''); } }
+                  );
+                }}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
+              >
+                {rejectSurveyMutation.isPending ? t('project.survey_confirming', language) : t('project.survey_confirm_reject', language)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {[
-          { label: 'SPI', value: project.health?.spi_value != null ? Number(project.health.spi_value).toFixed(3) : '--', color: 'text-blue-600' },
-          {
-            label: 'Deviation',
-            value: project.health?.deviation_percent != null ? `${project.health.deviation_percent >= 0 ? '+' : ''}${Number(project.health.deviation_percent).toFixed(1)}%` : '--',
-            color: (project.health?.deviation_percent ?? 0) >= 0 ? 'text-green-600' : 'text-red-600',
-          },
-          { label: 'Tasks Done', value: `${project.health?.completed_tasks ?? 0}/${project.health?.total_tasks ?? 0}`, color: 'text-gray-700' },
-          { label: 'Overtime', value: project.health?.overtime_tasks ?? 0, color: (project.health?.overtime_tasks ?? 0) > 0 ? 'text-amber-600' : 'text-gray-600' },
-          { label: 'Overdue', value: project.health?.overdue_tasks ?? 0, color: (project.health?.overdue_tasks ?? 0) > 0 ? 'text-orange-600' : 'text-gray-600' },
-        ].map((m) => (
+        {metrics.map((m) => (
           <div key={m.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 text-center">
             <p className="text-xs text-gray-400 dark:text-gray-500">{m.label}</p>
             <p className={`text-xl font-bold mt-0.5 ${m.color}`}>{m.value}</p>
@@ -211,10 +313,10 @@ export default function ProjectDetailPage() {
       {/* Assigned technicians */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Assigned Technicians</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('project.assigned_technicians', language)}</h3>
           {isManager && (
             <button onClick={() => setShowAssign(!showAssign)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-              {showAssign ? 'Cancel' : '+ Assign'}
+              {showAssign ? t('project.cancel_assign', language) : `+ ${t('project.assign', language)}`}
             </button>
           )}
         </div>
@@ -225,9 +327,9 @@ export default function ProjectDetailPage() {
               onChange={(e) => setAssignUserId(e.target.value)}
               className="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Select technician...</option>
-              {availableTechs.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
+              <option value="">{t('project.select_technician', language)}</option>
+              {availableTechs.map((tech) => (
+                <option key={tech.id} value={tech.id}>{tech.name}</option>
               ))}
             </select>
             <button
@@ -235,13 +337,13 @@ export default function ProjectDetailPage() {
               disabled={!assignUserId || assignTech.isPending}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-xs px-3 py-1.5 rounded-md"
             >
-              Assign
+              {t('project.assign', language)}
             </button>
           </div>
         )}
         <div className="flex flex-wrap gap-2">
           {(project.assigned_technicians ?? []).length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500">No technicians assigned</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">{t('project.no_technicians', language)}</p>
           ) : (
             project.assigned_technicians.map((tech) => (
               <span key={tech.id} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
@@ -295,6 +397,7 @@ export default function ProjectDetailPage() {
                 task={activeTask}
                 onStop={() => handleTimerStop(activeTask.id)}
                 isLoading={!!timerLoadingId}
+                language={language}
               />
             )}
 
@@ -305,7 +408,7 @@ export default function ProjectDetailPage() {
                   onClick={() => setShowTaskForm(true)}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
                 >
-                  + New Task
+                  {t('project.new_task', language)}
                 </button>
               )}
             </div>
@@ -335,42 +438,22 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
-        {activeTab === 'budget' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <BudgetTable
-              projectId={projectId}
-              budgetItems={project.budget_items ?? []}
-              canEdit={isManager}
-            />
-          </div>
-        )}
-
-        {activeTab === 'materials' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <MaterialsList
-              projectId={projectId}
-              materials={project.materials ?? []}
-              canEdit={isManager}
-            />
-          </div>
-        )}
-
         {activeTab === 'evidence' && (
           <div className="space-y-4">
             {(project.tasks ?? []).length === 0 ? (
-              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Create tasks first to upload evidence.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">{t('project.tasks_first', language)}</p>
             ) : (
-              (project.tasks ?? []).map((t) => (
-                <div key={t.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              (project.tasks ?? []).map((taskItem) => (
+                <div key={taskItem.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                   <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t.name}</h3>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">({t.evidence_count ?? 0} files)</span>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{taskItem.name}</h3>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">({taskItem.evidence_count ?? 0} files)</span>
                     </div>
                   </div>
                   <div className="p-4 space-y-3">
-                    <EvidenceUploader taskId={t.id} />
-                    <EvidenceGallery taskId={t.id} canDelete={isManager} />
+                    <EvidenceUploader taskId={taskItem.id} />
+                    <EvidenceGallery taskId={taskItem.id} canDelete={isManager} />
                   </div>
                 </div>
               ))
@@ -383,6 +466,13 @@ export default function ProjectDetailPage() {
             <EarnedValueChart projectId={projectId} />
           </div>
         )}
+
+        {activeTab === 'history' && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('project.history', language)}</h3>
+            <EntityActivityTimeline entityType="project" entityId={projectId} />
+          </div>
+        )}
       </div>
 
       {/* Task Detail Modal */}
@@ -393,16 +483,21 @@ export default function ProjectDetailPage() {
         onStatusChange={handleStatusChange}
         isChanging={changeStatus.isPending}
         userRole={userRole}
+        existingTasks={project.tasks ?? []}
+        technicians={technicians}
+        projectId={projectId}
       />
 
       {/* Create Task Modal */}
-      <Modal open={showTaskForm} onClose={() => setShowTaskForm(false)} title="Create New Task" maxWidth="max-w-lg">
+      <Modal open={showTaskForm} onClose={() => setShowTaskForm(false)} title={t('task.new', language)} maxWidth="max-w-lg">
         <TaskForm
           projectId={projectId}
           technicians={technicians}
+          existingTasks={project.tasks ?? []}
           onSubmit={handleCreateTask}
           onCancel={() => setShowTaskForm(false)}
           isPending={createTask.isPending}
+          projectPhase={project.phase}
         />
       </Modal>
     </div>

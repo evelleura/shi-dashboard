@@ -1,6 +1,8 @@
 import type { Task, TaskStatus, UserRole } from '../../types';
 import TaskStatusSelect from './TaskStatusSelect';
 import { formatTimeSpent } from './TaskTimer';
+import { useLanguage } from '../../hooks/useLanguage';
+import { t } from '../../lib/i18n';
 
 interface Props {
   task: Task;
@@ -12,16 +14,18 @@ interface Props {
   isTimerLoading?: boolean;
   userRole?: UserRole;
   columnId?: string;
+  isBlocked?: boolean;
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+function formatDate(dateStr: string, lang: 'id' | 'en' = 'id'): string {
+  return new Date(dateStr).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { day: '2-digit', month: 'short' });
 }
 
 export default function KanbanCard({
   task, onStatusChange, onClick, onTimerStart, onTimerStop,
-  isChanging, isTimerLoading, userRole, columnId,
+  isChanging, isTimerLoading, userRole, columnId, isBlocked,
 }: Props) {
+  const { language } = useLanguage();
   const isTechnician = userRole === 'technician';
   const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
   const isOvertimeColumn = columnId === 'overtime';
@@ -66,7 +70,7 @@ export default function KanbanCard({
                 ? 'bg-amber-100 hover:bg-amber-200 text-amber-700'
                 : 'bg-green-100 hover:bg-green-200 text-green-700'
             } disabled:opacity-50`}
-            aria-label={task.is_tracking ? 'Stop timer' : 'Start timer'}
+            aria-label={task.is_tracking ? (language === 'id' ? 'Hentikan timer' : 'Stop timer') : (language === 'id' ? 'Mulai timer' : 'Start timer')}
           >
             {isTimerLoading ? (
               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current" />
@@ -92,8 +96,18 @@ export default function KanbanCard({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
               </span>
             )}
+            {isBlocked && (
+              <span title={`${t('task.waiting_for', language)}: ${task.depends_on_name ?? (language === 'id' ? 'tugas prasyarat' : 'prerequisite task')}`}>
+                <svg className="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </span>
+            )}
             <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-2">{task.name}</h4>
           </div>
+          {isBlocked && task.depends_on_name && (
+            <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">{t('task.waiting_for', language)}: {task.depends_on_name}</p>
+          )}
         </div>
 
         {/* Evidence count */}
@@ -121,11 +135,11 @@ export default function KanbanCard({
       <div className="flex items-center gap-2 mt-2 cursor-pointer" onClick={() => onClick?.(task)}>
         {task.due_date ? (
           <span className={`text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
-            {isOverdue ? 'Overdue: ' : 'Due: '}
-            {formatDate(task.due_date)}
+            {isOverdue ? t('task.overdue_prefix', language) : t('task.due', language)}{' '}
+            {formatDate(task.due_date, language)}
           </span>
         ) : (
-          <span className="text-xs text-gray-300 dark:text-gray-600">No due date</span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">{t('task.no_due_date', language)}</span>
         )}
         {timeSpent > 0 && (
           <span className={`text-[10px] flex items-center gap-0.5 ${task.is_tracking ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
@@ -149,7 +163,7 @@ export default function KanbanCard({
 
       {!isTechnician && task.budget > 0 && (
         <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5">
-          Budget: Rp {Number(task.budget).toLocaleString('id-ID')}
+          {t('task.budget_label', language)}: Rp {Number(task.budget).toLocaleString(language === 'id' ? 'id-ID' : 'en-US')}
         </p>
       )}
     </div>

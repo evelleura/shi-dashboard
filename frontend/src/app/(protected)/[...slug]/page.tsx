@@ -18,6 +18,7 @@ import ProjectTimelinePage from '@/views/ProjectTimelinePage';
 import SchedulePage from '@/views/SchedulePage';
 import ReportsPage from '@/views/ReportsPage';
 import ProfilePage from '@/views/ProfilePage';
+import SettingsPage from '@/views/SettingsPage';
 
 type Props = { params: Promise<{ slug: string[] }> };
 
@@ -41,6 +42,7 @@ export default function ProtectedPage({ params }: Props) {
   if (section === 'schedule')      return <SchedulePage />;
   if (section === 'reports')       return <ReportsPage />;
   if (section === 'profile')       return <ProfilePage />;
+  if (section === 'settings')      return <SettingsPage />;
 
   return notFound();
 }

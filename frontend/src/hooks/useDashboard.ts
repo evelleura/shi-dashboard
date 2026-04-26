@@ -6,7 +6,6 @@ import {
   getTasksByOwner,
   getOverdueTasks,
   getTasksByDueDate,
-  getBudgetStatus,
   getEarnedValue,
   getTechnicianDashboard,
   globalSearch,
@@ -26,7 +25,6 @@ export const QUERY_KEYS = {
   chartTasksByOwner: ['charts', 'tasks-by-owner'] as const,
   chartOverdueTasks: ['charts', 'overdue-tasks'] as const,
   chartTasksByDueDate: ['charts', 'tasks-by-due-date'] as const,
-  chartBudgetStatus: ['charts', 'budget-status'] as const,
   chartEarnedValue: (projectId: number) => ['charts', 'earned-value', projectId] as const,
   technicianDashboard: ['technician-dashboard'] as const,
   globalSearch: (q: string) => ['global-search', q] as const,
@@ -85,14 +83,6 @@ export function useTasksByDueDateChart() {
   return useQuery({
     queryKey: QUERY_KEYS.chartTasksByDueDate,
     queryFn: getTasksByDueDate,
-    staleTime: 1000 * 60 * 2,
-  });
-}
-
-export function useBudgetStatusChart() {
-  return useQuery({
-    queryKey: QUERY_KEYS.chartBudgetStatus,
-    queryFn: getBudgetStatus,
     staleTime: 1000 * 60 * 2,
   });
 }

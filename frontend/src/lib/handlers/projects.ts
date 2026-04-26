@@ -137,7 +137,7 @@ export async function getProject(request: NextRequest, id: string) {
       return NextResponse.json({ success: false, error: 'Project not found' }, { status: 404 });
     }
 
-    const [tasksResult, reportsResult, materialsResult, budgetResult, assignmentsResult] = await Promise.all([
+    const [tasksResult, reportsResult, assignmentsResult] = await Promise.all([
       query(
         `SELECT t.*, u.name AS assigned_to_name, COUNT(te.id)::int AS evidence_count
          FROM tasks t LEFT JOIN users u ON u.id = t.assigned_to
@@ -151,8 +151,6 @@ export async function getProject(request: NextRequest, id: string) {
          WHERE dr.project_id = $1 ORDER BY dr.report_date DESC`,
         [projectId]
       ),
-      query('SELECT * FROM materials WHERE project_id = $1 ORDER BY created_at ASC', [projectId]),
-      query('SELECT * FROM budget_items WHERE project_id = $1 ORDER BY is_actual ASC, category ASC', [projectId]),
       query(
         `SELECT u.id, u.name, u.email, pa.assigned_at FROM project_assignments pa
          JOIN users u ON u.id = pa.user_id WHERE pa.project_id = $1`,
@@ -166,8 +164,6 @@ export async function getProject(request: NextRequest, id: string) {
         ...projectResult.rows[0],
         tasks: tasksResult.rows,
         daily_reports: reportsResult.rows,
-        materials: materialsResult.rows,
-        budget_items: budgetResult.rows,
         assigned_technicians: assignmentsResult.rows,
       },
     });

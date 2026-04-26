@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useResetPassword } from '../hooks/useUsers';
+import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useResetPassword, useDeactivateUser, useActivateUser } from '../hooks/useUsers';
 import { useAuth } from '../hooks/useAuth';
 import DataTable, { type Column } from '../components/ui/DataTable';
 import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import EmptyState from '../components/ui/EmptyState';
+import { useLanguage } from '../hooks/useLanguage';
+import { t } from '../lib/i18n';
 import type { User, UserRole } from '../types';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -19,6 +21,18 @@ function RoleBadge({ role }: { role: UserRole }) {
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${ROLE_BADGE[role] ?? ''}`}>
       {role}
+    </span>
+  );
+}
+
+function ActiveBadge({ isActive, language }: { isActive: boolean; language: string }) {
+  return isActive ? (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+      {t('user.active', language as Parameters<typeof t>[1])}
+    </span>
+  ) : (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+      {t('user.inactive', language as Parameters<typeof t>[1])}
     </span>
   );
 }
@@ -55,6 +69,11 @@ export default function UserManagementPage() {
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
   const resetMutation = useResetPassword();
+  const deactivateMutation = useDeactivateUser();
+  const activateMutation = useActivateUser();
+  const { language } = useLanguage();
+
+  const locale = language === 'id' ? 'id-ID' : 'en-US';
 
   // Modals
   const [showCreate, setShowCreate] = useState(false);
@@ -108,7 +127,7 @@ export default function UserManagementPage() {
       },
       {
         key: 'name',
-        label: 'Name',
+        label: t('label.name', language),
         render: (u) => (
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{u.name}</span>
         ),
@@ -117,7 +136,7 @@ export default function UserManagementPage() {
       },
       {
         key: 'email',
-        label: 'Email',
+        label: t('label.email', language),
         render: (u) => (
           <span className="text-sm text-gray-600 dark:text-gray-400">{u.email}</span>
         ),
@@ -126,18 +145,25 @@ export default function UserManagementPage() {
       },
       {
         key: 'role',
-        label: 'Role',
+        label: t('label.role', language),
         render: (u) => <RoleBadge role={u.role} />,
         sortValue: (u) => u.role,
         exportValue: (u) => u.role,
       },
       {
+        key: 'is_active',
+        label: t('label.status', language),
+        render: (u) => <ActiveBadge isActive={u.is_active} language={language} />,
+        sortValue: (u) => (u.is_active ? 1 : 0),
+        exportValue: (u) => (u.is_active ? t('user.active', language) : t('user.inactive', language)),
+      },
+      {
         key: 'created_at',
-        label: 'Joined',
+        label: t('user.joined', language),
         render: (u) => (
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {u.created_at
-              ? new Date(u.created_at).toLocaleDateString('id-ID', {
+              ? new Date(u.created_at).toLocaleDateString(locale, {
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric',
@@ -149,16 +175,17 @@ export default function UserManagementPage() {
         exportValue: (u) => u.created_at ?? '',
       },
     ],
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [language]
   );
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
   const handleCreate = async () => {
     setCreateError('');
-    if (!createForm.name.trim()) { setCreateError('Name is required.'); return; }
-    if (!createForm.email.trim()) { setCreateError('Email is required.'); return; }
-    if (createForm.password.length < 6) { setCreateError('Password must be at least 6 characters.'); return; }
+    if (!createForm.name.trim()) { setCreateError(t('user.name_required', language)); return; }
+    if (!createForm.email.trim()) { setCreateError(t('user.email_required', language)); return; }
+    if (createForm.password.length < 6) { setCreateError(t('user.pw_min_6', language)); return; }
 
     try {
       await createMutation.mutateAsync({
@@ -170,7 +197,7 @@ export default function UserManagementPage() {
       setCreateForm(EMPTY_CREATE);
       setShowCreate(false);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to create user.';
+      const msg = err instanceof Error ? err.message : t('user.create_failed', language);
       setCreateError(msg);
     }
   };
@@ -184,8 +211,8 @@ export default function UserManagementPage() {
   const handleUpdate = async () => {
     if (!editUser) return;
     setEditError('');
-    if (!editForm.name.trim()) { setEditError('Name is required.'); return; }
-    if (!editForm.email.trim()) { setEditError('Email is required.'); return; }
+    if (!editForm.name.trim()) { setEditError(t('user.name_required', language)); return; }
+    if (!editForm.email.trim()) { setEditError(t('user.email_required', language)); return; }
 
     try {
       await updateMutation.mutateAsync({
@@ -198,7 +225,7 @@ export default function UserManagementPage() {
       });
       setEditUser(null);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to update user.';
+      const msg = err instanceof Error ? err.message : t('user.update_failed', language);
       setEditError(msg);
     }
   };
@@ -218,14 +245,14 @@ export default function UserManagementPage() {
   const handleResetPassword = async () => {
     if (!editUser) return;
     setResetError('');
-    if (newPassword.length < 6) { setResetError('Password must be at least 6 characters.'); return; }
+    if (newPassword.length < 6) { setResetError(t('user.pw_min_6', language)); return; }
 
     try {
       await resetMutation.mutateAsync({ id: editUser.id, password: newPassword });
       setShowResetModal(false);
       setNewPassword('');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to reset password.';
+      const msg = err instanceof Error ? err.message : t('user.reset_failed', language);
       setResetError(msg);
     }
   };
@@ -234,7 +261,7 @@ export default function UserManagementPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64" role="status" aria-label="Loading users">
+      <div className="flex items-center justify-center h-64" role="status" aria-label={language === 'id' ? 'Memuat pengguna' : 'Loading users'}>
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
@@ -242,7 +269,7 @@ export default function UserManagementPage() {
 
   if (isError) {
     return (
-      <p className="text-center text-red-500 text-sm py-16">Failed to load users.</p>
+      <p className="text-center text-red-500 text-sm py-16">{t('error.load_failed', language)}.</p>
     );
   }
 
@@ -252,12 +279,12 @@ export default function UserManagementPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">User Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('user.management', language)}</h1>
         <button
           onClick={() => { setCreateForm(EMPTY_CREATE); setCreateError(''); setShowCreate(true); }}
           className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
-          + New User
+          {t('action.new_user', language)}
         </button>
       </div>
 
@@ -265,31 +292,31 @@ export default function UserManagementPage() {
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="search"
-          placeholder="Search by name or email..."
+          placeholder={t('user.search_placeholder', language)}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-72 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Search users"
+          aria-label={t('user.search_placeholder', language)}
         />
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
           className="w-full sm:w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Filter by role"
+          aria-label={language === 'id' ? 'Filter berdasarkan peran' : 'Filter by role'}
         >
-          <option value="all">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="manager">Manager</option>
-          <option value="technician">Technician</option>
+          <option value="all">{t('user.all_roles', language)}</option>
+          <option value="admin">{t('role.admin', language)}</option>
+          <option value="manager">{t('role.manager', language)}</option>
+          <option value="technician">{t('role.technician', language)}</option>
         </select>
       </div>
 
       {/* Table */}
       {filtered.length === 0 && users.length === 0 ? (
         <EmptyState
-          title="No users found"
-          description="Add the first user to get started."
-          action={{ label: '+ New User', onClick: () => { setCreateForm(EMPTY_CREATE); setCreateError(''); setShowCreate(true); } }}
+          title={t('user.no_users_title', language)}
+          description={t('user.no_users_desc', language)}
+          action={{ label: t('action.new_user', language), onClick: () => { setCreateForm(EMPTY_CREATE); setCreateError(''); setShowCreate(true); } }}
         />
       ) : (
         <DataTable<User>
@@ -297,30 +324,65 @@ export default function UserManagementPage() {
           data={filtered}
           rowKey={(u) => u.id}
           onRowClick={openEdit}
+          rowClass={(u) => (u.is_active ? '' : 'opacity-50')}
           defaultSortKey="created_at"
           defaultSortDesc={true}
           exportFileName="users"
-          emptyMessage="No users match your search."
+          emptyMessage={t('user.no_match', language)}
           actionColumn={{
-            label: 'Actions',
+            label: t('label.actions', language),
             render: (u) => (
               <div className="flex items-center gap-2">
                 {/* Edit */}
                 <button
                   onClick={(e) => { e.stopPropagation(); openEdit(u); }}
                   className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                  aria-label={`Edit ${u.name}`}
+                  aria-label={`${t('action.edit', language)} ${u.name}`}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </button>
+                {/* Deactivate / Activate — hidden for self */}
+                {u.id !== me?.id && (
+                  u.is_active ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deactivateMutation.mutate(u.id);
+                      }}
+                      disabled={deactivateMutation.isPending}
+                      className="text-amber-500 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors disabled:opacity-50"
+                      aria-label={`${t('user.deactivate', language)} ${u.name}`}
+                      title={t('user.deactivate', language)}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                      </svg>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        activateMutation.mutate(u.id);
+                      }}
+                      disabled={activateMutation.isPending}
+                      className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors disabled:opacity-50"
+                      aria-label={`${t('user.activate', language)} ${u.name}`}
+                      title={t('user.activate', language)}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                  )
+                )}
                 {/* Delete — hidden for self */}
                 {u.id !== me?.id && (
                   <button
                     onClick={(e) => { e.stopPropagation(); setDeleteId(u.id); }}
                     className="text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    aria-label={`Delete ${u.name}`}
+                    aria-label={`${t('action.delete', language)} ${u.name}`}
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -334,7 +396,7 @@ export default function UserManagementPage() {
       )}
 
       {/* ── Create User Modal ──────────────────────────────────────────────── */}
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Add New User">
+      <Modal open={showCreate} onClose={() => setShowCreate(false)} title={t('user.create_title', language)}>
         <div className="space-y-4">
           {createError && (
             <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">
@@ -342,53 +404,53 @@ export default function UserManagementPage() {
             </p>
           )}
           <div>
-            <label htmlFor="create-name" className={LABEL_CLASS}>Name *</label>
+            <label htmlFor="create-name" className={LABEL_CLASS}>{t('label.name', language)} *</label>
             <input
               id="create-name"
               type="text"
               value={createForm.name}
               onChange={(e) => setCreateForm((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Full name"
+              placeholder={t('user.full_name_placeholder', language)}
               required
               className={INPUT_CLASS}
             />
           </div>
           <div>
-            <label htmlFor="create-email" className={LABEL_CLASS}>Email *</label>
+            <label htmlFor="create-email" className={LABEL_CLASS}>{t('label.email', language)} *</label>
             <input
               id="create-email"
               type="email"
               value={createForm.email}
               onChange={(e) => setCreateForm((p) => ({ ...p, email: e.target.value }))}
-              placeholder="user@example.com"
+              placeholder={t('user.email_placeholder', language)}
               required
               className={INPUT_CLASS}
             />
           </div>
           <div>
-            <label htmlFor="create-password" className={LABEL_CLASS}>Password *</label>
+            <label htmlFor="create-password" className={LABEL_CLASS}>{t('label.password', language)} *</label>
             <input
               id="create-password"
               type="password"
               value={createForm.password}
               onChange={(e) => setCreateForm((p) => ({ ...p, password: e.target.value }))}
-              placeholder="Min 6 characters"
+              placeholder={t('user.pw_placeholder', language)}
               required
               minLength={6}
               className={INPUT_CLASS}
             />
           </div>
           <div>
-            <label htmlFor="create-role" className={LABEL_CLASS}>Role *</label>
+            <label htmlFor="create-role" className={LABEL_CLASS}>{t('label.role', language)} *</label>
             <select
               id="create-role"
               value={createForm.role}
               onChange={(e) => setCreateForm((p) => ({ ...p, role: e.target.value as UserRole }))}
               className={INPUT_CLASS}
             >
-              <option value="technician">Technician</option>
-              <option value="manager">Manager</option>
-              <option value="admin">Admin</option>
+              <option value="technician">{t('role.technician', language)}</option>
+              <option value="manager">{t('role.manager', language)}</option>
+              <option value="admin">{t('role.admin', language)}</option>
             </select>
           </div>
           <div className="flex gap-3 pt-2">
@@ -397,7 +459,7 @@ export default function UserManagementPage() {
               onClick={() => setShowCreate(false)}
               className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancel
+              {t('action.cancel', language)}
             </button>
             <button
               type="button"
@@ -405,7 +467,7 @@ export default function UserManagementPage() {
               disabled={createMutation.isPending}
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
             >
-              {createMutation.isPending ? 'Creating...' : 'Create User'}
+              {createMutation.isPending ? t('user.creating', language) : t('action.create_user', language)}
             </button>
           </div>
         </div>
@@ -415,7 +477,7 @@ export default function UserManagementPage() {
       <Modal
         open={editUser !== null && !showResetModal}
         onClose={() => setEditUser(null)}
-        title={`Edit User — ${editUser?.name ?? ''}`}
+        title={`${t('user.edit_title', language)} — ${editUser?.name ?? ''}`}
       >
         <div className="space-y-4">
           {editError && (
@@ -424,40 +486,40 @@ export default function UserManagementPage() {
             </p>
           )}
           <div>
-            <label htmlFor="edit-name" className={LABEL_CLASS}>Name *</label>
+            <label htmlFor="edit-name" className={LABEL_CLASS}>{t('label.name', language)} *</label>
             <input
               id="edit-name"
               type="text"
               value={editForm.name}
               onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Full name"
+              placeholder={t('user.full_name_placeholder', language)}
               required
               className={INPUT_CLASS}
             />
           </div>
           <div>
-            <label htmlFor="edit-email" className={LABEL_CLASS}>Email *</label>
+            <label htmlFor="edit-email" className={LABEL_CLASS}>{t('label.email', language)} *</label>
             <input
               id="edit-email"
               type="email"
               value={editForm.email}
               onChange={(e) => setEditForm((p) => ({ ...p, email: e.target.value }))}
-              placeholder="user@example.com"
+              placeholder={t('user.email_placeholder', language)}
               required
               className={INPUT_CLASS}
             />
           </div>
           <div>
-            <label htmlFor="edit-role" className={LABEL_CLASS}>Role *</label>
+            <label htmlFor="edit-role" className={LABEL_CLASS}>{t('label.role', language)} *</label>
             <select
               id="edit-role"
               value={editForm.role}
               onChange={(e) => setEditForm((p) => ({ ...p, role: e.target.value as UserRole }))}
               className={INPUT_CLASS}
             >
-              <option value="technician">Technician</option>
-              <option value="manager">Manager</option>
-              <option value="admin">Admin</option>
+              <option value="technician">{t('role.technician', language)}</option>
+              <option value="manager">{t('role.manager', language)}</option>
+              <option value="admin">{t('role.admin', language)}</option>
             </select>
           </div>
 
@@ -468,7 +530,7 @@ export default function UserManagementPage() {
               onClick={openResetPassword}
               className="text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 underline transition-colors"
             >
-              Reset Password
+              {t('user.reset_password', language)}
             </button>
           </div>
 
@@ -478,7 +540,7 @@ export default function UserManagementPage() {
               onClick={() => setEditUser(null)}
               className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancel
+              {t('action.cancel', language)}
             </button>
             <button
               type="button"
@@ -486,7 +548,7 @@ export default function UserManagementPage() {
               disabled={updateMutation.isPending}
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
             >
-              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+              {updateMutation.isPending ? t('action.saving', language) : t('action.save_changes', language)}
             </button>
           </div>
         </div>
@@ -496,7 +558,7 @@ export default function UserManagementPage() {
       <Modal
         open={showResetModal}
         onClose={() => setShowResetModal(false)}
-        title={`Reset Password — ${editUser?.name ?? ''}`}
+        title={`${t('user.reset_pw_title', language)} — ${editUser?.name ?? ''}`}
         maxWidth="max-w-sm"
       >
         <div className="space-y-4">
@@ -506,13 +568,13 @@ export default function UserManagementPage() {
             </p>
           )}
           <div>
-            <label htmlFor="reset-password" className={LABEL_CLASS}>New Password *</label>
+            <label htmlFor="reset-password" className={LABEL_CLASS}>{t('user.new_pw_label', language)}</label>
             <input
               id="reset-password"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min 6 characters"
+              placeholder={t('user.pw_placeholder', language)}
               minLength={6}
               className={INPUT_CLASS}
               autoFocus
@@ -524,7 +586,7 @@ export default function UserManagementPage() {
               onClick={() => setShowResetModal(false)}
               className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancel
+              {t('action.cancel', language)}
             </button>
             <button
               type="button"
@@ -532,7 +594,7 @@ export default function UserManagementPage() {
               disabled={resetMutation.isPending}
               className="flex-1 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
             >
-              {resetMutation.isPending ? 'Resetting...' : 'Reset Password'}
+              {resetMutation.isPending ? t('user.resetting', language) : t('user.reset_password', language)}
             </button>
           </div>
         </div>
@@ -543,9 +605,9 @@ export default function UserManagementPage() {
         open={deleteId !== null}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Delete User"
-        message="Are you sure you want to delete this user? This action cannot be undone. Their task assignments and project records will remain but the account will be removed."
-        confirmLabel="Delete"
+        title={t('user.delete_title', language)}
+        message={t('user.delete_message', language)}
+        confirmLabel={t('action.delete', language)}
         variant="danger"
         loading={deleteMutation.isPending}
       />

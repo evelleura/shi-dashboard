@@ -114,9 +114,10 @@ export function useApproveSurvey() {
 export function useRejectSurvey() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (projectId: number) => rejectSurvey(projectId),
-    onSuccess: (_data, projectId) => {
-      void qc.invalidateQueries({ queryKey: PROJECT_KEYS.detail(projectId) });
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) => rejectSurvey(id, reason),
+    onSuccess: (_data, { id }) => {
+      void qc.invalidateQueries({ queryKey: PROJECT_KEYS.detail(id) });
+      void qc.invalidateQueries({ queryKey: PROJECT_KEYS.all });
     },
   });
 }

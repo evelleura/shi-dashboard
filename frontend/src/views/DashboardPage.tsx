@@ -8,7 +8,6 @@ import TasksByStatusChart from '../components/charts/TasksByStatusChart';
 import TasksByOwnerChart from '../components/charts/TasksByOwnerChart';
 import TasksByDueDateChart from '../components/charts/TasksByDueDateChart';
 import OverdueTasksChart from '../components/charts/OverdueTasksChart';
-import BudgetStatusChart from '../components/charts/BudgetStatusChart';
 import ProjectCategoryPieChart from '../components/charts/ProjectCategoryPieChart';
 import TechnicianWorkloadChart from '../components/charts/TechnicianWorkloadChart';
 import SPITrendChart from '../components/charts/SPITrendChart';
@@ -19,6 +18,8 @@ import Modal from '../components/ui/Modal';
 import ProjectForm from '../components/projects/ProjectForm';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getClients, createProject, createClient } from '../services/api';
+import { useLanguage } from '../hooks/useLanguage';
+import { t } from '../lib/i18n';
 import type { DateRange, CreateProjectData } from '../types';
 
 type Filter = 'all' | 'red' | 'amber' | 'green' | 'none';
@@ -26,6 +27,7 @@ type Filter = 'all' | 'red' | 'amber' | 'green' | 'none';
 export default function DashboardPage() {
   const { data, isLoading, isError, refetch } = useDashboard();
   const router = useRouter();
+  const { language } = useLanguage();
   const [filter, setFilter] = useState<Filter>('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -48,16 +50,16 @@ export default function DashboardPage() {
   }, []);
 
   const filterButtons: { label: string; value: Filter; color: string }[] = [
-    { label: 'All', value: 'all', color: 'bg-gray-100 text-gray-700' },
-    { label: 'Critical', value: 'red', color: 'bg-red-100 text-red-700' },
-    { label: 'Warning', value: 'amber', color: 'bg-yellow-100 text-yellow-700' },
-    { label: 'On Track', value: 'green', color: 'bg-green-100 text-green-700' },
-    { label: 'No Data', value: 'none', color: 'bg-gray-100 text-gray-500' },
+    { label: t('dashboard.filter_all', language), value: 'all', color: 'bg-gray-100 text-gray-700' },
+    { label: t('dashboard.filter_critical', language), value: 'red', color: 'bg-red-100 text-red-700' },
+    { label: t('dashboard.filter_warning', language), value: 'amber', color: 'bg-yellow-100 text-yellow-700' },
+    { label: t('dashboard.filter_on_track', language), value: 'green', color: 'bg-green-100 text-green-700' },
+    { label: t('dashboard.filter_no_data', language), value: 'none', color: 'bg-gray-100 text-gray-500' },
   ];
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64" role="status" aria-label="Loading dashboard">
+      <div className="flex items-center justify-center h-64" role="status" aria-label={t('dashboard.loading', language)}>
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
@@ -66,8 +68,8 @@ export default function DashboardPage() {
   if (isError || !data) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500 text-sm">Failed to load dashboard data.</p>
-        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">Retry</button>
+        <p className="text-red-500 text-sm">{t('error.load_failed', language)}.</p>
+        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">{t('dashboard.retry', language)}</button>
       </div>
     );
   }
@@ -77,8 +79,8 @@ export default function DashboardPage() {
       {/* Header + Date Range Picker */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Project Dashboard</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">PT Smart Home Inovasi Yogyakarta -- Real-time project health monitoring</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('dashboard.title', language)}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.subtitle', language)}</p>
         </div>
         <DateRangePicker
           startDate={dateRange?.start ?? ''}
@@ -108,14 +110,14 @@ export default function DashboardPage() {
           <div className="flex-1">
             <p className="text-sm font-semibold text-red-700 dark:text-red-400">
               {(data.summary.open_escalations ?? 0) > 0
-                ? `${data.summary.open_escalations} open escalation${(data.summary.open_escalations ?? 0) > 1 ? 's' : ''} need attention`
+                ? `${data.summary.open_escalations} ${t('dashboard.escalation_need_attention', language)}`
                 : ''}
               {(data.summary.open_escalations ?? 0) > 0 && (data.summary.in_review_escalations ?? 0) > 0 ? ' -- ' : ''}
               {(data.summary.in_review_escalations ?? 0) > 0
-                ? `${data.summary.in_review_escalations} in review`
+                ? `${data.summary.in_review_escalations} ${t('dashboard.escalation_in_review', language)}`
                 : ''}
             </p>
-            <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">Click to manage escalations</p>
+            <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{t('dashboard.escalation_click', language)}</p>
           </div>
           <svg className="w-5 h-5 text-red-400 dark:text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -145,9 +147,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts Row 4: Overdue + Budget */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <OverdueTasksChart />
-        <BudgetStatusChart />
       </div>
 
       {/* SPI Trend (full width) */}
@@ -159,7 +160,7 @@ export default function DashboardPage() {
       {/* Project Health Grid */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Projects Overview</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.projects_overview', language)}</h2>
           <div className="flex flex-wrap gap-2">
             {filterButtons.map((btn) => (
               <button
@@ -185,7 +186,7 @@ export default function DashboardPage() {
       </div>
 
       {/* New Project Modal */}
-      <Modal open={showProjectModal} onClose={() => setShowProjectModal(false)} title="New Project">
+      <Modal open={showProjectModal} onClose={() => setShowProjectModal(false)} title={t('project.new', language)}>
         <ProjectForm
           clients={clients ?? []}
           onSubmit={async (d) => { await projectMutation.mutateAsync(d); }}
@@ -195,31 +196,31 @@ export default function DashboardPage() {
       </Modal>
 
       {/* New Client Modal */}
-      <Modal open={showClientModal} onClose={() => setShowClientModal(false)} title="New Client">
+      <Modal open={showClientModal} onClose={() => setShowClientModal(false)} title={t('client.new', language)}>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.name', language)} *</label>
             <input
               type="text"
               value={clientForm.name}
               onChange={(e) => setClientForm((f) => ({ ...f, name: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Client name"
+              placeholder={t('client.name_placeholder', language)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.address', language)}</label>
             <input
               type="text"
               value={clientForm.address}
               onChange={(e) => setClientForm((f) => ({ ...f, address: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Client address"
+              placeholder={t('client.address_placeholder', language)}
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.phone', language)}</label>
               <input
                 type="text"
                 value={clientForm.phone}
@@ -229,7 +230,7 @@ export default function DashboardPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.email', language)}</label>
               <input
                 type="email"
                 value={clientForm.email}
@@ -244,14 +245,14 @@ export default function DashboardPage() {
               onClick={() => setShowClientModal(false)}
               className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
             >
-              Cancel
+              {t('action.cancel', language)}
             </button>
             <button
               onClick={() => clientMutation.mutate()}
               disabled={clientMutation.isPending || !clientForm.name.trim()}
               className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-50"
             >
-              {clientMutation.isPending ? 'Saving...' : 'Create Client'}
+              {clientMutation.isPending ? t('action.saving', language) : t('action.create_client', language)}
             </button>
           </div>
         </div>
