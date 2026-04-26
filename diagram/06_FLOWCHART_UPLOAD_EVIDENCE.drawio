@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-26T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="fc-upload-evidence" name="Flowchart Upload Evidence Task">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- FLOWCHART UPLOAD EVIDENCE TASK -->
+        <!-- Gambar 4.5 Flowchart Upload Evidence Task -->
+
+        <!-- 1. Mulai -->
+        <mxCell id="start" value="Mulai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontColor=#000000;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="265" y="20" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 2. Pilih Task [working_on_it] -->
+        <mxCell id="p1" value="Pilih Task&#xa;[Status: working_on_it]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="104" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Klik Tombol Upload Evidence -->
+        <mxCell id="p2" value="Klik Tombol Upload Evidence" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="188" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 4. Pilih File (foto/dokumen) -->
+        <mxCell id="io1" value="Pilih File&#xa;(foto / dokumen)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="272" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Decision: File Valid? (ukuran & tipe) -->
+        <mxCell id="d1" value="File Valid?&#xa;(ukuran &amp; tipe)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="356" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Tampil Error Validasi File (cabang N - kiri) -->
+        <mxCell id="perrFile" value="Tampil Error&#xa;Validasi File" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="282" width="155" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 7. Upload ke Server (POST /api/evidence) -->
+        <mxCell id="p3" value="Upload ke Server&#xa;(POST /api/evidence)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="466" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 8. Decision: Upload Berhasil? -->
+        <mxCell id="d2" value="Upload Berhasil?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="550" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 9. Tampil Error Upload (cabang N - kiri) -->
+        <mxCell id="perrUpload" value="Tampil Error Upload" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="560" width="155" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 10. Selesai (jalur error upload) -->
+        <mxCell id="endErr" value="Selesai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontColor=#000000;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="67" y="644" width="130" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 11. Simpan Record di DB -->
+        <mxCell id="p4" value="Simpan Record di DB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="660" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 12. Tampil Konfirmasi Sukses -->
+        <mxCell id="io2" value="Tampil Konfirmasi Sukses" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="744" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 13. Selesai -->
+        <mxCell id="end" value="Selesai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontColor=#000000;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="265" y="828" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar 4.5 Flowchart Upload Evidence Task." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="185" y="900" width="420" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+
+        <!-- start → p1 -->
+        <mxCell id="e1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="start" target="p1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p1 → p2 -->
+        <mxCell id="e2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p1" target="p2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p2 → io1 -->
+        <mxCell id="e3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p2" target="io1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- io1 → d1 -->
+        <mxCell id="e4" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io1" target="d1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d1 → perrFile (N, kiri) -->
+        <mxCell id="e5" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d1" target="perrFile" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="205" y="386" />
+              <mxPoint x="205" y="304" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- perrFile → io1 (loop balik ke pilih file) -->
+        <mxCell id="e6" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="perrFile" target="io1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="25" y="304" />
+              <mxPoint x="25" y="294" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- d1 → p3 (Y, bawah) -->
+        <mxCell id="e7" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d1" target="p3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p3 → d2 -->
+        <mxCell id="e8" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p3" target="d2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d2 → perrUpload (N, kiri) -->
+        <mxCell id="e9" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d2" target="perrUpload" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- perrUpload → endErr -->
+        <mxCell id="e10" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="perrUpload" target="endErr" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d2 → p4 (Y, bawah) -->
+        <mxCell id="e11" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d2" target="p4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p4 → io2 -->
+        <mxCell id="e12" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p4" target="io2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- io2 → end -->
+        <mxCell id="e13" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io2" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

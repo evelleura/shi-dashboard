@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-26T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="fc-kalkulasi-spi" name="Flowchart Kalkulasi SPI">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1200" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- FLOWCHART KALKULASI SPI -->
+        <!-- SPI = (completed_tasks / total_tasks) / (elapsed_days / total_project_days) -->
+        <!-- Gambar 4.3 Flowchart Kalkulasi SPI -->
+
+        <!-- 1. Mulai -->
+        <mxCell id="start" value="Mulai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontColor=#000000;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="265" y="20" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 2. Status Task Berubah (input/trigger) -->
+        <mxCell id="io1" value="Status Task Berubah&#xa;(event trigger)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="104" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Ambil Data Proyek dari DB -->
+        <mxCell id="p1" value="Ambil Data Proyek dari DB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="188" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 4. Hitung Jumlah Task -->
+        <mxCell id="p2" value="Hitung Jumlah Task" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="272" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Hitung Elapsed dan Total Hari -->
+        <mxCell id="p3" value="Hitung Elapsed dan Total Hari" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="356" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Decision: Total Tasks > 0? -->
+        <mxCell id="d1" value="Total Tasks &gt; 0?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="440" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 7. Hitung SPI Task (cabang Y - kanan) -->
+        <mxCell id="pSPITask" value="SPI = (done/total) /&#xa;(elapsed/total_hari)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="470" y="450" width="175" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 8. Hitung SPI Laporan (cabang N - kiri) -->
+        <mxCell id="pSPILap" value="SPI dari Progress&#xa;Laporan Harian" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="30" y="450" width="175" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 9. Decision: SPI >= 0.95? -->
+        <mxCell id="d2" value="SPI &gt;= 0.95?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="554" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 10. Status = Green (cabang Y - kanan) -->
+        <mxCell id="pGreen" value="Status = Green&#xa;(On Track)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="470" y="564" width="155" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 11. Decision: SPI >= 0.85? -->
+        <mxCell id="d3" value="SPI &gt;= 0.85?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="664" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 12. Status = Amber (cabang Y - kanan) -->
+        <mxCell id="pAmber" value="Status = Amber&#xa;(Perlu Perhatian)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="470" y="674" width="155" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 13. Status = Red (cabang N - bawah) -->
+        <mxCell id="pRed" value="Status = Red&#xa;(Kritis)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="774" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 14. Update project_health di DB (titik merge dari 3 status) -->
+        <mxCell id="p4" value="Update project_health di DB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="868" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- 15. Selesai -->
+        <mxCell id="end" value="Selesai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontColor=#000000;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="265" y="952" width="160" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar 4.3 Flowchart Kalkulasi SPI." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="185" y="1020" width="420" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+
+        <!-- start → io1 -->
+        <mxCell id="e1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="start" target="io1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- io1 → p1 -->
+        <mxCell id="e2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io1" target="p1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p1 → p2 -->
+        <mxCell id="e3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p1" target="p2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p2 → p3 -->
+        <mxCell id="e4" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p2" target="p3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p3 → d1 -->
+        <mxCell id="e5" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p3" target="d1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d1 → pSPITask (Y, kanan) -->
+        <mxCell id="e6" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d1" target="pSPITask" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d1 → pSPILap (N, kiri) -->
+        <mxCell id="e7" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d1" target="pSPILap" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- pSPITask → d2 (merge ke keputusan SPI) -->
+        <mxCell id="e8" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="pSPITask" target="d2" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="557" y="530" />
+              <mxPoint x="425" y="584" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- pSPILap → d2 (merge ke keputusan SPI) -->
+        <mxCell id="e9" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="pSPILap" target="d2" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="117" y="530" />
+              <mxPoint x="265" y="584" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- d2 → pGreen (Y, kanan) -->
+        <mxCell id="e10" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d2" target="pGreen" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- pGreen → p4 (merge ke update) -->
+        <mxCell id="e11" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="pGreen" target="p4" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="547" y="840" />
+              <mxPoint x="425" y="890" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- d2 → d3 (N, bawah) -->
+        <mxCell id="e12" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d2" target="d3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d3 → pAmber (Y, kanan) -->
+        <mxCell id="e13" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d3" target="pAmber" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- pAmber → p4 (merge ke update) -->
+        <mxCell id="e14" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" source="pAmber" target="p4" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="547" y="850" />
+              <mxPoint x="425" y="868" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- d3 → pRed (N, bawah) -->
+        <mxCell id="e15" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d3" target="pRed" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- pRed → p4 -->
+        <mxCell id="e16" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="pRed" target="p4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- p4 → end -->
+        <mxCell id="e17" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p4" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
