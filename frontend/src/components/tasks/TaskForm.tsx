@@ -1,13 +1,19 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { checkTechnicianConflicts } from '../../services/api';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../lib/i18n';
 import type { CreateTaskData, Task, User } from '../../types';
 
+interface TechMeta {
+  busy_today: boolean;
+  active_tasks: number;
+}
+
 interface Props {
   projectId: number;
   technicians: User[];
+  technicianMeta?: Record<number, TechMeta>;
   existingTasks?: Task[];
   onSubmit: (data: CreateTaskData) => Promise<void>;
   onCancel: () => void;
@@ -15,8 +21,10 @@ interface Props {
   projectPhase?: string;
 }
 
-export default function TaskForm({ projectId, technicians, existingTasks = [], onSubmit, onCancel, isPending, projectPhase }: Props) {
+export default function TaskForm({ projectId, technicians, technicianMeta, existingTasks = [], onSubmit, onCancel, isPending, projectPhase }: Props) {
   const { language } = useLanguage();
+  const [assigneeOpen, setAssigneeOpen] = useState(false);
+  const assigneeRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -57,6 +65,18 @@ export default function TaskForm({ projectId, technicians, existingTasks = [], o
   useEffect(() => {
     if (!canCheckConflicts) return;
   }, [form.assigned_to, form.timeline_start, form.timeline_end, canCheckConflicts]);
+
+  // Close assignee dropdown on outside click
+  useEffect(() => {
+    if (!assigneeOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (assigneeRef.current && !assigneeRef.current.contains(e.target as Node)) {
+        setAssigneeOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [assigneeOpen]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -118,13 +138,79 @@ export default function TaskForm({ projectId, technicians, existingTasks = [], o
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="task-assignee" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.assignee', language)}</label>
-          <select id="task-assignee" name="assigned_to" value={form.assigned_to} onChange={handleChange} className={inputClass}>
-            <option value="">{t('task.unassigned', language)}</option>
-            {technicians.map((tech) => (
-              <option key={tech.id} value={tech.id}>{tech.name}</option>
-            ))}
-          </select>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.assignee', language)}</label>
+          {technicianMeta ? (
+            <div ref={assigneeRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setAssigneeOpen((o) => !o)}
+                className={`${inputClass} flex items-center justify-between text-left`}
+              >
+                <span>
+                  {form.assigned_to
+                    ? (() => {
+                        const tech = technicians.find((t) => String(t.id) === form.assigned_to);
+                        const meta = tech ? technicianMeta[tech.id] : undefined;
+                        return tech ? (
+                          <span className="flex items-center gap-2">
+                            {tech.name}
+                            {meta && (
+                              <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${meta.busy_today ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
+                                {meta.busy_today ? 'Sibuk' : 'Bebas'}
+                              </span>
+                            )}
+                          </span>
+                        ) : t('task.unassigned', language);
+                      })()
+                    : t('task.unassigned', language)}
+                </span>
+                <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {assigneeOpen && (
+                <div className="absolute z-20 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-52 overflow-y-auto">
+                  <button
+                    type="button"
+                    onClick={() => { setForm((f) => ({ ...f, assigned_to: '' })); setAssigneeOpen(false); }}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    {t('task.unassigned', language)}
+                  </button>
+                  {technicians.map((tech) => {
+                    const meta = technicianMeta[tech.id];
+                    return (
+                      <button
+                        key={tech.id}
+                        type="button"
+                        onClick={() => { setForm((f) => ({ ...f, assigned_to: String(tech.id) })); setAssigneeOpen(false); }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between gap-2"
+                      >
+                        <span className="text-sm text-gray-900 dark:text-gray-100">{tech.name}</span>
+                        {meta && (
+                          <span className="flex items-center gap-1.5 shrink-0">
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${meta.busy_today ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
+                              {meta.busy_today ? 'Sibuk' : 'Bebas'}
+                            </span>
+                            {meta.active_tasks > 0 && (
+                              <span className="text-xs text-gray-400">{meta.active_tasks} aktif</span>
+                            )}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <select id="task-assignee" name="assigned_to" value={form.assigned_to} onChange={handleChange} className={inputClass}>
+              <option value="">{t('task.unassigned', language)}</option>
+              {technicians.map((tech) => (
+                <option key={tech.id} value={tech.id}>{tech.name}</option>
+              ))}
+            </select>
+          )}
         </div>
         <div>
           <label htmlFor="task-due" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.due_date', language)}</label>

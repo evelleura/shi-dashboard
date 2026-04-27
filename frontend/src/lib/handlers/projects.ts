@@ -462,6 +462,41 @@ export async function assignTechnician(request: NextRequest, id: string) {
   }
 }
 
+export async function getProjectTechniciansWithMetrics(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const projectId = parseInt(id);
+  if (isNaN(projectId)) {
+    return NextResponse.json({ success: false, error: 'Invalid project ID' }, { status: 400 });
+  }
+
+  try {
+    const result = await query(
+      `SELECT u.id, u.name, u.email,
+        COUNT(t.id)::int AS total_tasks,
+        COUNT(t.id) FILTER (WHERE t.status = 'done')::int AS completed_tasks,
+        COUNT(t.id) FILTER (WHERE t.status IN ('to_do', 'working_on_it'))::int AS active_tasks,
+        COUNT(t.id) FILTER (WHERE t.due_date < CURRENT_DATE AND t.status != 'done')::int AS overdue_tasks,
+        MIN(t.due_date)::text AS earliest_due_date,
+        BOOL_OR(
+          t.timeline_start IS NOT NULL AND t.timeline_end IS NOT NULL
+          AND t.timeline_start <= CURRENT_DATE AND t.timeline_end >= CURRENT_DATE
+          AND t.status IN ('to_do', 'working_on_it')
+        ) AS busy_today
+       FROM users u
+       JOIN tasks t ON t.assigned_to = u.id AND t.project_id = $1
+       GROUP BY u.id, u.name, u.email
+       ORDER BY u.name ASC`,
+      [projectId]
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Get project technicians error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function unassignTechnician(request: NextRequest, id: string, userId: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;

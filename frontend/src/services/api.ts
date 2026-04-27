@@ -95,6 +95,23 @@ export const getTechnicians = async (): Promise<any[]> => {
   return res.data.data;
 };
 
+export interface ProjectTechnicianMetrics {
+  id: number;
+  name: string;
+  email: string;
+  total_tasks: number;
+  completed_tasks: number;
+  active_tasks: number;
+  overdue_tasks: number;
+  earliest_due_date: string | null;
+  busy_today: boolean;
+}
+
+export const getProjectTechnicians = async (projectId: number): Promise<ProjectTechnicianMetrics[]> => {
+  const res = await api.get(`/projects/${projectId}/technicians`);
+  return res.data.data;
+};
+
 export const getMyProjects = async (): Promise<Project[]> => {
   const res = await api.get<ApiResponse<Project[]>>('/users/me/projects');
   return res.data.data!;

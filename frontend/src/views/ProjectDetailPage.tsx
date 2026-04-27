@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useProject, useAssignTechnician, useUnassignTechnician, useApproveSurvey, useRejectSurvey } from '../hooks/useProjects';
+import { useProject, useProjectTechnicians, useApproveSurvey, useRejectSurvey } from '../hooks/useProjects';
 import { useChangeTaskStatus, useCreateTask } from '../hooks/useTasks';
 import { useStartTimer, useStopTimer } from '../hooks/useActivities';
-import { useTechnicians } from '../hooks/useDashboard';
+import { useTechnicianList } from '../hooks/useUsers';
 import StatusBadge from '../components/ui/StatusBadge';
 import ProgressBar from '../components/ui/ProgressBar';
 import Modal from '../components/ui/Modal';
@@ -66,12 +66,11 @@ export default function ProjectDetailPage() {
   const locale = language === 'id' ? 'id-ID' : 'en-US';
   const projectId = parseInt(id ?? '0');
   const { data: project, isLoading, isError } = useProject(projectId);
-  const { data: technicians = [] } = useTechnicians();
+  const { data: technicians = [] } = useTechnicianList();
+  const { data: projectTechnicians = [] } = useProjectTechnicians(projectId);
   const { user } = useAuth();
   const changeStatus = useChangeTaskStatus();
   const createTask = useCreateTask();
-  const assignTech = useAssignTechnician();
-  const unassignTech = useUnassignTechnician();
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();
 
@@ -82,8 +81,6 @@ export default function ProjectDetailPage() {
   const [taskView, setTaskView] = useState<'kanban' | 'table'>('kanban');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
-  const [showAssign, setShowAssign] = useState(false);
-  const [assignUserId, setAssignUserId] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
 
@@ -118,13 +115,6 @@ export default function ProjectDetailPage() {
     setShowTaskForm(false);
   };
 
-  const handleAssign = async () => {
-    if (!assignUserId) return;
-    await assignTech.mutateAsync({ projectId, userId: parseInt(assignUserId) });
-    setAssignUserId('');
-    setShowAssign(false);
-  };
-
   // Timer handlers (same pattern as TechnicianTasksPage)
   const handleTimerStart = (taskId: number) => {
     startTimer.mutate({ taskId, projectId });
@@ -150,10 +140,6 @@ export default function ProjectDetailPage() {
     { id: 'history', label: t('project.tab_history', language) },
   ];
 
-  // Available technicians for assignment (not yet assigned)
-  const assignedIds = new Set((project.assigned_technicians ?? []).map((tech) => tech.id));
-  const availableTechs = technicians.filter((tech) => !assignedIds.has(tech.id));
-
   const metrics = [
     { label: t('project.metric_spi', language), value: project.health?.spi_value != null ? Number(project.health.spi_value).toFixed(3) : '--', color: 'text-blue-600' },
     {
@@ -165,6 +151,10 @@ export default function ProjectDetailPage() {
     { label: t('project.metric_overtime', language), value: project.health?.overtime_tasks ?? 0, color: (project.health?.overtime_tasks ?? 0) > 0 ? 'text-amber-600' : 'text-gray-600' },
     { label: t('project.metric_overdue', language), value: project.health?.overdue_tasks ?? 0, color: (project.health?.overdue_tasks ?? 0) > 0 ? 'text-orange-600' : 'text-gray-600' },
   ];
+
+  const techMeta = Object.fromEntries(
+    projectTechnicians.map((pt) => [pt.id, { busy_today: pt.busy_today, active_tasks: pt.active_tasks }])
+  );
 
   return (
     <div className="space-y-6">
@@ -310,57 +300,71 @@ export default function ProjectDetailPage() {
         />
       </div>
 
-      {/* Assigned technicians */}
+      {/* Assigned technicians — derived from tasks */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('project.assigned_technicians', language)}</h3>
-          {isManager && (
-            <button onClick={() => setShowAssign(!showAssign)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-              {showAssign ? t('project.cancel_assign', language) : `+ ${t('project.assign', language)}`}
-            </button>
-          )}
-        </div>
-        {showAssign && (
-          <div className="flex gap-2 mb-3">
-            <select
-              value={assignUserId}
-              onChange={(e) => setAssignUserId(e.target.value)}
-              className="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">{t('project.select_technician', language)}</option>
-              {availableTechs.map((tech) => (
-                <option key={tech.id} value={tech.id}>{tech.name}</option>
-              ))}
-            </select>
-            <button
-              onClick={handleAssign}
-              disabled={!assignUserId || assignTech.isPending}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-xs px-3 py-1.5 rounded-md"
-            >
-              {t('project.assign', language)}
-            </button>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('project.assigned_technicians', language)}</h3>
+        {projectTechnicians.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500">{t('project.no_technicians', language)}</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left pb-2 font-medium pr-3">Teknisi</th>
+                  <th className="text-center pb-2 font-medium px-2">Total</th>
+                  <th className="text-center pb-2 font-medium px-2">Selesai</th>
+                  <th className="text-center pb-2 font-medium px-2">Aktif</th>
+                  <th className="text-center pb-2 font-medium px-2">Terlambat</th>
+                  <th className="text-center pb-2 font-medium px-2">Hari Ini</th>
+                  <th className="text-left pb-2 font-medium pl-2">Deadline Terdekat</th>
+                </tr>
+              </thead>
+              <tbody>
+                {projectTechnicians.map((tech) => (
+                  <tr
+                    key={tech.id}
+                    onClick={() => router.push(`/technicians/${tech.id}`)}
+                    className="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                  >
+                    <td className="py-2.5 pr-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 flex items-center justify-center text-xs font-semibold shrink-0">
+                          {tech.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{tech.name}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{tech.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="text-center py-2.5 px-2 text-gray-700 dark:text-gray-300">{tech.total_tasks}</td>
+                    <td className="text-center py-2.5 px-2 text-green-600 dark:text-green-400 font-medium">{tech.completed_tasks}</td>
+                    <td className="text-center py-2.5 px-2 text-blue-600 dark:text-blue-400">{tech.active_tasks}</td>
+                    <td className="text-center py-2.5 px-2">
+                      <span className={tech.overdue_tasks > 0 ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-400 dark:text-gray-500'}>
+                        {tech.overdue_tasks}
+                      </span>
+                    </td>
+                    <td className="text-center py-2.5 px-2">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        tech.busy_today
+                          ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300'
+                          : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                      }`}>
+                        {tech.busy_today ? 'Sibuk' : 'Bebas'}
+                      </span>
+                    </td>
+                    <td className="py-2.5 pl-2 text-gray-600 dark:text-gray-400 text-xs">
+                      {tech.earliest_due_date
+                        ? new Date(tech.earliest_due_date).toLocaleDateString(locale, { day: '2-digit', month: 'short' })
+                        : '--'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-        <div className="flex flex-wrap gap-2">
-          {(project.assigned_technicians ?? []).length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500">{t('project.no_technicians', language)}</p>
-          ) : (
-            project.assigned_technicians.map((tech) => (
-              <span key={tech.id} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
-                {tech.name}
-                {isManager && (
-                  <button
-                    onClick={() => unassignTech.mutate({ projectId, userId: tech.id })}
-                    className="text-blue-400 hover:text-red-500 ml-0.5"
-                    aria-label={`Unassign ${tech.name}`}
-                  >
-                    x
-                  </button>
-                )}
-              </span>
-            ))
-          )}
-        </div>
       </div>
 
       {/* Tabs */}
@@ -493,6 +497,7 @@ export default function ProjectDetailPage() {
         <TaskForm
           projectId={projectId}
           technicians={technicians}
+          technicianMeta={techMeta}
           existingTasks={project.tasks ?? []}
           onSubmit={handleCreateTask}
           onCancel={() => setShowTaskForm(false)}

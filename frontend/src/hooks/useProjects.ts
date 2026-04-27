@@ -10,6 +10,8 @@ import {
   approveSurvey,
   rejectSurvey,
   getMyProjects,
+  getProjectTechnicians,
+  type ProjectTechnicianMetrics,
 } from '../services/api';
 import type { CreateProjectData, UpdateProjectData } from '../types';
 
@@ -108,6 +110,15 @@ export function useApproveSurvey() {
       void qc.invalidateQueries({ queryKey: PROJECT_KEYS.detail(projectId) });
       void qc.invalidateQueries({ queryKey: PROJECT_KEYS.all });
     },
+  });
+}
+
+export function useProjectTechnicians(projectId: number) {
+  return useQuery<ProjectTechnicianMetrics[]>({
+    queryKey: ['project-technicians', projectId] as const,
+    queryFn: () => getProjectTechnicians(projectId),
+    staleTime: 1000 * 30,
+    enabled: projectId > 0,
   });
 }
 

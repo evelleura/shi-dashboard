@@ -152,6 +152,10 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     if (r1 && r2 === 'approve-survey' && method === 'POST') return projects.approveSurvey(request, r1);
     if (r1 && r2 === 'reject-survey'  && method === 'POST') return projects.rejectSurvey(request, r1);
     if (r1 && r2 === 'auto-assign'    && method === 'POST') return projects.autoAssign(request, r1);
+    if (r1 && r2 === 'technicians' && !r3) {
+      if (method === 'GET') return projects.getProjectTechniciansWithMetrics(request, r1);
+      return methodNotAllowed();
+    }
     if (r1 && r2 === 'assignments' && !r3) {
       if (method === 'GET')  return projects.listAssignments(request, r1);
       if (method === 'POST') return projects.assignTechnician(request, r1);

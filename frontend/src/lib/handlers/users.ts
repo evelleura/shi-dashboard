@@ -143,7 +143,13 @@ export async function listTechnicians(request: NextRequest) {
         COUNT(DISTINCT t.id) FILTER (WHERE t.status IN ('in_progress','working_on_it'))::int AS active_tasks,
         COUNT(DISTINCT t.id) FILTER (WHERE t.due_date < CURRENT_DATE AND t.status != 'done')::int AS overdue_tasks,
         COALESCE(SUM(t.time_spent_seconds), 0)::int AS total_time_seconds,
-        COUNT(DISTINCT te.id)::int AS evidence_count
+        COUNT(DISTINCT te.id)::int AS evidence_count,
+        BOOL_OR(
+          t.timeline_start IS NOT NULL AND t.timeline_end IS NOT NULL
+          AND t.timeline_start <= CURRENT_DATE AND t.timeline_end >= CURRENT_DATE
+          AND t.status IN ('to_do', 'working_on_it')
+        ) AS busy_today,
+        COUNT(DISTINCT t.id) FILTER (WHERE t.due_date = CURRENT_DATE AND t.status != 'done')::int AS tasks_due_today
        FROM users u
        LEFT JOIN project_assignments pa ON pa.user_id = u.id
        LEFT JOIN tasks t ON t.assigned_to = u.id

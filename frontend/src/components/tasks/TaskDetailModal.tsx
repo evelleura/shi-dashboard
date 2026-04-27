@@ -233,7 +233,18 @@ export default function TaskDetailModal({
         {/* Title + badges row */}
         <div>
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{task.name}</h3>
+            {isEditing ? (
+              <input
+                type="text"
+                value={editForm.name}
+                onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                className={inputClass + ' text-base font-semibold flex-1'}
+                placeholder={t('task.name', language)}
+                required
+              />
+            ) : (
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{task.name}</h3>
+            )}
             {canEdit && !isEditing && (
               <button
                 onClick={handleEditStart}
@@ -294,38 +305,107 @@ export default function TaskDetailModal({
           </div>
         </div>
 
-        {/* ===== EDIT FORM ===== */}
-        {isEditing && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-4">
-            <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-300">{t('task.edit_title', language)}</h4>
-
-            {/* Nama Tugas */}
+        {/* Escalation Form (inline, only when not editing) */}
+        {!isEditing && showEscalationForm && (
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-4 space-y-3" role="form" aria-label="Escalation form">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold text-red-700 dark:text-red-400">Laporkan Masalah</h4>
+              <button onClick={resetEscalationForm} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs" aria-label="Batal eskalasi">Batal</button>
+            </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('task.name', language)} <span className="text-red-500">*</span>
-              </label>
+              <label htmlFor="esc-title" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Judul <span className="text-red-500">*</span></label>
               <input
+                id="esc-title"
                 type="text"
-                value={editForm.name}
-                onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                className={inputClass}
+                value={escTitle}
+                onChange={(e) => setEscTitle(e.target.value)}
+                placeholder="Ringkasan singkat masalah"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
               />
             </div>
-
-            {/* Deskripsi */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.description', language)}</label>
+              <label htmlFor="esc-desc" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi <span className="text-red-500">*</span></label>
               <textarea
-                value={editForm.description}
-                onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
-                rows={2}
-                className={inputClass + ' resize-none'}
+                id="esc-desc"
+                value={escDescription}
+                onChange={(e) => setEscDescription(e.target.value)}
+                placeholder="Jelaskan masalah secara rinci..."
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                required
               />
             </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label htmlFor="esc-priority" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Prioritas</label>
+                <select
+                  id="esc-priority"
+                  value={escPriority}
+                  onChange={(e) => setEscPriority(e.target.value as EscalationPriority)}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                >
+                  <option value="low">Rendah</option>
+                  <option value="medium">Sedang</option>
+                  <option value="high">Tinggi</option>
+                  <option value="critical">Kritis</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <label htmlFor="esc-file" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Lampiran (opsional)</label>
+                <input
+                  id="esc-file"
+                  ref={escFileRef}
+                  type="file"
+                  onChange={(e) => setEscFile(e.target.files?.[0] ?? null)}
+                  className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-200 dark:hover:file:bg-gray-600"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={resetEscalationForm}
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleEscalationSubmit}
+                disabled={!escTitle.trim() || !escDescription.trim() || createEscalationMutation.isPending}
+                className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {createEscalationMutation.isPending ? 'Mengirim...' : 'Kirim Eskalasi'}
+              </button>
+            </div>
+            {createEscalationMutation.isError && (
+              <p className="text-xs text-red-600">Gagal mengirim eskalasi. Silakan coba lagi.</p>
+            )}
+          </div>
+        )}
 
-            {/* Penugasan */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.assignee', language)}</label>
+        {/* Description — editable inline */}
+        <div>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('task.description', language)}</p>
+          {isEditing ? (
+            <textarea
+              value={editForm.description}
+              onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+              rows={2}
+              placeholder={t('task.description', language)}
+              className={inputClass + ' resize-none'}
+            />
+          ) : (
+            task.description
+              ? <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">{task.description}</p>
+              : <p className="text-sm text-gray-400 dark:text-gray-500 italic">--</p>
+          )}
+        </div>
+
+        {/* Info grid — editable inline */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('label.assignee', language)}</p>
+            {isEditing ? (
               <select
                 value={editForm.assigned_to}
                 onChange={(e) => setEditForm((f) => ({ ...f, assigned_to: e.target.value }))}
@@ -333,78 +413,37 @@ export default function TaskDetailModal({
               >
                 <option value="">{t('task.unassigned', language)}</option>
                 {technicians.map((tech) => (
-                  <option key={tech.id} value={tech.id}>
-                    {tech.name}
-                  </option>
+                  <option key={tech.id} value={tech.id}>{tech.name}</option>
                 ))}
               </select>
-            </div>
-
-            {/* Tenggat Waktu */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.due_date', language)}</label>
+            ) : (
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.assigned_to_name ?? t('task.unassigned', language)}</p>
+            )}
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Proyek</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.project_name ?? '--'}</p>
+          </div>
+          <div className={`rounded-lg p-3 ${isOverdue && !isEditing ? 'bg-red-50 dark:bg-red-900/30' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('label.due_date', language)}</p>
+            {isEditing ? (
               <input
                 type="date"
                 value={editForm.due_date}
                 onChange={(e) => setEditForm((f) => ({ ...f, due_date: e.target.value }))}
                 className={inputClass}
               />
-            </div>
-
-            {/* Mulai Jadwal / Selesai Jadwal */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.timeline_start', language)}</label>
-                <input
-                  type="date"
-                  value={editForm.timeline_start}
-                  onChange={(e) => setEditForm((f) => ({ ...f, timeline_start: e.target.value }))}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.timeline_end', language)}</label>
-                <input
-                  type="date"
-                  value={editForm.timeline_end}
-                  onChange={(e) => setEditForm((f) => ({ ...f, timeline_end: e.target.value }))}
-                  className={inputClass}
-                />
-              </div>
-            </div>
-
-            {/* Catatan */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.notes', language)}</label>
-              <textarea
-                value={editForm.notes}
-                onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
-                rows={2}
-                className={inputClass + ' resize-none'}
-              />
-            </div>
-
-            {/* Bergantung Pada */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.depends_on', language)}</label>
-              <select
-                value={editForm.depends_on}
-                onChange={(e) => setEditForm((f) => ({ ...f, depends_on: e.target.value }))}
-                className={inputClass}
-              >
-                <option value="">{t('task.no_prerequisite', language)}</option>
-                {otherTasks.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Anggaran -- manager/admin only */}
-            {canEdit && (
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.budget_label', language)}</label>
+            ) : (
+              <p className={`text-sm font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                {task.due_date ? formatDate(task.due_date, language) : t('task.no_due_date', language)}
+                {isOverdue && ` (${t('task.overdue', language).toLowerCase()})`}
+              </p>
+            )}
+          </div>
+          {!isTechnician && (
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('task.budget_label', language)}</p>
+              {isEditing ? (
                 <input
                   type="number"
                   min="0"
@@ -414,22 +453,51 @@ export default function TaskDetailModal({
                   placeholder="0"
                   className={inputClass}
                 />
-              </div>
-            )}
+              ) : (
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {Number(task.budget) > 0 ? formatCurrency(Number(task.budget)) : '--'}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
 
-            {/* Error */}
-            {editError && (
-              <p className="text-xs text-red-600 dark:text-red-400">{editError}</p>
-            )}
+        {/* Notes — editable inline */}
+        <div>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('label.notes', language)}</p>
+          {isEditing ? (
+            <textarea
+              value={editForm.notes}
+              onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
+              rows={2}
+              placeholder={t('task.notes_placeholder', language)}
+              className={inputClass + ' resize-none'}
+            />
+          ) : (
+            task.notes
+              ? <p className="text-sm text-gray-700 dark:text-gray-300 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">{task.notes}</p>
+              : <p className="text-sm text-gray-400 dark:text-gray-500 italic">--</p>
+          )}
+        </div>
 
-            {/* Save / Cancel */}
-            <div className="flex justify-end gap-2 pt-1">
+        {/* Inline edit action bar */}
+        {isEditing && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+            {editError && <p className="text-xs text-red-600 dark:text-red-400 mb-2">{editError}</p>}
+            <div className="flex gap-2 justify-end">
               <button
                 onClick={handleEditCancel}
                 disabled={updateTaskMutation.isPending}
                 className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
               >
                 {t('action.cancel', language)}
+              </button>
+              <button
+                onClick={handleEditStart}
+                disabled={updateTaskMutation.isPending}
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+              >
+                Reset
               </button>
               <button
                 onClick={handleEditSave}
@@ -440,132 +508,6 @@ export default function TaskDetailModal({
               </button>
             </div>
           </div>
-        )}
-
-        {/* ===== READ-ONLY DISPLAY (when not editing) ===== */}
-        {!isEditing && (
-          <>
-            {/* Escalation Form (inline) */}
-            {showEscalationForm && (
-              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-4 space-y-3" role="form" aria-label="Escalation form">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-red-700 dark:text-red-400">Laporkan Masalah</h4>
-                  <button onClick={resetEscalationForm} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs" aria-label="Batal eskalasi">Batal</button>
-                </div>
-                <div>
-                  <label htmlFor="esc-title" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Judul <span className="text-red-500">*</span></label>
-                  <input
-                    id="esc-title"
-                    type="text"
-                    value={escTitle}
-                    onChange={(e) => setEscTitle(e.target.value)}
-                    placeholder="Ringkasan singkat masalah"
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="esc-desc" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi <span className="text-red-500">*</span></label>
-                  <textarea
-                    id="esc-desc"
-                    value={escDescription}
-                    onChange={(e) => setEscDescription(e.target.value)}
-                    placeholder="Jelaskan masalah secara rinci..."
-                    rows={3}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                    required
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <label htmlFor="esc-priority" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Prioritas</label>
-                    <select
-                      id="esc-priority"
-                      value={escPriority}
-                      onChange={(e) => setEscPriority(e.target.value as EscalationPriority)}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    >
-                      <option value="low">Rendah</option>
-                      <option value="medium">Sedang</option>
-                      <option value="high">Tinggi</option>
-                      <option value="critical">Kritis</option>
-                    </select>
-                  </div>
-                  <div className="flex-1">
-                    <label htmlFor="esc-file" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Lampiran (opsional)</label>
-                    <input
-                      id="esc-file"
-                      ref={escFileRef}
-                      type="file"
-                      onChange={(e) => setEscFile(e.target.files?.[0] ?? null)}
-                      className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-200 dark:hover:file:bg-gray-600"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={resetEscalationForm}
-                    className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    onClick={handleEscalationSubmit}
-                    disabled={!escTitle.trim() || !escDescription.trim() || createEscalationMutation.isPending}
-                    className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {createEscalationMutation.isPending ? 'Mengirim...' : 'Kirim Eskalasi'}
-                  </button>
-                </div>
-                {createEscalationMutation.isError && (
-                  <p className="text-xs text-red-600">Gagal mengirim eskalasi. Silakan coba lagi.</p>
-                )}
-              </div>
-            )}
-
-            {/* Description */}
-            {task.description && (
-              <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('task.description', language)}</p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">{task.description}</p>
-              </div>
-            )}
-
-            {/* Info grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 dark:text-gray-400">{t('label.assignee', language)}</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.assigned_to_name ?? t('task.unassigned', language)}</p>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Proyek</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.project_name ?? '--'}</p>
-              </div>
-              <div className={`rounded-lg p-3 ${isOverdue ? 'bg-red-50 dark:bg-red-900/30' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{t('label.due_date', language)}</p>
-                <p className={`text-sm font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}`}>
-                  {task.due_date ? formatDate(task.due_date, language) : t('task.no_due_date', language)}
-                  {isOverdue && ` (${t('task.overdue', language).toLowerCase()})`}
-                </p>
-              </div>
-              {!isTechnician && (
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('task.budget_label', language)}</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {Number(task.budget) > 0 ? formatCurrency(Number(task.budget)) : '--'}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Notes */}
-            {task.notes && (
-              <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('label.notes', language)}</p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">{task.notes}</p>
-              </div>
-            )}
-          </>
         )}
 
         {/* Section tabs -- always visible */}
@@ -594,20 +536,52 @@ export default function TaskDetailModal({
           {/* Details tab */}
           {activeSection === 'details' && (
             <div className="pt-3 space-y-3">
-              {(task.timeline_start || task.timeline_end) && (
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('schedule.gantt', language)}</p>
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('schedule.gantt', language)}</p>
+                {isEditing ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-0.5">{t('task.timeline_start', language)}</label>
+                      <input
+                        type="date"
+                        value={editForm.timeline_start}
+                        onChange={(e) => setEditForm((f) => ({ ...f, timeline_start: e.target.value }))}
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-0.5">{t('task.timeline_end', language)}</label>
+                      <input
+                        type="date"
+                        value={editForm.timeline_end}
+                        onChange={(e) => setEditForm((f) => ({ ...f, timeline_end: e.target.value }))}
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                ) : (
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     {task.timeline_start ? formatDate(task.timeline_start, language) : '?'} -- {task.timeline_end ? formatDate(task.timeline_end, language) : '?'}
                   </p>
-                </div>
-              )}
-              {task.depends_on_name && (
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('task.depends_on', language)}</p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">{task.depends_on_name}</p>
-                </div>
-              )}
+                )}
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('task.depends_on', language)}</p>
+                {isEditing ? (
+                  <select
+                    value={editForm.depends_on}
+                    onChange={(e) => setEditForm((f) => ({ ...f, depends_on: e.target.value }))}
+                    className={inputClass}
+                  >
+                    <option value="">{t('task.no_prerequisite', language)}</option>
+                    {otherTasks.map((ot) => (
+                      <option key={ot.id} value={ot.id}>{ot.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{task.depends_on_name ?? '--'}</p>
+                )}
+              </div>
               <div className="text-xs text-gray-400 dark:text-gray-500 space-y-1">
                 {task.created_at && <p>{t('label.created_at', language)}: {formatDate(task.created_at, language)}</p>}
                 {task.updated_at && <p>{t('label.updated_at', language)}: {formatDate(task.updated_at, language)}</p>}

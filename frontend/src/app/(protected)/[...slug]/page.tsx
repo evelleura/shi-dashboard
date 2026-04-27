@@ -37,6 +37,7 @@ export default function ProtectedPage({ params }: Props) {
   if (section === 'my-escalations') return <TechnicianEscalationsPage />;
   if (section === 'audit-log')     return <AuditLogPage />;
   if (section === 'users')         return <UserManagementPage />;
+  if (section === 'technicians' && id) return <TechnicianManagementPage defaultDetailId={parseInt(id)} />;
   if (section === 'technicians')   return <TechnicianManagementPage />;
   if (section === 'timeline')      return <ProjectTimelinePage />;
   if (section === 'schedule')      return <SchedulePage />;

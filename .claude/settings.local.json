@@ -41,7 +41,9 @@
       "Bash(psql -h 127.0.0.1 -p 5432 -U postgres -d shi_dashboard_new -c \"SELECT current_database\\(\\), version\\(\\);\")",
       "Bash(PGPASSWORD=12345 psql *)",
       "Bash(cat)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(npm list *)"
     ]
   },
   "spinnerTipsEnabled": false,

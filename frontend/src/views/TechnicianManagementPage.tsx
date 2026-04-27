@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTechnicianList, useTechnicianDetail, useCreateUser, useUpdateUser, useDeleteUser, useResetPassword } from '../hooks/useUsers';
 import { useAuth } from '../hooks/useAuth';
 import DataTable, { type Column } from '../components/ui/DataTable';
@@ -100,7 +100,7 @@ const LABEL_CLASS = 'block text-sm font-medium text-gray-700 dark:text-gray-300 
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function TechnicianManagementPage() {
+export default function TechnicianManagementPage({ defaultDetailId }: { defaultDetailId?: number } = {}) {
   const { user: me } = useAuth();
   const { data: technicians = [], isLoading, isError } = useTechnicianList();
   const createMutation = useCreateUser();
@@ -111,6 +111,10 @@ export default function TechnicianManagementPage() {
   // State
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (defaultDetailId && !isNaN(defaultDetailId)) setSelectedId(defaultDetailId);
+  }, [defaultDetailId]);
   const [showCreate, setShowCreate] = useState(false);
   const [editTech, setEditTech] = useState<TechnicianRow | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
