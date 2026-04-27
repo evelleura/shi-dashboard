@@ -9,6 +9,18 @@ export async function getDashboard(request: NextRequest) {
   const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
   if (roleCheck) return roleCheck;
 
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
+  // Filter: projects whose timeline overlaps the selected date range
+  const dateParams: string[] = [];
+  let dateClause = '';
+  if (startDate && endDate) {
+    dateParams.push(startDate, endDate);
+    dateClause = ` AND p.start_date <= $${dateParams.length} AND p.end_date >= $${dateParams.length - 1}`;
+  }
+
   try {
     const projectsResult = await query(
       `SELECT p.id, p.name, p.description, p.client_id, p.start_date, p.end_date,
@@ -26,11 +38,20 @@ export async function getDashboard(request: NextRequest) {
         SELECT constraints, report_date, progress_percentage FROM daily_reports
         WHERE project_id = p.id ORDER BY report_date DESC, created_at DESC LIMIT 1
       ) dr ON true
-      WHERE p.status = 'active'
+      WHERE p.status = 'active'${dateClause}
       ORDER BY
         CASE ph.status WHEN 'red' THEN 1 WHEN 'amber' THEN 2 WHEN 'green' THEN 3 ELSE 4 END,
-        ph.spi_value ASC NULLS LAST, p.end_date ASC`
+        ph.spi_value ASC NULLS LAST, p.end_date ASC`,
+      dateParams.length ? [dateParams[0], dateParams[1]] : []
     );
+
+    // Stats also scoped to filtered projects
+    const statsParams: string[] = [];
+    let statsDateClause = '';
+    if (startDate && endDate) {
+      statsParams.push(startDate, endDate);
+      statsDateClause = ` AND p.start_date <= $2 AND p.end_date >= $1`;
+    }
 
     const [statsResult, taskStatsResult, recentResult, escalationSummary] = await Promise.all([
       query(
@@ -42,7 +63,9 @@ export async function getDashboard(request: NextRequest) {
           COUNT(*) FILTER (WHERE ph.status IS NULL AND p.status = 'active')::int AS total_no_health,
           ROUND(AVG(ph.spi_value) FILTER (WHERE p.status = 'active'), 4) AS avg_spi,
           COUNT(*) FILTER (WHERE p.end_date < CURRENT_DATE AND p.status = 'active')::int AS overdue_projects
-         FROM projects p LEFT JOIN project_health ph ON ph.project_id = p.id`
+         FROM projects p LEFT JOIN project_health ph ON ph.project_id = p.id
+         WHERE 1=1${statsDateClause}`,
+        statsParams
       ),
       query(
         `SELECT COUNT(*)::int AS total_tasks,
@@ -51,7 +74,9 @@ export async function getDashboard(request: NextRequest) {
           COUNT(*) FILTER (WHERE t.status = 'working_on_it')::int AS working_tasks,
           COUNT(*) FILTER (WHERE t.status = 'review')::int AS review_tasks,
           COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress') AND t.due_date < CURRENT_DATE)::int AS overtime_tasks
-         FROM tasks t JOIN projects p ON p.id = t.project_id WHERE p.status = 'active'`
+         FROM tasks t JOIN projects p ON p.id = t.project_id
+         WHERE p.status = 'active'${statsDateClause}`,
+        statsParams
       ),
       query(
         `(SELECT 'task_updated' AS type, t.name AS item_name, p.name AS project_name,
@@ -179,14 +204,25 @@ export async function chartOverdueTasks(request: NextRequest) {
   const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
   if (roleCheck) return roleCheck;
 
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
   try {
+    const params: string[] = [];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND p.start_date <= $2 AND p.end_date >= $1`;
+    }
     const result = await query(
       `SELECT p.id AS project_id, p.name AS project_name,
         COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress'))::int AS overdue_working,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS overdue_todo
        FROM tasks t JOIN projects p ON p.id = t.project_id
-       WHERE t.due_date < CURRENT_DATE AND t.status NOT IN ('done') AND p.status = 'active'
-       GROUP BY p.id, p.name HAVING COUNT(*) > 0 ORDER BY COUNT(*) DESC`
+       WHERE t.due_date < CURRENT_DATE AND t.status NOT IN ('done') AND p.status = 'active'${dateClause}
+       GROUP BY p.id, p.name HAVING COUNT(*) > 0 ORDER BY COUNT(*) DESC`,
+      params
     );
     return NextResponse.json({ success: true, data: result.rows });
   } catch (err) {
@@ -201,7 +237,17 @@ export async function chartTasksByDueDate(request: NextRequest) {
   const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
   if (roleCheck) return roleCheck;
 
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
   try {
+    const params: string[] = [];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND t.due_date BETWEEN $1 AND $2`;
+    }
     const result = await query(
       `SELECT TO_CHAR(t.due_date, 'YYYY-MM') AS month,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do,
@@ -210,8 +256,9 @@ export async function chartTasksByDueDate(request: NextRequest) {
         COUNT(*) FILTER (WHERE t.status = 'review')::int AS review,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS done
        FROM tasks t JOIN projects p ON p.id = t.project_id
-       WHERE t.due_date IS NOT NULL AND p.status = 'active'
-       GROUP BY TO_CHAR(t.due_date, 'YYYY-MM') ORDER BY month ASC`
+       WHERE t.due_date IS NOT NULL AND p.status = 'active'${dateClause}
+       GROUP BY TO_CHAR(t.due_date, 'YYYY-MM') ORDER BY month ASC`,
+      params
     );
     return NextResponse.json({ success: true, data: result.rows });
   } catch (err) {
@@ -226,7 +273,17 @@ export async function chartTasksByOwner(request: NextRequest) {
   const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
   if (roleCheck) return roleCheck;
 
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
   try {
+    const params: string[] = [];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND p.start_date <= $2 AND p.end_date >= $1`;
+    }
     const result = await query(
       `SELECT u.id AS user_id, u.name, COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE t.status = 'done')::int AS done,
@@ -236,7 +293,8 @@ export async function chartTasksByOwner(request: NextRequest) {
         COUNT(*) FILTER (WHERE t.status IN ('working_on_it', 'in_progress') AND t.due_date < CURRENT_DATE)::int AS overtime,
         COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do
        FROM tasks t JOIN users u ON u.id = t.assigned_to JOIN projects p ON p.id = t.project_id
-       WHERE p.status = 'active' GROUP BY u.id, u.name ORDER BY total DESC`
+       WHERE p.status = 'active'${dateClause} GROUP BY u.id, u.name ORDER BY total DESC`,
+      params
     );
     return NextResponse.json({ success: true, data: result.rows });
   } catch (err) {
@@ -251,12 +309,24 @@ export async function chartTasksByStatus(request: NextRequest) {
   const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
   if (roleCheck) return roleCheck;
 
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
   try {
+    const params: string[] = [];
+    let dateClause = '';
+    if (startDate && endDate) {
+      params.push(startDate, endDate);
+      dateClause = ` AND p.start_date <= $2 AND p.end_date >= $1`;
+    }
     const result = await query(
       `SELECT t.status, COUNT(*)::int AS count
-       FROM tasks t JOIN projects p ON p.id = t.project_id WHERE p.status = 'active'
+       FROM tasks t JOIN projects p ON p.id = t.project_id
+       WHERE p.status = 'active'${dateClause}
        GROUP BY t.status
-       ORDER BY CASE t.status WHEN 'done' THEN 1 WHEN 'review' THEN 2 WHEN 'working_on_it' THEN 3 WHEN 'in_progress' THEN 4 WHEN 'to_do' THEN 5 END`
+       ORDER BY CASE t.status WHEN 'done' THEN 1 WHEN 'review' THEN 2 WHEN 'working_on_it' THEN 3 WHEN 'in_progress' THEN 4 WHEN 'to_do' THEN 5 END`,
+      params
     );
     const total = result.rows.reduce((sum, r) => sum + parseInt(String((r as Record<string, unknown>).count)), 0);
     const data = result.rows.map((r) => {

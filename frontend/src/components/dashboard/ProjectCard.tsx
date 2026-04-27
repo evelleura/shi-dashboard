@@ -30,7 +30,13 @@ export default function ProjectCard({ project }: Props) {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">{project.name}</h3>
             {project.client_name && (
-              <p className="text-xs text-blue-500 mt-0.5">{project.client_name}</p>
+              <a
+                href={project.client_id ? `/clients/${project.client_id}` : undefined}
+                onClick={(e) => { if (project.client_id) e.stopPropagation(); }}
+                className="text-xs text-blue-500 hover:text-blue-700 hover:underline mt-0.5 block w-fit"
+              >
+                {project.client_name}
+              </a>
             )}
             <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
               {formatDate(project.start_date)} -- {formatDate(project.end_date)}

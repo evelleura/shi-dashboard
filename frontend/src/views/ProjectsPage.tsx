@@ -144,7 +144,9 @@ export default function ProjectsPage() {
       key: 'client_name',
       label: t('client.title', language),
       render: (p) => (
-        <span className="text-sm text-gray-600 dark:text-gray-400">{p.client_name ?? '--'}</span>
+        p.client_name && p.client_id
+          ? <a href={`/clients/${p.client_id}`} onClick={(e) => e.stopPropagation()} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">{p.client_name}</a>
+          : <span className="text-sm text-gray-400 dark:text-gray-500">{p.client_name ?? '--'}</span>
       ),
       sortValue: (p) => (p.client_name ?? '').toLowerCase(),
       exportValue: (p) => p.client_name ?? '',

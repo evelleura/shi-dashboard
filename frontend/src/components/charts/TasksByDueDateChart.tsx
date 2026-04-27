@@ -1,8 +1,8 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useTasksByDueDateChart } from '../../hooks/useDashboard';
 
-export default function TasksByDueDateChart() {
-  const { data: rawData, isLoading } = useTasksByDueDateChart();
+export default function TasksByDueDateChart({ dateRange }: { dateRange?: import('../../types').DateRange }) {
+  const { data: rawData, isLoading } = useTasksByDueDateChart(dateRange);
 
   if (isLoading) {
     return (

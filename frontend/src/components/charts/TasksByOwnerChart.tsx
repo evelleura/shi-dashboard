@@ -1,7 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useTasksByOwnerChart } from '../../hooks/useDashboard';
 
-export default function TasksByOwnerChart() {
+export default function TasksByOwnerChart({ dateRange }: { dateRange?: import('../../types').DateRange }) {
   const { data: rawData, isLoading } = useTasksByOwnerChart();
 
   if (isLoading) {

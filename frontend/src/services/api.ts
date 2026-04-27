@@ -328,28 +328,38 @@ export const stopTimer = async (taskId: number): Promise<Task> => {
 
 // ==================== Dashboard ====================
 
-export const getDashboard = async (): Promise<DashboardData> => {
-  const res = await api.get<ApiResponse<DashboardData>>('/dashboard');
+export const getDashboard = async (params?: DateRange): Promise<DashboardData> => {
+  const res = await api.get<ApiResponse<DashboardData>>('/dashboard', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
   return res.data.data!;
 };
 
-export const getTasksByStatus = async (): Promise<TasksByStatusData[]> => {
-  const res = await api.get<ApiResponse<TasksByStatusData[]>>('/dashboard/charts/tasks-by-status');
+export const getTasksByStatus = async (params?: DateRange): Promise<TasksByStatusData[]> => {
+  const res = await api.get<ApiResponse<TasksByStatusData[]>>('/dashboard/charts/tasks-by-status', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
   return res.data.data!;
 };
 
-export const getTasksByOwner = async (): Promise<TasksByOwnerData[]> => {
-  const res = await api.get<ApiResponse<TasksByOwnerData[]>>('/dashboard/charts/tasks-by-owner');
+export const getTasksByOwner = async (params?: DateRange): Promise<TasksByOwnerData[]> => {
+  const res = await api.get<ApiResponse<TasksByOwnerData[]>>('/dashboard/charts/tasks-by-owner', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
   return res.data.data!;
 };
 
-export const getOverdueTasks = async (): Promise<OverdueTaskData[]> => {
-  const res = await api.get<ApiResponse<OverdueTaskData[]>>('/dashboard/charts/overdue-tasks');
+export const getOverdueTasks = async (params?: DateRange): Promise<OverdueTaskData[]> => {
+  const res = await api.get<ApiResponse<OverdueTaskData[]>>('/dashboard/charts/overdue-tasks', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
   return res.data.data!;
 };
 
-export const getTasksByDueDate = async (): Promise<TasksByDueDateData[]> => {
-  const res = await api.get<ApiResponse<TasksByDueDateData[]>>('/dashboard/charts/tasks-by-due-date');
+export const getTasksByDueDate = async (params?: DateRange): Promise<TasksByDueDateData[]> => {
+  const res = await api.get<ApiResponse<TasksByDueDateData[]>>('/dashboard/charts/tasks-by-due-date', {
+    params: params ? { start_date: params.start, end_date: params.end } : undefined,
+  });
   return res.data.data!;
 };
 

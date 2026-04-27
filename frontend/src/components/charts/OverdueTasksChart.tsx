@@ -1,8 +1,8 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useOverdueTasksChart } from '../../hooks/useDashboard';
 
-export default function OverdueTasksChart() {
-  const { data: rawData, isLoading } = useOverdueTasksChart();
+export default function OverdueTasksChart({ dateRange }: { dateRange?: import('../../types').DateRange }) {
+  const { data: rawData, isLoading } = useOverdueTasksChart(dateRange);
 
   if (isLoading) {
     return (

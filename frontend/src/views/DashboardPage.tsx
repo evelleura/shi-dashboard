@@ -25,11 +25,11 @@ import type { DateRange, CreateProjectData } from '../types';
 type Filter = 'all' | 'red' | 'amber' | 'green' | 'none';
 
 export default function DashboardPage() {
-  const { data, isLoading, isError, refetch } = useDashboard();
   const router = useRouter();
   const { language } = useLanguage();
   const [filter, setFilter] = useState<Filter>('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const { data, isLoading, isError, refetch } = useDashboard(dateRange);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showClientModal, setShowClientModal] = useState(false);
   const [clientForm, setClientForm] = useState({ name: '', address: '', phone: '', email: '' });
@@ -38,7 +38,7 @@ export default function DashboardPage() {
   const { data: clients } = useQuery({ queryKey: ['clients'], queryFn: getClients, staleTime: 1000 * 60 * 5 });
   const projectMutation = useMutation({
     mutationFn: (d: CreateProjectData) => createProject(d),
-    onSuccess: () => { setShowProjectModal(false); void queryClient.invalidateQueries({ queryKey: ['dashboard'] }); },
+    onSuccess: () => { setShowProjectModal(false); void queryClient.invalidateQueries({ queryKey: ['dashboard'] as const, exact: false }); },
   });
   const clientMutation = useMutation({
     mutationFn: () => createClient(clientForm),
@@ -126,12 +126,12 @@ export default function DashboardPage() {
       )}
 
       {/* KPI Summary Cards */}
-      <SummaryCards summary={data.summary} />
+      <SummaryCards summary={data.summary} onFilter={setFilter} activeFilter={filter} />
 
       {/* Charts Row 1: Health Pie + Task Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ProjectHealthPieChart summary={data.summary} />
-        <TasksByStatusChart />
+        <TasksByStatusChart dateRange={dateRange} />
       </div>
 
       {/* Charts Row 2: Project Category + Technician Workload */}
@@ -142,13 +142,13 @@ export default function DashboardPage() {
 
       {/* Charts Row 3: Tasks by Owner + Tasks by Due Date */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <TasksByOwnerChart />
-        <TasksByDueDateChart />
+        <TasksByOwnerChart dateRange={dateRange} />
+        <TasksByDueDateChart dateRange={dateRange} />
       </div>
 
-      {/* Charts Row 4: Overdue + Budget */}
+      {/* Charts Row 4: Overdue */}
       <div className="grid grid-cols-1 gap-4">
-        <OverdueTasksChart />
+        <OverdueTasksChart dateRange={dateRange} />
       </div>
 
       {/* SPI Trend (full width) */}

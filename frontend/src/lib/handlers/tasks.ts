@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
 import { query, getClient } from '@/lib/db';
 import { recalculateSPI } from '@/lib/spiCalculator';
+import { logChange } from './audit';
 
 const VALID_STATUSES = ['to_do', 'in_progress', 'working_on_it', 'review', 'done'];
 
@@ -111,6 +112,12 @@ export async function createTask(request: NextRequest) {
        depends_on || null, auth.user.userId]
     );
     await recalculateSPI(parseInt(project_id));
+    const actorName1 = ((await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string) || 'Unknown';
+    await logChange({
+      entityType: 'task', entityId: result.rows[0].id as number, entityName: name.trim(),
+      action: 'create', changes: [{ field: '*', oldValue: null, newValue: name.trim() }],
+      userId: auth.user.userId, userName: actorName1,
+    });
     return NextResponse.json({ success: true, data: result.rows[0] }, { status: 201 });
   } catch (err) {
     console.error('Create task error:', err);
@@ -292,6 +299,35 @@ export async function updateTask(request: NextRequest, id: string) {
     if (status !== undefined && status !== row.status) {
       await recalculateSPI(row.project_id as number);
     }
+
+    // Log all changed fields
+    const trackFields: { field: string; key: string; newVal: unknown }[] = [
+      { field: 'name', key: 'name', newVal: name },
+      { field: 'description', key: 'description', newVal: description },
+      { field: 'assigned_to', key: 'assigned_to', newVal: assigned_to },
+      { field: 'status', key: 'status', newVal: status },
+      { field: 'due_date', key: 'due_date', newVal: due_date },
+      { field: 'timeline_start', key: 'timeline_start', newVal: timeline_start },
+      { field: 'timeline_end', key: 'timeline_end', newVal: timeline_end },
+      { field: 'depends_on', key: 'depends_on', newVal: depends_on },
+    ];
+    const changes: { field: string; oldValue: string | null; newValue: string | null }[] = [];
+    for (const f of trackFields) {
+      if (f.newVal !== undefined) {
+        const oldVal = String(row[f.key] ?? '');
+        const newVal = String(f.newVal ?? '');
+        if (oldVal !== newVal) changes.push({ field: f.field, oldValue: oldVal || null, newValue: newVal || null });
+      }
+    }
+    if (changes.length > 0) {
+      const actorName2 = ((await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string) || 'Unknown';
+      await logChange({
+        entityType: 'task', entityId: taskId, entityName: (name !== undefined ? name : row.name) as string,
+        action: 'update', changes,
+        userId: auth.user.userId, userName: actorName2,
+      });
+    }
+
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.error('Update task error:', err);
@@ -311,11 +347,18 @@ export async function deleteTask(request: NextRequest, id: string) {
   }
 
   try {
-    const task = await query('SELECT project_id FROM tasks WHERE id = $1', [taskId]);
+    const task = await query('SELECT project_id, name FROM tasks WHERE id = $1', [taskId]);
     if (task.rowCount === 0) {
       return NextResponse.json({ success: false, error: 'Task not found' }, { status: 404 });
     }
-    const projectId = (task.rows[0] as Record<string, unknown>).project_id as number;
+    const taskRow = task.rows[0] as Record<string, unknown>;
+    const projectId = taskRow.project_id as number;
+    const actorName3 = ((await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string) || 'Unknown';
+    await logChange({
+      entityType: 'task', entityId: taskId, entityName: taskRow.name as string,
+      action: 'delete', changes: [{ field: '*', oldValue: taskRow.name as string, newValue: null }],
+      userId: auth.user.userId, userName: actorName3,
+    });
     await query('DELETE FROM tasks WHERE id = $1', [taskId]);
     await recalculateSPI(projectId);
     return NextResponse.json({ success: true, message: 'Task deleted successfully' });
@@ -379,7 +422,15 @@ export async function changeTaskStatus(request: NextRequest, id: string) {
       'UPDATE tasks SET status=$1, updated_at=NOW() WHERE id=$2 RETURNING *',
       [status, taskId]
     );
-    if (currentStatus !== status) await recalculateSPI(task.project_id as number);
+    if (currentStatus !== status) {
+      await recalculateSPI(task.project_id as number);
+      const actorName4 = ((await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string) || 'Unknown';
+      await logChange({
+        entityType: 'task', entityId: taskId, entityName: task.name as string,
+        action: 'update', changes: [{ field: 'status', oldValue: currentStatus, newValue: status }],
+        userId: auth.user.userId, userName: actorName4,
+      });
+    }
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.error('Change task status error:', err);

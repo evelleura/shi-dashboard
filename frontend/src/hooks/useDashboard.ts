@@ -19,12 +19,12 @@ import {
 import type { DateRange } from '../types';
 
 export const QUERY_KEYS = {
-  dashboard: ['dashboard'] as const,
+  dashboard: (dr?: DateRange) => ['dashboard', dr] as const,
   technicians: ['technicians'] as const,
-  chartTasksByStatus: ['charts', 'tasks-by-status'] as const,
-  chartTasksByOwner: ['charts', 'tasks-by-owner'] as const,
-  chartOverdueTasks: ['charts', 'overdue-tasks'] as const,
-  chartTasksByDueDate: ['charts', 'tasks-by-due-date'] as const,
+  chartTasksByStatus: (dr?: DateRange) => ['charts', 'tasks-by-status', dr] as const,
+  chartTasksByOwner: (dr?: DateRange) => ['charts', 'tasks-by-owner', dr] as const,
+  chartOverdueTasks: (dr?: DateRange) => ['charts', 'overdue-tasks', dr] as const,
+  chartTasksByDueDate: (dr?: DateRange) => ['charts', 'tasks-by-due-date', dr] as const,
   chartEarnedValue: (projectId: number) => ['charts', 'earned-value', projectId] as const,
   technicianDashboard: ['technician-dashboard'] as const,
   globalSearch: (q: string) => ['global-search', q] as const,
@@ -36,10 +36,10 @@ export const QUERY_KEYS = {
   techTimeSpent: (dr?: DateRange) => ['tech', 'time-spent', dr] as const,
 };
 
-export function useDashboard() {
+export function useDashboard(dateRange?: DateRange) {
   return useQuery({
-    queryKey: QUERY_KEYS.dashboard,
-    queryFn: getDashboard,
+    queryKey: QUERY_KEYS.dashboard(dateRange),
+    queryFn: () => getDashboard(dateRange),
     staleTime: 1000 * 60 * 2,
     refetchInterval: 1000 * 60 * 5,
   });
@@ -55,34 +55,34 @@ export function useTechnicians() {
 
 // === Chart hooks ===
 
-export function useTasksByStatusChart() {
+export function useTasksByStatusChart(dateRange?: DateRange) {
   return useQuery({
-    queryKey: QUERY_KEYS.chartTasksByStatus,
-    queryFn: getTasksByStatus,
+    queryKey: QUERY_KEYS.chartTasksByStatus(dateRange),
+    queryFn: () => getTasksByStatus(dateRange),
     staleTime: 1000 * 60 * 2,
   });
 }
 
-export function useTasksByOwnerChart() {
+export function useTasksByOwnerChart(dateRange?: DateRange) {
   return useQuery({
-    queryKey: QUERY_KEYS.chartTasksByOwner,
-    queryFn: getTasksByOwner,
+    queryKey: QUERY_KEYS.chartTasksByOwner(dateRange),
+    queryFn: () => getTasksByOwner(dateRange),
     staleTime: 1000 * 60 * 2,
   });
 }
 
-export function useOverdueTasksChart() {
+export function useOverdueTasksChart(dateRange?: DateRange) {
   return useQuery({
-    queryKey: QUERY_KEYS.chartOverdueTasks,
-    queryFn: getOverdueTasks,
+    queryKey: QUERY_KEYS.chartOverdueTasks(dateRange),
+    queryFn: () => getOverdueTasks(dateRange),
     staleTime: 1000 * 60 * 2,
   });
 }
 
-export function useTasksByDueDateChart() {
+export function useTasksByDueDateChart(dateRange?: DateRange) {
   return useQuery({
-    queryKey: QUERY_KEYS.chartTasksByDueDate,
-    queryFn: getTasksByDueDate,
+    queryKey: QUERY_KEYS.chartTasksByDueDate(dateRange),
+    queryFn: () => getTasksByDueDate(dateRange),
     staleTime: 1000 * 60 * 2,
   });
 }

@@ -137,7 +137,7 @@ export default function ProjectDetailPage() {
     { id: 'tasks', label: t('project.tab_tasks', language), count: project.tasks?.length ?? 0 },
     { id: 'evidence', label: t('project.tab_evidence', language) },
     { id: 'charts', label: t('project.tab_charts', language) },
-    { id: 'history', label: t('project.tab_history', language) },
+    ...(userRole === 'admin' ? [{ id: 'history' as TabId, label: t('project.tab_history', language) }] : []),
   ];
 
   const metrics = [
@@ -171,7 +171,12 @@ export default function ProjectDetailPage() {
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{project.name}</h1>
             {project.client_name && (
-              <p className="text-sm text-blue-500 dark:text-blue-400 mt-0.5">{t('project.client_label', language)} {project.client_name}</p>
+              <p className="text-sm text-blue-500 dark:text-blue-400 mt-0.5">
+                {t('project.client_label', language)}{' '}
+                {project.client_id && isManager
+                  ? <a href={`/clients/${project.client_id}`} className="hover:underline font-medium">{project.client_name}</a>
+                  : project.client_name}
+              </p>
             )}
             {project.description && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{project.description}</p>}
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">

@@ -1,0 +1,303 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
+  <diagram id="flowchart-sebelum-dashboard" name="Proses Sebelum Dashboard">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="1750" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- JUDUL                                                  -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        <mxCell id="title" value="Bagan Alur Proses Bisnis Sebelum Pengembangan Dashboard&#xa;PT Smart Home Inovasi — Kondisi Aplikasi Tanpa Dashboard &amp; Otomasi"
+          style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fillColor=none;strokeColor=none;"
+          vertex="1" parent="1">
+          <mxGeometry x="150" y="10" width="750" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- LEGENDA                                                -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        <mxCell id="leg-bg" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="870" y="80" width="195" height="165" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-title" value="Keterangan"
+          style="text;html=1;align=center;fontStyle=1;fontSize=11;fillColor=none;strokeColor=none;"
+          vertex="1" parent="1">
+          <mxGeometry x="870" y="85" width="195" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="Proses sudah berjalan di aplikasi"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="880" y="113" width="175" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="Database (data sudah digital)"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1e40af;fontColor=#ffffff;strokeColor=#1e3a8a;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="880" y="149" width="175" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="⚠ Keterbatasan aplikasi yang ada"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f97316;fontColor=#ffffff;strokeColor=#ea580c;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="880" y="185" width="175" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="Dampak — mendorong dibuatnya sistem"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dc2626;fontColor=#ffffff;strokeColor=#991b1b;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="880" y="221" width="175" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- LATAR BAGIAN 1 — Proses Sudah Berjalan                -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        <mxCell id="bg1" value="✓  Proses yang Sudah Berjalan di Aplikasi"
+          style="text;html=1;align=left;verticalAlign=top;fontSize=11;fontStyle=3;fillColor=none;strokeColor=none;fontColor=#166534;"
+          vertex="1" parent="1">
+          <mxGeometry x="265" y="128" width="320" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="bg1-rect" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#86efac;dashed=1;dashPattern=6 3;"
+          vertex="1" parent="1">
+          <mxGeometry x="260" y="148" width="520" height="490" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- LATAR BAGIAN 2 — Keterbatasan                         -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        <mxCell id="bg2" value="⚠  Keterbatasan: Tidak Ada Dashboard &amp; Otomasi"
+          style="text;html=1;align=left;verticalAlign=top;fontSize=11;fontStyle=3;fillColor=none;strokeColor=none;fontColor=#9a3412;"
+          vertex="1" parent="1">
+          <mxGeometry x="265" y="688" width="360" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="bg2-rect" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#fdba74;dashed=1;dashPattern=6 3;"
+          vertex="1" parent="1">
+          <mxGeometry x="260" y="708" width="520" height="490" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- NODES — ALUR UTAMA                                    -->
+        <!-- ══════════════════════════════════════════════════════ -->
+
+        <!-- START -->
+        <mxCell id="START" value="Klien Memesan Jasa Instalasi Smart Home&#xa;kepada PT Smart Home Inovasi"
+          style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="65" width="460" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- A -->
+        <mxCell id="A" value="Manajer Proyek Membuat Data Proyek Baru&#xa;di Aplikasi — Nama, Jadwal, Klien, Tim"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="160" width="460" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- B -->
+        <mxCell id="B" value="Manajer Menugaskan Teknisi Lapangan&#xa;ke Proyek melalui Aplikasi"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="260" width="460" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- C -->
+        <mxCell id="C" value="Teknisi Lapangan Menerima Penugasan&#xa;dan Mulai Bekerja di Lokasi Klien"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="360" width="460" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- D -->
+        <mxCell id="D" value="Teknisi Menginput Laporan Harian&#xa;dan Memperbarui Status Tugas di Aplikasi"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="460" width="460" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- DB (cylinder) -->
+        <mxCell id="DB" value="Seluruh Data Proyek, Tugas,&#xa;dan Laporan Tersimpan di Database"
+          style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#1e40af;fontColor=#ffffff;strokeColor=#1e3a8a;fontSize=11;fontStyle=1;boundedLbl=1;backgroundOutline=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="565" width="460" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- F (parallelogram, orange) -->
+        <mxCell id="F" value="⚠  Aplikasi Hanya Menampilkan Data&#xa;dalam Bentuk Tabel Statis&#xa;Tidak Ada Grafik atau Indikator Progres"
+          style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#f97316;fontColor=#ffffff;strokeColor=#ea580c;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="720" width="460" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- G (parallelogram, orange) -->
+        <mxCell id="G" value="⚠  Untuk Menganalisis Progres,&#xa;Manajer Harus Export Data ke Excel&#xa;Proses Manual dan Tidak Rutin Dilakukan"
+          style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#f97316;fontColor=#ffffff;strokeColor=#ea580c;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="840" width="460" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- H (parallelogram, orange) -->
+        <mxCell id="H" value="⚠  Manajer Menghitung Progres dan SPI&#xa;Secara Manual di Spreadsheet Excel&#xa;Tidak Real-Time dan Rawan Kesalahan Data"
+          style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#f97316;fontColor=#ffffff;strokeColor=#ea580c;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="960" width="460" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- I (parallelogram, orange) -->
+        <mxCell id="I" value="⚠  Tidak Ada Notifikasi atau Peringatan Otomatis&#xa;Manajer Harus Membuka Tiap Proyek&#xa;Satu per Satu Secara Manual"
+          style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#f97316;fontColor=#ffffff;strokeColor=#ea580c;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="1080" width="460" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- J (diamond) -->
+        <mxCell id="J" value="Status&#xa;Proyek?"
+          style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="375" y="1205" width="300" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- NODES — JALUR KRISIS (kanan)                          -->
+        <!-- ══════════════════════════════════════════════════════ -->
+
+        <!-- K (red - crisis) -->
+        <mxCell id="K" value="TIDAK ADA SISTEM PERINGATAN DINI&#xa;Klien Menghubungi Manajer Secara Langsung&#xa;karena Proyek Tidak Sesuai Target Jadwal&#xa;Manajer Baru Mengetahui Ada Masalah"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dc2626;fontColor=#ffffff;strokeColor=#991b1b;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="770" y="1198" width="290" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- L -->
+        <mxCell id="L" value="Manajer Menghubungi Teknisi&#xa;via Telepon atau WhatsApp&#xa;untuk Tindakan Penanganan Segera"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#fca5a5;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="770" y="1370" width="290" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- NODES — JALUR SELESAI                                 -->
+        <!-- ══════════════════════════════════════════════════════ -->
+
+        <!-- P -->
+        <mxCell id="P" value="Manajer Memeriksa Penyelesaian Proyek&#xa;dan Menyusun Laporan Akhir Secara Manual"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="1370" width="460" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- END -->
+        <mxCell id="END" value="Proyek Selesai&#xa;Proses Pemantauan Tidak Efisien dan Tidak Konsisten&#xa;Keterlambatan Sulit Dideteksi Lebih Awal&#xa;Berisiko Menurunkan Kepuasan Klien"
+          style="ellipse;whiteSpace=wrap;html=1;fillColor=#7f1d1d;fontColor=#ffffff;strokeColor=#450a0a;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="1500" width="460" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- EDGES — ALUR UTAMA (atas ke bawah)                    -->
+        <!-- ══════════════════════════════════════════════════════ -->
+
+        <mxCell id="e-start-a" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="START" target="A" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-a-b" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="A" target="B" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-b-c" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="B" target="C" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-c-d" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="C" target="D" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-d-db" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="D" target="DB" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-db-f" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="DB" target="F" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-f-g" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="F" target="G" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-g-h" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="G" target="H" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-h-i" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="H" target="I" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-i-j" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="I" target="J" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- EDGES — DARI DIAMOND J                                -->
+        <!-- ══════════════════════════════════════════════════════ -->
+
+        <!-- J → K (kanan: proyek terlambat, baru diketahui) -->
+        <mxCell id="e-j-k" value="Sedang berjalan, proyek sudah terlambat&#xa;tidak ada yang memberitahu manajer"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+          edge="1" source="J" target="K" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- J → P (bawah: semua selesai) -->
+        <mxCell id="e-j-p" value="Semua tugas&#xa;telah selesai"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+          edge="1" source="J" target="P" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- J → D (kiri: lanjut siklus, tidak ada masalah terdeteksi) -->
+        <mxCell id="e-j-d" value="Sedang berjalan&#xa;tidak ada masalah terdeteksi"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+          edge="1" source="J" target="D" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="110" y="1255" />
+              <mxPoint x="110" y="487" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- EDGES — JALUR KRISIS                                  -->
+        <!-- ══════════════════════════════════════════════════════ -->
+
+        <!-- K → L -->
+        <mxCell id="e-k-l" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="K" target="L" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- L → D (loop balik kiri: lanjut siklus setelah penanganan darurat) -->
+        <mxCell id="e-l-d" value="Lanjut siklus&#xa;setelah penanganan"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;"
+          edge="1" source="L" target="D" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="80" y="1402" />
+              <mxPoint x="80" y="515" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- EDGES — JALUR SELESAI                                 -->
+        <!-- ══════════════════════════════════════════════════════ -->
+
+        <!-- P → END -->
+        <mxCell id="e-p-end" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="P" target="END" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

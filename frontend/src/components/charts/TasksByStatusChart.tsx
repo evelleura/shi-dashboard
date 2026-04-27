@@ -21,7 +21,7 @@ const STATUS_LABELS: Record<string, string> = {
   over_deadline: 'Over Deadline',
 };
 
-export default function TasksByStatusChart() {
+export default function TasksByStatusChart({ dateRange }: { dateRange?: import('../../types').DateRange }) {
   const { data: rawData, isLoading } = useTasksByStatusChart();
 
   if (isLoading) {
