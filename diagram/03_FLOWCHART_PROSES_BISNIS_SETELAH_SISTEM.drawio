@@ -1,291 +1,222 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-04-28T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+<mxfile host="app.diagrams.net" modified="2026-04-27T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
   <diagram id="fc-proses-bisnis-setelah" name="Flowchart Proses Bisnis Setelah Sistem">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="1700" background="#FFFFFF" math="0" shadow="0">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1400" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <!-- ===== SWIMLANE HEADERS ===== -->
-        <!-- Manager lane header -->
-        <mxCell id="lane-mgr-hdr" value="Manager" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=13;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="60" y="10" width="360" height="30" as="geometry" />
-        </mxCell>
-        <!-- Teknisi lane header -->
-        <mxCell id="lane-tek-hdr" value="Teknisi" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=13;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="560" y="10" width="360" height="30" as="geometry" />
-        </mxCell>
-        <!-- Divider line -->
-        <mxCell id="lane-div" value="" style="line;strokeColor=#000000;fillColor=none;strokeWidth=1.5;" vertex="1" parent="1">
-          <mxGeometry x="480" y="10" width="10" height="1640" as="geometry" />
-        </mxCell>
+        <!-- FLOWCHART PROSES BISNIS SETELAH SISTEM DASHBOARD -->
+        <!-- Gambar 4.3 Flowchart Proses Bisnis Setelah Sistem. -->
 
-        <!-- ===== MULAI ===== -->
+        <!-- 1. Mulai -->
         <mxCell id="start" value="Mulai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontColor=#000000;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="185" y="50" width="140" height="44" as="geometry" />
+          <mxGeometry x="265" y="20" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- ===== FASE 1: INISIASI ===== -->
-        <!-- 1. Input Data Pelanggan -->
-        <mxCell id="p-input-client" value="Input Data Pelanggan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="134" width="160" height="44" as="geometry" />
+        <!-- 2. Manager Input Data Pelanggan -->
+        <mxCell id="p1" value="Manager Input Data Pelanggan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="94" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 2. Inisiasi Proyek untuk Client -->
-        <mxCell id="p-init-proj" value="Inisiasi Proyek untuk Client&#xa;[Fase: Survey]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="218" width="160" height="50" as="geometry" />
+        <!-- 3. Manager Buat Data Proyek -->
+        <mxCell id="p2" value="Manager Buat Data Proyek" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="168" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 3. Jadwalkan Survey -->
-        <mxCell id="p-jadwal-survey" value="Jadwalkan Survey&#xa;(Buat Task Survey)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="308" width="160" height="50" as="geometry" />
+        <!-- 4. Manager Buat Jadwal & Alokasikan Teknisi -->
+        <mxCell id="p3" value="Manager Buat Jadwal &amp; Alokasikan Teknisi" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="242" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 4. Assign Teknisi ke Task Survey -->
-        <mxCell id="p-assign-survey" value="Assign Teknisi ke Task Survey" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="398" width="160" height="44" as="geometry" />
+        <!-- 5. Teknisi Lihat Task Real-Time (I/O) -->
+        <mxCell id="io1" value="Teknisi Lihat Task Real-Time" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="316" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- ===== FASE 2: SURVEY (Teknisi) ===== -->
-        <!-- 5. Teknisi Terima Notifikasi Task Survey -->
-        <mxCell id="t-terima-survey" value="Terima Task Survey" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="600" y="398" width="160" height="44" as="geometry" />
+        <!-- 6. Manager Buat Daftar Task & Tenggat Waktu -->
+        <mxCell id="p4" value="Manager Buat Daftar Task &amp; Tenggat Waktu" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="390" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 6. Teknisi Laksanakan Survey Lapangan -->
-        <mxCell id="t-survey" value="Laksanakan Survey Lapangan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="600" y="482" width="160" height="44" as="geometry" />
+        <!-- 7. Teknisi Kerjakan Pekerjaan di Lapangan -->
+        <mxCell id="p5" value="Teknisi Kerjakan Pekerjaan di Lapangan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="464" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 7. Teknisi Upload Laporan Survey (Evidence) -->
-        <mxCell id="t-laporan-survey" value="Upload Laporan Survey&#xa;(Evidence + Catatan)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="600" y="566" width="160" height="50" as="geometry" />
+        <!-- 8. Teknisi Upload Report & Bukti Foto (I/O) -->
+        <mxCell id="io2" value="Teknisi Upload Report &amp; Bukti Foto" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="538" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- ===== FASE 3: REVIEW SURVEY (Manager) ===== -->
-        <!-- 8. Manager Review Laporan Survey -->
-        <mxCell id="p-review-survey" value="Review Laporan Survey di Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="566" width="160" height="50" as="geometry" />
+        <!-- 9. Manager Pantau Progres Real-Time -->
+        <mxCell id="p6" value="Manager Pantau Progres Real-Time" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="612" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 9. Decision: Survey OK? -->
-        <mxCell id="d-survey-ok" value="Survey&#xa;Disetujui?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="200" y="658" width="130" height="60" as="geometry" />
+        <!-- 10. Decision: Ada Kendala? -->
+        <mxCell id="d1" value="Ada Kendala?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="686" width="160" height="60" as="geometry" />
         </mxCell>
 
-        <!-- 10a. Minta Revisi Survey (N) -->
-        <mxCell id="p-minta-revisi" value="Minta Teknisi&#xa;Survei Ulang" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="50" y="668" width="120" height="44" as="geometry" />
+        <!-- 11. Teknisi Ajukan Eskalasi (I/O, cabang Y - kanan) -->
+        <mxCell id="io3" value="Teknisi Ajukan Eskalasi" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="470" y="696" width="155" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 10b. Teknisi Lakukan Survei Ulang -->
-        <mxCell id="t-survei-ulang" value="Lakukan Survei Ulang" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="600" y="668" width="160" height="44" as="geometry" />
+        <!-- 12. Manager Review & Tindak Lanjut (di bawah io3) -->
+        <mxCell id="pE" value="Manager Review &amp; Tindak Lanjut" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="470" y="780" width="155" height="44" as="geometry" />
         </mxCell>
 
-        <!-- ===== FASE 4: PASCA SURVEY (Manager) ===== -->
-        <!-- 11. Hubungi Client (diskusi) -->
-        <mxCell id="p-hubungi-client" value="Hubungi Client&#xa;(Diskusi Kebutuhan)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="758" width="160" height="50" as="geometry" />
+        <!-- 13. Teknisi Selesaikan & Report Hasil -->
+        <mxCell id="p7" value="Teknisi Selesaikan &amp; Report Hasil" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="874" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 12. Tandai Survey Disetujui di Sistem -->
-        <mxCell id="p-approve-survey" value="Approve Survey di Sistem&#xa;(survey_approved = true)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="848" width="160" height="50" as="geometry" />
+        <!-- 14. Decision: Health Status Aman? -->
+        <mxCell id="d2" value="Health Status Aman?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="958" width="160" height="60" as="geometry" />
         </mxCell>
 
-        <!-- 13. Susun Task-Task Proyek -->
-        <mxCell id="p-susun-task" value="Susun Task-Task Proyek&#xa;[Fase: Execution]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="938" width="160" height="50" as="geometry" />
+        <!-- 15. Performa Teknisi Dicatat Menurun (cabang N - kiri) -->
+        <mxCell id="p9" value="Performa Teknisi Dicatat Menurun" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="968" width="155" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 14. Assign Task ke Teknisi -->
-        <mxCell id="p-assign-task" value="Assign Task ke Teknisi" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="1028" width="160" height="44" as="geometry" />
+        <!-- 16. Teknisi Review Dashboard Performa (I/O) -->
+        <mxCell id="io4" value="Teknisi Review Dashboard Performa" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="1068" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- ===== FASE 5: PELAKSANAAN TASK (Teknisi) ===== -->
-        <!-- 15. Teknisi Terima Task -->
-        <mxCell id="t-terima-task" value="Terima Task Proyek" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="600" y="1028" width="160" height="44" as="geometry" />
+        <!-- 17. Manager Analisis Dashboard (I/O) -->
+        <mxCell id="io5" value="Manager Analisis Dashboard" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="1152" width="160" height="44" as="geometry" />
         </mxCell>
 
-        <!-- 16. Teknisi Update Status Task -->
-        <mxCell id="t-update-status" value="Update Status Task&#xa;(to_do → in_progress)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="600" y="1112" width="160" height="50" as="geometry" />
-        </mxCell>
-
-        <!-- 17. Teknisi Upload Evidence -->
-        <mxCell id="t-upload-ev" value="Upload Evidence Pekerjaan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="600" y="1202" width="160" height="44" as="geometry" />
-        </mxCell>
-
-        <!-- 18. Sistem Kalkulasi SPI Otomatis -->
-        <mxCell id="sys-spi" value="Sistem Kalkulasi SPI Otomatis" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="600" y="1286" width="160" height="44" as="geometry" />
-        </mxCell>
-
-        <!-- ===== FASE 6: MONITORING (Manager) ===== -->
-        <!-- 19. Monitor Dashboard Real-time -->
-        <mxCell id="p-monitor" value="Monitor Dashboard Real-time&#xa;(SPI &amp; Status Proyek)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="185" y="1286" width="160" height="50" as="geometry" />
-        </mxCell>
-
-        <!-- 20. Decision: Ada Proyek Kritis? -->
-        <mxCell id="d-kritis" value="Ada Proyek&#xa;Kritis?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="200" y="1378" width="130" height="60" as="geometry" />
-        </mxCell>
-
-        <!-- 21. Ambil Tindakan Korektif (Y) -->
-        <mxCell id="p-korektif" value="Ambil Tindakan Korektif&#xa;/ Eskalasi" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="50" y="1388" width="120" height="50" as="geometry" />
-        </mxCell>
-
-        <!-- ===== SELESAI ===== -->
+        <!-- 18. Selesai -->
         <mxCell id="end" value="Selesai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontColor=#000000;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="200" y="1488" width="130" height="44" as="geometry" />
+          <mxGeometry x="265" y="1236" width="160" height="44" as="geometry" />
         </mxCell>
 
         <!-- Caption -->
         <mxCell id="caption" value="Gambar 4.3 Flowchart Proses Bisnis Setelah Sistem." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="200" y="1560" width="560" height="30" as="geometry" />
+          <mxGeometry x="185" y="1308" width="420" height="30" as="geometry" />
         </mxCell>
 
         <!-- ===== EDGES ===== -->
 
-        <!-- start → p-input-client -->
-        <mxCell id="e1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="start" target="p-input-client" parent="1">
+        <!-- e1: start → p1 -->
+        <mxCell id="e1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="start" target="p1" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-input-client → p-init-proj -->
-        <mxCell id="e2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-input-client" target="p-init-proj" parent="1">
+        <!-- e2: p1 → p2 -->
+        <mxCell id="e2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p1" target="p2" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-init-proj → p-jadwal-survey -->
-        <mxCell id="e3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-init-proj" target="p-jadwal-survey" parent="1">
+        <!-- e3: p2 → p3 -->
+        <mxCell id="e3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p2" target="p3" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-jadwal-survey → p-assign-survey -->
-        <mxCell id="e4" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-jadwal-survey" target="p-assign-survey" parent="1">
+        <!-- e4: p3 → io1 -->
+        <mxCell id="e4" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p3" target="io1" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-assign-survey → t-terima-survey (cross lane) -->
-        <mxCell id="e5" value="" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;dashed=1;" edge="1" source="p-assign-survey" target="t-terima-survey" parent="1">
+        <!-- e5: io1 → p4 -->
+        <mxCell id="e5" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io1" target="p4" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- t-terima-survey → t-survey -->
-        <mxCell id="e6" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="t-terima-survey" target="t-survey" parent="1">
+        <!-- e6: p4 → p5 -->
+        <mxCell id="e6" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p4" target="p5" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- t-survey → t-laporan-survey -->
-        <mxCell id="e7" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="t-survey" target="t-laporan-survey" parent="1">
+        <!-- e7: p5 → io2 -->
+        <mxCell id="e7" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p5" target="io2" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- t-laporan-survey → p-review-survey (cross lane) -->
-        <mxCell id="e8" value="" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;dashed=1;" edge="1" source="t-laporan-survey" target="p-review-survey" parent="1">
+        <!-- e8: io2 → p6 -->
+        <mxCell id="e8" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io2" target="p6" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-review-survey → d-survey-ok -->
-        <mxCell id="e9" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-review-survey" target="d-survey-ok" parent="1">
+        <!-- e9: p6 → d1 -->
+        <mxCell id="e9" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p6" target="d1" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- d-survey-ok → p-minta-revisi (N, kiri) -->
-        <mxCell id="e10" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;" edge="1" source="d-survey-ok" target="p-minta-revisi" parent="1">
+        <!-- e10: d1 → io3 (Y, kanan - horizontal) -->
+        <!-- d1 center y=686+30=716; io3 center y=696+22=718 -->
+        <mxCell id="e10" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d1" target="io3" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-minta-revisi → t-survei-ulang (cross lane) -->
-        <mxCell id="e11" value="" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;dashed=1;" edge="1" source="p-minta-revisi" target="t-survei-ulang" parent="1">
+        <!-- e11: io3 → pE (straight down) -->
+        <mxCell id="e11" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io3" target="pE" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- t-survei-ulang → t-laporan-survey (loop back) -->
-        <mxCell id="e12" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="t-survei-ulang" target="t-laporan-survey" parent="1">
+        <!-- e12: pE → p7 (join dari kanan) -->
+        <!-- pE bottom center: x=548, y=824; p7 right center: x=425, y=896 -->
+        <mxCell id="e12" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="pE" target="p7" parent="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="820" y="690" />
-              <mxPoint x="820" y="591" />
+              <mxPoint x="548" y="850" />
+              <mxPoint x="425" y="896" />
             </Array>
           </mxGeometry>
         </mxCell>
 
-        <!-- d-survey-ok → p-hubungi-client (Y, bawah) -->
-        <mxCell id="e13" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;" edge="1" source="d-survey-ok" target="p-hubungi-client" parent="1">
+        <!-- e13: d1 → p7 (N, straight down) -->
+        <mxCell id="e13" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d1" target="p7" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-hubungi-client → p-approve-survey -->
-        <mxCell id="e14" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-hubungi-client" target="p-approve-survey" parent="1">
+        <!-- e14: p7 → d2 (straight down) -->
+        <mxCell id="e14" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p7" target="d2" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- p-approve-survey → p-susun-task -->
-        <mxCell id="e15" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-approve-survey" target="p-susun-task" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- p-susun-task → p-assign-task -->
-        <mxCell id="e16" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-susun-task" target="p-assign-task" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- p-assign-task → t-terima-task (cross lane) -->
-        <mxCell id="e17" value="" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;dashed=1;" edge="1" source="p-assign-task" target="t-terima-task" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- t-terima-task → t-update-status -->
-        <mxCell id="e18" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="t-terima-task" target="t-update-status" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- t-update-status → t-upload-ev -->
-        <mxCell id="e19" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="t-update-status" target="t-upload-ev" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- t-upload-ev → sys-spi -->
-        <mxCell id="e20" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="t-upload-ev" target="sys-spi" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- sys-spi → p-monitor (cross lane) -->
-        <mxCell id="e21" value="" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;dashed=1;" edge="1" source="sys-spi" target="p-monitor" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- p-monitor → d-kritis -->
-        <mxCell id="e22" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-monitor" target="d-kritis" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- d-kritis → p-korektif (Y, kiri) -->
-        <mxCell id="e23" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;" edge="1" source="d-kritis" target="p-korektif" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- p-korektif → end (loop balik ke monitor atau selesai) -->
-        <mxCell id="e24" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;" edge="1" source="p-korektif" target="end" parent="1">
+        <!-- e15: d2 → p9 (N, kiri) -->
+        <!-- d2 center y=958+30=988; p9 center y=968+22=990 -->
+        <mxCell id="e15" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="d2" target="p9" parent="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="110" y="1413" />
-              <mxPoint x="110" y="1510" />
-              <mxPoint x="265" y="1510" />
+              <mxPoint x="205" y="988" />
+              <mxPoint x="205" y="990" />
             </Array>
           </mxGeometry>
         </mxCell>
 
-        <!-- d-kritis → end (N, bawah) -->
-        <mxCell id="e25" value="N" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;" edge="1" source="d-kritis" target="end" parent="1">
+        <!-- e16: p9 → io4 (join dari kiri) -->
+        <!-- p9 left center: x=50, y=990; io4 left: x=265, center y=1068+22=1090 -->
+        <mxCell id="e16" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="p9" target="io4" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="25" y="990" />
+              <mxPoint x="25" y="1090" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- e17: d2 → io4 (Y, straight down) -->
+        <mxCell id="e17" value="Y" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d2" target="io4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- e18: io4 → io5 (straight down) -->
+        <mxCell id="e18" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io4" target="io5" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- e19: io5 → end (straight down) -->
+        <mxCell id="e19" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="io5" target="end" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
