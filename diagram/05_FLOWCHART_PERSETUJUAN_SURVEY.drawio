@@ -102,7 +102,7 @@
         </mxCell>
 
         <!-- 15. Sistem SPI -->
-        <mxCell id="sys-spi" value="Sistem Kalkulasi SPI Otomatis" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontStyle=2;" vertex="1" parent="1">
+        <mxCell id="sys-spi" value="Sistem Kalkulasi SPI Otomatis" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontStyle=2;" vertex="1" parent="1">
           <mxGeometry x="560" y="1042" width="160" height="44" as="geometry" />
         </mxCell>
 

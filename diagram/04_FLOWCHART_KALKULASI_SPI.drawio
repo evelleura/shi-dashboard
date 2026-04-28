@@ -86,7 +86,7 @@
         </mxCell>
 
         <!-- Caption -->
-        <mxCell id="caption" value="Gambar 4.3 Flowchart Kalkulasi SPI." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+        <mxCell id="caption" value="Gambar 4.4 Flowchart Kalkulasi SPI." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
           <mxGeometry x="185" y="1020" width="420" height="30" as="geometry" />
         </mxCell>
 
