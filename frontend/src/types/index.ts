@@ -7,7 +7,7 @@ export type HealthStatus = 'green' | 'amber' | 'red';
 export type TaskStatus = 'to_do' | 'in_progress' | 'working_on_it' | 'review' | 'done';
 export type EvidenceType = 'photo' | 'document' | 'form' | 'screenshot' | 'other';
 export type ActivityType = 'arrival' | 'start_work' | 'pause' | 'resume' | 'note' | 'photo' | 'complete';
-export type EscalationStatus = 'open' | 'in_review' | 'resolved';
+export type EscalationStatus = 'open' | 'in_review' | 'resolved' | 'cancelled';
 export type EscalationPriority = 'low' | 'medium' | 'high' | 'critical';
 
 // === Entities ===
@@ -118,6 +118,18 @@ export interface TaskActivity {
   created_at: string;
 }
 
+export type EscalationActionRequest = 'ganti_teknisi' | 'ganti_material' | 'perpanjang_deadline' | 'mediasi_client' | 'batalkan_eskalasi';
+export type EscalationActionRequestStatus = 'pending' | 'approved' | 'rejected';
+
+export interface EscalationUpdate {
+  id: number;
+  escalation_id: number;
+  author_id: number;
+  author_name?: string;
+  message: string;
+  created_at: string;
+}
+
 export interface Escalation {
   id: number;
   task_id: number;
@@ -138,6 +150,9 @@ export interface Escalation {
   resolver_name?: string;
   resolved_at?: string;
   resolution_notes?: string;
+  action_request?: EscalationActionRequest | null;
+  action_request_note?: string | null;
+  action_request_status?: EscalationActionRequestStatus | null;
   created_at: string;
   updated_at: string;
 }

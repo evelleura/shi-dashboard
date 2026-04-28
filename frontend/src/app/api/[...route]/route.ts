@@ -247,11 +247,16 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       return methodNotAllowed();
     }
     if (r1 && !r2) {
-      if (method === 'GET') return escalations.getEscalation(request, r1);
+      if (method === 'GET')    return escalations.getEscalation(request, r1);
+      if (method === 'DELETE') return escalations.deleteEscalation(request, r1);
       return methodNotAllowed();
     }
-    if (r1 && r2 === 'review'  && method === 'PATCH') return escalations.reviewEscalation(request, r1);
-    if (r1 && r2 === 'resolve' && method === 'PATCH') return escalations.resolveEscalation(request, r1);
+    if (r1 && r2 === 'review'          && method === 'PATCH') return escalations.reviewEscalation(request, r1);
+    if (r1 && r2 === 'resolve'         && method === 'PATCH') return escalations.resolveEscalation(request, r1);
+    if (r1 && r2 === 'updates'         && method === 'POST')  return escalations.addUpdate(request, r1);
+    if (r1 && r2 === 'updates'         && method === 'GET')   return escalations.getUpdates(request, r1);
+    if (r1 && r2 === 'action-request'  && method === 'POST')  return escalations.requestAction(request, r1);
+    if (r1 && r2 === 'action-request'  && method === 'PATCH') return escalations.respondActionRequest(request, r1);
     return notFound();
   }
 

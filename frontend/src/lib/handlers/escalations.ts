@@ -48,7 +48,7 @@ export async function listEscalations(request: NextRequest) {
       conditions.push(`e.reported_by = $${paramIdx++}`);
       params.push(userId);
     }
-    if (filterStatus && ['open', 'in_review', 'resolved'].includes(filterStatus)) {
+    if (filterStatus && ['open', 'in_review', 'resolved', 'cancelled'].includes(filterStatus)) {
       conditions.push(`e.status = $${paramIdx++}`);
       params.push(filterStatus);
     }
@@ -59,7 +59,7 @@ export async function listEscalations(request: NextRequest) {
     if (conditions.length > 0) baseQuery += ' WHERE ' + conditions.join(' AND ');
     baseQuery += `
       ORDER BY
-        CASE e.status WHEN 'open' THEN 1 WHEN 'in_review' THEN 2 WHEN 'resolved' THEN 3 END,
+        CASE e.status WHEN 'open' THEN 1 WHEN 'in_review' THEN 2 WHEN 'resolved' THEN 3 WHEN 'cancelled' THEN 4 END,
         CASE e.priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END,
         e.created_at DESC`;
 
@@ -231,6 +231,191 @@ export async function resolveEscalation(request: NextRequest, id: string) {
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.error('Resolve escalation error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function addUpdate(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const escalationId = parseInt(id);
+  if (isNaN(escalationId)) return NextResponse.json({ success: false, error: 'Invalid escalation ID' }, { status: 400 });
+
+  const body = await request.json();
+  const { message } = body as { message?: string };
+  if (!message || message.trim().length === 0) {
+    return NextResponse.json({ success: false, error: 'message is required' }, { status: 400 });
+  }
+
+  try {
+    const escCheck = await query<{ reported_by: number; status: string }>(
+      'SELECT reported_by, status FROM escalations WHERE id = $1', [escalationId]
+    );
+    if (escCheck.rowCount === 0) return NextResponse.json({ success: false, error: 'Escalation not found' }, { status: 404 });
+    const esc = escCheck.rows[0];
+    const role = auth.user.role;
+    if (role === 'technician' && esc.reported_by !== auth.user.userId) {
+      return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
+    }
+    if (esc.status === 'resolved') {
+      return NextResponse.json({ success: false, error: 'Tidak bisa menambah catatan pada eskalasi yang sudah diselesaikan' }, { status: 409 });
+    }
+    const result = await query(
+      `INSERT INTO escalation_updates (escalation_id, author_id, message) VALUES ($1, $2, $3) RETURNING *`,
+      [escalationId, auth.user.userId, message.trim()]
+    );
+    const update = result.rows[0] as Record<string, unknown>;
+    const userRes = await query<{ name: string }>('SELECT name FROM users WHERE id = $1', [auth.user.userId]);
+    return NextResponse.json({ success: true, data: { ...update, author_name: userRes.rows[0]?.name || null } }, { status: 201 });
+  } catch (err) {
+    console.error('Add escalation update error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function getUpdates(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const escalationId = parseInt(id);
+  if (isNaN(escalationId)) return NextResponse.json({ success: false, error: 'Invalid escalation ID' }, { status: 400 });
+
+  try {
+    const escCheck = await query<{ reported_by: number }>(
+      'SELECT reported_by FROM escalations WHERE id = $1', [escalationId]
+    );
+    if (escCheck.rowCount === 0) return NextResponse.json({ success: false, error: 'Escalation not found' }, { status: 404 });
+    if (auth.user.role === 'technician' && escCheck.rows[0].reported_by !== auth.user.userId) {
+      return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
+    }
+    const result = await query(
+      `SELECT eu.*, u.name AS author_name
+       FROM escalation_updates eu
+       LEFT JOIN users u ON u.id = eu.author_id
+       WHERE eu.escalation_id = $1
+       ORDER BY eu.created_at ASC`,
+      [escalationId]
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Get escalation updates error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function deleteEscalation(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['admin']);
+  if (roleCheck) return roleCheck;
+
+  const escalationId = parseInt(id);
+  if (isNaN(escalationId)) return NextResponse.json({ success: false, error: 'Invalid escalation ID' }, { status: 400 });
+
+  try {
+    const check = await query<{ status: string }>(
+      'SELECT status FROM escalations WHERE id = $1', [escalationId]
+    );
+    if (check.rowCount === 0) return NextResponse.json({ success: false, error: 'Escalation not found' }, { status: 404 });
+    if (check.rows[0].status === 'resolved') {
+      return NextResponse.json({ success: false, error: 'Eskalasi yang sudah diselesaikan tidak bisa dihapus' }, { status: 409 });
+    }
+
+    await query('DELETE FROM escalations WHERE id = $1', [escalationId]);
+    return NextResponse.json({ success: true, data: { id: escalationId } });
+  } catch (err) {
+    console.error('Delete escalation error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+const VALID_ACTION_REQUESTS = ['ganti_teknisi', 'ganti_material', 'perpanjang_deadline', 'mediasi_client', 'batalkan_eskalasi'];
+
+export async function requestAction(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const escalationId = parseInt(id);
+  if (isNaN(escalationId)) return NextResponse.json({ success: false, error: 'Invalid escalation ID' }, { status: 400 });
+
+  const body = await request.json();
+  const { action_request, action_request_note } = body as { action_request?: string; action_request_note?: string };
+
+  if (!action_request || !VALID_ACTION_REQUESTS.includes(action_request)) {
+    return NextResponse.json({ success: false, error: `action_request harus salah satu dari: ${VALID_ACTION_REQUESTS.join(', ')}` }, { status: 400 });
+  }
+  if (!action_request_note || action_request_note.trim().length === 0) {
+    return NextResponse.json({ success: false, error: 'Catatan untuk permintaan tindakan harus diisi' }, { status: 400 });
+  }
+
+  try {
+    const check = await query<{ reported_by: number; status: string; action_request_status: string | null }>(
+      'SELECT reported_by, status, action_request_status FROM escalations WHERE id = $1', [escalationId]
+    );
+    if (check.rowCount === 0) return NextResponse.json({ success: false, error: 'Escalation not found' }, { status: 404 });
+    const esc = check.rows[0];
+
+    if (auth.user.role === 'technician' && esc.reported_by !== auth.user.userId) {
+      return NextResponse.json({ success: false, error: 'Kamu hanya bisa mengajukan tindakan pada eskalasi milikmu sendiri' }, { status: 403 });
+    }
+    if (!['open', 'in_review'].includes(esc.status)) {
+      return NextResponse.json({ success: false, error: 'Permintaan tindakan hanya bisa diajukan pada eskalasi yang masih aktif' }, { status: 409 });
+    }
+    if (esc.action_request_status === 'pending') {
+      return NextResponse.json({ success: false, error: 'Sudah ada permintaan tindakan yang sedang menunggu persetujuan manager' }, { status: 409 });
+    }
+
+    const result = await query(
+      `UPDATE escalations SET action_request=$1, action_request_note=$2, action_request_status='pending', updated_at=NOW()
+       WHERE id=$3 RETURNING *`,
+      [action_request, action_request_note.trim(), escalationId]
+    );
+    return NextResponse.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    console.error('Request action error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function respondActionRequest(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
+  if (roleCheck) return roleCheck;
+
+  const escalationId = parseInt(id);
+  if (isNaN(escalationId)) return NextResponse.json({ success: false, error: 'Invalid escalation ID' }, { status: 400 });
+
+  const body = await request.json();
+  const { status: responseStatus, response_note } = body as { status?: string; response_note?: string };
+
+  if (!responseStatus || !['approved', 'rejected'].includes(responseStatus)) {
+    return NextResponse.json({ success: false, error: 'status harus "approved" atau "rejected"' }, { status: 400 });
+  }
+  if (!response_note || response_note.trim().length === 0) {
+    return NextResponse.json({ success: false, error: 'Catatan respons harus diisi' }, { status: 400 });
+  }
+
+  try {
+    const check = await query<{ action_request_status: string | null; action_request: string | null }>(
+      'SELECT action_request_status, action_request FROM escalations WHERE id = $1', [escalationId]
+    );
+    if (check.rowCount === 0) return NextResponse.json({ success: false, error: 'Escalation not found' }, { status: 404 });
+    const escRow = check.rows[0];
+    if (escRow.action_request_status !== 'pending') {
+      return NextResponse.json({ success: false, error: 'Tidak ada permintaan tindakan yang sedang menunggu persetujuan' }, { status: 409 });
+    }
+
+    const shouldCancel = responseStatus === 'approved' && escRow.action_request === 'batalkan_eskalasi';
+    const updateSql = shouldCancel
+      ? `UPDATE escalations SET action_request_status=$1, action_request_note=$2, status='cancelled', updated_at=NOW() WHERE id=$3 RETURNING *`
+      : `UPDATE escalations SET action_request_status=$1, action_request_note=$2, updated_at=NOW() WHERE id=$3 RETURNING *`;
+
+    const result = await query(updateSql, [responseStatus, response_note.trim(), escalationId]);
+    return NextResponse.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    console.error('Respond action request error:', err);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

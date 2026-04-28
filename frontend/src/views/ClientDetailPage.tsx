@@ -2,16 +2,15 @@
 
 import { useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
 import { useClient, useUpdateClient, useDeleteClient, useUploadClientPhoto } from '../hooks/useClients';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
-import { getAuditLogs } from '../services/api';
 import Modal from '../components/ui/Modal';
+import EntityActivityTimeline from '../components/ui/EntityActivityTimeline';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import MapPreview from '../components/ui/MapPreview';
-import type { Client, CreateClientData, AuditLogEntry } from '../types';
+import type { Client, CreateClientData } from '../types';
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -180,72 +179,6 @@ function ClientFormModal({
   );
 }
 
-// ── audit log timeline ───────────────────────────────────────────────────────
-
-function AuditTimeline({ logs, locale }: { logs: AuditLogEntry[]; locale: string }) {
-  const { language } = useLanguage();
-
-  if (logs.length === 0) {
-    return (
-      <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
-        Tidak ada riwayat
-      </p>
-    );
-  }
-
-  return (
-    <div className="relative space-y-3 pl-4">
-      <div className="absolute left-1.5 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700" />
-      {logs.map((log) => (
-        <div key={log.id} className="relative pl-4">
-          <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full border-2 border-blue-400 bg-white dark:bg-gray-900" />
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <span
-              className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
-                log.action === 'create'
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                  : log.action === 'delete'
-                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-              }`}
-            >
-              {log.action === 'create'
-                ? t('audit.created', language)
-                : log.action === 'delete'
-                ? t('audit.deleted', language)
-                : t('audit.updated', language)}
-            </span>
-            {log.field_name && log.field_name !== '*' && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                <span className="font-medium text-gray-700 dark:text-gray-300">{log.field_name}</span>
-                {log.old_value != null && (
-                  <span className="text-red-500 line-through ml-1">{log.old_value}</span>
-                )}
-                {log.new_value != null && (
-                  <span className="text-green-600 ml-1">→ {log.new_value}</span>
-                )}
-              </span>
-            )}
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {t('audit.by', language)}{' '}
-              <span className="font-medium">{log.changed_by_name}</span>
-            </span>
-            <span className="text-xs text-gray-400">
-              {new Date(log.created_at).toLocaleDateString(locale, {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ── client project row ───────────────────────────────────────────────────────
 
 interface ClientProject {
@@ -298,13 +231,6 @@ export default function ClientDetailPage() {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { data: auditData } = useQuery({
-    queryKey: ['audit', 'client', clientId],
-    queryFn: () => getAuditLogs({ entity_type: 'client', entity_id: clientId, limit: 50 }),
-    enabled: isAdmin && clientId > 0,
-    staleTime: 1000 * 30,
-  });
 
   const handleEdit = async (data: CreateClientData) => {
     await updateMutation.mutateAsync({ id: clientId, data });
@@ -640,7 +566,7 @@ export default function ClientDetailPage() {
         <div role="tabpanel">
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Riwayat Perubahan</h2>
-            <AuditTimeline logs={auditData?.logs ?? []} locale={locale} />
+            <EntityActivityTimeline entityType="client" entityId={clientId} />
           </div>
         </div>
       )}

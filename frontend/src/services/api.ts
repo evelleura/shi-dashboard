@@ -11,7 +11,9 @@ import type {
   TaskEvidence,
   TaskActivity,
   Escalation,
+  EscalationUpdate,
   EscalationSummary,
+  EscalationActionRequest,
   CreateProjectData,
   UpdateProjectData,
   CreateTaskData,
@@ -447,6 +449,41 @@ export const reviewEscalation = async (id: number): Promise<Escalation> => {
 
 export const resolveEscalation = async (id: number, resolution_notes: string): Promise<Escalation> => {
   const res = await api.patch<ApiResponse<Escalation>>(`/escalations/${id}/resolve`, { resolution_notes });
+  return res.data.data!;
+};
+
+export const getEscalationUpdates = async (id: number): Promise<EscalationUpdate[]> => {
+  const res = await api.get<ApiResponse<EscalationUpdate[]>>(`/escalations/${id}/updates`);
+  return res.data.data!;
+};
+
+export const addEscalationUpdate = async (id: number, message: string): Promise<EscalationUpdate> => {
+  const res = await api.post<ApiResponse<EscalationUpdate>>(`/escalations/${id}/updates`, { message });
+  return res.data.data!;
+};
+
+
+export const requestEscalationAction = async (
+  id: number,
+  action_request: EscalationActionRequest,
+  action_request_note: string
+): Promise<Escalation> => {
+  const res = await api.post<ApiResponse<Escalation>>(`/escalations/${id}/action-request`, {
+    action_request,
+    action_request_note,
+  });
+  return res.data.data!;
+};
+
+export const respondEscalationAction = async (
+  id: number,
+  status: 'approved' | 'rejected',
+  response_note: string
+): Promise<Escalation> => {
+  const res = await api.patch<ApiResponse<Escalation>>(`/escalations/${id}/action-request`, {
+    status,
+    response_note,
+  });
   return res.data.data!;
 };
 
