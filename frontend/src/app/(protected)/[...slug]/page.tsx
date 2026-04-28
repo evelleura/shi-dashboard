@@ -6,6 +6,7 @@ import DashboardPage from '@/views/DashboardPage';
 import ProjectsPage from '@/views/ProjectsPage';
 import ProjectDetailPage from '@/views/ProjectDetailPage';
 import ClientsPage from '@/views/ClientsPage';
+import ClientDetailPage from '@/views/ClientDetailPage';
 import EscalationsPage from '@/views/EscalationsPage';
 import TechnicianDashboard from '@/views/TechnicianDashboard';
 import TechnicianProjectsPage from '@/views/TechnicianProjectsPage';
@@ -29,6 +30,7 @@ export default function ProtectedPage({ params }: Props) {
   if (section === 'dashboard')     return <DashboardPage />;
   if (section === 'projects' && id) return <ProjectDetailPage />;
   if (section === 'projects')      return <ProjectsPage />;
+  if (section === 'clients' && id) return <ClientDetailPage />;
   if (section === 'clients')       return <ClientsPage />;
   if (section === 'escalations')   return <EscalationsPage />;
   if (section === 'my-dashboard')  return <TechnicianDashboard />;

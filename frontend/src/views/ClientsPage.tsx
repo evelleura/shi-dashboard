@@ -1,12 +1,10 @@
-import { useState, useMemo, useRef } from 'react';
-import { useClients, useCreateClient, useUpdateClient, useDeleteClient, useUploadClientPhoto, useClient } from '../hooks/useClients';
-import { useQuery } from '@tanstack/react-query';
-import { getAuditLogs } from '../services/api';
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from '../hooks/useClients';
 import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import EmptyState from '../components/ui/EmptyState';
 import DataTable, { type Column, type RowAge } from '../components/ui/DataTable';
-import MapPreview from '../components/ui/MapPreview';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import type { Client, CreateClientData } from '../types';
@@ -25,169 +23,6 @@ function getClientAge(c: Client): RowAge {
 
 const emptyForm: CreateClientData = { name: '', address: '', phone: '', email: '', notes: '', latitude: null, longitude: null };
 
-function ClientDetailModal({ clientId, onClose }: { clientId: number; onClose: () => void }) {
-  const { data: client, isLoading } = useClient(clientId);
-  const uploadPhotoMutation = useUploadClientPhoto();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { language } = useLanguage();
-
-  const locale = language === 'id' ? 'id-ID' : 'en-US';
-
-  const { data: auditData } = useQuery({
-    queryKey: ['audit', 'client', clientId],
-    queryFn: () => getAuditLogs({ entity_type: 'client', entity_id: clientId, limit: 50 }),
-    enabled: clientId > 0,
-    staleTime: 1000 * 30,
-  });
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    await uploadPhotoMutation.mutateAsync({ id: clientId, file });
-  };
-
-  if (isLoading) {
-    return (
-      <Modal open onClose={onClose} title={t('client.detail_title', language)}>
-        <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
-      </Modal>
-    );
-  }
-
-  if (!client) return null;
-
-  const clientWithProjects = client as Client & { projects?: { id: number; name: string; status: string; phase: string; health_status?: string }[] };
-  const hasCoords = client.latitude != null && client.longitude != null;
-
-  return (
-    <Modal open onClose={onClose} title={client.name} maxWidth="max-w-2xl">
-      <div className="space-y-6">
-        {/* Profile section */}
-        <div className="flex gap-4 items-start">
-          <div className="shrink-0">
-            {client.photo_path ? (
-              <img
-                src={client.photo_path}
-                alt={client.name}
-                className="w-24 h-24 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-            )}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadPhotoMutation.isPending}
-              className="mt-2 w-24 text-xs text-center py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded transition-colors"
-            >
-              {uploadPhotoMutation.isPending ? t('client.uploading', language) : t('client.upload_photo', language)}
-            </button>
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-          </div>
-          <div className="flex-1 min-w-0 space-y-2">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{client.name}</h3>
-            {client.email && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                {client.email}
-              </p>
-            )}
-            {client.phone && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                {client.phone}
-              </p>
-            )}
-            {client.address && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-1">
-                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                {client.address}
-              </p>
-            )}
-            {client.notes && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 italic">{client.notes}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Map */}
-        {hasCoords && (
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('client.location', language)}</h4>
-            <MapPreview lat={Number(client.latitude)} lng={Number(client.longitude)} height="200px" />
-            <p className="text-xs text-gray-400 mt-1">{Number(client.latitude).toFixed(6)}, {Number(client.longitude).toFixed(6)}</p>
-          </div>
-        )}
-
-        {/* Projects */}
-        {clientWithProjects.projects && clientWithProjects.projects.length > 0 && (
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('project.title', language)} ({clientWithProjects.projects.length})</h4>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {clientWithProjects.projects.map((p) => (
-                <div key={p.id} className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm">
-                  <span className="text-gray-800 dark:text-gray-200 font-medium">{p.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      p.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                      p.status === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                      'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-                    }`}>
-                      {p.status}
-                    </span>
-                    {p.health_status && (
-                      <span className={`w-2 h-2 rounded-full ${p.health_status === 'green' ? 'bg-green-500' : p.health_status === 'amber' ? 'bg-amber-500' : 'bg-red-500'}`} />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Activity Timeline */}
-        {auditData && auditData.logs.length > 0 && (
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{t('client.history', language)}</h4>
-            <div className="relative space-y-3 max-h-56 overflow-y-auto pl-4">
-              <div className="absolute left-1.5 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700" />
-              {auditData.logs.map((log) => (
-                <div key={log.id} className="relative pl-4">
-                  <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full border-2 border-blue-400 bg-white dark:bg-gray-900" />
-                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                    <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
-                      log.action === 'create' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                      log.action === 'delete' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                    }`}>
-                      {log.action === 'create' ? t('audit.created', language) : log.action === 'delete' ? t('audit.deleted', language) : t('audit.updated', language)}
-                    </span>
-                    {log.field_name && log.field_name !== '*' && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">{log.field_name}</span>
-                        {log.old_value != null && <span className="text-red-500 line-through ml-1">{log.old_value}</span>}
-                        {log.new_value != null && <span className="text-green-600 ml-1">→ {log.new_value}</span>}
-                      </span>
-                    )}
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{t('audit.by', language)} <span className="font-medium">{log.changed_by_name}</span></span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(log.created_at).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </Modal>
-  );
-}
 
 function ClientFormModal({
   open,
@@ -275,6 +110,7 @@ function ClientFormModal({
 }
 
 export default function ClientsPage() {
+  const router = useRouter();
   const { data: clients = [], isLoading, isError } = useClients();
   const createMutation = useCreateClient();
   const updateMutation = useUpdateClient();
@@ -283,7 +119,6 @@ export default function ClientsPage() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [editClient, setEditClient] = useState<Client | null>(null);
-  const [detailId, setDetailId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
 
@@ -307,7 +142,7 @@ export default function ClientsPage() {
       key: 'name',
       label: t('label.name', language),
       render: (c) => (
-        <button onClick={() => setDetailId(c.id)} className="text-left group">
+        <button onClick={() => router.push('/clients/' + c.id)} className="text-left group">
           <p className="text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:underline">{c.name}</p>
           {c.notes && <p className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-xs">{c.notes}</p>}
         </button>
@@ -482,11 +317,6 @@ export default function ClientsPage() {
           onSubmit={handleEdit}
           isPending={updateMutation.isPending}
         />
-      )}
-
-      {/* Detail Modal */}
-      {detailId !== null && (
-        <ClientDetailModal clientId={detailId} onClose={() => setDetailId(null)} />
       )}
 
       {/* Delete Confirmation */}
