@@ -119,6 +119,25 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     return notFound();
   }
 
+  // ── Util: resolve shortened URL ───────────────────────────────────────────
+  if (r0 === 'util' && r1 === 'resolve-url' && method === 'GET') {
+    const url = request.nextUrl.searchParams.get('url');
+    if (!url) return NextResponse.json({ success: false, error: 'url param required' }, { status: 400 });
+    try {
+      const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+      const finalUrl = res.url;
+      // parse coords from final URL
+      const atMatch = finalUrl.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+      const qMatch  = finalUrl.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+      const coords  = atMatch ? { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) }
+                    : qMatch  ? { lat: parseFloat(qMatch[1]),  lng: parseFloat(qMatch[2])  }
+                    : null;
+      return NextResponse.json({ success: true, data: { finalUrl, coords } });
+    } catch {
+      return NextResponse.json({ success: false, error: 'Failed to resolve URL' }, { status: 502 });
+    }
+  }
+
   // ── Clients ───────────────────────────────────────────────────────────────
   if (r0 === 'clients') {
     if (!r1) {

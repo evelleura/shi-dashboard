@@ -119,6 +119,13 @@ export const getMyProjects = async (): Promise<Project[]> => {
   return res.data.data!;
 };
 
+// ==================== Util ====================
+
+export const resolveGmapsUrl = async (url: string): Promise<{ finalUrl: string; coords: { lat: number; lng: number } | null }> => {
+  const res = await api.get<ApiResponse<{ finalUrl: string; coords: { lat: number; lng: number } | null }>>(`/util/resolve-url?url=${encodeURIComponent(url)}`);
+  return res.data.data!;
+};
+
 // ==================== Clients ====================
 
 export const getClients = async (): Promise<Client[]> => {

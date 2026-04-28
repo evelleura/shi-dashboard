@@ -76,8 +76,6 @@ export async function createClient(request: NextRequest) {
 export async function getClient(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
-  if (roleCheck) return roleCheck;
 
   const clientId = parseInt(id);
   if (isNaN(clientId)) {

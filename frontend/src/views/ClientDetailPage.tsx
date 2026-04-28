@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useClient, useUpdateClient, useDeleteClient, useUploadClientPhoto } from '../hooks/useClients';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import Modal from '../components/ui/Modal';
+import MapPreview from '../components/ui/MapPreview';
 import EntityActivityTimeline from '../components/ui/EntityActivityTimeline';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
-import MapPreview from '../components/ui/MapPreview';
 import type { Client, CreateClientData } from '../types';
+import { resolveGmapsUrl } from '../services/api';
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,63 @@ function formatRupiah(value: number): string {
 
 // ── sub-components ───────────────────────────────────────────────────────────
 
+function parseGmapsLink(link: string): { lat: number | null; lng: number | null } {
+  if (!link.trim()) return { lat: null, lng: null };
+  const atMatch = link.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (atMatch) return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
+  const qMatch = link.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (qMatch) return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
+  const placeMatch = link.match(/\/(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (placeMatch) return { lat: parseFloat(placeMatch[1]), lng: parseFloat(placeMatch[2]) };
+  return { lat: null, lng: null };
+}
+
+function isShortened(url: string): boolean {
+  return /goo\.gl|maps\.app/i.test(url);
+}
+
+function coordsToGmapsLink(lat: number | null | undefined, lng: number | null | undefined): string {
+  if (lat == null || lng == null) return '';
+  return `https://www.google.com/maps?q=${lat},${lng}`;
+}
+
+function useGmapsCoords(gmapsLink: string) {
+  const [resolved, setResolved] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
+  const [resolving, setResolving] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const sync = parseGmapsLink(gmapsLink);
+  const hasSyncCoords = sync.lat !== null;
+
+  useEffect(() => {
+    if (!gmapsLink.trim() || hasSyncCoords) {
+      setResolved({ lat: null, lng: null });
+      return;
+    }
+    if (!isShortened(gmapsLink)) {
+      setResolved({ lat: null, lng: null });
+      return;
+    }
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(async () => {
+      setResolving(true);
+      try {
+        const result = await resolveGmapsUrl(gmapsLink.trim());
+        setResolved(result.coords ?? { lat: null, lng: null });
+      } catch {
+        setResolved({ lat: null, lng: null });
+      } finally {
+        setResolving(false);
+      }
+    }, 600);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [gmapsLink, hasSyncCoords]);
+
+  const lat = hasSyncCoords ? sync.lat : resolved.lat;
+  const lng = hasSyncCoords ? sync.lng : resolved.lng;
+  return { lat, lng, resolving };
+}
+
 function ClientFormModal({
   open,
   onClose,
@@ -46,10 +104,14 @@ function ClientFormModal({
   isPending: boolean;
 }) {
   const [form, setForm] = useState<CreateClientData>(initialData);
+  const [gmapsLink, setGmapsLink] = useState(() => coordsToGmapsLink(initialData.latitude, initialData.longitude));
   const { language } = useLanguage();
 
   const set = (key: keyof CreateClientData, value: string | number | null) =>
     setForm((p) => ({ ...p, [key]: value }));
+
+  const { lat: coordLat, lng: coordLng, resolving } = useGmapsCoords(gmapsLink);
+  const hasValidCoords = coordLat !== null;
 
   const handleSubmit = async () => {
     if (!form.name.trim()) return;
@@ -60,8 +122,8 @@ function ClientFormModal({
       phone: form.phone?.trim() || undefined,
       email: form.email?.trim() || undefined,
       notes: form.notes?.trim() || undefined,
-      latitude: form.latitude != null && form.latitude !== ('' as unknown) ? Number(form.latitude) : null,
-      longitude: form.longitude != null && form.longitude !== ('' as unknown) ? Number(form.longitude) : null,
+      latitude: coordLat,
+      longitude: coordLng,
     });
   };
 
@@ -100,13 +162,28 @@ function ClientFormModal({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('label.phone', language)}
             </label>
-            <input
-              type="text"
-              value={form.phone ?? ''}
-              onChange={(e) => set('phone', e.target.value)}
-              placeholder="+62812xxxx"
-              className={inputClass}
-            />
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={form.phone ?? ''}
+                onChange={(e) => set('phone', e.target.value)}
+                placeholder="+62812xxxx"
+                className={inputClass}
+              />
+              {form.phone?.trim() && (
+                <a
+                  href={`https://wa.me/${form.phone.trim().replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Chat via WhatsApp"
+                  className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-green-500 hover:bg-green-600 transition-colors"
+                >
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </a>
+              )}
+            </div>
           </div>
         </div>
         <div>
@@ -121,29 +198,46 @@ function ClientFormModal({
             className={`${inputClass} resize-none`}
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Latitude</label>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Link Google Maps
+          </label>
+          <div className="flex gap-1.5">
             <input
-              type="number"
-              step="any"
-              value={form.latitude ?? ''}
-              onChange={(e) => set('latitude', e.target.value ? parseFloat(e.target.value) : null)}
-              placeholder="-7.797068"
+              type="url"
+              value={gmapsLink}
+              onChange={(e) => setGmapsLink(e.target.value)}
+              placeholder="https://maps.google.com/..."
               className={inputClass}
             />
+            {gmapsLink.trim() && (
+              <a
+                href={gmapsLink.trim()}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Buka di Google Maps"
+                className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors"
+              >
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </a>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Longitude</label>
-            <input
-              type="number"
-              step="any"
-              value={form.longitude ?? ''}
-              onChange={(e) => set('longitude', e.target.value ? parseFloat(e.target.value) : null)}
-              placeholder="110.370529"
-              className={inputClass}
-            />
-          </div>
+          {gmapsLink.trim() && (
+            <p className={`text-xs mt-1 ${resolving ? 'text-gray-400 dark:text-gray-500' : hasValidCoords ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+              {resolving
+                ? '⏳ Memuat koordinat dari link...'
+                : hasValidCoords
+                  ? `✓ Koordinat terdeteksi: ${coordLat?.toFixed(5)}, ${coordLng?.toFixed(5)}`
+                  : '⚠ Koordinat tidak terdeteksi dari link ini'}
+            </p>
+          )}
+          {hasValidCoords && coordLat !== null && coordLng !== null && (
+            <div className="mt-2">
+              <MapPreview lat={coordLat} lng={coordLng} height="200px" />
+            </div>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -368,7 +462,25 @@ export default function ClientDetailPage() {
             </svg>
             <div>
               <p className="text-xs text-gray-400 dark:text-gray-500">{t('label.phone', language)}</p>
-              <p className="text-sm text-gray-800 dark:text-gray-200">{client.phone ?? '--'}</p>
+              {client.phone ? (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-sm text-gray-800 dark:text-gray-200">{client.phone}</p>
+                  <a
+                    href={`https://wa.me/${client.phone.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Chat via WhatsApp"
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-green-600 dark:fill-green-400 shrink-0">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    <span className="text-xs font-medium text-green-700 dark:text-green-400">WhatsApp</span>
+                  </a>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-800 dark:text-gray-200">--</p>
+              )}
             </div>
           </div>
 

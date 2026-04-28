@@ -40,7 +40,7 @@ export const translations = {
     // Common labels
     'label.name': 'Nama',
     'label.email': 'Email',
-    'label.phone': 'Telepon',
+    'label.phone': 'Telepon (WhatsApp)',
     'label.address': 'Alamat',
     'label.notes': 'Catatan',
     'label.status': 'Status',
@@ -403,7 +403,7 @@ export const translations = {
     // Common labels
     'label.name': 'Name',
     'label.email': 'Email',
-    'label.phone': 'Phone',
+    'label.phone': 'Phone (WhatsApp)',
     'label.address': 'Address',
     'label.notes': 'Notes',
     'label.status': 'Status',
