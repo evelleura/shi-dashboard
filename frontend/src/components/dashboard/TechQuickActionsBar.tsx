@@ -1,4 +1,8 @@
+'use client';
+
 import Link from 'next/link';
+import { useLanguage } from '../../hooks/useLanguage';
+import { t } from '../../lib/i18n';
 
 function TasksIcon() {
   return (
@@ -25,40 +29,39 @@ function EscalationIcon() {
 }
 
 export default function TechQuickActionsBar() {
+  const { language } = useLanguage();
+
   return (
     <div
       className="flex flex-wrap items-center gap-2"
       role="toolbar"
-      aria-label="Quick navigation"
+      aria-label={t('nav.my_tasks', language)}
     >
-      {/* My Tasks */}
       <Link
         href="/my-tasks"
         className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-        aria-label="View my tasks"
+        aria-label={t('nav.my_tasks', language)}
       >
         <TasksIcon />
-        My Tasks
+        {t('nav.my_tasks', language)}
       </Link>
 
-      {/* My Projects */}
       <Link
         href="/my-projects"
         className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 active:bg-green-800 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-        aria-label="View my projects"
+        aria-label={t('nav.my_projects', language)}
       >
         <ProjectsIcon />
-        My Projects
+        {t('nav.my_projects', language)}
       </Link>
 
-      {/* Escalations */}
       <Link
         href="/my-escalations"
         className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-amber-500 text-white text-sm font-medium hover:bg-amber-600 active:bg-amber-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1"
-        aria-label="View escalations"
+        aria-label={t('nav.my_escalations', language)}
       >
         <EscalationIcon />
-        Escalations
+        {t('nav.my_escalations', language)}
       </Link>
     </div>
   );

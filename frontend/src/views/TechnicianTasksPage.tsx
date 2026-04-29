@@ -3,6 +3,8 @@ import { useTechnicianDashboard } from '../hooks/useDashboard';
 import { useChangeTaskStatus } from '../hooks/useTasks';
 import { useStartTimer, useStopTimer } from '../hooks/useActivities';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../hooks/useLanguage';
+import { t, type Language } from '../lib/i18n';
 import KanbanBoard from '../components/tasks/KanbanBoard';
 import TaskTable from '../components/tasks/TaskTable';
 import TaskDetailModal from '../components/tasks/TaskDetailModal';
@@ -10,7 +12,8 @@ import ViewToggle from '../components/tasks/ViewToggle';
 import { formatTimeSpent } from '../components/tasks/TaskTimer';
 import type { Task, TaskStatus } from '../types';
 
-function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () => void; isLoading: boolean }) {
+function ActiveTaskBanner({ task, onStop, isLoading, language }: { task: Task; onStop: () => void; isLoading: boolean; language: Language }) {
+  const id = language === 'id';
   return (
     <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-3">
       <span className="relative flex h-3 w-3 shrink-0">
@@ -18,7 +21,9 @@ function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () 
         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-green-600 dark:text-green-400 font-medium">Currently working on</p>
+        <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+          {id ? 'Sedang dikerjakan' : 'Currently working on'}
+        </p>
         <p className="text-sm font-semibold text-green-900 dark:text-green-100 truncate">{task.name}</p>
         {task.project_name && <p className="text-xs text-green-600 dark:text-green-400">{task.project_name}</p>}
       </div>
@@ -32,7 +37,7 @@ function ActiveTaskBanner({ task, onStop, isLoading }: { task: Task; onStop: () 
           <rect x="6" y="4" width="4" height="16" rx="1" />
           <rect x="14" y="4" width="4" height="16" rx="1" />
         </svg>
-        Stop
+        {t('action.stop', language)}
       </button>
     </div>
   );
@@ -44,6 +49,8 @@ export default function TechnicianTasksPage() {
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const id = language === 'id';
 
   const [taskView, setTaskView] = useState<'kanban' | 'table'>('kanban');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -59,8 +66,8 @@ export default function TechnicianTasksPage() {
   if (isError || !data) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500 text-sm">Failed to load tasks.</p>
-        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">Retry</button>
+        <p className="text-red-500 text-sm">{t('error.load_failed', language)}.</p>
+        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">{t('action.retry', language)}</button>
       </div>
     );
   }
@@ -74,17 +81,19 @@ export default function TechnicianTasksPage() {
 
   const activeTask = data.recent_tasks.find((t) => t.is_tracking);
 
-  const handleTimerStart = (id: number) => {
-    const t = data.recent_tasks.find((x) => x.id === id);
-    if (t) startTimer.mutate({ taskId: id, projectId: t.project_id });
+  const handleTimerStart = (taskId: number) => {
+    const task = data.recent_tasks.find((x) => x.id === taskId);
+    if (task) startTimer.mutate({ taskId, projectId: task.project_id });
   };
 
-  const handleTimerStop = (id: number) => {
-    const t = data.recent_tasks.find((x) => x.id === id);
-    if (t) stopTimer.mutate({ taskId: id, projectId: t.project_id });
+  const handleTimerStop = (taskId: number) => {
+    const task = data.recent_tasks.find((x) => x.id === taskId);
+    if (task) stopTimer.mutate({ taskId, projectId: task.project_id });
   };
 
   const timerLoading = startTimer.isPending ? startTimer.variables?.taskId : stopTimer.isPending ? stopTimer.variables?.taskId : undefined;
+
+  const taskCount = data.recent_tasks.length;
 
   return (
     <div className="space-y-4">
@@ -94,14 +103,17 @@ export default function TechnicianTasksPage() {
           task={activeTask}
           onStop={() => handleTimerStop(activeTask.id)}
           isLoading={!!timerLoading}
+          language={language}
         />
       )}
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Tasks</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('nav.my_tasks', language)}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {data.recent_tasks.length} task{data.recent_tasks.length !== 1 ? 's' : ''} assigned to you
+            {id
+              ? `${taskCount} tugas ditugaskan kepadamu`
+              : `${taskCount} task${taskCount !== 1 ? 's' : ''} assigned to you`}
           </p>
         </div>
         <ViewToggle view={taskView} onChange={setTaskView} />
@@ -112,8 +124,12 @@ export default function TechnicianTasksPage() {
           <svg className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
-          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">No tasks assigned to you yet.</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Tasks will appear here once your manager assigns them.</p>
+          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            {id ? 'Belum ada tugas yang ditugaskan kepadamu.' : 'No tasks assigned to you yet.'}
+          </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            {id ? 'Tugas akan muncul di sini setelah manager menugaskannya.' : 'Tasks will appear here once your manager assigns them.'}
+          </p>
         </div>
       ) : taskView === 'kanban' ? (
         <KanbanBoard
@@ -140,7 +156,6 @@ export default function TechnicianTasksPage() {
         />
       )}
 
-      {/* Task Detail Modal */}
       <TaskDetailModal
         task={selectedTask}
         open={!!selectedTask}

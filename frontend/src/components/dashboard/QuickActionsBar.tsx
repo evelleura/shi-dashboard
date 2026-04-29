@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface Props {
   onNewProject?: () => void;
@@ -22,42 +25,38 @@ function FolderIcon() {
 }
 
 export default function QuickActionsBar({ onNewProject, onNewClient }: Props) {
+  const { language } = useLanguage();
+  const id = language === 'id';
+
   return (
-    <div
-      className="flex flex-wrap items-center gap-2"
-      role="toolbar"
-      aria-label="Quick actions"
-    >
-      {/* New Project */}
+    <div className="flex flex-wrap items-center gap-2" role="toolbar" aria-label={id ? 'Aksi cepat' : 'Quick actions'}>
       <button
         type="button"
         onClick={onNewProject}
         className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-        aria-label="Create new project"
+        aria-label={id ? 'Buat proyek baru' : 'Create new project'}
       >
         <PlusIcon />
-        New Project
+        {id ? 'Proyek Baru' : 'New Project'}
       </button>
 
-      {/* New Client */}
       <button
         type="button"
         onClick={onNewClient}
         className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 active:bg-green-800 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-        aria-label="Create new client"
+        aria-label={id ? 'Buat klien baru' : 'Create new client'}
       >
         <PlusIcon />
-        New Client
+        {id ? 'Klien Baru' : 'New Client'}
       </button>
 
-      {/* View All Projects (link) */}
       <Link
         href="/projects"
         className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 active:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-1"
-        aria-label="View all projects"
+        aria-label={id ? 'Lihat semua proyek' : 'View all projects'}
       >
         <FolderIcon />
-        View All Projects
+        {id ? 'Lihat Semua Proyek' : 'View All Projects'}
       </Link>
     </div>
   );

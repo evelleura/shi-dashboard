@@ -1,8 +1,11 @@
+'use client';
+
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
   ResponsiveContainer, Dot,
 } from 'recharts';
 import { useSPITrendChart } from '../../hooks/useDashboard';
+import { useLanguage } from '../../hooks/useLanguage';
 import type { DateRange } from '../../types';
 
 interface Props {
@@ -11,7 +14,6 @@ interface Props {
 
 function formatWeekLabel(weekStart: string): string {
   const d = new Date(weekStart);
-  // Guard against invalid dates
   if (isNaN(d.getTime())) return weekStart;
   return `${d.getDate()}/${d.getMonth() + 1}`;
 }
@@ -27,10 +29,13 @@ function CardWrapper({ children, title }: { children: React.ReactNode; title: st
 
 export default function SPITrendChart({ dateRange }: Props) {
   const { data: rawData, isLoading } = useSPITrendChart(dateRange);
+  const { language } = useLanguage();
+  const id = language === 'id';
+  const title = id ? 'Tren SPI (Rata-rata Mingguan)' : 'SPI Trend (Weekly Average)';
 
   if (isLoading) {
     return (
-      <CardWrapper title="SPI Trend (Weekly Average)">
+      <CardWrapper title={title}>
         <div className="flex items-center justify-center h-56">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" aria-label="Loading chart..." />
         </div>
@@ -46,51 +51,42 @@ export default function SPITrendChart({ dateRange }: Props) {
 
   if (chartData.length === 0) {
     return (
-      <CardWrapper title="SPI Trend (Weekly Average)">
-        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No SPI trend data available</p>
+      <CardWrapper title={title}>
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">
+          {id ? 'Belum ada data tren SPI' : 'No SPI trend data available'}
+        </p>
       </CardWrapper>
     );
   }
 
   return (
-    <CardWrapper title="SPI Trend (Weekly Average)">
+    <CardWrapper title={title}>
       <ResponsiveContainer width="100%" height={260}>
         <LineChart data={chartData} margin={{ left: 0, right: 16, top: 4, bottom: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis
-            dataKey="week"
-            tick={{ fontSize: 11 }}
-            tickLine={false}
-          />
-          <YAxis
-            domain={[0, 2]}
-            tick={{ fontSize: 11 }}
-            tickFormatter={(v: number) => v.toFixed(2)}
-            width={40}
-          />
+          <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
+          <YAxis domain={[0, 2]} tick={{ fontSize: 11 }} tickFormatter={(v: number) => v.toFixed(2)} width={40} />
           <Tooltip
             contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
             formatter={(value, name) => {
               if (name === 'SPI') return [Number(value).toFixed(3), name];
               return [value, name];
             }}
-            labelFormatter={(label) => `Week of ${label}`}
+            labelFormatter={(label) => id ? `Minggu ${label}` : `Week of ${label}`}
           />
-          {/* On Track threshold */}
           <ReferenceLine
             y={0.95}
             stroke="#22c55e"
             strokeDasharray="5 4"
             strokeWidth={1.5}
-            label={{ value: 'On Track', position: 'right', fontSize: 10, fill: '#22c55e' }}
+            label={{ value: id ? 'Tepat Waktu' : 'On Track', position: 'right', fontSize: 10, fill: '#22c55e' }}
           />
-          {/* Critical threshold */}
           <ReferenceLine
             y={0.85}
             stroke="#ef4444"
             strokeDasharray="5 4"
             strokeWidth={1.5}
-            label={{ value: 'Critical', position: 'right', fontSize: 10, fill: '#ef4444' }}
+            label={{ value: id ? 'Kritis' : 'Critical', position: 'right', fontSize: 10, fill: '#ef4444' }}
           />
           <Line
             type="monotone"
