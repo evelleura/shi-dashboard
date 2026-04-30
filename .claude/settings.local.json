@@ -44,7 +44,8 @@
       "Read(//tmp/**)",
       "Bash(echo \"Exit code: $?\")",
       "Bash(npm list *)",
-      "Bash(PGPASSWORD=12345 /opt/homebrew/Cellar/postgresql@17/17.9/bin/psql *)"
+      "Bash(PGPASSWORD=12345 /opt/homebrew/Cellar/postgresql@17/17.9/bin/psql *)",
+      "Bash(grep -E \"error TS|warning TS|Found [0-9]+ error|^$\")"
     ]
   },
   "spinnerTipsEnabled": false,
