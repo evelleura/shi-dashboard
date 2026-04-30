@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-30T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="act-review-gate" name="Activity Diagram Pelaporan Progres Harian dan Validasi (Review Gate)">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="870" pageHeight="1200" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ===================================================
+             SWIMLANES (left to right):
+             lane1=User(Teknisi) | lane2=User(Manajer) | lane3=Sistem | lane4=Database
+             =================================================== -->
+
+        <mxCell id="lane1" value="User (Teknisi)" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="185" height="1080" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane2" value="User (Manajer)" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="225" y="50" width="190" height="1080" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane3" value="Sistem" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="415" y="50" width="200" height="1080" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane4" value="Database" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="615" y="50" width="190" height="1080" as="geometry" />
+        </mxCell>
+
+        <!-- ===================================================
+             TEKNISI LANE NODES
+             =================================================== -->
+
+        <!-- Start -->
+        <mxCell id="start" value="" style="ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="lane1">
+          <mxGeometry x="80" y="50" width="24" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- A1: Membuka papan Kanban -->
+        <mxCell id="a1" value="Membuka Papan Kanban Proyek" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane1">
+          <mxGeometry x="8" y="100" width="168" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- A2: Menggeser status + upload foto (loop target) -->
+        <mxCell id="a2" value="Menggeser Status Tugas ke Working On It dan Mengunggah Foto Bukti" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane1">
+          <mxGeometry x="8" y="200" width="168" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- A_end_tek: Melihat tugas selesai -->
+        <mxCell id="a_end_tek" value="Melihat Tugas Selesai di Kanban" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane1">
+          <mxGeometry x="8" y="890" width="168" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===================================================
+             MANAJER LANE NODES
+             =================================================== -->
+
+        <!-- M1: Membuka detail tugas -->
+        <mxCell id="m1" value="Membuka Detail Tugas dan Meninjau Foto Bukti dari Teknisi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane2">
+          <mxGeometry x="10" y="380" width="168" height="54" as="geometry" />
+        </mxCell>
+
+        <!-- D1: Decision -->
+        <mxCell id="d1" value="Apakah Hasil&#xa;Pekerjaan Valid?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane2">
+          <mxGeometry x="30" y="460" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- M2_no: Kirim catatan revisi (Tidak path) -->
+        <mxCell id="m2_no" value="Mengirim Catatan Revisi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane2">
+          <mxGeometry x="10" y="550" width="168" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- M2_yes: Setujui → Done (Ya path) -->
+        <mxCell id="m2_yes" value="Menyetujui dan Menggeser Status Tugas menjadi Done" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane2">
+          <mxGeometry x="10" y="720" width="168" height="54" as="geometry" />
+        </mxCell>
+
+        <!-- A_end_mgr: Melihat pembaruan selesai -->
+        <mxCell id="a_end_mgr" value="Melihat Pembaruan Selesai" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane2">
+          <mxGeometry x="10" y="890" width="168" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- End (endState in Manajer lane) -->
+        <mxCell id="end" value="" style="ellipse;html=1;shape=endState;fillColor=strokeColor;" vertex="1" parent="lane2">
+          <mxGeometry x="80" y="970" width="30" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===================================================
+             SISTEM LANE NODES
+             =================================================== -->
+
+        <!-- S1: Terima data -->
+        <mxCell id="s1" value="Menerima Data Pembaruan Tugas dan File Foto" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane3">
+          <mxGeometry x="10" y="200" width="180" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- S2: Notifikasi ke Manajer -->
+        <mxCell id="s2" value="Memunculkan Notifikasi Perlu Direview di Dashboard Manajer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane3">
+          <mxGeometry x="10" y="310" width="180" height="54" as="geometry" />
+        </mxCell>
+
+        <!-- S3: Teruskan notifikasi ke Teknisi (Tidak path) -->
+        <mxCell id="s3" value="Meneruskan Notifikasi Revisi ke Teknisi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane3">
+          <mxGeometry x="10" y="550" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- S4: Proses persetujuan (Ya path) -->
+        <mxCell id="s4" value="Memproses Persetujuan Tugas Selesai" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane3">
+          <mxGeometry x="10" y="720" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- S5: Pesan berhasil -->
+        <mxCell id="s5" value="Menampilkan Pesan Tugas Berhasil Diselesaikan ke Kedua Aktor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane3">
+          <mxGeometry x="10" y="820" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===================================================
+             DATABASE LANE NODES (cylinder shape)
+             =================================================== -->
+
+        <!-- DB1: Simpan data sementara -->
+        <mxCell id="db1" value="Menyimpan Data Progres Sementara" style="shape=mxgraph.flowchart.database;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane4">
+          <mxGeometry x="10" y="216" width="168" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- DB2: Update status akhir -->
+        <mxCell id="db2" value="Memperbarui Status Akhir Tugas" style="shape=mxgraph.flowchart.database;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane4">
+          <mxGeometry x="10" y="756" width="168" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- ===================================================
+             EDGES
+             =================================================== -->
+
+        <!-- start → a1 (within Teknisi) -->
+        <mxCell id="e1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="start" target="a1" parent="lane1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- a1 → a2 (within Teknisi) -->
+        <mxCell id="e2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a1" target="a2" parent="lane1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- a2 → s1 (cross-lane: Teknisi → Sistem) -->
+        <mxCell id="e3" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="a2" target="s1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- s1 → db1 (cross-lane: Sistem → Database) -->
+        <mxCell id="e4" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s1" target="db1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- db1 → s2 (cross-lane: Database → Sistem) -->
+        <mxCell id="e5" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="db1" target="s2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- s2 → m1 (cross-lane: Sistem → Manajer) -->
+        <mxCell id="e6" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s2" target="m1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- m1 → d1 (within Manajer) -->
+        <mxCell id="e7" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="m1" target="d1" parent="lane2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d1 → m2_no: Tidak path (within Manajer, straight down) -->
+        <mxCell id="e8" value="Tidak" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d1" target="m2_no" parent="lane2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- d1 → m2_yes: Ya path (within Manajer, route left via waypoints to bypass m2_no) -->
+        <mxCell id="e9" value="Ya" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d1" target="m2_yes" parent="lane2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="5" y="490" />
+              <mxPoint x="5" y="720" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- m2_no → s3 (cross-lane: Manajer → Sistem) -->
+        <mxCell id="e10" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="m2_no" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- s3 → a2 loop-back (cross-lane: Sistem → Teknisi, goes via left margin) -->
+        <mxCell id="e11" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s3" target="a2" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="22" y="630" />
+              <mxPoint x="22" y="258" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- m2_yes → s4 (cross-lane: Manajer → Sistem) -->
+        <mxCell id="e12" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="m2_yes" target="s4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- s4 → db2 (cross-lane: Sistem → Database) -->
+        <mxCell id="e13" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s4" target="db2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- db2 → s5 (cross-lane: Database → Sistem) -->
+        <mxCell id="e14" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="db2" target="s5" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- s5 → a_end_tek (cross-lane: Sistem → Teknisi) -->
+        <mxCell id="e15" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s5" target="a_end_tek" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- s5 → a_end_mgr (cross-lane: Sistem → Manajer) -->
+        <mxCell id="e16" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s5" target="a_end_mgr" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- a_end_tek → end (cross-lane: Teknisi → Manajer) -->
+        <mxCell id="e17" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="a_end_tek" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="132" y="970" />
+              <mxPoint x="132" y="985" />
+              <mxPoint x="305" y="985" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- a_end_mgr → end (within Manajer) -->
+        <mxCell id="e18" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a_end_mgr" target="end" parent="lane2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar 3.4 Activity Diagram Pelaporan Progres Harian dan Validasi (Review Gate)." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1155" width="700" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
