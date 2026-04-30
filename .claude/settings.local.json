@@ -45,7 +45,8 @@
       "Bash(echo \"Exit code: $?\")",
       "Bash(npm list *)",
       "Bash(PGPASSWORD=12345 /opt/homebrew/Cellar/postgresql@17/17.9/bin/psql *)",
-      "Bash(grep -E \"error TS|warning TS|Found [0-9]+ error|^$\")"
+      "Bash(grep -E \"error TS|warning TS|Found [0-9]+ error|^$\")",
+      "Bash(git -C '/Users/user/Documents/COLLEGE/Mata Kuliah/8/Tugas Akhir/coding/project_ta_dian_putri_iswandi' status --short)"
     ]
   },
   "spinnerTipsEnabled": false,

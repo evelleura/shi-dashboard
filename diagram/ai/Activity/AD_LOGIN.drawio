@@ -6,96 +6,124 @@
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <mxCell id="lane_u" value="User" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="50" y="70" width="340" height="680" as="geometry" />
+        <!-- ═══ LANE: User (x=50, w=310, h=750) ═══ -->
+        <!-- abs content top = 70+30 = 100. Abs y of node = 100 + local_y -->
+        <mxCell id="lu" value="User" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="70" width="310" height="750" as="geometry" />
         </mxCell>
 
-        <mxCell id="start_u" value="" style="ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="lane_u">
-          <mxGeometry x="158" y="40" width="24" height="24" as="geometry" />
+        <mxCell id="su" value="" style="ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="lu">
+          <mxGeometry x="143" y="40" width="24" height="24" as="geometry" />
         </mxCell>
 
-        <mxCell id="a1" value="Membuka halaman login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
-          <mxGeometry x="85" y="90" width="170" height="40" as="geometry" />
+        <!-- local y=90 → abs y=190 -->
+        <mxCell id="a1" value="Membuka halaman login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lu">
+          <mxGeometry x="70" y="90" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="a2" value="Mengisi email dan password" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
-          <mxGeometry x="85" y="155" width="170" height="40" as="geometry" />
+        <!-- local y=160 → abs y=260 [LOOP TARGET] -->
+        <mxCell id="a2" value="Mengisi email dan password" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lu">
+          <mxGeometry x="70" y="160" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="a3" value="Mengklik tombol Masuk" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
-          <mxGeometry x="85" y="220" width="170" height="40" as="geometry" />
+        <!-- local y=230 → abs y=330, center-y=352 -->
+        <mxCell id="a3" value="Mengklik tombol Masuk" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lu">
+          <mxGeometry x="70" y="230" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="a_err" value="Melihat pesan kesalahan login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
-          <mxGeometry x="85" y="360" width="170" height="40" as="geometry" />
+        <!-- local y=375 → abs y=475, center-y=497 [receives from s2] -->
+        <mxCell id="aerr" value="Melihat pesan kesalahan login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lu">
+          <mxGeometry x="70" y="375" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="a4" value="Mengakses dashboard sesuai role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
-          <mxGeometry x="85" y="500" width="170" height="44" as="geometry" />
+        <!-- local y=545 → abs y=645, center-y=667 [receives from s4] -->
+        <mxCell id="a4" value="Mengakses dashboard sesuai role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lu">
+          <mxGeometry x="70" y="545" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="end_u" value="" style="ellipse;html=1;shape=endState;fillColor=strokeColor;" vertex="1" parent="lane_u">
-          <mxGeometry x="155" y="590" width="30" height="30" as="geometry" />
+        <mxCell id="eu" value="" style="ellipse;html=1;shape=endState;fillColor=strokeColor;" vertex="1" parent="lu">
+          <mxGeometry x="140" y="640" width="30" height="30" as="geometry" />
         </mxCell>
 
-        <mxCell id="lane_s" value="Sistem" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="390" y="70" width="370" height="680" as="geometry" />
+        <!-- ═══ LANE: Sistem (x=360, w=410, h=750) ═══ -->
+        <mxCell id="ls" value="Sistem" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="360" y="70" width="410" height="750" as="geometry" />
         </mxCell>
 
-        <mxCell id="s1" value="Memvalidasi kredensial pengguna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
-          <mxGeometry x="100" y="220" width="170" height="40" as="geometry" />
+        <!-- local y=230 → abs y=330, center-y=352  ← ALIGNS with a3 → horizontal arrow -->
+        <mxCell id="s1" value="Memvalidasi kredensial pengguna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="ls">
+          <mxGeometry x="120" y="230" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="D1" value="Kredensial valid?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
-          <mxGeometry x="110" y="285" width="150" height="60" as="geometry" />
+        <!-- D1 center local-y = 300+30 = 330, abs center-y = 430 -->
+        <mxCell id="d1" value="Kredensial valid?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="ls">
+          <mxGeometry x="130" y="300" width="150" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="s2" value="Menampilkan pesan kesalahan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
-          <mxGeometry x="100" y="375" width="170" height="40" as="geometry" />
+        <!-- local y=375 → abs y=475, center-y=497  ← ALIGNS with aerr → horizontal arrow -->
+        <mxCell id="s2" value="Menampilkan pesan kesalahan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="ls">
+          <mxGeometry x="120" y="375" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="s3" value="Memeriksa role pengguna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
-          <mxGeometry x="100" y="460" width="170" height="40" as="geometry" />
+        <!-- local y=460 → Ya branch (skips s2 via right-margin waypoint) -->
+        <mxCell id="s3" value="Memeriksa role pengguna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="ls">
+          <mxGeometry x="120" y="460" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="s4" value="Mengarahkan ke halaman dashboard sesuai role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
-          <mxGeometry x="100" y="525" width="170" height="44" as="geometry" />
+        <!-- local y=530 → abs y=630, center-y=652  ...align a4 below -->
+        <!-- a4 local y=545+22=567 abs y=667. s4 local y=545+22=567 abs y=667 → MATCH -->
+        <mxCell id="s4" value="Mengarahkan ke halaman dashboard sesuai role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="ls">
+          <mxGeometry x="120" y="545" width="170" height="44" as="geometry" />
         </mxCell>
 
-        <!-- Within-User edges -->
-        <mxCell id="eu1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="start_u" target="a1" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="eu2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a1" target="a2" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="eu3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a2" target="a3" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="eu4" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="a_err" target="a2" parent="lane_u">
+        <!-- ═══ EDGES within User lane ═══ -->
+        <mxCell id="eu1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="su" target="a1" parent="lu"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eu2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="a1" target="a2" parent="lu"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eu3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="a2" target="a3" parent="lu"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- aerr → a2 loop-back: left margin x=22, local coords within lu -->
+        <mxCell id="eu4" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="aerr" target="a2" parent="lu">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="22" y="380" />
-              <mxPoint x="22" y="175" />
+              <mxPoint x="22" y="397" />
+              <mxPoint x="22" y="182" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="eu5" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a4" target="end_u" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
 
-        <!-- Within-Sistem edges -->
-        <mxCell id="es1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s1" target="D1" parent="lane_s"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="es2" value="Tidak" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="D1" target="s2" parent="lane_s"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="es3" value="Ya" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="D1" target="s3" parent="lane_s">
+        <mxCell id="eu5" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="a4" target="eu" parent="lu"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ═══ EDGES within Sistem lane ═══ -->
+        <mxCell id="es1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="s1" target="d1" parent="ls"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- D1 Tidak → s2 straight down -->
+        <mxCell id="es2" value="Tidak" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="d1" target="s2" parent="ls"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- D1 Ya → s3 via right margin (x=380 within lane w=410) -->
+        <mxCell id="es3" value="Ya" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" edge="1" source="d1" target="s3" parent="ls">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="345" y="315" />
-              <mxPoint x="345" y="480" />
+              <mxPoint x="380" y="330" />
+              <mxPoint x="380" y="482" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es4" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s3" target="s4" parent="lane_s"><mxGeometry relative="1" as="geometry" /></mxCell>
 
-        <!-- Cross-lane edges (parent="1") -->
-        <mxCell id="ec1" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="a3" target="s1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="ec2" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s2" target="a_err" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="ec3" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s4" target="a4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es4" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="s3" target="s4" parent="ls"><mxGeometry relative="1" as="geometry" /></mxCell>
 
-        <mxCell id="caption" value="Gambar 3.5 Activity Diagram Proses Login Pengguna." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="50" y="776" width="720" height="30" as="geometry" />
+        <!-- ═══ CROSS-LANE edges (parent="1", absolute coords) ═══ -->
+
+        <!-- a3 right → s1 left: same abs center-y=352 → horizontal -->
+        <mxCell id="ec1" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="a3" target="s1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- s2 left → aerr right: same abs center-y=497 → horizontal -->
+        <mxCell id="ec2" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" source="s2" target="aerr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- s4 left → a4 right: same abs center-y=667 → horizontal -->
+        <mxCell id="ec3" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" source="s4" target="a4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="cap" value="Gambar 3.5 Activity Diagram Proses Login Pengguna." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="848" width="720" height="30" as="geometry" />
         </mxCell>
 
       </root>

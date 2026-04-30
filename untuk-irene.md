@@ -20,5 +20,21 @@ kamu capek iya aku tau,,
  aku nungguin kamu, dan aku udah utarakan,,
 -*- aku ga akan kemana mana atau gmana mana.
 -*- aku tau kmu selalu inget juga, apapun yg udah kamu lalui yang menyenangkan atau bikin kesal,, disaat kmu lagi sibuk sibuknya, dan capek. Aku sangat menyayangi kamu.
-jadi mohon maaf, kamu tau aku.
+jadi aku mohon maaf kalau kmu sedih karna apapun itu, kamu tau aku sayang kmu.
 -*- saat ini kamu lelah, bukan karna kesibukan tapi karna tumpukan berbagai hal, ingat yaaa aku sayang kamu.
+
+
+==
+aku muak.
+silakan ngomong apapun. makasih.
+aku terima, aku tetap melanjutkan kegiatan aku,
+ada kamu ataupun engga.
+kalo ada kamu pun rasanya kaya gaada, sekalian aja.
+
+==
+babbyyy,, maaf yaaa
+jangan lupa makan dlu, minum yg banyak. 
+sekali lagi aku sayanggg kamu,
+semangat ayokkk sayanggg ngerjain ini gimana,, 
+
+nanti kamu udah ngerasa baikan dan reda keselnya.,
