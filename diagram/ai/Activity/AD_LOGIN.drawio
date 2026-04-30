@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-30T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="ad-login" name="Activity Diagram Login">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="lane_u" value="User" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="70" width="340" height="680" as="geometry" />
+        </mxCell>
+
+        <mxCell id="start_u" value="" style="ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="lane_u">
+          <mxGeometry x="158" y="40" width="24" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a1" value="Membuka halaman login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
+          <mxGeometry x="85" y="90" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a2" value="Mengisi email dan password" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
+          <mxGeometry x="85" y="155" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a3" value="Mengklik tombol Masuk" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
+          <mxGeometry x="85" y="220" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a_err" value="Melihat pesan kesalahan login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
+          <mxGeometry x="85" y="360" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a4" value="Mengakses dashboard sesuai role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_u">
+          <mxGeometry x="85" y="500" width="170" height="44" as="geometry" />
+        </mxCell>
+
+        <mxCell id="end_u" value="" style="ellipse;html=1;shape=endState;fillColor=strokeColor;" vertex="1" parent="lane_u">
+          <mxGeometry x="155" y="590" width="30" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane_s" value="Sistem" style="swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="390" y="70" width="370" height="680" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1" value="Memvalidasi kredensial pengguna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
+          <mxGeometry x="100" y="220" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="D1" value="Kredensial valid?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
+          <mxGeometry x="110" y="285" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2" value="Menampilkan pesan kesalahan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
+          <mxGeometry x="100" y="375" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3" value="Memeriksa role pengguna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
+          <mxGeometry x="100" y="460" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s4" value="Mengarahkan ke halaman dashboard sesuai role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="lane_s">
+          <mxGeometry x="100" y="525" width="170" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- Within-User edges -->
+        <mxCell id="eu1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="start_u" target="a1" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eu2" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a1" target="a2" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eu3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a2" target="a3" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eu4" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="a_err" target="a2" parent="lane_u">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="22" y="380" />
+              <mxPoint x="22" y="175" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eu5" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a4" target="end_u" parent="lane_u"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Within-Sistem edges -->
+        <mxCell id="es1" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s1" target="D1" parent="lane_s"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es2" value="Tidak" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="D1" target="s2" parent="lane_s"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es3" value="Ya" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="D1" target="s3" parent="lane_s">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="345" y="315" />
+              <mxPoint x="345" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es4" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s3" target="s4" parent="lane_s"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Cross-lane edges (parent="1") -->
+        <mxCell id="ec1" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="a3" target="s1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ec2" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s2" target="a_err" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ec3" style="endArrow=classic;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s4" target="a4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="caption" value="Gambar 3.5 Activity Diagram Proses Login Pengguna." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="776" width="720" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
