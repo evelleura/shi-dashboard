@@ -13,3 +13,12 @@ Just remember that I love you no matter what,
 Please,,,
 
 ======
+aku cape sama kamu. terserah kamu mau ngapain
+-*- aku maunya kita baikan, kamu kesel aku tau, 
+kamu marah aku tau, 
+kamu capek iya aku tau,,
+ aku nungguin kamu, dan aku udah utarakan,,
+-*- aku ga akan kemana mana atau gmana mana.
+-*- aku tau kmu selalu inget juga, apapun yg udah kamu lalui yang menyenangkan atau bikin kesal,, disaat kmu lagi sibuk sibuknya, dan capek. Aku sangat menyayangi kamu.
+jadi mohon maaf, kamu tau aku.
+-*- saat ini kamu lelah, bukan karna kesibukan tapi karna tumpukan berbagai hal, ingat yaaa aku sayang kamu.
