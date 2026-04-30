@@ -114,7 +114,7 @@ function ClientFormModal({
   const hasValidCoords = coordLat !== null;
 
   const handleSubmit = async () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim() || !form.phone?.trim()) return;
     await onSubmit({
       ...form,
       name: form.name.trim(),
@@ -160,7 +160,7 @@ function ClientFormModal({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('label.phone', language)}
+              {t('label.phone', language)} <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-1.5">
               <input
@@ -262,7 +262,7 @@ function ClientFormModal({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isPending}
+            disabled={isPending || !form.name.trim() || !form.phone?.trim()}
             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
           >
             {isPending ? t('action.saving', language) : t('action.save', language)}

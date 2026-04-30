@@ -193,44 +193,103 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Survey Status Banner */}
-      {project.phase === 'survey' && !project.survey_approved && isManager && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-xl p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-800 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-600">
-                  {t('project.fase_survey', language)}
-                </span>
+      {project.phase === 'survey' && (() => {
+        const surveyTasks = (project.tasks ?? []).filter((t) => t.is_survey_task);
+        const surveyDone = surveyTasks.filter((t) => t.status === 'done').length;
+        const surveyTotal = surveyTasks.length;
+        const allDone = surveyTotal > 0 && surveyDone === surveyTotal;
+        const id = language === 'id';
+
+        return (
+          <>
+            {/* Technician: show phase lock info */}
+            {isTechnician && (
+              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-purple-800 dark:text-purple-200">
+                      {id ? 'Fase Survei — Selesaikan Tugas Survei Dahulu' : 'Survey Phase — Complete Survey Tasks First'}
+                    </p>
+                    <p className="text-xs text-purple-600 dark:text-purple-300 mt-0.5">
+                      {id
+                        ? 'Proyek ini sedang dalam fase survei. Kamu hanya bisa mengerjakan tugas survei saat ini. Tugas proyek akan terbuka setelah survei disetujui manager.'
+                        : 'This project is in survey phase. You can only work on survey tasks now. Project tasks will unlock after the manager approves the survey.'}
+                    </p>
+                    {surveyTotal > 0 && (
+                      <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mt-1.5">
+                        {id ? `Kemajuan survei: ${surveyDone}/${surveyTotal} tugas selesai` : `Survey progress: ${surveyDone}/${surveyTotal} tasks done`}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-amber-800 dark:text-amber-200">
-                {t('project.survey_banner', language)}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => approveSurveyMutation.mutate(project.id)}
-                disabled={approveSurveyMutation.isPending || rejectSurveyMutation.isPending}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-300 dark:disabled:bg-green-800 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                {t('project.approve_survey', language)}
-              </button>
-              <button
-                onClick={() => setShowRejectModal(true)}
-                disabled={approveSurveyMutation.isPending || rejectSurveyMutation.isPending}
-                className="inline-flex items-center gap-1.5 px-4 py-2 border border-red-400 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50 text-sm font-medium rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                {t('project.reject_survey', language)}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            )}
+
+            {/* Manager: approval panel */}
+            {isManager && !project.survey_approved && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-xl p-4">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-800 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-600">
+                        {t('project.fase_survey', language)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                      {t('project.survey_banner', language)}
+                    </p>
+                    {/* Survey task progress */}
+                    {surveyTotal === 0 ? (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-medium">
+                        {id ? '⚠ Belum ada tugas survei. Buat tugas survei terlebih dahulu.' : '⚠ No survey tasks yet. Create survey tasks first.'}
+                      </p>
+                    ) : (
+                      <div className="mt-2">
+                        <p className="text-xs text-amber-700 dark:text-amber-300 mb-1">
+                          {id ? `Tugas survei: ${surveyDone}/${surveyTotal} selesai` : `Survey tasks: ${surveyDone}/${surveyTotal} done`}
+                          {allDone && <span className="ml-2 text-green-600 dark:text-green-400 font-semibold">{id ? '✓ Semua selesai' : '✓ All done'}</span>}
+                        </p>
+                        <div className="h-1.5 bg-amber-200 dark:bg-amber-800 rounded-full overflow-hidden w-48">
+                          <div
+                            className="h-full bg-green-500 rounded-full transition-all"
+                            style={{ width: `${surveyTotal > 0 ? (surveyDone / surveyTotal) * 100 : 0}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => approveSurveyMutation.mutate(project.id)}
+                      disabled={approveSurveyMutation.isPending || rejectSurveyMutation.isPending || !allDone}
+                      title={!allDone ? (id ? 'Selesaikan semua tugas survei terlebih dahulu' : 'Complete all survey tasks first') : undefined}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white disabled:text-gray-500 dark:disabled:text-gray-400 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {t('project.approve_survey', language)}
+                    </button>
+                    <button
+                      onClick={() => setShowRejectModal(true)}
+                      disabled={approveSurveyMutation.isPending || rejectSurveyMutation.isPending}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 border border-red-400 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      {t('project.reject_survey', language)}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {project.phase === 'survey' && project.survey_approved && (
         <div className="flex items-center gap-2">

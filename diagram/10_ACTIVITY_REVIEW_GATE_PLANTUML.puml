@@ -1,0 +1,99 @@
+@startuml
+' ============================================================
+' Activity Diagram: Pelaporan Progres Harian dan Validasi
+' (Review Gate)
+' Gambar 3.4
+' ============================================================
+
+skinparam backgroundColor White
+skinparam activityBackgroundColor White
+skinparam activityBorderColor Black
+skinparam activityFontColor Black
+skinparam activityFontSize 11
+skinparam arrowColor Black
+skinparam activityArrowFontSize 10
+skinparam activityArrowFontColor Black
+skinparam swimlaneBorderColor Black
+skinparam swimlaneBorderThickness 1.5
+skinparam swimlaneTitleFontSize 12
+skinparam swimlaneTitleFontStyle bold
+skinparam swimlaneTitleFontColor Black
+
+' ============================================================
+' LANE ORDER (kiri ke kanan):
+'   |Teknisi| → |Manajer| → |Sistem| → |Database|
+' ============================================================
+
+|Teknisi|
+start
+
+:Membuka papan Kanban proyek;
+
+' ============================================================
+' LOOP: ulang sampai hasil pekerjaan valid
+' ============================================================
+repeat
+
+  |Teknisi|
+  :Menggeser status tugas ke "Working On It"
+  dan mengunggah foto bukti;
+
+  |Sistem|
+  :Menerima data pembaruan tugas dan file foto;
+
+  |Database|
+  :Menyimpan data progres sementara;
+
+  |Sistem|
+  :Memunculkan notifikasi "Perlu Direview"
+  di dashboard Manajer;
+
+  |Manajer|
+  :Membuka detail tugas dan meninjau
+  foto bukti dari Teknisi;
+
+  ' ----------------------------------------------------------
+  ' DECISION: apakah hasil pekerjaan valid?
+  ' ----------------------------------------------------------
+  if (Apakah hasil pekerjaan\nvalid / sesuai?) then (Ya)
+    break
+  else (Tidak)
+    :Mengirim catatan revisi;
+    |Sistem|
+    :Meneruskan notifikasi ke Teknisi;
+    |Teknisi|
+  endif
+
+repeat while (Perlu diulang?) is (Ya) not (Selesai)
+
+' ============================================================
+' ALUR SETELAH DISETUJUI (keluar dari loop via break)
+' ============================================================
+
+|Manajer|
+:Menyetujui dan menggeser
+status tugas menjadi "Done";
+
+|Sistem|
+:Memproses persetujuan tugas selesai;
+
+|Database|
+:Memperbarui status akhir tugas;
+
+|Sistem|
+:Menampilkan pesan tugas berhasil
+diselesaikan ke kedua aktor;
+
+' ============================================================
+' FORK: kedua aktor menerima konfirmasi secara bersamaan
+' ============================================================
+fork
+  |Teknisi|
+  :Melihat tugas selesai di Kanban;
+fork again
+  |Manajer|
+  :Melihat pembaruan selesai;
+end fork
+
+stop
+@enduml

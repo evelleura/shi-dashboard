@@ -306,6 +306,25 @@ export async function approveSurvey(request: NextRequest, id: string) {
     if (project.survey_approved) {
       return NextResponse.json({ success: false, error: 'Survey already approved' }, { status: 400 });
     }
+    // Block approval if survey tasks exist but are not all done
+    const surveyTaskCheck = await query(
+      `SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE status = 'done')::int AS done_count
+       FROM tasks WHERE project_id = $1 AND is_survey_task = TRUE`,
+      [projectId]
+    );
+    const { total: surveyTotal, done_count: surveyDone } = surveyTaskCheck.rows[0] as { total: number; done_count: number };
+    if (surveyTotal === 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'Tidak ada tugas survei yang dibuat. Buat dan selesaikan tugas survei terlebih dahulu.',
+      }, { status: 400 });
+    }
+    if (surveyDone < surveyTotal) {
+      return NextResponse.json({
+        success: false,
+        error: `Survei belum selesai. ${surveyDone} dari ${surveyTotal} tugas survei selesai. Selesaikan semua tugas survei sebelum menyetujui.`,
+      }, { status: 400 });
+    }
     const result = await query(
       `UPDATE projects SET phase='execution', survey_approved=TRUE,
         survey_approved_by=$1, survey_approved_at=NOW(), updated_at=NOW()

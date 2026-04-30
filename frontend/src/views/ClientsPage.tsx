@@ -109,7 +109,7 @@ function ClientFormModal({
   const hasValidCoords = coordLat !== null;
 
   const handleSubmit = async () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim() || !form.phone?.trim()) return;
     await onSubmit({
       ...form,
       name: form.name.trim(),
@@ -137,7 +137,7 @@ function ClientFormModal({
             <input type="email" value={form.email ?? ''} onChange={(e) => set('email', e.target.value)} placeholder="klien@example.com" className={inputClass} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.phone', language)}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.phone', language)} <span className="text-red-500">*</span></label>
             <div className="flex gap-1.5">
               <input type="text" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} placeholder="+62812xxxx" className={inputClass} />
               {form.phone?.trim() && (
@@ -209,7 +209,7 @@ function ClientFormModal({
           <button type="button" onClick={onClose} className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             {t('action.cancel', language)}
           </button>
-          <button type="button" onClick={handleSubmit} disabled={isPending} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+          <button type="button" onClick={handleSubmit} disabled={isPending || !form.name.trim() || !form.phone?.trim()} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
             {isPending ? t('action.saving', language) : t('action.save', language)}
           </button>
         </div>

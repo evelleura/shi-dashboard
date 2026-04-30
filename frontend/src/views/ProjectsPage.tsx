@@ -208,39 +208,13 @@ export default function ProjectsPage() {
     {
       key: 'phase',
       label: language === 'id' ? 'Fase' : 'Phase',
-      render: (p) => {
-        const isEditing = editingCell?.id === p.id && editingCell?.field === 'phase';
-        if (isEditing) {
-          return (
-            <select
-              autoFocus
-              className="px-2 py-1 text-xs border border-blue-400 rounded bg-white dark:bg-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
-              defaultValue={p.phase}
-              onBlur={(e) => saveEdit(p.id, 'phase', e.target.value)}
-              onChange={(e) => saveEdit(p.id, 'phase', e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Escape') setEditingCell(null); }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <option value="survey">{t('project.phase_survey', language)}</option>
-              <option value="execution">{t('project.phase_execution', language)}</option>
-            </select>
-          );
-        }
-        return (
-          <div
-            className="group/cell flex items-center gap-1"
-            onDoubleClick={(e) => { e.stopPropagation(); startEdit(p.id, 'phase'); }}
-            title={language === 'id' ? 'Klik dua kali untuk edit' : 'Double-click to edit'}
-          >
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              p.phase === 'survey' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-            }`}>
-              {p.phase === 'survey' ? t('project.phase_survey', language) : t('project.phase_execution', language)}
-            </span>
-            <PencilIcon />
-          </div>
-        );
-      },
+      render: (p) => (
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+          p.phase === 'survey' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+        }`}>
+          {p.phase === 'survey' ? t('project.phase_survey', language) : t('project.phase_execution', language)}
+        </span>
+      ),
       sortValue: (p) => p.phase,
       exportValue: (p) => p.phase === 'survey' ? t('project.phase_survey', language) : t('project.phase_execution', language),
     },

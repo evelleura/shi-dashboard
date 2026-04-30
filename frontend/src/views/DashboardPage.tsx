@@ -278,7 +278,7 @@ export default function DashboardPage() {
                   <input type="email" value={clientForm.email ?? ''} onChange={(e) => setClientForm((f) => ({ ...f, email: e.target.value }))} placeholder="klien@example.com" className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.phone', language)}</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.phone', language)} <span className="text-red-500">*</span></label>
                   <div className="flex gap-1.5">
                     <input type="text" value={clientForm.phone ?? ''} onChange={(e) => setClientForm((f) => ({ ...f, phone: e.target.value }))} placeholder="+62812xxxx" className={inputClass} />
                     {clientForm.phone?.trim() && (
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                 <button type="button" onClick={() => setShowClientModal(false)} className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                   {t('action.cancel', language)}
                 </button>
-                <button type="button" onClick={() => clientMutation.mutate()} disabled={clientMutation.isPending || !clientForm.name.trim()} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                <button type="button" onClick={() => clientMutation.mutate()} disabled={clientMutation.isPending || !clientForm.name.trim() || !clientForm.phone?.trim()} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
                   {clientMutation.isPending ? t('action.saving', language) : t('action.save', language)}
                 </button>
               </div>

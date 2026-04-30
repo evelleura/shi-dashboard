@@ -98,7 +98,7 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
         timeline_end: form.timeline_end || undefined,
         notes: form.notes.trim() || undefined,
         budget: form.budget ? parseFloat(form.budget) : undefined,
-        is_survey_task: form.is_survey_task,
+        is_survey_task: projectPhase === 'survey' ? true : form.is_survey_task,
         depends_on: form.depends_on ? parseInt(form.depends_on) : null,
       });
     } catch (err: unknown) {
@@ -255,9 +255,15 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
       </div>
 
       {projectPhase === 'survey' && (
-        <div className="flex items-center gap-2">
-          <input type="checkbox" id="is-survey" name="is_survey_task" checked={form.is_survey_task} onChange={handleChange} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-          <label htmlFor="is-survey" className="text-sm text-gray-700 dark:text-gray-300">{t('task.survey_task', language)}</label>
+        <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg px-3 py-2">
+          <svg className="w-4 h-4 text-purple-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <p className="text-xs text-purple-700 dark:text-purple-300">
+            {language === 'id'
+              ? 'Tugas ini otomatis ditandai sebagai Tugas Survei karena proyek masih dalam fase survei.'
+              : 'This task is automatically marked as a Survey Task because the project is in survey phase.'}
+          </p>
         </div>
       )}
 

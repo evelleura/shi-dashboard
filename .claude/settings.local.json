@@ -43,7 +43,8 @@
       "Bash(cat)",
       "Read(//tmp/**)",
       "Bash(echo \"Exit code: $?\")",
-      "Bash(npm list *)"
+      "Bash(npm list *)",
+      "Bash(PGPASSWORD=12345 /opt/homebrew/Cellar/postgresql@17/17.9/bin/psql *)"
     ]
   },
   "spinnerTipsEnabled": false,

@@ -395,6 +395,17 @@ export async function changeTaskStatus(request: NextRequest, id: string) {
       if (task.assigned_to !== auth.user.userId) {
         return NextResponse.json({ success: false, error: 'You can only change status of tasks assigned to you' }, { status: 403 });
       }
+      // Block non-survey tasks when project is in survey phase
+      const projPhase = await query('SELECT phase FROM projects WHERE id = $1', [task.project_id]);
+      if (projPhase.rowCount !== 0) {
+        const phase = (projPhase.rows[0] as { phase: string }).phase;
+        if (phase === 'survey' && !task.is_survey_task) {
+          return NextResponse.json({
+            success: false,
+            error: 'Tugas ini bukan bagian dari survei. Selesaikan survei terlebih dahulu sebelum mengerjakan tugas proyek.',
+          }, { status: 400 });
+        }
+      }
       const allowed = STATUS_TRANSITIONS[currentStatus] || [];
       if (!allowed.includes(status)) {
         return NextResponse.json({
