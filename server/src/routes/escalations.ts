@@ -33,22 +33,21 @@ function sanitizeFilename(filename: string): string {
 // Configure multer with disk storage for escalation file uploads
 const storage = multer.diskStorage({
   destination: async (req: AuthRequest, _file, cb) => {
-    const taskId = req.body.task_id;
-    if (!taskId) {
-      return cb(new Error('task_id is required'), '');
+    const projectId = req.body.project_id;
+    if (!projectId) {
+      return cb(new Error('project_id is required'), '');
     }
 
     try {
-      const taskResult = await query<{ project_id: number }>(
-        'SELECT project_id FROM tasks WHERE id = $1',
-        [taskId]
+      const projectResult = await query<{ id: number }>(
+        'SELECT id FROM projects WHERE id = $1',
+        [projectId]
       );
 
-      if (taskResult.rowCount === 0) {
-        return cb(new Error('Task not found'), '');
+      if (projectResult.rowCount === 0) {
+        return cb(new Error('Project not found'), '');
       }
 
-      const projectId = taskResult.rows[0].project_id;
       const uploadDir = path.join(
         process.cwd(), 'uploads', 'projects', String(projectId),
         'escalations'
@@ -141,14 +140,14 @@ router.post(
     });
   },
   async (req: AuthRequest, res: Response) => {
-    const { task_id, title, description, priority } = req.body;
+    const { project_id, title, description, priority } = req.body;
     const file = req.file;
     const userId = req.user!.userId;
 
     // Validate required fields
-    if (!task_id) {
+    if (!project_id) {
       if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      res.status(400).json({ success: false, error: 'task_id is required' });
+      res.status(400).json({ success: false, error: 'project_id is required' });
       return;
     }
 
@@ -169,25 +168,35 @@ router.post(
       : 'medium';
 
     try {
-      // Verify task exists and get project_id
-      const taskCheck = await query<{ id: number; project_id: number; assigned_to: number }>(
-        'SELECT id, project_id, assigned_to FROM tasks WHERE id = $1',
-        [task_id]
+      // Verify project exists and is not completed
+      const projectCheck = await query<{ id: number; status: string; name: string }>(
+        'SELECT id, status, name FROM projects WHERE id = $1',
+        [project_id]
       );
 
-      if (taskCheck.rowCount === 0) {
+      if (projectCheck.rowCount === 0) {
         if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
-        res.status(404).json({ success: false, error: 'Task not found' });
+        res.status(404).json({ success: false, error: 'Project not found' });
         return;
       }
 
-      const task = taskCheck.rows[0];
-
-      // Technician: verify assigned to the task
-      if (req.user!.role === 'technician' && task.assigned_to !== userId) {
+      if (projectCheck.rows[0].status === 'completed') {
         if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
-        res.status(403).json({ success: false, error: 'You can only escalate tasks assigned to you' });
+        res.status(400).json({ success: false, error: 'Cannot escalate a completed project' });
         return;
+      }
+
+      // Technician: verify assigned to the project
+      if (req.user!.role === 'technician') {
+        const assignmentCheck = await query(
+          'SELECT id FROM project_assignments WHERE project_id = $1 AND user_id = $2',
+          [project_id, userId]
+        );
+        if (assignmentCheck.rowCount === 0) {
+          if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+          res.status(403).json({ success: false, error: 'You are not assigned to this project' });
+          return;
+        }
       }
 
       let filePath: string | null = null;
@@ -197,7 +206,7 @@ router.post(
 
       if (file) {
         filePath = path.join(
-          'uploads', 'projects', String(task.project_id),
+          'uploads', 'projects', String(project_id),
           'escalations', file.filename
         ).replace(/\\/g, '/');
         fileName = file.originalname;
@@ -207,25 +216,24 @@ router.post(
 
       const result = await query(
         `INSERT INTO escalations (task_id, project_id, reported_by, title, description, priority, file_path, file_name, file_type, file_size)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
-        [task_id, task.project_id, userId, title.trim(), description.trim(), finalPriority, filePath, fileName, fileType, fileSize]
+        [project_id, userId, title.trim(), description.trim(), finalPriority, filePath, fileName, fileType, fileSize]
       );
 
       const escalation = result.rows[0] as Record<string, unknown>;
 
       // Fetch joined names for response
       const userResult = await query<{ name: string }>('SELECT name FROM users WHERE id = $1', [userId]);
-      const taskName = await query<{ name: string }>('SELECT name FROM tasks WHERE id = $1', [task_id]);
-      const projectName = await query<{ name: string }>('SELECT name FROM projects WHERE id = $1', [task.project_id]);
+      const projectName = projectCheck.rows[0].name;
 
       res.status(201).json({
         success: true,
         data: {
           ...escalation,
           reporter_name: userResult.rows[0]?.name || null,
-          task_name: taskName.rows[0]?.name || null,
-          project_name: projectName.rows[0]?.name || null,
+          task_name: null,
+          project_name: projectName,
         },
       });
     } catch (err) {

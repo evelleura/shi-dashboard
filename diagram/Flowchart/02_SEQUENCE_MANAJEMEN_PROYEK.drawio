@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-02T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="seq-manajemen-proyek" name="Sequence Manajemen Proyek">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1050" pageHeight="1400" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Lifeline heads -->
+        <mxCell id="2" value="User (Manajer)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="60" y="60" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Sistem" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="430" y="60" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="User (Teknisi)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="800" y="60" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Lifelines -->
+        <mxCell id="5" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="100" as="sourcePoint" />
+            <mxPoint x="135" y="1320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="505" y="100" as="sourcePoint" />
+            <mxPoint x="505" y="1320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="7" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="875" y="100" as="sourcePoint" />
+            <mxPoint x="875" y="1320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Activation bars -->
+        <mxCell id="8" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="499" y="150" width="12" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="129" y="330" width="12" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="499" y="450" width="12" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="869" y="560" width="12" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="499" y="680" width="12" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="129" y="780" width="12" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="499" y="820" width="12" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="" style="fillColor=#000000;strokeColor=#000000;html=1;" vertex="1" parent="1">
+          <mxGeometry x="499" y="1010" width="12" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- MSG 1: Manajer -> Sistem: Membuat proyek baru -->
+        <mxCell id="20" value="Membuat proyek baru" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="150" as="sourcePoint" />
+            <mxPoint x="499" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 2: Sistem -> Manajer: Rekomendasi teknisi berdasarkan jadwal -->
+        <mxCell id="21" value="Rekomendasi teknisi berdasarkan jadwal" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="499" y="200" as="sourcePoint" />
+            <mxPoint x="135" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 3: Manajer -> Sistem: Alokasi teknisi dan buat daftar tugas -->
+        <mxCell id="22" value="Alokasi teknisi &amp; buat daftar tugas" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="250" as="sourcePoint" />
+            <mxPoint x="499" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 4: Manajer -> Sistem: Simpan data proyek -->
+        <mxCell id="23" value="Simpan data proyek baru" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="330" as="sourcePoint" />
+            <mxPoint x="499" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 5: Sistem -> Teknisi: Notifikasi proyek baru -->
+        <mxCell id="24" value="Notifikasi proyek baru" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="499" y="380" as="sourcePoint" />
+            <mxPoint x="875" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Separator 1 -->
+        <mxCell id="25" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="420" as="sourcePoint" />
+            <mxPoint x="980" y="420" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 6: Teknisi -> Sistem: Buka papan Kanban, geser status + unggah foto -->
+        <mxCell id="26" value="Buka Kanban, geser status ke Working On It &amp; unggah foto bukti" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="875" y="560" as="sourcePoint" />
+            <mxPoint x="511" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 7: Sistem -> Manajer: Notifikasi perlu direview -->
+        <mxCell id="27" value="Notifikasi perlu direview di Dashboard Manajer" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="499" y="620" as="sourcePoint" />
+            <mxPoint x="135" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Separator 2 -->
+        <mxCell id="28" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="660" as="sourcePoint" />
+            <mxPoint x="980" y="660" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 8: Manajer -> Sistem: Buka detail tugas, tinjau foto bukti -->
+        <mxCell id="29" value="Buka detail tugas &amp; tinjau foto bukti" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="780" as="sourcePoint" />
+            <mxPoint x="499" y="780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ALT fragment box -->
+        <mxCell id="30" value="alt" style="swimlane;startSize=20;swimlaneHead=0;swimlaneBody=0;fillColor=none;strokeColor=#000000;strokeWidth=1;fontStyle=1;fontSize=10;fontColor=#000000;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="840" width="940" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="[Hasil valid]" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#000000;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="842" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="[Hasil tidak valid]" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#000000;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="916" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="920" as="sourcePoint" />
+            <mxPoint x="980" y="920" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 9 [valid]: Manajer -> Sistem: Setujui, geser status ke Done -->
+        <mxCell id="34" value="Setujui &amp; geser status tugas menjadi Done" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="870" as="sourcePoint" />
+            <mxPoint x="499" y="870" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 10 [tidak valid]: Manajer -> Sistem: Kirim catatan revisi ke Teknisi -->
+        <mxCell id="35" value="Kirim catatan revisi ke Teknisi" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="141" y="960" as="sourcePoint" />
+            <mxPoint x="499" y="960" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 11 [tidak valid]: Sistem -> Teknisi: Teruskan notifikasi revisi -->
+        <mxCell id="36" value="Teruskan notifikasi revisi ke Teknisi" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="511" y="990" as="sourcePoint" />
+            <mxPoint x="875" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Separator 3 -->
+        <mxCell id="37" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="1060" as="sourcePoint" />
+            <mxPoint x="980" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 12: Sistem -> Sistem: Hitung SPI & perbarui Health Status -->
+        <mxCell id="38" value="Hitung SPI &amp; perbarui Health Status Proyek" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="511" y="1030" as="sourcePoint" />
+            <mxPoint x="511" y="1030" as="targetPoint">
+              <Array as="points">
+                <mxPoint x="560" y="1030" />
+                <mxPoint x="560" y="1060" />
+              </Array>
+            </mxPoint>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 13: Sistem -> Manajer: Dashboard proyek diperbarui -->
+        <mxCell id="39" value="Hitung SPI &amp; perbarui Health Status Proyek" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="511" y="1090" as="sourcePoint" />
+            <mxPoint x="511" y="1090" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 13: Sistem broadcast: Tampilkan pesan tugas selesai -->
+        <mxCell id="40" value="Tampilkan pesan Tugas Berhasil Diselesaikan" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="511" y="1090" as="sourcePoint" />
+            <mxPoint x="135" y="1090" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="41" value="Tampilkan pesan Tugas Berhasil Diselesaikan" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="511" y="1130" as="sourcePoint" />
+            <mxPoint x="875" y="1130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 14: Sistem -> Manajer: Dashboard proyek diperbarui -->
+        <mxCell id="42" value="Dashboard proyek diperbarui" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="511" y="1170" as="sourcePoint" />
+            <mxPoint x="135" y="1170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- MSG 15: Sistem -> Teknisi: Dashboard performa diperbarui -->
+        <mxCell id="43" value="Dashboard performa diperbarui" style="endArrow=block;endFill=1;dashed=1;html=1;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="511" y="1210" as="sourcePoint" />
+            <mxPoint x="875" y="1210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Caption -->
+        <mxCell id="50" value="Gambar 3.2 Sequence Diagram Manajemen Proyek dan Review Tugas." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="175" y="1340" width="700" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

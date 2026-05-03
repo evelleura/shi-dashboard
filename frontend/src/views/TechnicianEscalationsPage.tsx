@@ -7,6 +7,7 @@ import {
   useAddEscalationUpdate,
   useRequestEscalationAction,
 } from '../hooks/useEscalations';
+import { useMyProjects } from '../hooks/useProjects';
 import { useLanguage } from '../hooks/useLanguage';
 import Modal from '../components/ui/Modal';
 import type { Escalation, EscalationPriority, EscalationStatus, EscalationActionRequest } from '../types';
@@ -67,9 +68,14 @@ function formatDateTime(dateStr: string, lang: string): string {
 export default function TechnicianEscalationsPage() {
   const { data: escalations, isLoading, isError, refetch } = useEscalations();
   const { data: summary } = useEscalationSummary();
+  const { data: myProjects } = useMyProjects();
   const createMutation = useCreateEscalation();
   const { language } = useLanguage();
   const id = language === 'id';
+
+  const activeProjects = (myProjects ?? []).filter(
+    (p) => p.status !== 'completed' && p.status !== 'cancelled'
+  );
 
   const [showForm, setShowForm] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -78,20 +84,20 @@ export default function TechnicianEscalationsPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<EscalationPriority>('medium');
-  const [taskId, setTaskId] = useState('');
+  const [projectId, setProjectId] = useState<number>(0);
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
-    setTitle(''); setDescription(''); setPriority('medium'); setTaskId(''); setFile(null);
+    setTitle(''); setDescription(''); setPriority('medium'); setProjectId(0); setFile(null);
     if (fileRef.current) fileRef.current.value = '';
     setShowForm(false);
   };
 
   const handleSubmit = () => {
-    if (!title.trim() || !description.trim() || !taskId.trim()) return;
+    if (!title.trim() || !description.trim() || !projectId) return;
     const formData = new FormData();
-    formData.append('task_id', taskId.trim());
+    formData.append('project_id', String(projectId));
     formData.append('title', title.trim());
     formData.append('description', description.trim());
     formData.append('priority', priority);
@@ -207,15 +213,27 @@ export default function TechnicianEscalationsPage() {
       <Modal open={showForm} onClose={resetForm} title={id ? 'Eskalasi Baru' : 'New Escalation'} maxWidth="max-w-lg">
         <div className="space-y-4">
           <div>
-            <label htmlFor="new-esc-task" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Task ID <span className="text-red-500">*</span>
+            <label htmlFor="new-esc-project" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {id ? 'Proyek' : 'Project'} <span className="text-red-500">*</span>
             </label>
-            <input
-              id="new-esc-task" type="number" value={taskId}
-              onChange={(e) => setTaskId(e.target.value)}
-              placeholder={id ? 'Masukkan ID task' : 'Enter task ID'}
+            <select
+              id="new-esc-project"
+              value={projectId}
+              onChange={(e) => setProjectId(Number(e.target.value))}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
+            >
+              <option value={0}>{id ? '-- Pilih proyek --' : '-- Select project --'}</option>
+              {activeProjects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.project_code ? `[${p.project_code}] ` : ''}{p.name}
+                </option>
+              ))}
+            </select>
+            {activeProjects.length === 0 && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                {id ? 'Tidak ada proyek aktif yang ditugaskan.' : 'No active projects assigned to you.'}
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="new-esc-title" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -273,7 +291,7 @@ export default function TechnicianEscalationsPage() {
             </button>
             <button
               onClick={handleSubmit}
-              disabled={!title.trim() || !description.trim() || !taskId.trim() || createMutation.isPending}
+              disabled={!title.trim() || !description.trim() || !projectId || createMutation.isPending}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {createMutation.isPending

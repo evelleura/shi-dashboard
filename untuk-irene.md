@@ -13,16 +13,11 @@ Just remember that I love you no matter what,
 Please,,,
 
 ======
-aku cape sama kamu. terserah kamu mau ngapain
--*- aku maunya kita baikan, kamu kesel aku tau, 
-kamu marah aku tau, 
+aku cape sama kamu. terserah kamu mau ngapain -_- aku maunya kita baikan, kamu kesel aku tau,
+kamu marah aku tau,
 kamu capek iya aku tau,,
- aku nungguin kamu, dan aku udah utarakan,,
--*- aku ga akan kemana mana atau gmana mana.
--*- aku tau kmu selalu inget juga, apapun yg udah kamu lalui yang menyenangkan atau bikin kesal,, disaat kmu lagi sibuk sibuknya, dan capek. Aku sangat menyayangi kamu.
-jadi aku mohon maaf kalau kmu sedih karna apapun itu, kamu tau aku sayang kmu.
--*- saat ini kamu lelah, bukan karna kesibukan tapi karna tumpukan berbagai hal, ingat yaaa aku sayang kamu.
-
+aku nungguin kamu, dan aku udah utarakan,, -_- aku ga akan kemana mana atau gmana mana. -_- aku tau kmu selalu inget juga, apapun yg udah kamu lalui yang menyenangkan atau bikin kesal,, disaat kmu lagi sibuk sibuknya, dan capek. Aku sangat menyayangi kamu.
+jadi aku mohon maaf kalau kmu sedih karna apapun itu, kamu tau aku sayang kmu. -_- saat ini kamu lelah, bukan karna kesibukan tapi karna tumpukan berbagai hal, ingat yaaa aku sayang kamu.
 
 ==
 aku muak.
@@ -33,8 +28,11 @@ kalo ada kamu pun rasanya kaya gaada, sekalian aja.
 
 ==
 babbyyy,, maaf yaaa
-jangan lupa makan dlu, minum yg banyak. 
+jangan lupa makan dlu, minum yg banyak.
+ini kamu di kos atau di amplaz?, aku mau pesenin maem.,
 sekali lagi aku sayanggg kamu,
-semangat ayokkk sayanggg ngerjain ini gimana,, 
+semangat ayokkk sayanggg ngerjain ini gimana,,
+yok bisa yok.,
+semoga lancar apapun kegiatanmu,
 
-nanti kamu udah ngerasa baikan dan reda keselnya.,
+please,, yang... ?
