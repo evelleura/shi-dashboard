@@ -111,6 +111,49 @@ swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;font
 
 ---
 
+## Sequence Diagram
+
+**Page size:** 850–1400 wide (jumlah lifeline), tinggi auto-grow per panjang flow.
+
+### Lifeline header
+
+| Elemen | Style |
+|--------|-------|
+| Actor | `shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#000000;fillColor=#FFFFFF;fontSize=11;fontColor=#000000;` (30×60, label di bawah) |
+| Object | `rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;` (150×40, bold) |
+| Lifeline | `endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;` (vertical edge dari bottom-of-header sampai bottom-of-page) |
+
+### Messages
+
+| Tipe | Style | Catatan |
+|------|-------|---------|
+| Sync | `endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;align=center;verticalAlign=bottom;` | Panah solid penuh, label endpoint/method |
+| Return | `endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;align=center;verticalAlign=bottom;` | Dashed, label nilai balik / status code |
+| Async | `endArrow=open;endFill=0;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;` | Solid open arrow, untuk push notif / WS |
+| Self | Sync style + `Array as="points"` waypoint `(x+50, y0)` `(x+50, y1)` | Loop balik ke lifeline sendiri |
+
+### Combined Fragment (academic style: OMIT)
+
+Untuk gaya akademik (Tugas Akhir, skripsi), combined fragment (alt/loop/opt/par) DIHILANGKAN.
+Sequence menampilkan happy-path saja secara linear dari atas ke bawah.
+Conditional logic, loop, dan parallel diagrams tidak digambarkan dalam sequence; cukup di activity diagram.
+
+Reference: thesis author's own p50-p54 sequence diagrams use this convention.
+
+### Lifeline rule (mirror activity layout)
+
+- **Single-actor flow** (3 lifelines): `User (Role) | Sistem | Database`
+- **Dual-actor flow** (4 lifelines): `User1 | Sistem | Database | User2`
+- Drop `Browser`, `API Backend`, `Browser-T`, `Browser-M` separation — collapse to single `Sistem` object
+- User actor labels typed by role: `User (Manager)`, `User (Teknisi)`, `User (Klien)`
+- Lifeline order MUST match activity diagram swimlane order
+
+### Generator
+
+`diagram/ai/Sequence/_gen.py` — Python builder. Edit spec di file, jalankan `python _gen.py`, output 4 `SD_*.drawio`.
+
+---
+
 ## PlantUML (Activity — alternatif)
 
 Gunakan PlantUML jika diagram perlu di-render dengan tools akademik.
