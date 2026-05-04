@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" modified="2026-05-04T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
   <diagram id="CD_BUDGET_MATERIAL" name="CD_BUDGET_MATERIAL">
-    <mxGraphModel dx="1300" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1000" background="#FFFFFF" math="0" shadow="0">
+    <mxGraphModel dx="1400" dy="1050" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1050" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -27,7 +27,7 @@
           <mxGeometry y="118" width="280" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_material" value="Material" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="60" y="380" width="300" height="318" as="geometry" />
+          <mxGeometry x="60" y="400" width="300" height="318" as="geometry" />
         </mxCell>
         <mxCell id="cls_material_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_material">
           <mxGeometry y="28" width="300" height="20" as="geometry" />
@@ -75,7 +75,7 @@
           <mxGeometry y="298" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_budget" value="BudgetItem" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="500" y="380" width="300" height="298" as="geometry" />
+          <mxGeometry x="500" y="400" width="300" height="298" as="geometry" />
         </mxCell>
         <mxCell id="cls_budget_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_budget">
           <mxGeometry y="28" width="300" height="20" as="geometry" />
@@ -120,7 +120,7 @@
           <mxGeometry y="278" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_dailyreport" value="DailyReport" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="940" y="380" width="300" height="258" as="geometry" />
+          <mxGeometry x="940" y="400" width="300" height="258" as="geometry" />
         </mxCell>
         <mxCell id="cls_dailyreport_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_dailyreport">
           <mxGeometry y="28" width="300" height="20" as="geometry" />
@@ -128,7 +128,7 @@
         <mxCell id="cls_dailyreport_a1" value="- project_id: int {FK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_dailyreport">
           <mxGeometry y="48" width="300" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="cls_dailyreport_a2" value="- task_id: int {FK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_dailyreport">
+        <mxCell id="cls_dailyreport_a2" value="- task_id: int {FK, nullable}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_dailyreport">
           <mxGeometry y="68" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_dailyreport_a3" value="- report_date: date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_dailyreport">
@@ -158,8 +158,23 @@
         <mxCell id="cls_dailyreport_m2" value="+ getByDate(date): DailyReport[]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_dailyreport">
           <mxGeometry y="238" width="300" height="20" as="geometry" />
         </mxCell>
+        <mxCell id="cls_user" value="User" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="940" y="60" width="240" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="cls_user_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_user">
+          <mxGeometry y="28" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cls_user_a1" value="- name: string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_user">
+          <mxGeometry y="48" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cls_user_a2" value="- role: enum" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_user">
+          <mxGeometry y="68" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cls_user_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="cls_user">
+          <mxGeometry y="88" width="240" height="10" as="geometry" />
+        </mxCell>
         <mxCell id="rel_project_material" style="endArrow=diamondThin;endFill=1;endSize=14;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.2;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="cls_material" target="cls_project">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="210" y="320" /><mxPoint x="556" y="320" /></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="210" y="340" /><mxPoint x="556" y="340" /></Array></mxGeometry>
         </mxCell>
         <mxCell id="rel_project_material_lms" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_project_material">
           <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
@@ -177,7 +192,7 @@
           <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
         </mxCell>
         <mxCell id="rel_project_dailyreport" style="endArrow=diamondThin;endFill=1;endSize=14;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.8;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="cls_dailyreport" target="cls_project">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1090" y="320" /><mxPoint x="724" y="320" /></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1090" y="340" /><mxPoint x="724" y="340" /></Array></mxGeometry>
         </mxCell>
         <mxCell id="rel_project_dailyreport_lms" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_project_dailyreport">
           <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
@@ -185,8 +200,23 @@
         <mxCell id="rel_project_dailyreport_lmt" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_project_dailyreport">
           <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
         </mxCell>
+        <mxCell id="rel_user_report" style="endArrow=open;endFill=0;endSize=12;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="cls_dailyreport" target="cls_user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_user_report_lms" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_report">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_user_report_lmt" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_report">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_user_report_lr" value="reporter" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;fontStyle=2;" connectable="0" vertex="1" parent="rel_user_report">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
         <mxCell id="caption" value="&lt;i&gt;Gambar 4.X Class Diagram Budget dan Material.&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="350" y="940" width="600" height="30" as="geometry" />
+          <mxGeometry x="400" y="990" width="600" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="&lt;i&gt;Atribut yang ditampilkan adalah subset relevan untuk fitur ini.&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1022" width="600" height="24" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

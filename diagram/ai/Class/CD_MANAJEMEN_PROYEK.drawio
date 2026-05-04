@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" modified="2026-05-04T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
   <diagram id="CD_MANAJEMEN_PROYEK" name="CD_MANAJEMEN_PROYEK">
-    <mxGraphModel dx="1300" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+    <mxGraphModel dx="1600" dy="1300" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1300" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="cls_user" value="User" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="60" y="60" width="240" height="118" as="geometry" />
+          <mxGeometry x="60" y="60" width="240" height="98" as="geometry" />
         </mxCell>
         <mxCell id="cls_user_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_user">
           <mxGeometry y="28" width="240" height="20" as="geometry" />
@@ -20,11 +20,8 @@
         <mxCell id="cls_user_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="cls_user">
           <mxGeometry y="88" width="240" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="cls_user_m0" value="+ authenticate(): User" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_user">
-          <mxGeometry y="98" width="240" height="20" as="geometry" />
-        </mxCell>
         <mxCell id="cls_client" value="Client" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="980" y="60" width="240" height="118" as="geometry" />
+          <mxGeometry x="1180" y="60" width="240" height="98" as="geometry" />
         </mxCell>
         <mxCell id="cls_client_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_client">
           <mxGeometry y="28" width="240" height="20" as="geometry" />
@@ -38,11 +35,8 @@
         <mxCell id="cls_client_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="cls_client">
           <mxGeometry y="88" width="240" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="cls_client_m0" value="+ create(): Client" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_client">
-          <mxGeometry y="98" width="240" height="20" as="geometry" />
-        </mxCell>
         <mxCell id="cls_project" value="Project" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="480" y="320" width="340" height="598" as="geometry" />
+          <mxGeometry x="520" y="280" width="340" height="598" as="geometry" />
         </mxCell>
         <mxCell id="cls_project_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_project">
           <mxGeometry y="28" width="340" height="20" as="geometry" />
@@ -65,7 +59,7 @@
         <mxCell id="cls_project_a6" value="- end_date: date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_project">
           <mxGeometry y="148" width="340" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="cls_project_a7" value="- duration: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_project">
+        <mxCell id="cls_project_a7" value="- duration: int {derived}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_project">
           <mxGeometry y="168" width="340" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_project_a8" value="- status: enum" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_project">
@@ -132,7 +126,7 @@
           <mxGeometry y="578" width="340" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_assignment" value="ProjectAssignment" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="60" y="440" width="280" height="158" as="geometry" />
+          <mxGeometry x="60" y="480" width="280" height="158" as="geometry" />
         </mxCell>
         <mxCell id="cls_assignment_a0" value="- project_id: int {PK,FK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_assignment">
           <mxGeometry y="28" width="280" height="20" as="geometry" />
@@ -156,55 +150,109 @@
           <mxGeometry y="138" width="280" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health" value="ProjectHealth" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="920" y="360" width="320" height="338" as="geometry" />
+          <mxGeometry x="1100" y="380" width="300" height="338" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a0" value="- project_id: int {PK,FK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="28" width="320" height="20" as="geometry" />
+          <mxGeometry y="28" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a1" value="- spi_value: decimal" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="48" width="320" height="20" as="geometry" />
+          <mxGeometry y="48" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a2" value="- status: enum" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="68" width="320" height="20" as="geometry" />
+          <mxGeometry y="68" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a3" value="- deviation_percent: decimal" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="88" width="320" height="20" as="geometry" />
+          <mxGeometry y="88" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a4" value="- actual_progress: decimal" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="108" width="320" height="20" as="geometry" />
+          <mxGeometry y="108" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a5" value="- planned_progress: decimal" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="128" width="320" height="20" as="geometry" />
+          <mxGeometry y="128" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a6" value="- total_tasks: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="148" width="320" height="20" as="geometry" />
+          <mxGeometry y="148" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a7" value="- completed_tasks: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="168" width="320" height="20" as="geometry" />
+          <mxGeometry y="168" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a8" value="- working_tasks: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="188" width="320" height="20" as="geometry" />
+          <mxGeometry y="188" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a9" value="- overtime_tasks: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="208" width="320" height="20" as="geometry" />
+          <mxGeometry y="208" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a10" value="- overdue_tasks: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="228" width="320" height="20" as="geometry" />
+          <mxGeometry y="228" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_a11" value="- last_updated: timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="248" width="320" height="20" as="geometry" />
+          <mxGeometry y="248" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="268" width="320" height="10" as="geometry" />
+          <mxGeometry y="268" width="300" height="10" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_m0" value="+ recalculate(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="278" width="320" height="20" as="geometry" />
+          <mxGeometry y="278" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_m1" value="+ getStatus(): HealthStatus" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="298" width="320" height="20" as="geometry" />
+          <mxGeometry y="298" width="300" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_health_m2" value="+ computePlannedValue(): decimal" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_health">
-          <mxGeometry y="318" width="320" height="20" as="geometry" />
+          <mxGeometry y="318" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_status" value="ProjectStatus" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="700" width="200" height="138" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_status_stereo" value="&lt;&lt;enumeration&gt;&gt;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;fontStyle=2;" vertex="1" parent="enum_proj_status">
+          <mxGeometry y="28" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_status_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="enum_proj_status">
+          <mxGeometry y="48" width="200" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_status_l0" value="active" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_proj_status">
+          <mxGeometry y="58" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_status_l1" value="completed" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_proj_status">
+          <mxGeometry y="78" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_status_l2" value="on-hold" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_proj_status">
+          <mxGeometry y="98" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_status_l3" value="cancelled" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_proj_status">
+          <mxGeometry y="118" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_phase" value="ProjectPhase" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="820" width="180" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_phase_stereo" value="&lt;&lt;enumeration&gt;&gt;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;fontStyle=2;" vertex="1" parent="enum_proj_phase">
+          <mxGeometry y="28" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_phase_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="enum_proj_phase">
+          <mxGeometry y="48" width="180" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_phase_l0" value="survey" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_proj_phase">
+          <mxGeometry y="58" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_proj_phase_l1" value="execution" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_proj_phase">
+          <mxGeometry y="78" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_health_status" value="HealthStatus" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="940" width="180" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_health_status_stereo" value="&lt;&lt;enumeration&gt;&gt;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;fontStyle=2;" vertex="1" parent="enum_health_status">
+          <mxGeometry y="28" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_health_status_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="enum_health_status">
+          <mxGeometry y="48" width="180" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_health_status_l0" value="green" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_health_status">
+          <mxGeometry y="58" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_health_status_l1" value="amber" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_health_status">
+          <mxGeometry y="78" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_health_status_l2" value="red" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="enum_health_status">
+          <mxGeometry y="98" width="180" height="20" as="geometry" />
         </mxCell>
         <mxCell id="rel_user_assignment" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cls_user" target="cls_assignment">
           <mxGeometry relative="1" as="geometry" />
@@ -242,8 +290,79 @@
         <mxCell id="rel_project_health_lmt" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_project_health">
           <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
         </mxCell>
+        <mxCell id="rel_user_project_created" style="endArrow=open;endFill=0;endSize=12;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;exitX=0;exitY=0.4;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cls_project" target="cls_user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_user_project_created_lms" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_project_created">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_user_project_created_lmt" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_project_created">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_user_project_created_lr" value="creator" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;fontStyle=2;" connectable="0" vertex="1" parent="rel_user_project_created">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="na_spi" style="endArrow=none;dashed=1;startArrow=none;edgeStyle=none;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1" source="note_spi" target="cls_health">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="na_phase" style="endArrow=none;dashed=1;startArrow=none;edgeStyle=none;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1" source="note_phase" target="cls_project">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_enum_pstatus" style="endArrow=open;endFill=0;endSize=12;dashed=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="enum_proj_status" target="cls_project">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_enum_pstatus_lms" value="" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_enum_pstatus">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_pstatus_lmt" value="" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_enum_pstatus">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_pstatus_lr" value="&lt;&lt;use&gt;&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;fontStyle=2;" connectable="0" vertex="1" parent="rel_enum_pstatus">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_pphase" style="endArrow=open;endFill=0;endSize=12;dashed=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.6;entryDx=0;entryDy=0;" edge="1" parent="1" source="enum_proj_phase" target="cls_project">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_enum_pphase_lms" value="" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_enum_pphase">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_pphase_lmt" value="" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_enum_pphase">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_pphase_lr" value="&lt;&lt;use&gt;&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;fontStyle=2;" connectable="0" vertex="1" parent="rel_enum_pphase">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_hstatus" style="endArrow=open;endFill=0;endSize=12;dashed=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="enum_health_status" target="cls_health">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_enum_hstatus_lms" value="" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_enum_hstatus">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_hstatus_lmt" value="" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_enum_hstatus">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_enum_hstatus_lr" value="&lt;&lt;use&gt;&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;fontStyle=2;" connectable="0" vertex="1" parent="rel_enum_hstatus">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="note_spi" value="Aturan Status Kesehatan (SPI):
+  Hijau : SPI &gt;= 0.95
+  Kuning: 0.85 &lt;= SPI &lt; 0.95
+  Merah : SPI &lt; 0.85
+
+SPI = (selesai/total) / (hari_terpakai/total_hari)" style="shape=note;size=14;whiteSpace=wrap;html=1;fontSize=11;fontColor=#000000;fillColor=#FFF8DC;strokeColor=#000000;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="60" y="800" width="360" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="note_phase" value="Siklus dua fase:
+  phase=survey -&gt; survey_approved=true
+  -&gt; phase=execution
+  Hanya manager dapat approve survey." style="shape=note;size=14;whiteSpace=wrap;html=1;fontSize=11;fontColor=#000000;fillColor=#FFF8DC;strokeColor=#000000;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="500" y="800" width="360" height="80" as="geometry" />
+        </mxCell>
         <mxCell id="caption" value="&lt;i&gt;Gambar 4.X Class Diagram Manajemen Proyek.&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
-          <mxGeometry x="350" y="1040" width="600" height="30" as="geometry" />
+          <mxGeometry x="500" y="1240" width="600" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="&lt;i&gt;Atribut yang ditampilkan adalah subset relevan untuk fitur ini.&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="500" y="1272" width="600" height="24" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -46,7 +46,8 @@
       "Bash(npm list *)",
       "Bash(PGPASSWORD=12345 /opt/homebrew/Cellar/postgresql@17/17.9/bin/psql *)",
       "Bash(grep -E \"error TS|warning TS|Found [0-9]+ error|^$\")",
-      "Bash(git -C '/Users/user/Documents/COLLEGE/Mata Kuliah/8/Tugas Akhir/coding/project_ta_dian_putri_iswandi' status --short)"
+      "Bash(git -C '/Users/user/Documents/COLLEGE/Mata Kuliah/8/Tugas Akhir/coding/project_ta_dian_putri_iswandi' status --short)",
+      "mcp__chain-context-mcp__bulk_append"
     ]
   },
   "spinnerTipsEnabled": false,
