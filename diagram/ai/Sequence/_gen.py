@@ -1,14 +1,14 @@
-"""Generator for 4 Sequence Diagrams (Gambar 4.10-4.13).
-Spec source: naskah/ narrative. Run: python _gen.py
-Output: SD_*.drawio in this directory.
+"""Generator for 5 Sequence Diagrams (Gambar 4.10-4.14).
+Mirrors Activity Diagrams 4.5-4.9 (1:1).
+Spec source: naskah/09_activity_diagram.md narrative. Run: python _gen.py.
 
-Lifeline pattern: mirrors activity diagram actors.
-  3-lifeline: User (Role) [actor] | Sistem [object] | Database [object]
-  User uses umlActor stick figure; Sistem/Database use object rectangle.
-Activation bar (execution specification): narrow white rectangle on each
-  lifeline spanning duration the lifeline is involved in interaction.
-Academic style: linear happy-path only, no combined fragments.
-Messages: academic Indonesian vocabulary (no SQL/HTTP/code strings).
+Pattern (Raharja KKP business-process):
+  Single-actor: Aktor | Form/Data lifelines (3 partisipan)
+  Dual-actor: Aktor1 | Form/Data lifelines | Aktor2 (4 partisipan)
+Aktor = umlActor stick figure. Lifeline = object rectangle.
+Activation bar on every partisipan that participates.
+Linear happy-path only, no combined fragments.
+Academic Indonesian (no SQL/HTTP/code).
 """
 from xml.sax.saxutils import escape
 import pathlib
@@ -210,7 +210,7 @@ class SeqBuilder:
 # ============ specs ============
 
 def sd1_autentikasi():
-    """SD Autentikasi — Gambar 4.10
+    """SD Autentikasi — Gambar 4.10 (mirror Activity 4.5).
     Aktor (1): Pengguna
     Lifelines (2): Form Login, Data Pengguna
     """
@@ -222,90 +222,126 @@ def sd1_autentikasi():
     sb.msg('akt', 'frm', 'membuka halaman login')
     sb.msg('akt', 'frm', 'memasukkan email dan kata sandi')
     sb.msg('frm', 'dat', 'meminta verifikasi kredensial')
+    sb.msg('dat', 'dat', 'mencocokkan data pada tabel pengguna')
     sb.msg('dat', 'frm', 'mengembalikan data pengguna', 'return')
     sb.msg('frm', 'frm', 'memvalidasi kesesuaian kredensial')
     sb.msg('frm', 'frm', 'memeriksa peran pengguna')
     sb.msg('frm', 'akt', 'menampilkan dashboard sesuai peran', 'return')
+    sb.msg('akt', 'frm', 'mengirim permintaan logout')
+    sb.msg('frm', 'akt', 'mengonfirmasi keluar dari sesi', 'return')
     return sb.emit('Sequence Diagram Autentikasi', '4.10',
                    'Sequence Diagram Autentikasi')
 
 
-def sd2_pengelolaan_proyek():
-    """SD Pengelolaan Proyek — Gambar 4.11
-    Aktor (1): Manajer
-    Lifelines (3): Form Proyek, Data Klien, Data Proyek
+def sd2_review_gate():
+    """SD Pelaporan Progres Harian (Review Gate) — Gambar 4.11 (mirror Activity 4.6).
+    Aktor (2): Manajer (kiri), Teknisi (kanan)
+    Lifelines (2): Papan Kanban, Data Tugas
     """
-    sb = SeqBuilder(page_w=1100, lifelines=[
+    sb = SeqBuilder(page_w=1200, lifelines=[
+        ('mgr', 'Manajer',      'actor'),
+        ('kbn', 'Papan Kanban', 'object'),
+        ('tug', 'Data Tugas',   'object'),
+        ('tek', 'Teknisi',      'actor'),
+    ])
+    sb.msg('tek', 'kbn', 'menggeser status tugas menjadi Working On It')
+    sb.msg('kbn', 'tug', 'memperbarui status tugas')
+    sb.msg('tek', 'kbn', 'mengunggah foto bukti pekerjaan')
+    sb.msg('kbn', 'tug', 'menyimpan bukti pada tugas')
+    sb.msg('tug', 'kbn', 'mengonfirmasi penyimpanan', 'return')
+    sb.msg('kbn', 'mgr', 'menampilkan notifikasi tugas siap ditinjau', 'return')
+    sb.msg('mgr', 'kbn', 'membuka papan kanban dan meninjau bukti')
+    sb.msg('mgr', 'kbn', 'menyetujui tugas menjadi Done')
+    sb.msg('kbn', 'tug', 'memperbarui status tugas menjadi Done')
+    sb.msg('kbn', 'kbn', 'menghitung ulang SPI dan Health Status')
+    sb.msg('tug', 'kbn', 'mengembalikan data terbaru', 'return')
+    sb.msg('kbn', 'mgr', 'memperbarui dashboard secara real-time', 'return')
+    sb.msg('kbn', 'tek', 'mengirim notifikasi tugas telah disetujui', 'return')
+    return sb.emit('Sequence Diagram Pelaporan Progres Harian (Review Gate)', '4.11',
+                   'Sequence Diagram Pelaporan Progres Harian')
+
+
+def sd3_pengelolaan_proyek():
+    """SD Pengelolaan Proyek — Gambar 4.12 (mirror Activity 4.7).
+    Aktor (1): Manajer
+    Lifelines (2): Form Proyek, Data Proyek
+    """
+    sb = SeqBuilder(page_w=900, lifelines=[
         ('akt', 'Manajer',     'actor'),
         ('frm', 'Form Proyek', 'object'),
-        ('klr', 'Data Klien',  'object'),
         ('dat', 'Data Proyek', 'object'),
     ])
-    sb.msg('akt', 'frm', 'membuka formulir proyek baru')
-    sb.msg('frm', 'klr', 'meminta daftar klien terdaftar')
-    sb.msg('klr', 'frm', 'mengembalikan daftar klien', 'return')
-    sb.msg('akt', 'frm', 'mengisi data proyek dan memilih klien')
-    sb.msg('akt', 'frm', 'menetapkan teknisi penanggung jawab')
-    sb.msg('akt', 'frm', 'mengirim formulir proyek')
-    sb.msg('frm', 'frm', 'memvalidasi kelengkapan data')
-    sb.msg('frm', 'dat', 'menyimpan data proyek')
+    sb.msg('akt', 'frm', 'memilih opsi tambah proyek baru dan mengisi detail')
+    sb.msg('akt', 'frm', 'memasukkan rentang waktu pengerjaan')
+    sb.msg('frm', 'dat', 'meminta pengecekan ketersediaan teknisi')
+    sb.msg('dat', 'dat', 'memfilter teknisi berdasarkan jadwal')
+    sb.msg('dat', 'frm', 'mengembalikan daftar teknisi tersedia', 'return')
+    sb.msg('frm', 'akt', 'menampilkan daftar teknisi yang tersedia', 'return')
+    sb.msg('akt', 'frm', 'memilih teknisi dan menyusun daftar tugas')
+    sb.msg('akt', 'frm', 'menekan tombol simpan proyek')
+    sb.msg('frm', 'dat', 'menyimpan data proyek dan alokasi tugas')
     sb.msg('dat', 'frm', 'mengonfirmasi penyimpanan', 'return')
-    sb.msg('frm', 'akt', 'menampilkan konfirmasi pembuatan proyek', 'return')
-    return sb.emit('Sequence Diagram Pengelolaan Proyek', '4.11',
+    sb.msg('frm', 'akt', 'menampilkan pesan sukses dan distribusi notifikasi', 'return')
+    return sb.emit('Sequence Diagram Pengelolaan Proyek', '4.12',
                    'Sequence Diagram Pengelolaan Proyek')
 
 
-def sd3_dashboard_ews():
-    """SD Dashboard Early Warning System — Gambar 4.12
+def sd4_dashboard_ews():
+    """SD Dashboard Early Warning System — Gambar 4.13 (mirror Activity 4.8).
     Aktor (1): Manajer
     Lifelines (2): Dashboard, Data Proyek
     """
     sb = SeqBuilder(page_w=900, lifelines=[
         ('akt', 'Manajer',     'actor'),
-        ('frm', 'Dashboard',   'object'),
+        ('dsh', 'Dashboard',   'object'),
         ('dat', 'Data Proyek', 'object'),
     ])
-    sb.msg('akt', 'frm', 'membuka halaman dashboard')
-    sb.msg('frm', 'dat', 'meminta data progres seluruh proyek')
-    sb.msg('dat', 'frm', 'mengembalikan data progres dan tugas', 'return')
-    sb.msg('frm', 'frm', 'menghitung nilai SPI tiap proyek')
-    sb.msg('frm', 'frm', 'menetapkan status RAG')
-    sb.msg('frm', 'frm', 'mengurutkan proyek berdasarkan urgensi')
-    sb.msg('frm', 'akt', 'menampilkan dashboard dengan indikator peringatan dini', 'return')
-    return sb.emit('Sequence Diagram Dashboard Early Warning System', '4.12',
+    sb.msg('akt', 'dsh', 'mengakses halaman utama dashboard')
+    sb.msg('dsh', 'dat', 'meneruskan permintaan ekstraksi data metrik')
+    sb.msg('dat', 'dat', 'memproses kueri data SPI dan status tugas')
+    sb.msg('dat', 'dsh', 'mengembalikan data metrik proyek', 'return')
+    sb.msg('dsh', 'dsh', 'memetakan status kesehatan ke indikator warna EWS')
+    sb.msg('dsh', 'dsh', 'mengurutkan proyek berdasarkan tingkat urgensi')
+    sb.msg('dsh', 'akt', 'menampilkan dashboard dengan indikator peringatan dini', 'return')
+    return sb.emit('Sequence Diagram Dashboard Early Warning System', '4.13',
                    'Sequence Diagram Dashboard Early Warning System')
 
 
-def sd4_upload_evidence():
-    """SD Upload Bukti Pekerjaan — Gambar 4.13
-    Aktor (1): Teknisi
-    Lifelines (2): Form Bukti, Data Tugas
+def sd5_eskalasi():
+    """SD Pengajuan & Penanganan Eskalasi — Gambar 4.14 (mirror Activity 4.9).
+    Aktor (2): Teknisi (kiri), Manajer (kanan)
+    Lifelines (2): Form Eskalasi, Data Eskalasi
     """
-    sb = SeqBuilder(page_w=900, lifelines=[
-        ('akt', 'Teknisi',    'actor'),
-        ('frm', 'Form Bukti', 'object'),
-        ('dat', 'Data Tugas', 'object'),
+    sb = SeqBuilder(page_w=1200, lifelines=[
+        ('tek', 'Teknisi',        'actor'),
+        ('frm', 'Form Eskalasi',  'object'),
+        ('dat', 'Data Eskalasi',  'object'),
+        ('mgr', 'Manajer',        'actor'),
     ])
-    sb.msg('akt', 'frm', 'membuka detail tugas')
-    sb.msg('akt', 'frm', 'memilih berkas bukti dari perangkat')
-    sb.msg('akt', 'frm', 'mengirim berkas bukti')
-    sb.msg('frm', 'frm', 'memvalidasi tipe dan ukuran berkas')
-    sb.msg('frm', 'frm', 'menyimpan berkas ke direktori')
-    sb.msg('frm', 'dat', 'mencatat data bukti pada tugas')
+    sb.msg('tek', 'frm', 'membuka form eskalasi kendala')
+    sb.msg('tek', 'frm', 'mengisi detail kendala lapangan')
+    sb.msg('tek', 'frm', 'mengirim laporan eskalasi')
+    sb.msg('frm', 'dat', 'menyimpan tiket eskalasi baru')
     sb.msg('dat', 'frm', 'mengonfirmasi penyimpanan', 'return')
-    sb.msg('frm', 'akt', 'menampilkan konfirmasi unggah berhasil', 'return')
-    return sb.emit('Sequence Diagram Upload Bukti Pekerjaan', '4.13',
-                   'Sequence Diagram Upload Bukti Pekerjaan')
+    sb.msg('frm', 'mgr', 'menampilkan indikator flag merah pada dashboard', 'return')
+    sb.msg('mgr', 'frm', 'meninjau detail kendala eskalasi')
+    sb.msg('mgr', 'frm', 'mengirim instruksi penanganan')
+    sb.msg('frm', 'dat', 'memperbarui status tiket menjadi Ditangani')
+    sb.msg('dat', 'frm', 'mengonfirmasi pembaruan status', 'return')
+    sb.msg('frm', 'tek', 'meneruskan instruksi balasan dan notifikasi selesai', 'return')
+    return sb.emit('Sequence Diagram Pengajuan dan Penanganan Eskalasi', '4.14',
+                   'Sequence Diagram Pengajuan dan Penanganan Eskalasi')
 
 
 # ============ main ============
 
 if __name__ == '__main__':
     targets = [
-        ('SD_AUTENTIKASI.drawio',       sd1_autentikasi),
-        ('SD_PENGELOLAAN_PROYEK.drawio', sd2_pengelolaan_proyek),
-        ('SD_DASHBOARD_EWS.drawio',     sd3_dashboard_ews),
-        ('SD_UPLOAD_EVIDENCE.drawio',   sd4_upload_evidence),
+        ('SD_AUTENTIKASI.drawio',        sd1_autentikasi),
+        ('SD_REVIEW_GATE.drawio',        sd2_review_gate),
+        ('SD_PENGELOLAAN_PROYEK.drawio', sd3_pengelolaan_proyek),
+        ('SD_DASHBOARD_EWS.drawio',      sd4_dashboard_ews),
+        ('SD_ESKALASI.drawio',           sd5_eskalasi),
     ]
     for fn, builder in targets:
         xml = builder()
