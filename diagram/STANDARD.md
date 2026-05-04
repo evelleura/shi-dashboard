@@ -113,40 +113,91 @@ swimlane;startSize=30;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;font
 
 ## Sequence Diagram
 
-**Page size:** 850–1400 wide (jumlah lifeline), tinggi auto-grow per panjang flow.
+**Reference standard:** Raharja University KKP — `widuri.raharja.info/index.php?title=KP1122469850`
+**Page size:** 850–1400 wide (jumlah aktor + lifeline), tinggi auto-grow per panjang flow.
 
-### Lifeline header
+### Paradigma: business-process, bukan MVC
 
-| Elemen | Style |
-|--------|-------|
-| Actor | `shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#000000;fillColor=#FFFFFF;fontSize=11;fontColor=#000000;` (30×60, label di bawah) |
-| Object | `rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;` (150×40, bold) |
-| Lifeline | `endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;` (vertical edge dari bottom-of-header sampai bottom-of-page) |
+Sequence diagram menggambarkan **alur proses bisnis** antara aktor dan entitas/dokumen bisnis.
+JANGAN gunakan komponen teknis (Halaman, Controller, Service, Database, API).
+Lifeline merepresentasikan **objek bisnis** (Form, Dokumen, Data, Laporan), bukan layer arsitektur.
 
-### Messages
+### Skema warna (UML blue, override global B&W)
+
+| Property | Value |
+|----------|-------|
+| Fill | `#DAE8FC` (light blue) |
+| Stroke | `#6C8EBF` (darker blue) |
+| Lifeline garis & arrow | `#000000` (black, kontras) |
+
+### Komponen
+
+| Komponen | Bentuk | Style | Catatan |
+|----------|--------|-------|---------|
+| Aktor | Stick figure | `shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;` (30×60) | Orang/peran: Pengguna, Manajer, Teknisi, Klien |
+| Lifeline (objek) | Rectangle | `rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;` (160×40) | Form/Data/Dokumen: Form Login, Data Pengguna, Dashboard |
+| Garis lifeline | Dashed vertical | `endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;` | Putus-putus dari header ke bawah |
+| Activation bar | Narrow rectangle | `rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1;` (10×variabel) | Persegi panjang biru di lifeline saat aktif |
+
+### Layout (alignment baseline)
+
+Aktor stick figure & object box di-baseline di y=130:
+- Actor figure: y=50, h=60 (figure 50-110, label 110-130)
+- Object box: y=90, h=40 (box 90-130)
+- Lifeline garis dashed mulai y=150
+- Page width auto sesuai jumlah aktor+lifeline (3 partisipan ~800px, 4 ~950px)
+
+### Penamaan lifeline (objek bisnis)
+
+| Tipe | Contoh |
+|------|--------|
+| Form | `Form Login`, `Form Proyek`, `Form Bukti`, `Formulir Tugas` |
+| Data | `Data Pengguna`, `Data Proyek`, `Data Tugas`, `Data Klien` |
+| Dokumen | `Laporan`, `Proposal`, `Bukti Pekerjaan` |
+| Tampilan | `Dashboard`, `Halaman Detail` |
+
+### Penamaan aktor (peran)
+
+`Pengguna`, `Manajer`, `Teknisi`, `Klien`, `Admin`. Tanpa prefix `User (...)`.
+Susunan kiri→kanan: aktor utama paling kiri, lifeline objek bisnis ke kanan, aktor lain (jika ada) di paling kanan.
+
+### Activation bar (execution specification)
+
+Persegi panjang putih sempit di lifeline yang menunjukkan durasi objek aktif memproses pesan.
+- Lebar: 10px, posisi: center pada lifeline
+- Tinggi: dari y pesan masuk pertama ke y pesan keluar terakhir (+8px margin)
+- Setiap aktor & lifeline yang terlibat WAJIB punya activation bar
+
+### Messages (academic Indonesian)
 
 | Tipe | Style | Catatan |
 |------|-------|---------|
-| Sync | `endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;align=center;verticalAlign=bottom;` | Panah solid penuh, label endpoint/method |
-| Return | `endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;align=center;verticalAlign=bottom;` | Dashed, label nilai balik / status code |
-| Async | `endArrow=open;endFill=0;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;` | Solid open arrow, untuk push notif / WS |
-| Self | Sync style + `Array as="points"` waypoint `(x+50, y0)` `(x+50, y1)` | Loop balik ke lifeline sendiri |
+| Sync | `endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;align=center;verticalAlign=top;` | Panah solid, label kalimat aksi |
+| Return | `endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;align=center;verticalAlign=top;` | Dashed, balik ke pemanggil |
+| Self | Sync style + `Array as="points"` waypoint `(x+50, y0)` `(x+50, y1)` | Loop ke diri sendiri |
 
-### Combined Fragment (academic style: OMIT)
+**Kosakata pesan akademik (kata kerja Indonesia formal):**
+- Aksi user: `membuka`, `mengisi`, `memilih`, `mengirim`, `menetapkan`, `meminta persetujuan`
+- Aksi sistem/objek: `memvalidasi`, `memverifikasi`, `memeriksa`, `menghitung`, `menyimpan`, `menampilkan`, `mengonfirmasi`
+- Aksi data: `meminta data`, `mengembalikan data`, `mencatat`, `memperbarui`
 
-Untuk gaya akademik (Tugas Akhir, skripsi), combined fragment (alt/loop/opt/par) DIHILANGKAN.
-Sequence menampilkan happy-path saja secara linear dari atas ke bawah.
-Conditional logic, loop, dan parallel diagrams tidak digambarkan dalam sequence; cukup di activity diagram.
+JANGAN gunakan istilah teknis: SQL, GET/POST, endpoint, table name, method name, kode.
 
-Reference: thesis author's own p50-p54 sequence diagrams use this convention.
+### Combined fragment: OMIT
 
-### Lifeline rule (mirror activity layout)
+Untuk gaya akademik (Tugas Akhir, KKP, skripsi), combined fragment (alt/loop/opt/par) DIHILANGKAN.
+Sequence menampilkan **happy-path** saja secara linear atas-ke-bawah.
+Conditional logic, loop, parallel cukup digambar di activity diagram.
 
-- **Single-actor flow** (3 lifelines): `User (Role) | Sistem | Database`
-- **Dual-actor flow** (4 lifelines): `User1 | Sistem | Database | User2`
-- Drop `Browser`, `API Backend`, `Browser-T`, `Browser-M` separation — collapse to single `Sistem` object
-- User actor labels typed by role: `User (Manager)`, `User (Teknisi)`, `User (Klien)`
-- Lifeline order MUST match activity diagram swimlane order
+### Narrative paragraph (wajib di naskah)
+
+Setiap sequence diagram wajib diikuti paragraf narasi dengan format:
+
+> Berdasarkan gambar X.X Sequence Diagram di atas terdapat: 1). N Lifeline, yaitu: [list]. 2). M Aktor, yaitu: [list]. 3). K Message yang memuat informasi-informasi tentang aktivitas yang terjadi, kegiatan yang biasa dilakukan oleh aktor tersebut.
+
+### Caption format
+
+`Gambar X.X Sequence Diagram [NamaKegiatan].` (italic, bold, centered, font 11)
 
 ### Generator
 

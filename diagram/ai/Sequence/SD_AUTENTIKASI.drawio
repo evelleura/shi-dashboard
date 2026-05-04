@@ -1,28 +1,102 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-05-05T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
-  <diagram id="4_10" name="Sequence Diagram Autentikasi (Login)">
-    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="700" pageHeight="505" background="#FFFFFF" math="0" shadow="0">
-      <root>
-        <mxCell id="0"/>
-        <mxCell id="1" parent="0"/>
-        <mxCell id="title" value="Sequence Diagram Autentikasi (Login)" style="text;html=1;align=center;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="20" width="620" height="20" as="geometry"/></mxCell>
-        <mxCell id="user_h" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#000000;fillColor=#FFFFFF;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="160" y="60" width="30" height="60" as="geometry"/></mxCell>
-        <mxCell id="user_l" style="endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="175" y="120" as="sourcePoint"/><mxPoint x="175" y="430" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="sys_h" value="Sistem" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="275" y="60" width="150" height="40" as="geometry"/></mxCell>
-        <mxCell id="sys_l" style="endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="350" y="100" as="sourcePoint"/><mxPoint x="350" y="430" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="db_h" value="Database" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="450" y="60" width="150" height="40" as="geometry"/></mxCell>
-        <mxCell id="db_l" style="endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="525" y="100" as="sourcePoint"/><mxPoint x="525" y="430" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="c101" value="input email + password" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="175" y="150" as="sourcePoint"/><mxPoint x="350" y="150" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="c102" value="SELECT * FROM tb_user WHERE email = ?" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="350" y="178" as="sourcePoint"/><mxPoint x="525" y="178" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="c103" value="user row" style="endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="525" y="206" as="sourcePoint"/><mxPoint x="350" y="206" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="c104" value="bcrypt.compare(password, hash)" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="350" y="234" as="sourcePoint"/><mxPoint x="350" y="256" as="targetPoint"/><Array as="points"><mxPoint x="400" y="234"/><mxPoint x="400" y="256"/></Array></mxGeometry></mxCell>
-        <mxCell id="c105" value="generate JWT (payload: id, role)" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="350" y="266" as="sourcePoint"/><mxPoint x="350" y="288" as="targetPoint"/><Array as="points"><mxPoint x="400" y="266"/><mxPoint x="400" y="288"/></Array></mxGeometry></mxCell>
-        <mxCell id="c106" value="INSERT tb_session (userId, token, expiresAt)" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="350" y="298" as="sourcePoint"/><mxPoint x="525" y="298" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="c107" value="ok" style="endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="525" y="326" as="sourcePoint"/><mxPoint x="350" y="326" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="c108" value="200 OK { token, user, role }" style="endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="350" y="354" as="sourcePoint"/><mxPoint x="175" y="354" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="c109" value="redirect ke halaman dashboard" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="175" y="382" as="sourcePoint"/><mxPoint x="350" y="382" as="targetPoint"/></mxGeometry></mxCell>
-        <mxCell id="caption" value="Gambar 4.10 Sequence Diagram Autentikasi." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="455" width="620" height="20" as="geometry"/></mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="65bd71144e">
+    <diagram id="4_10" name="Sequence Diagram Autentikasi">
+        <mxGraphModel dx="803" dy="528" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="479" background="#FFFFFF" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Sequence Diagram Autentikasi" style="text;html=1;align=center;fontSize=12;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="20" width="820" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="akt_h" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="145" y="50" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="akt_l" style="endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="160" y="150" as="sourcePoint"/>
+                        <mxPoint x="160" y="404" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="frm_h" value="Form Login" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="370" y="90" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="frm_l" style="endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" edge="1" source="frm_h">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="450" y="150" as="sourcePoint"/>
+                        <mxPoint x="450" y="404" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="dat_h" value="Data User" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1.5;fontSize=11;fontColor=#000000;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="90" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="dat_l" style="endArrow=none;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="740" y="130" as="sourcePoint"/>
+                        <mxPoint x="740" y="404" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="akt_act" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1;" parent="1" vertex="1">
+                    <mxGeometry x="155" y="172" width="10" height="192" as="geometry"/>
+                </mxCell>
+                <mxCell id="frm_act" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1;" parent="1" vertex="1">
+                    <mxGeometry x="445" y="172" width="10" height="192" as="geometry"/>
+                </mxCell>
+                <mxCell id="dat_act" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1;" parent="1" vertex="1">
+                    <mxGeometry x="735" y="228" width="10" height="44" as="geometry"/>
+                </mxCell>
+                <mxCell id="c101" value="membuka halaman login" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=top;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="165" y="180" as="sourcePoint"/>
+                        <mxPoint x="445" y="180" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c102" value="memasukkan email dan kata sandi" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=top;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="165" y="208" as="sourcePoint"/>
+                        <mxPoint x="445" y="208" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c103" value="meminta verifikasi kredensial" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=top;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="455" y="236" as="sourcePoint"/>
+                        <mxPoint x="735" y="236" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c104" value="mengembalikan data pengguna" style="endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=top;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="735" y="264" as="sourcePoint"/>
+                        <mxPoint x="455" y="264" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c105" value="memvalidasi kesesuaian kredensial" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=left;verticalAlign=middle;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="455" y="292" as="sourcePoint"/>
+                        <mxPoint x="455" y="314" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="510" y="292"/>
+                            <mxPoint x="510" y="314"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c106" value="memeriksa peran pengguna" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=left;verticalAlign=middle;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="455" y="324" as="sourcePoint"/>
+                        <mxPoint x="455" y="346" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="510" y="324"/>
+                            <mxPoint x="510" y="346"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c107" value="menampilkan dashboard sesuai peran" style="endArrow=open;endFill=0;html=1;rounded=0;dashed=1;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=top;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="445" y="356" as="sourcePoint"/>
+                        <mxPoint x="165" y="356" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="caption" value="Gambar 4.10 Sequence Diagram Autentikasi." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="429" width="820" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>
