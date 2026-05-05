@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-05T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="wf_03" name="WF-03 Buat Proyek Baru">
+    <mxGraphModel dx="1200" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="0" arrows="0" fold="0" page="1" pageScale="1" pageWidth="1200" pageHeight="727" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- ── Top nav ── -->
+        <mxCell id="nav" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="1200" height="50" as="geometry"/></mxCell>
+        <mxCell id="nav_brand" value="PT Smart Home Inovasi" style="text;html=1;align=left;fontSize=13;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="16" y="0" width="300" height="50" as="geometry"/></mxCell>
+        <mxCell id="nav_user" value="Manajer: [Nama] | Keluar" style="text;html=1;align=right;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="860" y="0" width="324" height="50" as="geometry"/></mxCell>
+        <!-- ── Sidebar ── -->
+        <mxCell id="sidebar" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="0" y="50" width="200" height="677" as="geometry"/></mxCell>
+        <mxCell id="sb_head" value="MENU" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;spacingLeft=16;" vertex="1" parent="1"><mxGeometry x="0" y="55" width="200" height="28" as="geometry"/></mxCell>
+        <mxCell id="sb_l1" value="  Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;fontSize=11;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="86" width="200" height="34" as="geometry"/></mxCell>
+        <mxCell id="sb_l2" value="■ Proyek" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontStyle=1;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="120" width="200" height="34" as="geometry"/></mxCell>
+        <mxCell id="sb_l3" value="  Klien" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;fontSize=11;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="154" width="200" height="34" as="geometry"/></mxCell>
+        <mxCell id="sb_l4" value="  Laporan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;fontSize=11;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="188" width="200" height="34" as="geometry"/></mxCell>
+        <!-- ── Breadcrumb ── -->
+        <mxCell id="bc" value="Proyek &gt; Buat Proyek Baru" style="text;html=1;align=left;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="220" y="56" width="400" height="18" as="geometry"/></mxCell>
+        <!-- ── Page title ── -->
+        <mxCell id="ph" value="Buat Proyek Baru" style="text;html=1;align=left;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="220" y="76" width="400" height="28" as="geometry"/></mxCell>
+        <!-- ── Form card ── -->
+        <mxCell id="form_card" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1"><mxGeometry x="220" y="112" width="940" height="530" as="geometry"/></mxCell>
+        <!-- Row 1: Nama Proyek + Klien (50/50) -->
+        <mxCell id="lbl_nama" value="Nama Proyek *" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="240" y="128" width="430" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_nama" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="240" y="148" width="430" height="34" as="geometry"/></mxCell>
+        <mxCell id="lbl_klien" value="Klien *" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="700" y="128" width="430" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_klien" value="[ Pilih Klien ▾ ]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="700" y="148" width="430" height="34" as="geometry"/></mxCell>
+        <!-- Row 2: Tanggal Mulai + Tanggal Selesai -->
+        <mxCell id="lbl_start" value="Tanggal Mulai *" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="240" y="202" width="205" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_start" value="YYYY-MM-DD" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="240" y="222" width="205" height="34" as="geometry"/></mxCell>
+        <mxCell id="lbl_end" value="Tanggal Selesai *" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="465" y="202" width="205" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_end" value="YYYY-MM-DD" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="465" y="222" width="205" height="34" as="geometry"/></mxCell>
+        <mxCell id="lbl_val" value="Nilai Proyek (Rp) *" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="700" y="202" width="430" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_val" value="0" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="700" y="222" width="430" height="34" as="geometry"/></mxCell>
+        <!-- Row 3: Phase + Status -->
+        <mxCell id="lbl_phase" value="Fase Proyek" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="240" y="276" width="430" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_phase" value="[ Survei / Eksekusi ▾ ]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="240" y="296" width="430" height="34" as="geometry"/></mxCell>
+        <mxCell id="lbl_status" value="Status Awal" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="700" y="276" width="430" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_status" value="[ Aktif / Selesai / Ditunda ▾ ]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="700" y="296" width="430" height="34" as="geometry"/></mxCell>
+        <!-- Row 4: Deskripsi -->
+        <mxCell id="lbl_desc" value="Deskripsi Proyek" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="240" y="350" width="890" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_desc" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="240" y="370" width="890" height="80" as="geometry"/></mxCell>
+        <!-- Row 5: Penugasan Teknisi -->
+        <mxCell id="lbl_tech" value="Penugasan Teknisi (opsional)" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="240" y="462" width="890" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_tech" value="[ Pilih Teknisi... ] — dapat dipilih lebih dari satu" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="240" y="482" width="890" height="34" as="geometry"/></mxCell>
+        <!-- Action buttons -->
+        <mxCell id="btn_batal" value="Batal" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=12;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="780" y="546" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="btn_simpan" value="Simpan Proyek" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1"><mxGeometry x="920" y="546" width="220" height="40" as="geometry"/></mxCell>
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar WF-03. Wireframe Halaman Buat Proyek Baru." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="700" width="1120" height="20" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

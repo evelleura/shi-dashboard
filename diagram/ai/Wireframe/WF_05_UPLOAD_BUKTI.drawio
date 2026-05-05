@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-05T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="wf_05" name="WF-05 Upload Bukti Pekerjaan">
+    <mxGraphModel dx="1200" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="0" arrows="0" fold="0" page="1" pageScale="1" pageWidth="1200" pageHeight="727" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- ── Top nav (Teknisi) ── -->
+        <mxCell id="nav" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="1200" height="50" as="geometry"/></mxCell>
+        <mxCell id="nav_brand" value="PT Smart Home Inovasi" style="text;html=1;align=left;fontSize=13;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="16" y="0" width="300" height="50" as="geometry"/></mxCell>
+        <mxCell id="nav_links" value="Tugas Saya  |  Proyek Saya" style="text;html=1;align=left;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="360" y="0" width="300" height="50" as="geometry"/></mxCell>
+        <mxCell id="nav_user" value="Teknisi: [Nama] | Keluar" style="text;html=1;align=right;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="860" y="0" width="324" height="50" as="geometry"/></mxCell>
+        <!-- ── Breadcrumb ── -->
+        <mxCell id="bc" value="Tugas Saya &gt; Instalasi Panel Listrik &gt; Pemasangan panel MCB" style="text;html=1;align=left;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="60" width="700" height="18" as="geometry"/></mxCell>
+        <!-- ── Two-column layout ── -->
+        <!-- Left: Task detail (w=520) -->
+        <mxCell id="task_panel" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1"><mxGeometry x="40" y="86" width="520" height="580" as="geometry"/></mxCell>
+        <mxCell id="task_hdr" value="Detail Tugas" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="86" width="520" height="32" as="geometry"/></mxCell>
+        <mxCell id="task_title_lbl" value="Nama Tugas" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="130" width="160" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_title_val" value="Pemasangan panel MCB" style="text;html=1;align=left;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="150" width="488" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_proj_lbl" value="Proyek" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="180" width="160" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_proj_val" value="Instalasi Panel Listrik – Kec. Mlati" style="text;html=1;align=left;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="198" width="488" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_due_lbl" value="Tenggat" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="228" width="160" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_due_val" value="8 Mei 2026" style="text;html=1;align=left;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="246" width="200" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_status_lbl" value="Status" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="276" width="160" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_status_val" value="[Working On It]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="296" width="160" height="26" as="geometry"/></mxCell>
+        <mxCell id="status_note" value="Ubah status: [ To Do ▾ ]  [ Working On It ▾ ]  (hanya dua pilihan)" style="text;html=1;align=left;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="334" width="488" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_desc_lbl" value="Keterangan" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="56" y="364" width="160" height="18" as="geometry"/></mxCell>
+        <mxCell id="task_desc_val" value="Pasang breaker MCB 3 phase pada panel utama gedung A. Pastikan label terpasang dan jalur aman." style="text;html=1;align=left;fontSize=10;fontColor=#000000;whiteSpace=wrap;" vertex="1" parent="1"><mxGeometry x="56" y="382" width="488" height="52" as="geometry"/></mxCell>
+        <!-- Right: Upload bukti (w=580) -->
+        <mxCell id="up_panel" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1"><mxGeometry x="600" y="86" width="560" height="580" as="geometry"/></mxCell>
+        <mxCell id="up_hdr" value="Unggah Bukti Pekerjaan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="600" y="86" width="560" height="32" as="geometry"/></mxCell>
+        <!-- Drop zone -->
+        <mxCell id="dropzone" value="Klik di sini atau seret file ke area ini&lt;br/&gt;&lt;br/&gt;[ Foto / PDF / Dokumen ]&lt;br/&gt;Maks. 10 MB per file" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8F8F8;strokeColor=#000000;strokeWidth=1;dashed=1;fontSize=11;fontColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="620" y="130" width="520" height="120" as="geometry"/></mxCell>
+        <mxCell id="btn_unggah" value="Pilih File" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=1;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1"><mxGeometry x="720" y="264" width="320" height="36" as="geometry"/></mxCell>
+        <!-- Gallery section -->
+        <mxCell id="gal_sep" value="Bukti yang Sudah Diunggah (3)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="600" y="316" width="560" height="28" as="geometry"/></mxCell>
+        <!-- 3 image placeholders -->
+        <mxCell id="img1" value="[Foto 1]&lt;br/&gt;panel_mcb_01.jpg&lt;br/&gt;2.1 MB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="620" y="354" width="155" height="120" as="geometry"/></mxCell>
+        <mxCell id="img2" value="[Foto 2]&lt;br/&gt;panel_mcb_02.jpg&lt;br/&gt;1.8 MB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="793" y="354" width="155" height="120" as="geometry"/></mxCell>
+        <mxCell id="img3" value="[Foto 3]&lt;br/&gt;catatan_teknis.pdf&lt;br/&gt;0.5 MB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="966" y="354" width="174" height="120" as="geometry"/></mxCell>
+        <!-- Delete / view actions below each image -->
+        <mxCell id="img1_act" value="[ Lihat ] [ Hapus ]" style="text;html=1;align=center;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="620" y="480" width="155" height="18" as="geometry"/></mxCell>
+        <mxCell id="img2_act" value="[ Lihat ] [ Hapus ]" style="text;html=1;align=center;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="793" y="480" width="155" height="18" as="geometry"/></mxCell>
+        <mxCell id="img3_act" value="[ Lihat ] [ Hapus ]" style="text;html=1;align=center;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="966" y="480" width="174" height="18" as="geometry"/></mxCell>
+        <!-- Note -->
+        <mxCell id="note" value="Bukti dikirim ke manajer untuk ditinjau. Teknisi tidak dapat menandai tugas sebagai Done." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="600" y="638" width="560" height="28" as="geometry"/></mxCell>
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar WF-05. Wireframe Halaman Unggah Bukti Pekerjaan (Teknisi)." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="700" width="1120" height="20" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-05T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="wf_01" name="WF-01 Halaman Login">
+    <mxGraphModel dx="1200" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="0" arrows="0" fold="0" page="1" pageScale="1" pageWidth="1200" pageHeight="727" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- ── Top bar ── -->
+        <mxCell id="nav" value="PT Smart Home Inovasi — Sistem Manajemen Proyek" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#000000;strokeWidth=1;fontSize=13;fontStyle=1;fontColor=#000000;align=left;spacingLeft=16;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="1200" height="50" as="geometry"/></mxCell>
+        <!-- ── Page background ── -->
+        <mxCell id="bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="50" width="1200" height="650" as="geometry"/></mxCell>
+        <!-- ── Login card ── -->
+        <mxCell id="card" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1"><mxGeometry x="400" y="120" width="400" height="420" as="geometry"/></mxCell>
+        <mxCell id="card_title" value="Masuk ke Sistem" style="text;html=1;align=center;fontSize=16;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="400" y="140" width="400" height="36" as="geometry"/></mxCell>
+        <mxCell id="card_sep" value="" style="line;strokeColor=#D0D0D0;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="420" y="183" width="360" height="10" as="geometry"/></mxCell>
+        <!-- Email -->
+        <mxCell id="lbl_email" value="Email" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="440" y="206" width="320" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_email" value="contoh@perusahaan.com" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="440" y="226" width="320" height="34" as="geometry"/></mxCell>
+        <!-- Password -->
+        <mxCell id="lbl_pass" value="Kata Sandi" style="text;html=1;align=left;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="440" y="278" width="320" height="18" as="geometry"/></mxCell>
+        <mxCell id="inp_pass" value="••••••••" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#AAAAAA;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="440" y="298" width="320" height="34" as="geometry"/></mxCell>
+        <!-- Login button -->
+        <mxCell id="btn_login" value="Masuk" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=1;fontSize=13;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1"><mxGeometry x="440" y="358" width="320" height="42" as="geometry"/></mxCell>
+        <!-- Forgot password -->
+        <mxCell id="forgot" value="Lupa kata sandi? Hubungi administrator sistem" style="text;html=1;align=center;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="400" y="414" width="400" height="18" as="geometry"/></mxCell>
+        <!-- Role info note -->
+        <mxCell id="sep2" value="" style="line;strokeColor=#D0D0D0;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="420" y="442" width="360" height="10" as="geometry"/></mxCell>
+        <mxCell id="role_note" value="[Peran pengguna: Teknisi / Manajer / Admin — otomatis dari database]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="420" y="458" width="360" height="28" as="geometry"/></mxCell>
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar WF-01. Wireframe Halaman Login." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="700" width="1120" height="20" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

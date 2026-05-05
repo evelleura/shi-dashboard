@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-05T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="wf_06" name="WF-06 Eskalasi Proyek Kritis">
+    <mxGraphModel dx="1200" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="0" arrows="0" fold="0" page="1" pageScale="1" pageWidth="1200" pageHeight="727" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- ── Top nav ── -->
+        <mxCell id="nav" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="1200" height="50" as="geometry"/></mxCell>
+        <mxCell id="nav_brand" value="PT Smart Home Inovasi" style="text;html=1;align=left;fontSize=13;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="16" y="0" width="300" height="50" as="geometry"/></mxCell>
+        <mxCell id="nav_user" value="Manajer: [Nama] | Keluar" style="text;html=1;align=right;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="860" y="0" width="324" height="50" as="geometry"/></mxCell>
+        <!-- ── Sidebar ── -->
+        <mxCell id="sidebar" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="0" y="50" width="200" height="677" as="geometry"/></mxCell>
+        <mxCell id="sb_l1" value="  Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;fontSize=11;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="86" width="200" height="34" as="geometry"/></mxCell>
+        <mxCell id="sb_l2" value="■ Proyek" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontStyle=1;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="120" width="200" height="34" as="geometry"/></mxCell>
+        <mxCell id="sb_l3" value="  Klien" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;fontSize=11;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="154" width="200" height="34" as="geometry"/></mxCell>
+        <mxCell id="sb_l4" value="  Laporan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;fontSize=11;fontColor=#000000;align=left;spacingLeft=12;" vertex="1" parent="1"><mxGeometry x="0" y="188" width="200" height="34" as="geometry"/></mxCell>
+        <!-- ── Page title ── -->
+        <mxCell id="ph" value="Proyek Kritis — Early Warning System" style="text;html=1;align=left;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="220" y="62" width="600" height="28" as="geometry"/></mxCell>
+        <mxCell id="ph_sub" value="Proyek dengan SPI &lt; 0.85 memerlukan tindakan segera" style="text;html=1;align=left;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="220" y="90" width="600" height="18" as="geometry"/></mxCell>
+        <!-- ── Alert banner ── -->
+        <mxCell id="alert_banner" value="5 proyek dalam kondisi KRITIS — SPI di bawah ambang batas (0.85)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=2;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="220" y="116" width="960" height="36" as="geometry"/></mxCell>
+        <!-- ── Escalation cards ── -->
+        <!-- Card 1 (expanded) -->
+        <mxCell id="ec1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1"><mxGeometry x="220" y="162" width="960" height="156" as="geometry"/></mxCell>
+        <mxCell id="ec1_hdr" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="220" y="162" width="960" height="36" as="geometry"/></mxCell>
+        <mxCell id="ec1_name" value="Instalasi Panel Listrik – Kec. Mlati" style="text;html=1;align=left;fontSize=12;fontStyle=1;fontColor=#000000;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="162" width="600" height="36" as="geometry"/></mxCell>
+        <mxCell id="ec1_badge" value="[SPI: 0.72]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#C0C0C0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="860" y="168" width="100" height="24" as="geometry"/></mxCell>
+        <mxCell id="ec1_collapse" value="[ ▲ Tutup ]" style="text;html=1;align=right;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1100" y="162" width="74" height="36" as="geometry"/></mxCell>
+        <!-- Expanded detail -->
+        <mxCell id="ec1_d1" value="Klien: PT Artha Sejahtera" style="text;html=1;align=left;fontSize=10;fontColor=#000000;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="204" width="300" height="18" as="geometry"/></mxCell>
+        <mxCell id="ec1_d2" value="Tenggat: 20 Mei 2026 (15 hari tersisa)" style="text;html=1;align=left;fontSize=10;fontColor=#000000;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="222" width="300" height="18" as="geometry"/></mxCell>
+        <mxCell id="ec1_d3" value="Progres aktual: 43%  |  Progres rencana: 60%" style="text;html=1;align=left;fontSize=10;fontColor=#000000;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="240" width="400" height="18" as="geometry"/></mxCell>
+        <mxCell id="ec1_d4" value="Deviasi: -17%  |  Tugas selesai: 3 dari 7" style="text;html=1;align=left;fontSize=10;fontColor=#000000;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="258" width="400" height="18" as="geometry"/></mxCell>
+        <!-- Progress bar placeholder -->
+        <mxCell id="ec1_pbar_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="640" y="210" width="360" height="16" as="geometry"/></mxCell>
+        <mxCell id="ec1_pbar_fill" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#C0C0C0;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="640" y="210" width="155" height="16" as="geometry"/></mxCell>
+        <mxCell id="ec1_pbar_lbl" value="43% / 60% rencana" style="text;html=1;align=left;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="640" y="230" width="200" height="16" as="geometry"/></mxCell>
+        <!-- Escalation buttons -->
+        <mxCell id="ec1_btn1" value="Lihat Detail Proyek" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="630" y="272" width="160" height="28" as="geometry"/></mxCell>
+        <mxCell id="ec1_btn2" value="Eskalasikan ke Pimpinan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1"><mxGeometry x="808" y="272" width="196" height="28" as="geometry"/></mxCell>
+        <mxCell id="ec1_btn3" value="Tandai Sudah Ditangani" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1020" y="272" width="150" height="28" as="geometry"/></mxCell>
+        <!-- Cards 2-4 (collapsed) -->
+        <mxCell id="ec2" value="Pemasangan CCTV Gedung B  ·  CV Maju Bersama  ·  [SPI: 0.78]  [ ▼ Buka ]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;align=left;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="330" width="960" height="36" as="geometry"/></mxCell>
+        <mxCell id="ec3" value="Instalasi Smart Meter – Blok C  ·  PT Sinar Mandiri  ·  [SPI: 0.81]  [ ▼ Buka ]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;align=left;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="378" width="960" height="36" as="geometry"/></mxCell>
+        <mxCell id="ec4" value="Rewiring Panel Apartemen  ·  CV Karya Prima  ·  [SPI: 0.83]  [ ▼ Buka ]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;align=left;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="426" width="960" height="36" as="geometry"/></mxCell>
+        <mxCell id="ec5" value="Pemasangan Solar Panel Rooftop  ·  Bapak Hendra  ·  [SPI: 0.84]  [ ▼ Buka ]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;align=left;spacingLeft=10;" vertex="1" parent="1"><mxGeometry x="220" y="474" width="960" height="36" as="geometry"/></mxCell>
+        <!-- Note on EWS logic -->
+        <mxCell id="ews_note" value="Early Warning System: proyek diurutkan berdasarkan SPI terendah (paling kritis di atas). SPI dihitung ulang setiap perubahan status tugas." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="220" y="524" width="960" height="30" as="geometry"/></mxCell>
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar WF-06. Wireframe Halaman Eskalasi Proyek Kritis (Early Warning System)." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="700" width="1120" height="20" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
