@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1700" math="0" shadow="0" background="#FFFFFF">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KOLOM 1 — User Hierarchy                                        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- AuditLog: x=40, y=40, w=280, h=218 -->
+    <mxCell id="cls_audit" value="AuditLog" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="40" width="280" height="218" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="130" width="280" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="26" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_a1" value="- entity_type: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="42" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_a2" value="- entity_id: int" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="58" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_a3" value="- action: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="74" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_a4" value="- changed_by: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="90" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_a5" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="106" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_m0" value="+ record(entity, action): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="138" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_audit_m1" value="+ query(filter): AuditLog[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_audit">
+      <mxGeometry x="0" y="154" width="280" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- User (abstract): x=380, y=40, w=300, h=218 -->
+    <mxCell id="cls_user" value="&lt;&lt;abstract&gt;&gt; User" style="swimlane;startSize=26;fontStyle=3;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="380" y="40" width="300" height="218" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="140" width="300" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="26" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_a1" value="- name: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="42" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_a2" value="- email: string {unique}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="58" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_a3" value="- password_hash: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="74" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_a4" value="- role: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="90" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_a5" value="- is_active: boolean" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="106" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_a6" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="122" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_m0" value="+ getFullName(): string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="148" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_user_m1" value="+ hasRole(role): boolean" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_user">
+      <mxGeometry x="0" y="164" width="300" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- Technician: x=40, y=400, w=260, h=78 -->
+    <mxCell id="cls_tech" value="Technician" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="400" width="260" height="78" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_tech_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_tech">
+      <mxGeometry x="0" y="26" width="260" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_tech_m0" value="+ getAssignedTasks(): Task[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_tech">
+      <mxGeometry x="0" y="34" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_tech_m1" value="+ submitActivityLog(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_tech">
+      <mxGeometry x="0" y="50" width="260" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- Manager: x=360, y=400, w=260, h=98 -->
+    <mxCell id="cls_mgr" value="Manager" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="360" y="400" width="260" height="98" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mgr_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_mgr">
+      <mxGeometry x="0" y="26" width="260" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mgr_m0" value="+ approveSurvey(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mgr">
+      <mxGeometry x="0" y="34" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mgr_m1" value="+ markTaskDone(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mgr">
+      <mxGeometry x="0" y="50" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mgr_m2" value="+ viewDashboard(): Dashboard" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mgr">
+      <mxGeometry x="0" y="66" width="260" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- Admin: x=680, y=400, w=260, h=78 -->
+    <mxCell id="cls_admin" value="Admin" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="680" y="400" width="260" height="78" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_admin_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_admin">
+      <mxGeometry x="0" y="26" width="260" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_admin_m0" value="+ manageUsers(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_admin">
+      <mxGeometry x="0" y="34" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_admin_m1" value="+ viewAuditLog(): AuditLog[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_admin">
+      <mxGeometry x="0" y="50" width="260" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KOLOM 2 — Client &amp; Project                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Client: x=1000, y=40, w=260, h=138 -->
+    <mxCell id="cls_client" value="Client" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1000" y="40" width="260" height="138" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_client_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_client">
+      <mxGeometry x="0" y="90" width="260" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_client_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_client">
+      <mxGeometry x="0" y="26" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_client_a1" value="- name: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_client">
+      <mxGeometry x="0" y="42" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_client_a2" value="- address: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_client">
+      <mxGeometry x="0" y="58" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_client_a3" value="- phone: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_client">
+      <mxGeometry x="0" y="74" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_client_m0" value="+ create(): Client" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_client">
+      <mxGeometry x="0" y="98" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_client_m1" value="+ update(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_client">
+      <mxGeometry x="0" y="114" width="260" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- Project: x=1000, y=240, w=300, h=418 -->
+    <mxCell id="cls_proj" value="Project" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1000" y="240" width="300" height="418" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="270" width="300" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="26" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a1" value="- project_code: string {unique}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="42" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a2" value="- name: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="58" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a3" value="- client_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="74" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a4" value="- start_date: date" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="90" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a5" value="- end_date: date" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="106" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a6" value="- status: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="122" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a7" value="- phase: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="138" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a8" value="- project_value: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="154" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a9" value="- survey_approved: boolean" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="170" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a10" value="- created_by: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="186" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a11" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="202" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a12" value="- updated_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="218" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_a13" value="- description: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="234" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_m0" value="+ create(): Project" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="278" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_m1" value="+ update(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="294" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_m2" value="+ approveSurvey(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="310" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_m3" value="+ calculateSPI(): float" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="326" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_proj_m4" value="+ getHealth(): ProjectHealth" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_proj">
+      <mxGeometry x="0" y="342" width="300" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- ProjectAssignment: x=1000, y=730, w=280, h=158 -->
+    <mxCell id="cls_assign" value="ProjectAssignment" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1000" y="730" width="280" height="158" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_assign_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_assign">
+      <mxGeometry x="0" y="78" width="280" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_assign_a0" value="- project_id: int {PK, FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_assign">
+      <mxGeometry x="0" y="26" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_assign_a1" value="- user_id: int {PK, FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_assign">
+      <mxGeometry x="0" y="42" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_assign_a2" value="- assigned_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_assign">
+      <mxGeometry x="0" y="58" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_assign_m0" value="+ assign(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_assign">
+      <mxGeometry x="0" y="86" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_assign_m1" value="+ unassign(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_assign">
+      <mxGeometry x="0" y="102" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_assign_m2" value="+ getByProject(): User[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_assign">
+      <mxGeometry x="0" y="118" width="280" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KOLOM 3 — Health &amp; Task                                     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- ProjectHealth: x=1380, y=40, w=300, h=318 -->
+    <mxCell id="cls_health" value="ProjectHealth" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1380" y="40" width="300" height="318" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="198" width="300" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a0" value="- project_id: int {PK, FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="26" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a1" value="- spi_value: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="42" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a2" value="- status: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="58" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a3" value="- deviation_percent: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="74" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a4" value="- actual_progress: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="90" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a5" value="- planned_progress: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="106" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a6" value="- total_tasks: int" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="122" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a7" value="- completed_tasks: int" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="138" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a8" value="- overtime_tasks: int" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="154" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_a9" value="- last_updated: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="170" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_m0" value="+ recalculate(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="206" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_m1" value="+ getStatus(): HealthStatus" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="222" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_health_m2" value="+ computePV(): decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_health">
+      <mxGeometry x="0" y="238" width="300" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- Task: x=1380, y=430, w=300, h=398 -->
+    <mxCell id="cls_task" value="Task" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1380" y="430" width="300" height="398" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="250" width="300" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="26" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a1" value="- project_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="42" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a2" value="- name: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="58" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a3" value="- assigned_to: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="74" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a4" value="- status: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="90" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a5" value="- due_date: date" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="106" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a6" value="- sort_order: int" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="122" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a7" value="- is_survey_task: boolean" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="138" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a8" value="- created_by: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="154" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a9" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="170" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a10" value="- updated_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="186" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_a11" value="- description: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="202" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_m0" value="+ create(): Task" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="258" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_m1" value="+ update(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="274" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_m2" value="+ delete(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="290" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_m3" value="+ changeStatus(status): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="306" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_m4" value="+ isOvertime(): boolean" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="322" width="300" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_task_m5" value="+ isOverDeadline(): boolean" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_task">
+      <mxGeometry x="0" y="338" width="300" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KOLOM 4 — Task children &amp; Project resources                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- TaskEvidence: x=1780, y=40, w=280, h=258 -->
+    <mxCell id="cls_evid" value="TaskEvidence" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1780" y="40" width="280" height="258" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="162" width="280" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="26" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a1" value="- task_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="42" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a2" value="- file_path: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="58" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a3" value="- file_name: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="74" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a4" value="- file_type: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="90" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a5" value="- file_size: int" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="106" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a6" value="- uploaded_by: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="122" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_a7" value="- uploaded_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="138" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_m0" value="+ upload(file): TaskEvidence" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="170" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_m1" value="+ download(): File" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="186" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_m2" value="+ delete(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="202" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_evid_m3" value="+ getByTask(): TaskEvidence[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_evid">
+      <mxGeometry x="0" y="218" width="280" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- TaskActivity: x=1780, y=360, w=280, h=238 -->
+    <mxCell id="cls_act" value="TaskActivity" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1780" y="360" width="280" height="238" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="130" width="280" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="26" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_a1" value="- task_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="42" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_a2" value="- user_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="58" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_a3" value="- message: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="74" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_a4" value="- activity_type: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="90" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_a5" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="106" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_m0" value="+ log(message, type): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="138" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_m1" value="+ getJournal(): TaskActivity[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="154" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_m2" value="+ logArrival(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="170" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_act_m3" value="+ logComplete(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_act">
+      <mxGeometry x="0" y="186" width="280" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- Material: x=1780, y=660, w=260, h=218 -->
+    <mxCell id="cls_mat" value="Material" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1780" y="660" width="260" height="218" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="130" width="260" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="26" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_a1" value="- project_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="42" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_a2" value="- name: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="58" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_a3" value="- quantity: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="74" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_a4" value="- unit: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="90" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_a5" value="- unit_price: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="106" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_a6" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="122" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_m0" value="+ create(): Material" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="138" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_m1" value="+ update(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="154" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_mat_m2" value="+ delete(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_mat">
+      <mxGeometry x="0" y="170" width="260" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- BudgetItem: x=1780, y=940, w=260, h=218 -->
+    <mxCell id="cls_budget" value="BudgetItem" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1780" y="940" width="260" height="218" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="130" width="260" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="26" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_a1" value="- project_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="42" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_a2" value="- description: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="58" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_a3" value="- category: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="74" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_a4" value="- amount: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="90" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_a5" value="- notes: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="106" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_a6" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="122" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_m0" value="+ create(): BudgetItem" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="138" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_m1" value="+ update(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="154" width="260" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_budget_m2" value="+ delete(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_budget">
+      <mxGeometry x="0" y="170" width="260" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KOLOM 5 — Escalation                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Escalation: x=2140, y=40, w=280, h=318 -->
+    <mxCell id="cls_esc" value="Escalation" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="2140" y="40" width="280" height="318" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="210" width="280" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="26" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a1" value="- project_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="42" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a2" value="- task_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="58" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a3" value="- reported_by: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="74" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a4" value="- title: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="90" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a5" value="- description: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="106" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a6" value="- priority: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="122" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a7" value="- status: enum" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="138" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a8" value="- resolved_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="154" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_a9" value="- created_at: timestamp" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="170" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_m0" value="+ create(): Escalation" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="218" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_m1" value="+ resolve(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="234" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_esc_m2" value="+ escalate(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_esc">
+      <mxGeometry x="0" y="250" width="280" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- EscalationUpdate: x=2140, y=420, w=280, h=158 -->
+    <mxCell id="cls_escupd" value="EscalationUpdate" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="2140" y="420" width="280" height="158" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_escupd_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_escupd">
+      <mxGeometry x="0" y="90" width="280" height="8" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_escupd_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+      <mxGeometry x="0" y="26" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_escupd_a1" value="- escalation_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+      <mxGeometry x="0" y="42" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_escupd_a2" value="- user_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+      <mxGeometry x="0" y="58" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_escupd_a3" value="- message: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+      <mxGeometry x="0" y="74" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_escupd_m0" value="+ addUpdate(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+      <mxGeometry x="0" y="98" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_escupd_m1" value="+ getHistory(): EscalationUpdate[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+      <mxGeometry x="0" y="114" width="280" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- EDGES                                                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- GENERALISASI: Technician → User -->
+    <!-- exit top of Technician, route up then right to bottom-left of User -->
+    <mxCell id="rel_tech_user" value="" style="endArrow=block;endFill=0;endSize=16;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.1;entryY=1;entryDx=0;entryDy=0;" edge="1" source="cls_tech" target="cls_user" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="170" y="370" />
+          <mxPoint x="410" y="370" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- GENERALISASI: Manager → User -->
+    <mxCell id="rel_mgr_user" value="" style="endArrow=block;endFill=0;endSize=16;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="cls_mgr" target="cls_user" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- GENERALISASI: Admin → User -->
+    <mxCell id="rel_admin_user" value="" style="endArrow=block;endFill=0;endSize=16;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.9;entryY=1;entryDx=0;entryDy=0;" edge="1" source="cls_admin" target="cls_user" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="810" y="370" />
+          <mxPoint x="648" y="370" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ASOSIASI: User → AuditLog (1 → *) changed_by -->
+    <mxCell id="rel_user_audit" value="changed_by" style="endArrow=open;endFill=0;endSize=10;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="cls_user" target="cls_audit" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_user_audit_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_audit">
+      <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_user_audit_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_audit">
+      <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- ASOSIASI: User → ProjectAssignment (1 → *) -->
+    <!-- route: right-bottom of User → x=750 → down to y=800 → right into ProjAssign left -->
+    <mxCell id="rel_user_assign" value="" style="endArrow=open;endFill=0;endSize=10;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" source="cls_user" target="cls_assign" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="750" y="193" />
+          <mxPoint x="750" y="777" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_user_assign_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_assign">
+      <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_user_assign_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_assign">
+      <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- ASOSIASI: Client → Project (0..1 → 1..*) open diamond at source -->
+    <mxCell id="rel_client_proj" value="" style="endArrow=none;startArrow=diamondThin;startFill=0;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cls_client" target="cls_proj" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_client_proj_lms" value="0..1" style="resizable=0;html=1;align=center;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_client_proj">
+      <mxGeometry x="-0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_client_proj_lmt" value="1..*" style="resizable=0;html=1;align=center;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_client_proj">
+      <mxGeometry x="0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Project → ProjectHealth (1 → 1) solid diamond at source -->
+    <!-- exit right top of Project → route right then up to left of ProjectHealth -->
+    <mxCell id="rel_proj_health" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.1;exitDx=0;exitDy=0;entryX=0;entryY=0.1;entryDx=0;entryDy=0;" edge="1" source="cls_proj" target="cls_health" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1330" y="282" />
+          <mxPoint x="1330" y="72" />
+          <mxPoint x="1380" y="72" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_health_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_health">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_health_lmt" value="1" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_health">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Project → Task (1 → *) solid diamond at source -->
+    <!-- exit right of Project at y=0.6 → route right to x=1330 → down to Task level → right into Task left -->
+    <mxCell id="rel_proj_task" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.6;exitDx=0;exitDy=0;entryX=0;entryY=0.1;entryDx=0;entryDy=0;" edge="1" source="cls_proj" target="cls_task" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1330" y="491" />
+          <mxPoint x="1330" y="470" />
+          <mxPoint x="1380" y="470" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_task_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_task">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_task_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_task">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Project → ProjectAssignment (1 → *) solid diamond at source -->
+    <mxCell id="rel_proj_assign" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cls_proj" target="cls_assign" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_proj_assign_lms" value="1" style="resizable=0;html=1;align=center;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_assign">
+      <mxGeometry x="-0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_assign_lmt" value="*" style="resizable=0;html=1;align=center;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_assign">
+      <mxGeometry x="0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Project → Material (1 → *) solid diamond at source -->
+    <!-- exit right-bottom of Project → waypoints down and right to Material left -->
+    <mxCell id="rel_proj_mat" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="cls_proj" target="cls_mat" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1340" y="595" />
+          <mxPoint x="1340" y="769" />
+          <mxPoint x="1780" y="769" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_mat_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_mat">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_mat_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_mat">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Project → BudgetItem (1 → *) solid diamond at source -->
+    <mxCell id="rel_proj_budget" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.95;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" source="cls_proj" target="cls_budget" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1350" y="637" />
+          <mxPoint x="1350" y="1006" />
+          <mxPoint x="1780" y="1006" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_budget_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_budget">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_budget_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_budget">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Project → Escalation (1 → *) solid diamond at source -->
+    <!-- Route up from Project right-top, through x=1360, y=200, across top to Escalation -->
+    <mxCell id="rel_proj_esc" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" edge="1" source="cls_proj" target="cls_esc" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1360" y="365" />
+          <mxPoint x="1360" y="198" />
+          <mxPoint x="2140" y="198" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_esc_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_esc">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_proj_esc_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_esc">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Task → TaskEvidence (1 → *) solid diamond at source -->
+    <!-- exit right-top of Task → route right to x=1720, up to y=120, right into TaskEvidence -->
+    <mxCell id="rel_task_evid" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" source="cls_task" target="cls_evid" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1720" y="510" />
+          <mxPoint x="1720" y="92" />
+          <mxPoint x="1780" y="92" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_task_evid_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_evid">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_task_evid_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_evid">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Task → TaskActivity (1 → *) solid diamond at source -->
+    <!-- exit right-middle of Task → right to x=1730 → route to TaskActivity left -->
+    <mxCell id="rel_task_act" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.55;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" source="cls_task" target="cls_act" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1730" y="649" />
+          <mxPoint x="1730" y="431" />
+          <mxPoint x="1780" y="431" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_task_act_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_act">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_task_act_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_act">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Task → Escalation (1 → *) solid diamond at source -->
+    <!-- route: exit right-bottom of Task → right to x=1740, up to y=197, right into Escalation left -->
+    <mxCell id="rel_task_esc" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="cls_task" target="cls_esc" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1740" y="749" />
+          <mxPoint x="1740" y="199" />
+          <mxPoint x="2140" y="199" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_task_esc_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_esc">
+      <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_task_esc_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_esc">
+      <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- KOMPOSISI: Escalation → EscalationUpdate (1 → *) solid diamond at source -->
+    <mxCell id="rel_esc_escupd" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cls_esc" target="cls_escupd" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_esc_escupd_lms" value="1" style="resizable=0;html=1;align=center;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_esc_escupd">
+      <mxGeometry x="-0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_esc_escupd_lmt" value="*" style="resizable=0;html=1;align=center;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_esc_escupd">
+      <mxGeometry x="0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- ASOSIASI: User → Task (assignee) (1 → *) -->
+    <!-- exit right of User at y=0.2 → x=960 → down to y=474 → right into Task left at y=0.1 -->
+    <mxCell id="rel_user_task" value="assignee" style="endArrow=open;endFill=0;endSize=10;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.1;entryDx=0;entryDy=0;" edge="1" source="cls_user" target="cls_task" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="960" y="84" />
+          <mxPoint x="960" y="470" />
+          <mxPoint x="1380" y="470" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_user_task_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_task">
+      <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_user_task_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_task">
+      <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- ASOSIASI: User → TaskEvidence (uploader) (1 → *) -->
+    <!-- route along top: exit right of User at y=0.3 → x=970 up to y=30 → across x=1760 → down to TaskEvidence top -->
+    <mxCell id="rel_user_evid" value="uploader" style="endArrow=open;endFill=0;endSize=10;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cls_user" target="cls_evid" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="970" y="106" />
+          <mxPoint x="970" y="20" />
+          <mxPoint x="1920" y="20" />
+          <mxPoint x="1920" y="40" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_user_evid_lms" value="1" style="resizable=0;html=1;align=right;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_evid">
+      <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_user_evid_lmt" value="*" style="resizable=0;html=1;align=left;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_user_evid">
+      <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CAPTION                                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <mxCell id="caption" value="Gambar 4.X Class Diagram Sistem PT Smart Home Inovasi." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;fontStyle=2;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="800" y="1650" width="1000" height="30" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>
