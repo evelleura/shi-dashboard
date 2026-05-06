@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-06T00:00:00.000Z" agent="Claude Code" version="26.0.0" type="device">
+  <diagram id="relasi_data" name="Relasi Antar Data">
+    <mxGraphModel dx="1400" dy="1000" grid="0" gridSize="10" guides="1" tooltips="1" connect="0" arrows="0" fold="0" page="1" pageScale="1" pageWidth="1560" pageHeight="1000" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="Perancangan Relasi Antar Data — Sistem Dashboard PT Smart Home Inovasi" style="text;html=1;align=center;fontSize=13;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="8" width="1480" height="24" as="geometry"/></mxCell>
+
+        <!-- Helper: table box style -->
+        <!-- PK row style: dark bg -->
+        <!-- FK row style: italic -->
+        <!-- Regular row: plain -->
+
+        <!-- ═══ TABLE: users ═══ -->
+        <mxCell id="t_usr" value="users" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="80" width="220" height="134" as="geometry"/></mxCell>
+        <mxCell id="t_usr_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_usr"><mxGeometry y="28" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_usr_2" value="     name : VARCHAR(100)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_usr"><mxGeometry y="48" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_usr_3" value="     email : VARCHAR(150) UNIQUE" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_usr"><mxGeometry y="68" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_usr_4" value="     role : VARCHAR(20)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_usr"><mxGeometry y="88" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_usr_5" value="     password_hash : TEXT" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_usr"><mxGeometry y="108" width="220" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: clients ═══ -->
+        <mxCell id="t_cli" value="clients" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="280" width="220" height="134" as="geometry"/></mxCell>
+        <mxCell id="t_cli_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_cli"><mxGeometry y="28" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_cli_2" value="     name : VARCHAR(100) NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_cli"><mxGeometry y="48" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_cli_3" value="     address : TEXT" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_cli"><mxGeometry y="68" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_cli_4" value="     phone : VARCHAR(20)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_cli"><mxGeometry y="88" width="220" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_cli_5" value="     email : VARCHAR(150)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_cli"><mxGeometry y="108" width="220" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: projects ═══ -->
+        <mxCell id="t_prj" value="projects" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="370" y="60" width="255" height="290" as="geometry"/></mxCell>
+        <mxCell id="t_prj_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="28" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_2" value="     name : VARCHAR(200) NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="48" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_3" value="FK  client_id → clients(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="68" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_4" value="     start_date : DATE NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="88" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_5" value="     end_date : DATE NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="108" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_6" value="     status : VARCHAR(20)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="128" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_7" value="     project_value : NUMERIC(15,2)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="148" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_8" value="     phase : VARCHAR(20)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="168" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_9" value="     survey_approved : BOOLEAN" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="188" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_10" value="FK  created_by → users(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="208" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_11" value="     created_at : TIMESTAMP DEFAULT NOW()" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="228" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_prj_12" value="     updated_at : TIMESTAMP" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_prj"><mxGeometry y="248" width="255" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: project_assignments ═══ -->
+        <mxCell id="t_pa" value="project_assignments" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="370" y="420" width="255" height="110" as="geometry"/></mxCell>
+        <mxCell id="t_pa_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_pa"><mxGeometry y="28" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_pa_2" value="FK  project_id → projects(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_pa"><mxGeometry y="48" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_pa_3" value="FK  user_id → users(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_pa"><mxGeometry y="68" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_pa_4" value="     assigned_at : TIMESTAMP" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_pa"><mxGeometry y="88" width="255" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: project_health ═══ -->
+        <mxCell id="t_ph" value="project_health" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="750" y="40" width="255" height="170" as="geometry"/></mxCell>
+        <mxCell id="t_ph_pk" value="PK/FK  project_id → projects(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=3;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_ph"><mxGeometry y="28" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_ph_2" value="     spi_value : NUMERIC(5,4)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_ph"><mxGeometry y="48" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_ph_3" value="     status : VARCHAR(10)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_ph"><mxGeometry y="68" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_ph_4" value="     deviation_percent : NUMERIC(5,2)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_ph"><mxGeometry y="88" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_ph_5" value="     total_tasks : INT DEFAULT 0" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_ph"><mxGeometry y="108" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_ph_6" value="     completed_tasks : INT DEFAULT 0" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_ph"><mxGeometry y="128" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_ph_7" value="     last_updated : TIMESTAMP" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_ph"><mxGeometry y="148" width="255" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: tasks ═══ -->
+        <mxCell id="t_tsk" value="tasks" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="750" y="280" width="255" height="210" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="28" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_2" value="FK  project_id → projects(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="48" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_3" value="     title : VARCHAR(200) NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="68" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_4" value="     description : TEXT" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="88" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_5" value="FK  assigned_to → users(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="108" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_6" value="     status : VARCHAR(30) NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="128" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_7" value="     due_date : DATE" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="148" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_8" value="     sort_order : INT DEFAULT 0" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="168" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_tsk_9" value="     created_at / updated_at : TS" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_tsk"><mxGeometry y="188" width="255" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: task_evidence ═══ -->
+        <mxCell id="t_te" value="task_evidence" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1120" y="240" width="255" height="190" as="geometry"/></mxCell>
+        <mxCell id="t_te_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="28" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_te_2" value="FK  task_id → tasks(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="48" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_te_3" value="     file_path : TEXT NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="68" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_te_4" value="     file_name : VARCHAR(255)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="88" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_te_5" value="     file_type : VARCHAR(50)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="108" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_te_6" value="FK  uploaded_by → users(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="128" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_te_7" value="     created_at : TIMESTAMP" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="148" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_te_8" value="     file_size : BIGINT" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_te"><mxGeometry y="168" width="255" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: materials ═══ -->
+        <mxCell id="t_mat" value="materials" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="750" y="570" width="255" height="170" as="geometry"/></mxCell>
+        <mxCell id="t_mat_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_mat"><mxGeometry y="28" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_mat_2" value="FK  project_id → projects(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_mat"><mxGeometry y="48" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_mat_3" value="     name : VARCHAR(200) NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_mat"><mxGeometry y="68" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_mat_4" value="     quantity : NUMERIC(10,2)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_mat"><mxGeometry y="88" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_mat_5" value="     unit : VARCHAR(30)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_mat"><mxGeometry y="108" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_mat_6" value="     unit_price : NUMERIC(15,2)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_mat"><mxGeometry y="128" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_mat_7" value="     created_at : TIMESTAMP" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_mat"><mxGeometry y="148" width="255" height="20" as="geometry"/></mxCell>
+
+        <!-- ═══ TABLE: budget_items ═══ -->
+        <mxCell id="t_bud" value="budget_items" style="swimlane;startSize=28;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="750" y="810" width="255" height="150" as="geometry"/></mxCell>
+        <mxCell id="t_bud_pk" value="PK  id : SERIAL NOT NULL" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=1;fillColor=#E8E8E8;strokeColor=#C0C0C0;strokeWidth=1;spacingLeft=4;" vertex="1" parent="t_bud"><mxGeometry y="28" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_bud_2" value="FK  project_id → projects(id)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontStyle=2;spacingLeft=4;" vertex="1" parent="t_bud"><mxGeometry y="48" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_bud_3" value="     description : TEXT" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_bud"><mxGeometry y="68" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_bud_4" value="     category : VARCHAR(50)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_bud"><mxGeometry y="88" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_bud_5" value="     amount : NUMERIC(15,2)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_bud"><mxGeometry y="108" width="255" height="20" as="geometry"/></mxCell>
+        <mxCell id="t_bud_6" value="     created_at : TIMESTAMP" style="text;html=1;align=left;fontSize=9;fontColor=#000000;spacingLeft=4;" vertex="1" parent="t_bud"><mxGeometry y="128" width="255" height="20" as="geometry"/></mxCell>
+
+        <!-- ════════════════ FK RELATIONSHIP ARROWS ════════════════ -->
+        <!-- clients (1) → projects (N)  [client_id] -->
+        <mxCell id="fk_cli_prj" value="1" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="t_cli" target="t_prj"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="347" as="sourcePoint"/><mxPoint x="370" y="205" as="targetPoint"/></mxGeometry></mxCell>
+
+        <!-- users (1) → projects (N)  [created_by] -->
+        <mxCell id="fk_usr_prj" value="1" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="t_usr" target="t_prj"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- users (1) → project_assignments (N)  [user_id] -->
+        <mxCell id="fk_usr_pa" value="" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_usr" target="t_pa"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="310" y="414"/><mxPoint x="310" y="475"/></Array></mxGeometry></mxCell>
+
+        <!-- projects (1) → project_assignments (N)  [project_id] -->
+        <mxCell id="fk_prj_pa" value="" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t_prj" target="t_pa"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- projects (1) → project_health (1)  [project_id] -->
+        <mxCell id="fk_prj_ph" value="" style="endArrow=ERone;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t_prj" target="t_ph"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- projects (1) → tasks (N)  [project_id] -->
+        <mxCell id="fk_prj_tsk" value="" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.55;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="t_prj" target="t_tsk"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- projects (1) → materials (N)  [project_id] -->
+        <mxCell id="fk_prj_mat" value="" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.9;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_prj" target="t_mat"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="680" y="321"/><mxPoint x="680" y="604"/></Array></mxGeometry></mxCell>
+
+        <!-- projects (1) → budget_items (N)  [project_id] -->
+        <mxCell id="fk_prj_bud" value="" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.95;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_prj" target="t_bud"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="692" y="332"/><mxPoint x="692" y="840"/></Array></mxGeometry></mxCell>
+
+        <!-- tasks (1) → task_evidence (N)  [task_id] -->
+        <mxCell id="fk_tsk_te" value="" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.4;entryDx=0;entryDy=0;" edge="1" parent="1" source="t_tsk" target="t_te"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- users (1) → tasks (N)  [assigned_to] -->
+        <mxCell id="fk_usr_tsk" value="" style="endArrow=ERmany;startArrow=ERone;strokeColor=#000000;strokeWidth=1.5;html=1;exitX=1;exitY=0.9;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_usr" target="t_tsk"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="315" y="193"/><mxPoint x="315" y="415"/><mxPoint x="700" y="415"/><mxPoint x="700" y="427"/></Array></mxGeometry></mxCell>
+
+        <!-- Legend -->
+        <mxCell id="leg_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8F8F8;strokeColor=#000000;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="1120" y="500" width="350" height="130" as="geometry"/></mxCell>
+        <mxCell id="leg_title" value="Keterangan" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1130" y="508" width="200" height="18" as="geometry"/></mxCell>
+        <mxCell id="leg1" value="PK  — Primary Key" style="text;html=1;align=left;fontSize=10;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1130" y="530" width="320" height="18" as="geometry"/></mxCell>
+        <mxCell id="leg2" value="FK  — Foreign Key (italic)" style="text;html=1;align=left;fontSize=10;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1130" y="550" width="320" height="18" as="geometry"/></mxCell>
+        <mxCell id="leg3" value="──►  Satu ke Satu (1:1)" style="text;html=1;align=left;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1130" y="570" width="320" height="18" as="geometry"/></mxCell>
+        <mxCell id="leg4" value="──⋈  Satu ke Banyak (1:N)" style="text;html=1;align=left;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1130" y="590" width="320" height="18" as="geometry"/></mxCell>
+        <mxCell id="leg5" value="ON DELETE CASCADE berlaku untuk semua FK" style="text;html=1;align=left;fontSize=9;fontColor=#555555;" vertex="1" parent="1"><mxGeometry x="1130" y="612" width="320" height="16" as="geometry"/></mxCell>
+
+        <!-- Caption -->
+        <mxCell id="caption" value="Gambar 4.X. Perancangan Relasi Antar Data (Physical ERD) Sistem Dashboard PT Smart Home Inovasi." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="972" width="1480" height="20" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
