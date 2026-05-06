@@ -91,7 +91,6 @@
         <mxCell id="c84" value="" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1" source="c6" target="c83"><mxGeometry relative="1" as="geometry"/></mxCell>
         <mxCell id="c85" value="file_path" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1520" y="1010" width="110" height="36" as="geometry"/></mxCell>
         <mxCell id="c86" value="" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1" source="c6" target="c85"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="c87" value="Gambar 4.18 Entity Relationship Diagram" style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="550" y="1210" width="600" height="24" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>

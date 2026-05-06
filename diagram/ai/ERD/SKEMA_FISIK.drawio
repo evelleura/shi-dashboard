@@ -5,7 +5,6 @@
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-        <mxCell id="title" value="Perancangan Fisik Basis Data — Sistem Dashboard PT Smart Home Inovasi" style="text;html=1;align=center;fontSize=13;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="8" width="1480" height="24" as="geometry"/></mxCell>
 
         <!-- ── Shared styles ─────────────────────────────────────────────── -->
         <!-- tbl_hdr: dark header, col_hdr: mid gray header, r_odd: white row, r_even: light gray row -->
@@ -118,8 +117,6 @@
         <mxCell id="r_mat_7" value="  7   |  notes                 |  TEXT            |  —        |  —" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8D8D8;strokeWidth=1;fontSize=9;fontColor=#000000;align=left;spacingLeft=4;" vertex="1" parent="1"><mxGeometry x="820" y="1098" width="700" height="22" as="geometry"/></mxCell>
         <mxCell id="r_mat_8" value="  8   |  created_at            |  TIMESTAMP       |  —        |  DEFAULT NOW()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F4F4F4;strokeColor=#D8D8D8;strokeWidth=1;fontSize=9;fontColor=#000000;align=left;spacingLeft=4;" vertex="1" parent="1"><mxGeometry x="820" y="1120" width="700" height="22" as="geometry"/></mxCell>
 
-        <!-- Caption -->
-        <mxCell id="caption" value="Gambar 4.X. Perancangan Fisik Basis Data — Spesifikasi Tabel Sistem Dashboard PT Smart Home Inovasi." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="1230" width="1480" height="20" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>

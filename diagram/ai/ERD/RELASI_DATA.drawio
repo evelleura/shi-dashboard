@@ -5,7 +5,6 @@
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-        <mxCell id="title" value="Perancangan Relasi Antar Data — Sistem Dashboard PT Smart Home Inovasi" style="text;html=1;align=center;fontSize=13;fontStyle=1;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="8" width="1480" height="24" as="geometry"/></mxCell>
 
         <!-- Helper: table box style -->
         <!-- PK row style: dark bg -->
@@ -142,8 +141,6 @@
         <mxCell id="leg4" value="──⋈  Satu ke Banyak (1:N)" style="text;html=1;align=left;fontSize=10;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="1130" y="590" width="320" height="18" as="geometry"/></mxCell>
         <mxCell id="leg5" value="ON DELETE CASCADE berlaku untuk semua FK" style="text;html=1;align=left;fontSize=9;fontColor=#555555;" vertex="1" parent="1"><mxGeometry x="1130" y="612" width="320" height="16" as="geometry"/></mxCell>
 
-        <!-- Caption -->
-        <mxCell id="caption" value="Gambar 4.X. Perancangan Relasi Antar Data (Physical ERD) Sistem Dashboard PT Smart Home Inovasi." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="972" width="1480" height="20" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>
