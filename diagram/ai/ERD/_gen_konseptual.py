@@ -1,6 +1,6 @@
 """Chen-notation ERD generator.
-Strict 3-row grid, diamonds at exact midpoints of entity pairs,
-attributes tight-clustered to outside corners, no edge crossings."""
+Strict 3-row grid. Entity-relationship-entity edges = orthogonal (right-angle).
+Entity-attribute edges = straight (diagonal OK)."""
 import os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ERD_KONSEPTUAL.drawio")
@@ -14,7 +14,11 @@ S_ATTR_PK = ("ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0000
              "strokeWidth=1;fontSize=10;fontStyle=4;fontColor=#000000;")
 S_REL = ("rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;"
          "strokeWidth=1.5;fontSize=11;fontColor=#000000;")
-S_LINE = "endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;"
+# Attribute edge: plain straight line
+S_LINE_ATTR = "endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;"
+# Relationship edge: orthogonal (right-angle siku)
+S_LINE_REL = ("endArrow=none;startArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;"
+              "strokeColor=#000000;strokeWidth=1;jettySize=auto;orthogonalLoop=1;")
 S_CAPTION = "text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;"
 
 cells = []
@@ -34,10 +38,24 @@ def oval(x, y, w, h, label, pk=False):
     return shape(x, y, w, h, label, S_ATTR_PK if pk else S_ATTR)
 def diamond(x, y, w, h, label): return shape(x, y, w, h, label, S_REL)
 
-def edge(src, tgt):
+def edge_attr(src, tgt):
+    """Entity to attribute: straight line, no constraint on routing."""
     i = gid()
-    cells.append(f'<mxCell id="{i}" value="" style="{S_LINE}" edge="1" parent="1" '
+    cells.append(f'<mxCell id="{i}" value="" style="{S_LINE_ATTR}" edge="1" parent="1" '
                  f'source="{src}" target="{tgt}"><mxGeometry relative="1" as="geometry"/></mxCell>')
+    return i
+
+def edge_rel(src, tgt, waypoints=None):
+    """Entity to relationship diamond: orthogonal route. Optional waypoints."""
+    i = gid()
+    geom = '<mxGeometry relative="1" as="geometry"'
+    if waypoints:
+        pts = "".join(f'<mxPoint x="{px}" y="{py}"/>' for px, py in waypoints)
+        geom += f'><Array as="points">{pts}</Array></mxGeometry>'
+    else:
+        geom += "/>"
+    cells.append(f'<mxCell id="{i}" value="" style="{S_LINE_REL}" edge="1" parent="1" '
+                 f'source="{src}" target="{tgt}">{geom}</mxCell>')
     return i
 
 def card_label(edge_id, text, near_source=True):
@@ -50,12 +68,12 @@ def card_label(edge_id, text, near_source=True):
                  f'<mxGeometry x="{x}" relative="1" as="geometry">'
                  f'<mxPoint as="offset"/></mxGeometry></mxCell>')
 
-def link_pair(ent_a, rel, ent_b, card_a, card_b):
-    e1 = edge(ent_a, rel); card_label(e1, card_a, near_source=True)
-    e2 = edge(rel, ent_b); card_label(e2, card_b, near_source=False)
+def link_pair(ent_a, rel, ent_b, card_a, card_b, wp_a=None, wp_b=None):
+    e1 = edge_rel(ent_a, rel, wp_a); card_label(e1, card_a, near_source=True)
+    e2 = edge_rel(rel, ent_b, wp_b); card_label(e2, card_b, near_source=False)
 
 # ============================================================
-# Layout — strict 3-row, 3-col grid
+# Layout — strict grid
 # ============================================================
 PAGE_W = 1700
 PAGE_H = 1280
@@ -63,7 +81,6 @@ ENT_W, ENT_H = 140, 50
 REL_W, REL_H = 130, 60
 ATTR_W, ATTR_H = 110, 36
 
-# Top-left coords (entity)
 KLIEN  = (300, 180)
 PROYEK = (1300, 180)
 USER   = (800, 560)
@@ -81,36 +98,50 @@ e_bukti  = rect(*BUKTI,  ENT_W, ENT_H, "tb_bukti")
 def dmd(cx, cy, label):
     return diamond(cx - REL_W // 2, cy - REL_H // 2, REL_W, REL_H, label)
 
+# ============================================================
+# Diamond positions (centers) for clean orthogonal routing
+# ============================================================
 # Entity centers: klien(370,205) proyek(1370,205) user(870,585)
 #                 eskal(370,945) tugas(870,945) bukti(1370,945)
-# Diamond positions = midpoints of connected pair centers
-r_klien_proy = dmd(870,  205, "memiliki")    # row1 horiz
-r_user_proy  = dmd(1120, 395, "mengelola")   # diag user-proyek
-r_proy_tug   = dmd(1120, 575, "memiliki")    # diag proyek-tugas
-r_user_tug   = dmd(870,  765, "mengerjakan") # vert user-tugas
-r_tug_bk     = dmd(1120, 945, "memiliki")    # row3 horiz tugas-bukti
-r_user_esk   = dmd(620,  765, "melaporkan")  # diag user-eskalasi
+r_klien_proy = dmd(870,  205, "memiliki")    # row1 horiz: klien-proyek y=205
+r_user_proy  = dmd(1370, 395, "mengelola")   # x=proyek, y=between (above user)
+r_proy_tug   = dmd(1100, 765, "memiliki")    # off-axis, route via waypoints
+r_user_tug   = dmd(870,  765, "mengerjakan") # vert: user-tugas x=870
+r_tug_bk     = dmd(1120, 1080, "memiliki")   # below row3 to free corridor
+r_user_esk   = dmd(140,  585, "melaporkan")  # far-left x, y=user
 
 # ============================================================
-# Relationship pairs with cardinality
+# Relationship pairs with cardinality + waypoints
 # ============================================================
-link_pair(e_klien,  r_klien_proy, e_proyek, "1", "N")
-link_pair(e_user,   r_user_proy,  e_proyek, "M", "N")
-link_pair(e_proyek, r_proy_tug,   e_tugas,  "1", "N")
-link_pair(e_user,   r_user_tug,   e_tugas,  "1", "N")
-link_pair(e_tugas,  r_tug_bk,     e_bukti,  "1", "N")
-link_pair(e_user,   r_user_esk,   e_eskal,  "1", "N")
+# 1. klien-proyek: pure horiz at y=205, no waypoints
+link_pair(e_klien, r_klien_proy, e_proyek, "1", "N")
+
+# 2. user-proyek: user goes UP-then-RIGHT, proyek-diamond vertical at x=1370
+link_pair(e_user, r_user_proy, e_proyek, "M", "N")
+
+# 3. proyek-tugas: waypoint forces route via top-left to avoid r_user_proy
+#    proyek -> (1100, 205) -> diamond(1100, 765)
+link_pair(e_proyek, r_proy_tug, e_tugas, "1", "N",
+          wp_a=[(1100, 205)])
+
+# 4. user-tugas: pure vert at x=870, no waypoints
+link_pair(e_user, r_user_tug, e_tugas, "1", "N")
+
+# 5. tugas-bukti: tugas down-then-right to diamond, bukti down-then-left to diamond
+link_pair(e_tugas, r_tug_bk, e_bukti, "1", "N")
+
+# 6. user-eskalasi: user-LEFT to diamond at y=585, eskalasi-UP to diamond
+link_pair(e_user, r_user_esk, e_eskal, "1", "N")
 
 # ============================================================
-# Attributes — tight clusters at outside corners
+# Attributes — clustered tight at outside corners
 # ============================================================
 def attach_attrs(entity, attrs):
-    """attrs = list of (x, y, label, is_pk)"""
     for x, y, label, pk in attrs:
         a = oval(x, y, ATTR_W, ATTR_H, label, pk=pk)
-        edge(entity, a)
+        edge_attr(entity, a)
 
-# tb_klien (NW arc, fan above-left of entity at 300,180)
+# tb_klien (NW)
 attach_attrs(e_klien, [
     (60,   90, "id_klien",   True),
     (200,  60, "nama_klien", False),
@@ -118,7 +149,7 @@ attach_attrs(e_klien, [
     (200, 120, "no_telp",    False),
 ])
 
-# tb_proyek (NE arc, fan above-right of entity at 1300,180)
+# tb_proyek (NE)
 attach_attrs(e_proyek, [
     (1240,  60, "id_proyek",     True),
     (1380,  30, "nama_proyek",   False),
@@ -128,7 +159,7 @@ attach_attrs(e_proyek, [
     (1380,  90, "project_value", False),
 ])
 
-# tb_user (above entity at 800,560), 4 attrs in arc
+# tb_user (above, top arc)
 attach_attrs(e_user, [
     (640, 480, "id_user", True),
     (760, 450, "name",    False),
@@ -136,31 +167,32 @@ attach_attrs(e_user, [
     (1000, 480, "role",   False),
 ])
 
-# tb_eskalasi (SW arc below-left of 300,920)
+# tb_eskalasi (SW)
 attach_attrs(e_eskal, [
     (60,  990, "id_eskalasi", True),
     (60, 1050, "id_proyek",   False),
     (60, 1110, "priority",    False),
-    (200, 1090, "status",     False),
+    (200, 1110, "status",     False),
 ])
 
-# tb_tugas (below entity at 800,920), 4 attrs
+# tb_tugas (below, bottom arc) — careful: avoid r_tug_bk at (1120, 1080)
+# attrs to LEFT-bottom and immediate below
 attach_attrs(e_tugas, [
     (640, 1010, "id_tugas",  True),
-    (760, 1050, "id_proyek", False),
-    (880, 1050, "status",    False),
-    (1000, 1010, "due_date", False),
+    (640, 1070, "id_proyek", False),
+    (760, 1130, "status",    False),
+    (880, 1130, "due_date",  False),
 ])
 
-# tb_bukti (SE arc below-right of 1300,920)
+# tb_bukti (SE)
 attach_attrs(e_bukti, [
-    (1240, 1010, "id_bukti",  True),
-    (1380, 1050, "id_tugas",  False),
-    (1520, 1010, "file_path", False),
+    (1450, 990,  "id_bukti",  True),
+    (1450, 1050, "id_tugas",  False),
+    (1570, 990,  "file_path", False),
 ])
 
 # Caption
-shape(550, 1210, 600, 24, "Gambar 4.18 Entity Relationship Diagram", S_CAPTION)
+shape(550, 1230, 600, 24, "Gambar 4.18 Entity Relationship Diagram", S_CAPTION)
 
 # ============================================================
 xml_cells = "\n        ".join(cells)
