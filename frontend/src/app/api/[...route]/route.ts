@@ -58,6 +58,8 @@ import * as dashboard from '@/lib/handlers/dashboard';
 import * as escalations from '@/lib/handlers/escalations';
 import * as activities from '@/lib/handlers/activities';
 import * as audit from '@/lib/handlers/audit';
+import * as materials from '@/lib/handlers/materials';
+import * as budget from '@/lib/handlers/budget';
 
 type Context = { params: Promise<{ route: string[] }> };
 
@@ -298,6 +300,34 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     }
     if (r1 === 'task' && r2 && r3 === 'timer' && r4 === 'stop' && method === 'POST') {
       return activities.stopTimer(request, r2);
+    }
+    return notFound();
+  }
+
+  // ── Materials ──────────────────────────────────────────────────────────────
+  if (r0 === 'materials') {
+    if (!r1) {
+      if (method === 'POST') return materials.createMaterial(request);
+      return methodNotAllowed();
+    }
+    if (r1 === 'project' && r2) return materials.getMaterialsByProject(request, r2);
+    if (r1 && !r2) {
+      if (method === 'PATCH')  return materials.updateMaterial(request, r1);
+      if (method === 'DELETE') return materials.deleteMaterial(request, r1);
+    }
+    return notFound();
+  }
+
+  // ── Budget ─────────────────────────────────────────────────────────────────
+  if (r0 === 'budget') {
+    if (!r1) {
+      if (method === 'POST') return budget.createBudgetItem(request);
+      return methodNotAllowed();
+    }
+    if (r1 === 'project' && r2) return budget.getBudgetByProject(request, r2);
+    if (r1 && !r2) {
+      if (method === 'PATCH')  return budget.updateBudgetItem(request, r1);
+      if (method === 'DELETE') return budget.deleteBudgetItem(request, r1);
     }
     return notFound();
   }

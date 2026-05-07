@@ -58,7 +58,9 @@
       "Bash(npm install *)",
       "Bash(node -e 'const bcrypt=require\\('\\\\''bcryptjs'\\\\''\\); bcrypt.compare\\('\\\\''password123'\\\\'', '\\\\''$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'\\\\''\\).then\\(r=>console.log\\('\\\\''match:'\\\\'',r\\)\\)')",
       "Bash(node -e 'const bcrypt=require\\('\\\\''bcrypt'\\\\''\\); bcrypt.compare\\('\\\\''password123'\\\\'', '\\\\''$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'\\\\''\\).then\\(r=>console.log\\('\\\\''match:'\\\\'',r\\)\\)')",
-      "Bash(node run_flow.js)"
+      "Bash(node run_flow.js)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"budi@shi.co.id\",\"password\":\"password123\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"rizky@shi.co.id\",\"password\":\"password123\"}')"
     ]
   },
   "spinnerTipsEnabled": false,
