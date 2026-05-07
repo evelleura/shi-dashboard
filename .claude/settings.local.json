@@ -50,7 +50,10 @@
       "mcp__chain-context-mcp__bulk_append",
       "Bash(python3 _gen_lengkap.py)",
       "Bash(python3 *)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(pip3 install *)",
+      "Bash(psql -U postgres -h 127.0.0.1 -p 5432 -d shi_dashboard_new -c \"\\\\dt\")",
+      "Bash(curl -s http://localhost:3000)"
     ]
   },
   "spinnerTipsEnabled": false,
