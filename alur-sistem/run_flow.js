@@ -143,7 +143,15 @@ async function main() {
   const mPage = await mCtx.newPage();
   const tPage = await tCtx.newPage();
 
-  // Pre-auth both pages (silently — no screenshot for login).
+  // ── STEP 0 – Login page (capture form before auth) ─────────────────────
+  console.log('\n[0] Halaman login');
+  await mPage.goto(`${BASE}/login`);
+  // Type credentials so the form is visible & filled in the screenshot
+  await mPage.locator('input[name="email"]').fill(MANAGER.email);
+  await mPage.locator('input[name="password"]').fill(MANAGER.password);
+  await ss(mPage, '00-login.png', 600);
+
+  // Now actually authenticate both contexts (no screenshots).
   console.log('\n[auth] Manager + Teknisi');
   const mToken = await login(mPage, MANAGER, '/dashboard');
   const tToken = await login(tPage, TECH, '/my-dashboard');
@@ -152,6 +160,23 @@ async function main() {
 
   // ── STEP 1 – Nambah client ─────────────────────────────────────────────
   console.log('\n[1] Nambah client');
+
+  // 1a — open the "Tambah Klien" popup, fill inputs, screenshot the form
+  await mPage.goto(`${BASE}/clients`);
+  await settle(mPage);
+  await mPage.getByRole('button', { name: /Tambah Klien/i }).first().click();
+  await mPage.waitForSelector('[role="dialog"]', { timeout: 5000 });
+  const cDlg = mPage.locator('[role="dialog"]');
+  await cDlg.locator('input[type="text"]').first().fill('PT Maju Jaya Sejahtera');
+  await cDlg.locator('input[type="email"]').fill('info@majujaya.co.id');
+  await cDlg.locator('input[placeholder*="62"]').fill('022-8812345');
+  await cDlg.locator('textarea').first().fill('Jl. Raya Cihanjuang No. 45, Bandung');
+  await ss(mPage, '01a-input-client.png', 600);
+
+  // close the popup (Escape) — actual creation goes via API for reliability
+  await mPage.keyboard.press('Escape');
+  await mPage.waitForTimeout(300);
+
   const client = await api('POST', '/api/clients', {
     name: 'PT Maju Jaya Sejahtera',
     address: 'Jl. Raya Cihanjuang No. 45, Bandung',
@@ -161,14 +186,32 @@ async function main() {
   }, mToken);
   console.log('  Client ID:', client.id);
 
-  await mPage.goto(`${BASE}/clients`);
-  await ss(mPage, '01-nambah-client.png', 800);
+  // 1b — list view with the new client row
+  await mPage.reload();
+  await ss(mPage, '01b-nambah-client.png', 800);
 
   // ── STEP 2 – Nambah proyek (fase survei) ───────────────────────────────
   console.log('\n[2] Nambah proyek (fase survei)');
   const startDate = new Date(); startDate.setDate(startDate.getDate() + 1);
   const endDate   = new Date(); endDate.setDate(endDate.getDate() + 30);
   const fmt = d => d.toISOString().split('T')[0];
+
+  // 2a — open "Proyek Baru" popup, fill inputs, screenshot the form
+  await mPage.goto(`${BASE}/projects`);
+  await settle(mPage);
+  await mPage.getByRole('button', { name: /Proyek Baru/i }).first().click();
+  await mPage.waitForSelector('[role="dialog"]', { timeout: 5000 });
+  const pDlg = mPage.locator('[role="dialog"]');
+  await pDlg.locator('input[name="name"]').fill('Instalasi Smart Home – PT Maju Jaya');
+  await pDlg.locator('select[name="client_id"]').selectOption({ label: 'PT Maju Jaya Sejahtera' });
+  await pDlg.locator('textarea[name="description"]').fill('Pemasangan sistem smart home lengkap 3 lantai: lighting, security, HVAC automation');
+  await pDlg.locator('input[name="start_date"]').fill(fmt(startDate));
+  await pDlg.locator('input[name="end_date"]').fill(fmt(endDate));
+  await pDlg.locator('input[name="project_value"]').fill('125000000');
+  await ss(mPage, '02a-input-proyek.png', 600);
+
+  await mPage.keyboard.press('Escape');
+  await mPage.waitForTimeout(300);
 
   const project = await api('POST', '/api/projects', {
     name: 'Instalasi Smart Home – PT Maju Jaya',
@@ -183,10 +226,13 @@ async function main() {
   }, mToken);
   console.log('  Project ID:', project.id);
 
-  await mPage.goto(`${BASE}/projects`);
-  await ss(mPage, '02-nambah-proyek.png', 800);
+  // 2b — list view with the new project
+  await mPage.reload();
+  await ss(mPage, '02b-nambah-proyek.png', 800);
 
   // ── STEP 3 – Harus survei + pilih teknisi ──────────────────────────────
+  // The "Teknisi yang Ditugaskan" widget aggregates from tasks-by-assignee,
+  // so we seed the very first survey task here to make the technician appear.
   console.log('\n[3] Survei phase + pilih teknisi');
   const users = await api('GET', '/api/users/technicians', null, mToken);
   const tech  = users.find(u => u.email === TECH.email);
@@ -196,13 +242,6 @@ async function main() {
     user_id: tech.id, role: 'technician',
   }, mToken);
 
-  // navigate, then a reload to pick up the freshly-saved assignment
-  await mPage.goto(`${BASE}/projects/${project.id}`);
-  await mPage.reload();
-  await ss(mPage, '03-pilih-teknisi.png', 1000);
-
-  // ── STEP 4 – Buat task detail survei ───────────────────────────────────
-  console.log('\n[4] Buat task survei');
   const surveyTasks = [
     'Survei kondisi bangunan & layout instalasi',
     'Identifikasi titik instalasi sensor & panel',
@@ -210,7 +249,38 @@ async function main() {
   ];
   const dueDate = new Date(); dueDate.setDate(dueDate.getDate() + 5);
   const tIds = [];
-  for (const name of surveyTasks) {
+
+  // Seed one task so widget displays the assigned technician
+  const firstSurveyTask = await api('POST', '/api/tasks', {
+    project_id: project.id,
+    name: surveyTasks[0],
+    description: `Detail survei: ${surveyTasks[0]}`,
+    assigned_to: tech.id,
+    status: 'to_do',
+    due_date: fmt(dueDate),
+    is_survey_task: true,
+  }, mToken);
+  tIds.push(firstSurveyTask.id);
+
+  await mPage.goto(`${BASE}/projects/${project.id}`);
+  await ss(mPage, '03-pilih-teknisi.png', 1000);
+
+  // ── STEP 4 – Buat task detail survei (sisanya) ─────────────────────────
+  console.log('\n[4] Buat sisa task survei');
+
+  // 4a — open "Tugas Baru" popup on project detail, fill inputs, screenshot
+  await mPage.getByRole('button', { name: /Tugas Baru/i }).first().click();
+  await mPage.waitForSelector('[role="dialog"]', { timeout: 5000 });
+  const tDlg = mPage.locator('[role="dialog"]');
+  await tDlg.locator('input[name="name"]').fill(surveyTasks[1]);
+  await tDlg.locator('textarea[name="description"]').fill(`Detail survei: ${surveyTasks[1]}`);
+  await tDlg.locator('input[name="due_date"]').fill(fmt(dueDate));
+  await ss(mPage, '04a-input-task-survei.png', 600);
+
+  await mPage.keyboard.press('Escape');
+  await mPage.waitForTimeout(300);
+
+  for (const name of surveyTasks.slice(1)) {
     const t = await api('POST', '/api/tasks', {
       project_id: project.id,
       name,
@@ -224,7 +294,7 @@ async function main() {
   }
 
   await mPage.reload();
-  await ss(mPage, '04-task-survei-dibuat.png', 1000);
+  await ss(mPage, '04b-task-survei-dibuat.png', 1000);
 
   // ── STEP 5 – Teknisi cek task real-time ────────────────────────────────
   console.log('\n[5] Teknisi cek task real-time');
