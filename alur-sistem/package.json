@@ -1,0 +1,16 @@
+{
+  "name": "alur-sistem",
+  "version": "1.0.0",
+  "main": "run_flow.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "pg": "^8.20.0",
+    "playwright": "^1.59.1"
+  }
+}

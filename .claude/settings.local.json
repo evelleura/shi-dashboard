@@ -53,7 +53,12 @@
       "Bash(git *)",
       "Bash(pip3 install *)",
       "Bash(psql -U postgres -h 127.0.0.1 -p 5432 -d shi_dashboard_new -c \"\\\\dt\")",
-      "Bash(curl -s http://localhost:3000)"
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node -e 'const bcrypt=require\\('\\\\''bcryptjs'\\\\''\\); bcrypt.compare\\('\\\\''password123'\\\\'', '\\\\''$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'\\\\''\\).then\\(r=>console.log\\('\\\\''match:'\\\\'',r\\)\\)')",
+      "Bash(node -e 'const bcrypt=require\\('\\\\''bcrypt'\\\\''\\); bcrypt.compare\\('\\\\''password123'\\\\'', '\\\\''$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6'\\\\''\\).then\\(r=>console.log\\('\\\\''match:'\\\\'',r\\)\\)')",
+      "Bash(node run_flow.js)"
     ]
   },
   "spinnerTipsEnabled": false,
