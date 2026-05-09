@@ -485,10 +485,7 @@ export default function ProjectDetailPage() {
                 tasks={project.tasks ?? []}
                 onStatusChange={handleStatusChange}
                 onTaskClick={setSelectedTask}
-                onTimerStart={handleTimerStart}
-                onTimerStop={handleTimerStop}
                 changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
-                timerLoadingId={timerLoadingId}
                 userRole={userRole}
               />
             ) : (
@@ -496,10 +493,7 @@ export default function ProjectDetailPage() {
                 tasks={project.tasks ?? []}
                 onStatusChange={handleStatusChange}
                 onTaskClick={setSelectedTask}
-                onTimerStart={handleTimerStart}
-                onTimerStop={handleTimerStop}
                 changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
-                timerLoadingId={timerLoadingId}
                 userRole={userRole}
               />
             )}

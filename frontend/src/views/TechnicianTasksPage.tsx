@@ -136,10 +136,7 @@ export default function TechnicianTasksPage() {
           tasks={data.recent_tasks}
           onStatusChange={handleStatusChange}
           onTaskClick={setSelectedTask}
-          onTimerStart={handleTimerStart}
-          onTimerStop={handleTimerStop}
           changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
-          timerLoadingId={timerLoading}
           userRole={user?.role}
         />
       ) : (
@@ -147,10 +144,7 @@ export default function TechnicianTasksPage() {
           tasks={data.recent_tasks}
           onStatusChange={handleStatusChange}
           onTaskClick={setSelectedTask}
-          onTimerStart={handleTimerStart}
-          onTimerStop={handleTimerStop}
           changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
-          timerLoadingId={timerLoading}
           showProject
           userRole={user?.role}
         />

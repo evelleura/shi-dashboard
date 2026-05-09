@@ -8,10 +8,7 @@ interface Props {
   task: Task;
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   onClick?: (task: Task) => void;
-  onTimerStart?: (taskId: number) => void;
-  onTimerStop?: (taskId: number) => void;
   isChanging?: boolean;
-  isTimerLoading?: boolean;
   userRole?: UserRole;
   columnId?: string;
   isBlocked?: boolean;
@@ -22,8 +19,8 @@ function formatDate(dateStr: string, lang: 'id' | 'en' = 'id'): string {
 }
 
 export default function KanbanCard({
-  task, onStatusChange, onClick, onTimerStart, onTimerStop,
-  isChanging, isTimerLoading, userRole, columnId, isBlocked,
+  task, onStatusChange, onClick,
+  isChanging, userRole, columnId, isBlocked,
 }: Props) {
   const { language } = useLanguage();
   const isTechnician = userRole === 'technician';
@@ -36,8 +33,6 @@ export default function KanbanCard({
     ? 'border-red-300 bg-red-50/30'
     : isOvertimeColumn
     ? 'border-amber-300 bg-amber-50/30'
-    : task.is_tracking
-    ? 'border-green-400 bg-green-50/20 dark:bg-green-900/20'
     : isReview
     ? 'border-purple-300 bg-purple-50/20 dark:bg-purple-900/20'
     : isOverdue
@@ -45,7 +40,6 @@ export default function KanbanCard({
     : 'border-gray-200 dark:border-gray-700';
 
   const timeSpent = Number(task.time_spent_seconds) || 0;
-  const showTimer = task.status !== 'done' && (onTimerStart || onTimerStop);
 
   return (
     <div
@@ -58,44 +52,11 @@ export default function KanbanCard({
         <p className="text-[10px] font-medium text-blue-500 uppercase tracking-wide mb-1 truncate">{task.project_name}</p>
       )}
 
-      {/* Title row: play button + name + evidence */}
+      {/* Title row: name + evidence */}
       <div className="flex items-start gap-2 mb-2">
-        {/* Play/Pause button */}
-        {showTimer && (
-          <button
-            onClick={(e) => { e.stopPropagation(); task.is_tracking ? onTimerStop?.(task.id) : onTimerStart?.(task.id); }}
-            disabled={isTimerLoading}
-            className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-              task.is_tracking
-                ? 'bg-amber-100 hover:bg-amber-200 text-amber-700'
-                : 'bg-green-100 hover:bg-green-200 text-green-700'
-            } disabled:opacity-50`}
-            aria-label={task.is_tracking ? (language === 'id' ? 'Hentikan timer' : 'Stop timer') : (language === 'id' ? 'Mulai timer' : 'Start timer')}
-          >
-            {isTimerLoading ? (
-              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current" />
-            ) : task.is_tracking ? (
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                <rect x="6" y="4" width="4" height="16" rx="1" />
-                <rect x="14" y="4" width="4" height="16" rx="1" />
-              </svg>
-            ) : (
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            )}
-          </button>
-        )}
-
         {/* Task name */}
         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onClick?.(task)}>
           <div className="flex items-center gap-1.5">
-            {task.is_tracking && (
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-              </span>
-            )}
             {isBlocked && (
               <span title={`${t('task.waiting_for', language)}: ${task.depends_on_name ?? (language === 'id' ? 'tugas prasyarat' : 'prerequisite task')}`}>
                 <svg className="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -142,7 +103,7 @@ export default function KanbanCard({
           <span className="text-xs text-gray-300 dark:text-gray-600">{t('task.no_due_date', language)}</span>
         )}
         {timeSpent > 0 && (
-          <span className={`text-[10px] flex items-center gap-0.5 ${task.is_tracking ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
+          <span className="text-[10px] flex items-center gap-0.5 text-gray-400">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

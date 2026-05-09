@@ -31,7 +31,6 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
     assigned_to: '',
     due_date: '',
     timeline_start: '',
-    timeline_end: '',
     notes: '',
     budget: '',
     is_survey_task: false,
@@ -48,14 +47,14 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
     setForm((prev) => ({ ...prev, [target.name]: value }));
   };
 
-  // Conflict check: only when technician + both dates are set
-  const canCheckConflicts = !!form.assigned_to && !!form.timeline_start && !!form.timeline_end;
+  // Conflict check: only when technician + both dates are set (end = due_date)
+  const canCheckConflicts = !!form.assigned_to && !!form.timeline_start && !!form.due_date;
   const { data: conflicts } = useQuery({
-    queryKey: ['conflicts', form.assigned_to, form.timeline_start, form.timeline_end],
+    queryKey: ['conflicts', form.assigned_to, form.timeline_start, form.due_date],
     queryFn: () => checkTechnicianConflicts({
       technician_id: parseInt(form.assigned_to),
       start: form.timeline_start,
-      end: form.timeline_end,
+      end: form.due_date,
     }),
     enabled: canCheckConflicts,
     staleTime: 1000 * 15,
@@ -64,7 +63,7 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
   // Reset conflict when inputs change
   useEffect(() => {
     if (!canCheckConflicts) return;
-  }, [form.assigned_to, form.timeline_start, form.timeline_end, canCheckConflicts]);
+  }, [form.assigned_to, form.timeline_start, form.due_date, canCheckConflicts]);
 
   // Close assignee dropdown on outside click
   useEffect(() => {
@@ -87,6 +86,13 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
       return;
     }
 
+    if (form.timeline_start && form.due_date && form.due_date < form.timeline_start) {
+      setError(language === 'id'
+        ? 'Tenggat waktu tidak boleh lebih awal dari mulai jadwal.'
+        : 'Deadline cannot be earlier than schedule start.');
+      return;
+    }
+
     try {
       await onSubmit({
         project_id: projectId,
@@ -95,7 +101,7 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
         assigned_to: form.assigned_to ? parseInt(form.assigned_to) : undefined,
         due_date: form.due_date || undefined,
         timeline_start: form.timeline_start || undefined,
-        timeline_end: form.timeline_end || undefined,
+        timeline_end: form.due_date || undefined,
         notes: form.notes.trim() || undefined,
         budget: form.budget ? parseFloat(form.budget) : undefined,
         is_survey_task: projectPhase === 'survey' ? true : form.is_survey_task,
@@ -213,20 +219,14 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
           )}
         </div>
         <div>
-          <label htmlFor="task-due" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.due_date', language)}</label>
-          <input id="task-due" type="date" name="due_date" value={form.due_date} onChange={handleChange} className={inputClass} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
           <label htmlFor="task-tl-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.timeline_start', language)}</label>
           <input id="task-tl-start" type="date" name="timeline_start" value={form.timeline_start} onChange={handleChange} className={inputClass} />
         </div>
-        <div>
-          <label htmlFor="task-tl-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.timeline_end', language)}</label>
-          <input id="task-tl-end" type="date" name="timeline_end" value={form.timeline_end} onChange={handleChange} min={form.timeline_start} className={inputClass} />
-        </div>
+      </div>
+
+      <div>
+        <label htmlFor="task-due" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.due_date', language)}</label>
+        <input id="task-due" type="date" name="due_date" value={form.due_date} onChange={handleChange} min={form.timeline_start || undefined} className={inputClass} />
       </div>
 
       {existingTasks.length > 0 && (

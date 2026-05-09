@@ -86,6 +86,7 @@ export interface Task {
   activity_count?: number;
   depends_on?: number | null;
   depends_on_name?: string | null;
+  status_changed_at?: string | null;
   created_by?: number;
   created_at?: string;
   updated_at?: string;
