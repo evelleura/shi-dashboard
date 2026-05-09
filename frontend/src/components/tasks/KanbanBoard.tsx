@@ -23,10 +23,7 @@ interface Props {
   tasks: Task[];
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   onTaskClick?: (task: Task) => void;
-  onTimerStart?: (taskId: number) => void;
-  onTimerStop?: (taskId: number) => void;
   changingTaskId?: number;
-  timerLoadingId?: number;
   userRole?: UserRole;
 }
 
@@ -99,16 +96,13 @@ function AlertIcon() {
 
 // Sortable wrapper for a single card
 function SortableCard({
-  task, onStatusChange, onTaskClick, onTimerStart, onTimerStop,
-  isChanging, isTimerLoading, userRole, columnId, isBlocked,
+  task, onStatusChange, onTaskClick,
+  isChanging, userRole, columnId, isBlocked,
 }: {
   task: Task;
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   onTaskClick?: (task: Task) => void;
-  onTimerStart?: (taskId: number) => void;
-  onTimerStop?: (taskId: number) => void;
   isChanging?: boolean;
-  isTimerLoading?: boolean;
   userRole?: UserRole;
   columnId?: string;
   isBlocked?: boolean;
@@ -131,10 +125,7 @@ function SortableCard({
         task={task}
         onStatusChange={onStatusChange}
         onClick={onTaskClick}
-        onTimerStart={onTimerStart}
-        onTimerStop={onTimerStop}
         isChanging={isChanging}
-        isTimerLoading={isTimerLoading}
         userRole={userRole}
         columnId={columnId}
         isBlocked={isBlocked}
@@ -143,7 +134,7 @@ function SortableCard({
   );
 }
 
-export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTimerStart, onTimerStop, changingTaskId, timerLoadingId, userRole }: Props) {
+export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changingTaskId, userRole }: Props) {
   const { language } = useLanguage();
   const COLUMNS = getColumns(language);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
@@ -250,10 +241,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onTime
                         task={task}
                         onStatusChange={onStatusChange}
                         onTaskClick={onTaskClick}
-                        onTimerStart={onTimerStart}
-                        onTimerStop={onTimerStop}
                         isChanging={changingTaskId === task.id}
-                        isTimerLoading={timerLoadingId === task.id}
                         userRole={userRole}
                         columnId={col.id}
                         isBlocked={task.depends_on != null && !doneTaskIds.has(task.depends_on)}

@@ -430,7 +430,7 @@ export async function changeTaskStatus(request: NextRequest, id: string) {
     }
 
     const result = await query(
-      'UPDATE tasks SET status=$1, updated_at=NOW() WHERE id=$2 RETURNING *',
+      'UPDATE tasks SET status=$1, updated_at=NOW(), status_changed_at=NOW() WHERE id=$2 RETURNING *',
       [status, taskId]
     );
     if (currentStatus !== status) {

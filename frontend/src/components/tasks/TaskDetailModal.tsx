@@ -1,18 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import Modal from '../ui/Modal';
 import TaskStatusSelect from './TaskStatusSelect';
 import EvidenceUploader from '../evidence/EvidenceUploader';
 import EvidenceGallery from '../evidence/EvidenceGallery';
 import ActivityFeed from './ActivityFeed';
-import TaskTimer from './TaskTimer';
-import { useStartTimer, useStopTimer } from '../../hooks/useActivities';
 import { useCreateEscalation } from '../../hooks/useEscalations';
 import { useUpdateTask } from '../../hooks/useTasks';
 import { useTechnicians } from '../../hooks/useDashboard';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../lib/i18n';
 import type { Task, TaskStatus, UserRole, EscalationPriority, User, UpdateTaskData } from '../../types';
+
+function formatDuration(ms: number): string {
+  const days = Math.floor(ms / 86400000);
+  const hours = Math.floor((ms % 86400000) / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
 
 type Section = 'details' | 'evidence' | 'activity';
 
@@ -22,7 +29,6 @@ interface EditForm {
   assigned_to: string;
   due_date: string;
   timeline_start: string;
-  timeline_end: string;
   notes: string;
   depends_on: string;
   budget: string;
@@ -72,8 +78,6 @@ export default function TaskDetailModal({
   const qc = useQueryClient();
   const [activeSection, setActiveSection] = useState<Section>('details');
 
-  const startTimerMutation = useStartTimer();
-  const stopTimerMutation = useStopTimer();
   const createEscalationMutation = useCreateEscalation();
   const updateTaskMutation = useUpdateTask();
 
@@ -89,7 +93,6 @@ export default function TaskDetailModal({
     assigned_to: '',
     due_date: '',
     timeline_start: '',
-    timeline_end: '',
     notes: '',
     depends_on: '',
     budget: '',
@@ -150,14 +153,6 @@ export default function TaskDetailModal({
     void qc.invalidateQueries({ queryKey: ['technician-dashboard'] });
   };
 
-  const handleStartTimer = () => {
-    startTimerMutation.mutate({ taskId: task.id, projectId: task.project_id });
-  };
-
-  const handleStopTimer = () => {
-    stopTimerMutation.mutate({ taskId: task.id, projectId: task.project_id });
-  };
-
   const handleEditStart = () => {
     setEditForm({
       name: task.name,
@@ -165,7 +160,6 @@ export default function TaskDetailModal({
       assigned_to: task.assigned_to != null ? String(task.assigned_to) : '',
       due_date: toDateInputValue(task.due_date),
       timeline_start: toDateInputValue(task.timeline_start),
-      timeline_end: toDateInputValue(task.timeline_end),
       notes: task.notes ?? '',
       depends_on: task.depends_on != null ? String(task.depends_on) : '',
       budget: task.budget != null && Number(task.budget) > 0 ? String(task.budget) : '',
@@ -185,13 +179,20 @@ export default function TaskDetailModal({
       return;
     }
 
+    if (editForm.timeline_start && editForm.due_date && editForm.due_date < editForm.timeline_start) {
+      setEditError(language === 'id'
+        ? 'Tenggat waktu tidak boleh lebih awal dari mulai jadwal.'
+        : 'Deadline cannot be earlier than schedule start.');
+      return;
+    }
+
     const data: UpdateTaskData = {
       name: editForm.name.trim(),
       description: editForm.description.trim() || undefined,
       assigned_to: editForm.assigned_to === '' ? null : parseInt(editForm.assigned_to, 10),
       due_date: editForm.due_date || undefined,
       timeline_start: editForm.timeline_start || undefined,
-      timeline_end: editForm.timeline_end || undefined,
+      timeline_end: editForm.due_date || undefined,
       notes: editForm.notes.trim() || undefined,
       depends_on: editForm.depends_on === '' ? null : parseInt(editForm.depends_on, 10),
       budget: editForm.budget === '' ? undefined : parseFloat(editForm.budget),
@@ -537,31 +538,17 @@ export default function TaskDetailModal({
           {activeSection === 'details' && (
             <div className="pt-3 space-y-3">
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('schedule.gantt', language)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('task.timeline_start', language)}</p>
                 {isEditing ? (
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-0.5">{t('task.timeline_start', language)}</label>
-                      <input
-                        type="date"
-                        value={editForm.timeline_start}
-                        onChange={(e) => setEditForm((f) => ({ ...f, timeline_start: e.target.value }))}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-0.5">{t('task.timeline_end', language)}</label>
-                      <input
-                        type="date"
-                        value={editForm.timeline_end}
-                        onChange={(e) => setEditForm((f) => ({ ...f, timeline_end: e.target.value }))}
-                        className={inputClass}
-                      />
-                    </div>
-                  </div>
+                  <input
+                    type="date"
+                    value={editForm.timeline_start}
+                    onChange={(e) => setEditForm((f) => ({ ...f, timeline_start: e.target.value }))}
+                    className={inputClass}
+                  />
                 ) : (
                   <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {task.timeline_start ? formatDate(task.timeline_start, language) : '?'} -- {task.timeline_end ? formatDate(task.timeline_end, language) : '?'}
+                    {task.timeline_start ? formatDate(task.timeline_start, language) : '?'} {task.due_date ? `-- ${formatDate(task.due_date, language)}` : ''}
                   </p>
                 )}
               </div>
@@ -600,13 +587,22 @@ export default function TaskDetailModal({
           {/* Activity tab */}
           {activeSection === 'activity' && (
             <div className="pt-3 space-y-4">
-              {/* Timer at top */}
-              <TaskTimer
-                task={task}
-                onStart={handleStartTimer}
-                onStop={handleStopTimer}
-                isLoading={startTimerMutation.isPending || stopTimerMutation.isPending}
-              />
+              {/* Activity duration */}
+              {task.status_changed_at && (
+                <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg px-3 py-2">
+                  <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {language === 'id' ? 'Durasi Status Saat Ini' : 'Current Status Duration'}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {formatDuration(Date.now() - new Date(task.status_changed_at).getTime())}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Activity feed */}
               <ActivityFeed taskId={task.id} />

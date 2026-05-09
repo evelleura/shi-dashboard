@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 import type { Task, TaskStatus, UserRole } from '../../types';
 import TaskStatusSelect from './TaskStatusSelect';
@@ -10,10 +10,7 @@ interface Props {
   tasks: Task[];
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   onTaskClick?: (task: Task) => void;
-  onTimerStart?: (taskId: number) => void;
-  onTimerStop?: (taskId: number) => void;
   changingTaskId?: number;
-  timerLoadingId?: number;
   showProject?: boolean;
   userRole?: UserRole;
 }
@@ -57,31 +54,14 @@ const AGE_BORDER: Record<RowAge, string> = {
   stale:  'border-l-4 border-l-gray-300',
 };
 
-function getElapsedSeconds(task: Task): number {
-  const base = Number(task.time_spent_seconds) || 0;
-  if (!task.is_tracking || !task.timer_started_at) return base;
-  const started = new Date(task.timer_started_at).getTime();
-  const diff = Math.max(0, Math.floor((Date.now() - started) / 1000));
-  return base + diff;
-}
-
-function LiveTime({ task }: { task: Task }) {
-  const [elapsed, setElapsed] = useState(() => getElapsedSeconds(task));
-
-  useEffect(() => {
-    setElapsed(getElapsedSeconds(task));
-    if (!task.is_tracking) return;
-    const iv = setInterval(() => setElapsed(getElapsedSeconds(task)), 1000);
-    return () => clearInterval(iv);
-  }, [task.is_tracking, task.timer_started_at, task.time_spent_seconds]);
-
-  if (elapsed === 0 && !task.is_tracking) {
+function TimeSpentDisplay({ task }: { task: Task }) {
+  const seconds = Number(task.time_spent_seconds) || 0;
+  if (seconds === 0) {
     return <span className="text-gray-300">--:--</span>;
   }
-
   return (
-    <span className={`font-mono text-xs ${task.is_tracking ? 'text-green-600 font-semibold' : 'text-gray-600 dark:text-gray-400'}`}>
-      {formatTimeSpent(elapsed)}
+    <span className="font-mono text-xs text-gray-600 dark:text-gray-400">
+      {formatTimeSpent(seconds)}
     </span>
   );
 }
@@ -96,8 +76,8 @@ const AGE_LEGEND: { key: RowAge; label: string; dot: string }[] = [
 const PAGE_SIZES = [10, 25, 50];
 
 export default function TaskTable({
-  tasks, onStatusChange, onTaskClick, onTimerStart, onTimerStop,
-  changingTaskId, timerLoadingId, showProject = false, userRole,
+  tasks, onStatusChange, onTaskClick,
+  changingTaskId, showProject = false, userRole,
 }: Props) {
   const { language } = useLanguage();
   const [sortKey, setSortKey] = useState<SortKey>('created_at');
@@ -219,8 +199,6 @@ export default function TaskTable({
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" role="table">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
-              {/* Timer column */}
-              <th className="px-2 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12" />
               <SortHeader label={t('task.name', language)} field="name" />
               {showProject && (
                 <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('project.title', language)}</th>
@@ -238,15 +216,12 @@ export default function TaskTable({
               const urgency = getTaskUrgency(task);
               const age = getTaskAge(task);
               const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
-              const isTimerLoading = timerLoadingId === task.id;
 
               // Urgency colors take priority, then age border
               const urgencyBg = urgency === 'over_deadline'
                 ? 'bg-red-50/50 hover:bg-red-50 dark:bg-red-900/20 dark:hover:bg-red-900/30'
                 : urgency === 'overtime'
                 ? 'bg-amber-50/50 hover:bg-amber-50 dark:bg-amber-900/20 dark:hover:bg-amber-900/30'
-                : task.is_tracking
-                ? 'bg-green-50/30 hover:bg-green-50 dark:bg-green-900/20 dark:hover:bg-green-900/30'
                 : task.status === 'review'
                 ? 'bg-purple-50/30 hover:bg-purple-50 dark:bg-purple-900/20 dark:hover:bg-purple-900/30'
                 : age === 'stale'
@@ -257,50 +232,9 @@ export default function TaskTable({
 
               return (
                 <tr key={task.id} className={`${urgencyBg} ${ageBorder} transition-colors`}>
-                  {/* Play/Pause button */}
-                  <td className="px-2 py-2 text-center" onClick={(e) => e.stopPropagation()}>
-                    {task.status !== 'done' && onTimerStart && onTimerStop ? (
-                      <button
-                        onClick={() => task.is_tracking ? onTimerStop(task.id) : onTimerStart(task.id)}
-                        disabled={isTimerLoading}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shrink-0 ${
-                          task.is_tracking
-                            ? 'bg-amber-100 hover:bg-amber-200 text-amber-700'
-                            : 'bg-green-100 hover:bg-green-200 text-green-700'
-                        } disabled:opacity-50`}
-                        aria-label={task.is_tracking ? (language === 'id' ? 'Hentikan timer' : 'Stop timer') : (language === 'id' ? 'Mulai timer' : 'Start timer')}
-                      >
-                        {isTimerLoading ? (
-                          <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-current" />
-                        ) : task.is_tracking ? (
-                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                            <rect x="6" y="4" width="4" height="16" rx="1" />
-                            <rect x="14" y="4" width="4" height="16" rx="1" />
-                          </svg>
-                        ) : (
-                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        )}
-                      </button>
-                    ) : task.status === 'done' ? (
-                      <span className="text-green-400" aria-label="Completed">
-                        <svg className="w-5 h-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </span>
-                    ) : null}
-                  </td>
-
                   {/* Task name */}
                   <td className="px-3 py-2.5 cursor-pointer" onClick={() => onTaskClick?.(task)}>
                     <div className="flex items-center gap-2">
-                      {task.is_tracking && (
-                        <span className="relative flex h-2 w-2 shrink-0">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-                        </span>
-                      )}
                       <div className="min-w-0">
                         <p className={`text-sm font-medium truncate ${age === 'stale' && !urgency ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>{task.name}</p>
                         {task.description && (
@@ -353,9 +287,9 @@ export default function TaskTable({
                     {task.estimated_hours ? `${task.estimated_hours}h` : '--'}
                   </td>
 
-                  {/* Time spent (live) */}
+                  {/* Time spent */}
                   <td className="px-3 py-2.5 cursor-pointer" onClick={() => onTaskClick?.(task)}>
-                    <LiveTime task={task} />
+                    <TimeSpentDisplay task={task} />
                   </td>
 
                   {/* Evidence count */}

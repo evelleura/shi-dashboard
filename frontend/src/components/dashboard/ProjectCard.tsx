@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { DashboardProject } from '../../types';
 import StatusBadge from '../ui/StatusBadge';
 import ProgressBar from '../ui/ProgressBar';
@@ -18,25 +19,36 @@ function formatDate(dateStr: string) {
 }
 
 export default function ProjectCard({ project }: Props) {
+  const router = useRouter();
   const borderClass = project.health_status ? borderColor[project.health_status] : 'border-l-gray-300';
   const taskProgress = project.total_tasks > 0
     ? Math.round((project.completed_tasks / project.total_tasks) * 100)
     : 0;
 
+  const goToProject = () => router.push(`/projects/${project.id}`);
+
   return (
-    <Link href={`/projects/${project.id}`}>
-      <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 border-l-4 ${borderClass} p-4 hover:shadow-md transition-shadow cursor-pointer`}>
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={goToProject}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToProject(); } }}
+      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 border-l-4 ${borderClass} p-4 hover:shadow-md transition-shadow cursor-pointer`}
+    >
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">{project.name}</h3>
-            {project.client_name && (
-              <a
-                href={project.client_id ? `/clients/${project.client_id}` : undefined}
-                onClick={(e) => { if (project.client_id) e.stopPropagation(); }}
+            {project.client_name && project.client_id && (
+              <Link
+                href={`/clients/${project.client_id}`}
+                onClick={(e) => e.stopPropagation()}
                 className="text-xs text-blue-500 hover:text-blue-700 hover:underline mt-0.5 block w-fit"
               >
                 {project.client_name}
-              </a>
+              </Link>
+            )}
+            {project.client_name && !project.client_id && (
+              <span className="text-xs text-gray-500 mt-0.5 block w-fit">{project.client_name}</span>
             )}
             <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
               {formatDate(project.start_date)} -- {formatDate(project.end_date)}
@@ -94,7 +106,6 @@ export default function ProjectCard({ project }: Props) {
             Rp {Number(project.project_value).toLocaleString('id-ID')}
           </p>
         )}
-      </div>
-    </Link>
+    </div>
   );
 }

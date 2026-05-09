@@ -24,11 +24,21 @@ CREATE TABLE IF NOT EXISTS clients (
   phone VARCHAR(50),
   email VARCHAR(255),
   notes TEXT,
+  latitude DECIMAL(10,7),
+  longitude DECIMAL(10,7),
+  photo_path VARCHAR(1000),
+  photo_name VARCHAR(500),
   created_by INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id)
 );
+
+-- Backfill columns for existing installs (idempotent)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,7);
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS longitude DECIMAL(10,7);
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS photo_path VARCHAR(1000);
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS photo_name VARCHAR(500);
 
 CREATE INDEX IF NOT EXISTS idx_clients_name ON clients(name);
 CREATE INDEX IF NOT EXISTS idx_clients_created_by ON clients(created_by);
@@ -103,14 +113,21 @@ CREATE TABLE IF NOT EXISTS tasks (
   time_spent_seconds INT DEFAULT 0,
   is_tracking BOOLEAN DEFAULT FALSE,
   estimated_hours DECIMAL(5,1),
+  depends_on INT,
+  status_changed_at TIMESTAMP DEFAULT NOW(),
   created_by INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
   FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (depends_on) REFERENCES tasks(id) ON DELETE SET NULL,
   FOREIGN KEY (created_by) REFERENCES users(id),
   CONSTRAINT task_status_check CHECK (status IN ('to_do', 'in_progress', 'working_on_it', 'review', 'done'))
 );
+
+-- Backfill columns for existing installs (idempotent)
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS depends_on INT REFERENCES tasks(id) ON DELETE SET NULL;
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS status_changed_at TIMESTAMP DEFAULT NOW();
 
 CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_assigned ON tasks(assigned_to);
