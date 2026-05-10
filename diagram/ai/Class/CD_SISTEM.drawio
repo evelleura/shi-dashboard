@@ -695,19 +695,19 @@
         <mxCell id="cls_dailyreport_m2" value="+ getByDate(date): DailyReport[]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_dailyreport">
           <mxGeometry y="238" width="270" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="cls_esc_update" value="EscalationUpdate" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+        <mxCell id="cls_esc_update" value="DailyReport" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
           <mxGeometry x="1660" y="700" width="280" height="178" as="geometry" />
         </mxCell>
         <mxCell id="cls_esc_update_a0" value="- id: int {PK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
           <mxGeometry y="28" width="280" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="cls_esc_update_a1" value="- escalation_id: int {FK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
+        <mxCell id="cls_esc_update_a1" value="- project_id: int {FK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
           <mxGeometry y="48" width="280" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="cls_esc_update_a2" value="- author_id: int {FK}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
+        <mxCell id="cls_esc_update_a2" value="- task_id: int {FK, nullable}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
           <mxGeometry y="68" width="280" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="cls_esc_update_a3" value="- message: string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
+        <mxCell id="cls_esc_update_a3" value="- progress_percentage: decimal" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
           <mxGeometry y="88" width="280" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_esc_update_a4" value="- created_at: timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
@@ -716,10 +716,10 @@
         <mxCell id="cls_esc_update_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;strokeColor=#000000;" vertex="1" parent="cls_esc_update">
           <mxGeometry y="128" width="280" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="cls_esc_update_m0" value="+ post(message): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
+        <mxCell id="cls_esc_update_m0" value="+ submit(report): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
           <mxGeometry y="138" width="280" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="cls_esc_update_m1" value="+ getThread(): EscalationUpdate[]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
+        <mxCell id="cls_esc_update_m1" value="+ listByProject(pid): DailyReport[]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontColor=#000000;" vertex="1" parent="cls_esc_update">
           <mxGeometry y="158" width="280" height="20" as="geometry" />
         </mxCell>
         <mxCell id="cls_technician" value="Technician" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;swimlaneFillColor=#FFFFFF;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
@@ -1019,7 +1019,7 @@
         <mxCell id="rel_project_dailyreport_lmt" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_project_dailyreport">
           <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel_esc_update" style="endArrow=diamondThin;endFill=1;endSize=14;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.4;exitDx=0;exitDy=0;entryX=1;entryY=0.4;entryDx=0;entryDy=0;" edge="1" parent="1" source="cls_esc_update" target="cls_escalation">
+        <mxCell id="rel_esc_update" style="endArrow=diamondThin;endFill=1;endSize=14;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;exitX=0;exitY=0.4;exitDx=0;exitDy=0;entryX=1;entryY=0.4;entryDx=0;entryDy=0;" edge="1" parent="1" source="cls_esc_update" target="cls_project">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="rel_esc_update_lms" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#000000;" connectable="0" vertex="1" parent="rel_esc_update">

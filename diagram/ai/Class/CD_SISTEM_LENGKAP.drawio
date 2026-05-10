@@ -567,30 +567,45 @@
       <mxGeometry x="0" y="250" width="280" height="16" as="geometry" />
     </mxCell>
 
-    <!-- EscalationUpdate: x=2140, y=420, w=280, h=158 -->
-    <mxCell id="cls_escupd" value="EscalationUpdate" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
-      <mxGeometry x="2140" y="420" width="280" height="158" as="geometry" />
+    <!-- DailyReport: x=2140, y=420, w=280, h=218 (replaced EscalationUpdate, schema-aligned) -->
+    <mxCell id="cls_daily" value="DailyReport" style="swimlane;startSize=26;fontStyle=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="2140" y="420" width="280" height="218" as="geometry" />
     </mxCell>
-    <mxCell id="cls_escupd_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_escupd">
-      <mxGeometry x="0" y="90" width="280" height="8" as="geometry" />
+    <mxCell id="cls_daily_sep" value="" style="line;strokeColor=#000000;fillColor=none;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="138" width="280" height="8" as="geometry" />
     </mxCell>
-    <mxCell id="cls_escupd_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+    <mxCell id="cls_daily_a0" value="- id: int {PK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
       <mxGeometry x="0" y="26" width="280" height="16" as="geometry" />
     </mxCell>
-    <mxCell id="cls_escupd_a1" value="- escalation_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+    <mxCell id="cls_daily_a1" value="- project_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
       <mxGeometry x="0" y="42" width="280" height="16" as="geometry" />
     </mxCell>
-    <mxCell id="cls_escupd_a2" value="- user_id: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+    <mxCell id="cls_daily_a2" value="- task_id: int {FK, nullable}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
       <mxGeometry x="0" y="58" width="280" height="16" as="geometry" />
     </mxCell>
-    <mxCell id="cls_escupd_a3" value="- message: string" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
+    <mxCell id="cls_daily_a3" value="- report_date: date" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
       <mxGeometry x="0" y="74" width="280" height="16" as="geometry" />
     </mxCell>
-    <mxCell id="cls_escupd_m0" value="+ addUpdate(): void" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
-      <mxGeometry x="0" y="98" width="280" height="16" as="geometry" />
+    <mxCell id="cls_daily_a4" value="- progress_percentage: decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="90" width="280" height="16" as="geometry" />
     </mxCell>
-    <mxCell id="cls_escupd_m1" value="+ getHistory(): EscalationUpdate[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_escupd">
-      <mxGeometry x="0" y="114" width="280" height="16" as="geometry" />
+    <mxCell id="cls_daily_a5" value="- constraints: text" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="106" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_daily_a6" value="- created_by: int {FK}" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="122" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_daily_m0" value="+ submit(report): DailyReport" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="146" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_daily_m1" value="+ getProgress(): decimal" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="162" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_daily_m2" value="+ listByProject(pid): DailyReport[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="178" width="280" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="cls_daily_m3" value="+ findByTask(tid): DailyReport[]" style="text;align=left;spacingLeft=6;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=10;" vertex="1" parent="cls_daily">
+      <mxGeometry x="0" y="194" width="280" height="16" as="geometry" />
     </mxCell>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -816,14 +831,25 @@
       <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
     </mxCell>
 
-    <!-- KOMPOSISI: Escalation → EscalationUpdate (1 → *) solid diamond at source -->
-    <mxCell id="rel_esc_escupd" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cls_esc" target="cls_escupd" parent="1">
+    <!-- KOMPOSISI: Project → DailyReport (1 → *) solid diamond at source -->
+    <mxCell id="rel_proj_daily" value="" style="endArrow=none;startArrow=diamondThin;startFill=1;startSize=14;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" source="cls_proj" target="cls_daily" parent="1">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
-    <mxCell id="rel_esc_escupd_lms" value="1" style="resizable=0;html=1;align=center;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_esc_escupd">
+    <mxCell id="rel_proj_daily_lms" value="1" style="resizable=0;html=1;align=center;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_daily">
       <mxGeometry x="-0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
     </mxCell>
-    <mxCell id="rel_esc_escupd_lmt" value="*" style="resizable=0;html=1;align=center;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_esc_escupd">
+    <mxCell id="rel_proj_daily_lmt" value="*" style="resizable=0;html=1;align=center;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_proj_daily">
+      <mxGeometry x="0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+
+    <!-- ASOSIASI: Task -> DailyReport (optional 1 -> *) -->
+    <mxCell id="rel_task_daily" value="optional" style="endArrow=open;endFill=0;endSize=10;startArrow=none;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=1;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" edge="1" source="cls_task" target="cls_daily" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_task_daily_lms" value="0..1" style="resizable=0;html=1;align=center;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_daily">
+      <mxGeometry x="-0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+    </mxCell>
+    <mxCell id="rel_task_daily_lmt" value="*" style="resizable=0;html=1;align=center;verticalAlign=top;labelBackgroundColor=none;fontSize=10;strokeColor=none;fillColor=none;fontColor=#000000;" connectable="0" vertex="1" parent="rel_task_daily">
       <mxGeometry x="0.7" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
     </mxCell>
 
