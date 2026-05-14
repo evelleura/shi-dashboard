@@ -1,53 +1,18 @@
 import { useState } from 'react';
 import { useTechnicianDashboard } from '../hooks/useDashboard';
 import { useChangeTaskStatus } from '../hooks/useTasks';
-import { useStartTimer, useStopTimer } from '../hooks/useActivities';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
-import { t, type Language } from '../lib/i18n';
+import { t } from '../lib/i18n';
 import KanbanBoard from '../components/tasks/KanbanBoard';
 import TaskTable from '../components/tasks/TaskTable';
 import TaskDetailModal from '../components/tasks/TaskDetailModal';
 import ViewToggle from '../components/tasks/ViewToggle';
-import { formatTimeSpent } from '../components/tasks/TaskTimer';
 import type { Task, TaskStatus } from '../types';
-
-function ActiveTaskBanner({ task, onStop, isLoading, language }: { task: Task; onStop: () => void; isLoading: boolean; language: Language }) {
-  const id = language === 'id';
-  return (
-    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-3">
-      <span className="relative flex h-3 w-3 shrink-0">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
-      </span>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-green-600 dark:text-green-400 font-medium">
-          {id ? 'Sedang dikerjakan' : 'Currently working on'}
-        </p>
-        <p className="text-sm font-semibold text-green-900 dark:text-green-100 truncate">{task.name}</p>
-        {task.project_name && <p className="text-xs text-green-600 dark:text-green-400">{task.project_name}</p>}
-      </div>
-      <p className="text-lg font-mono font-bold text-green-700 dark:text-green-400">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
-      <button
-        onClick={onStop}
-        disabled={isLoading}
-        className="px-3 py-1.5 bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
-      >
-        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-          <rect x="6" y="4" width="4" height="16" rx="1" />
-          <rect x="14" y="4" width="4" height="16" rx="1" />
-        </svg>
-        {t('action.stop', language)}
-      </button>
-    </div>
-  );
-}
 
 export default function TechnicianTasksPage() {
   const { data, isLoading, isError, refetch } = useTechnicianDashboard();
   const changeStatus = useChangeTaskStatus();
-  const startTimer = useStartTimer();
-  const stopTimer = useStopTimer();
   const { user } = useAuth();
   const { language } = useLanguage();
   const id = language === 'id';
@@ -79,53 +44,35 @@ export default function TechnicianTasksPage() {
     }
   };
 
-  const activeTask = data.recent_tasks.find((t) => t.is_tracking);
+  const todayStr = new Date().toDateString();
+  const todayDoneTasks = data.recent_tasks.filter(
+    (t) => t.status === 'done' && t.updated_at && new Date(t.updated_at).toDateString() === todayStr
+  );
+  const activeTasks = data.recent_tasks.filter((t) => t.status !== 'done');
 
-  const handleTimerStart = (taskId: number) => {
-    const task = data.recent_tasks.find((x) => x.id === taskId);
-    if (task) startTimer.mutate({ taskId, projectId: task.project_id });
-  };
-
-  const handleTimerStop = (taskId: number) => {
-    const task = data.recent_tasks.find((x) => x.id === taskId);
-    if (task) stopTimer.mutate({ taskId, projectId: task.project_id });
-  };
-
-  const timerLoading = startTimer.isPending ? startTimer.variables?.taskId : stopTimer.isPending ? stopTimer.variables?.taskId : undefined;
-
-  const taskCount = data.recent_tasks.length;
+  const taskCount = activeTasks.length;
 
   return (
     <div className="space-y-4">
-      {/* Currently Working On banner */}
-      {activeTask && (
-        <ActiveTaskBanner
-          task={activeTask}
-          onStop={() => handleTimerStop(activeTask.id)}
-          isLoading={!!timerLoading}
-          language={language}
-        />
-      )}
-
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('nav.my_tasks', language)}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {id
-              ? `${taskCount} tugas ditugaskan kepadamu`
-              : `${taskCount} task${taskCount !== 1 ? 's' : ''} assigned to you`}
+              ? `${taskCount} tugas aktif ditugaskan kepadamu`
+              : `${taskCount} active task${taskCount !== 1 ? 's' : ''} assigned to you`}
           </p>
         </div>
         <ViewToggle view={taskView} onChange={setTaskView} />
       </div>
 
-      {data.recent_tasks.length === 0 ? (
+      {activeTasks.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
           <svg className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
           <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            {id ? 'Belum ada tugas yang ditugaskan kepadamu.' : 'No tasks assigned to you yet.'}
+            {id ? 'Belum ada tugas aktif yang ditugaskan kepadamu.' : 'No active tasks assigned to you yet.'}
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
             {id ? 'Tugas akan muncul di sini setelah manager menugaskannya.' : 'Tasks will appear here once your manager assigns them.'}
@@ -133,7 +80,7 @@ export default function TechnicianTasksPage() {
         </div>
       ) : taskView === 'kanban' ? (
         <KanbanBoard
-          tasks={data.recent_tasks}
+          tasks={activeTasks}
           onStatusChange={handleStatusChange}
           onTaskClick={setSelectedTask}
           changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
@@ -141,13 +88,54 @@ export default function TechnicianTasksPage() {
         />
       ) : (
         <TaskTable
-          tasks={data.recent_tasks}
+          tasks={activeTasks}
           onStatusChange={handleStatusChange}
           onTaskClick={setSelectedTask}
           changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
           showProject
           userRole={user?.role}
         />
+      )}
+
+      {/* Tugas Selesai Hari Ini */}
+      {todayDoneTasks.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {id ? 'Tugas Selesai Hari Ini' : 'Tasks Completed Today'}
+            </h2>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+              {todayDoneTasks.length}
+            </span>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-green-200 dark:border-green-800 overflow-hidden">
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {todayDoneTasks.map((task) => (
+                <button
+                  key={task.id}
+                  onClick={() => setSelectedTask(task)}
+                  className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-green-50/50 dark:hover:bg-green-900/10 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400 line-through truncate">{task.name}</p>
+                    {task.project_name && (
+                      <p className="text-xs text-gray-400 truncate">{task.project_name}</p>
+                    )}
+                  </div>
+                  {task.due_date && (
+                    <span className="text-xs text-gray-400 shrink-0 hidden sm:block">{task.due_date.split('T')[0]}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
 
       <TaskDetailModal

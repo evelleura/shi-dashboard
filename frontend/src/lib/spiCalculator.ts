@@ -6,7 +6,6 @@ export interface ProjectHealth {
   project_id: number;
   spi_value: number;
   status: HealthStatus;
-  deviation_percent: number;
   actual_progress: number;
   planned_progress: number;
   total_tasks: number;
@@ -140,19 +139,17 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
     ? Math.round((actualProgress / plannedValue) * 10000) / 10000
     : 1;
 
-  const deviationPercent = Math.round((actualProgress - plannedValue) * 100) / 100;
   const status = categorizeHealth(spiValue);
 
   const upsertResult = await query<ProjectHealth>(
     `INSERT INTO project_health
-      (project_id, spi_value, status, deviation_percent, actual_progress, planned_progress,
+      (project_id, spi_value, status, actual_progress, planned_progress,
        total_tasks, completed_tasks, working_tasks, overtime_tasks, overdue_tasks, last_updated)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
      ON CONFLICT (project_id)
      DO UPDATE SET
        spi_value = EXCLUDED.spi_value,
        status = EXCLUDED.status,
-       deviation_percent = EXCLUDED.deviation_percent,
        actual_progress = EXCLUDED.actual_progress,
        planned_progress = EXCLUDED.planned_progress,
        total_tasks = EXCLUDED.total_tasks,
@@ -166,7 +163,6 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
       projectId,
       spiValue,
       status,
-      deviationPercent,
       Math.round(actualProgress * 100) / 100,
       plannedValue,
       taskCounts.total,

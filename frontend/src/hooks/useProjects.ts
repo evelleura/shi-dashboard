@@ -126,7 +126,7 @@ export function useApproveSurvey() {
     onSuccess: (_data, projectId) => {
       void qc.invalidateQueries({ queryKey: PROJECT_KEYS.detail(projectId) });
       void qc.invalidateQueries({ queryKey: PROJECT_KEYS.all });
-      toast('Survei disetujui, proyek masuk fase eksekusi');
+      toast('Survei disetujui, proyek masuk fase proyek');
     },
     onError: () => { toast('Gagal menyetujui survei', 'error'); },
   });

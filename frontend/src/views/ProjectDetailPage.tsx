@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useProject, useProjectTechnicians, useApproveSurvey, useRejectSurvey } from '../hooks/useProjects';
-import { useChangeTaskStatus, useCreateTask } from '../hooks/useTasks';
-import { useStartTimer, useStopTimer } from '../hooks/useActivities';
+import { useChangeTaskStatus, useCreateTask, useSwapTaskOrder } from '../hooks/useTasks';
 import { useTechnicianList } from '../hooks/useUsers';
 import StatusBadge from '../components/ui/StatusBadge';
 import ProgressBar from '../components/ui/ProgressBar';
@@ -15,7 +14,6 @@ import ViewToggle from '../components/tasks/ViewToggle';
 import EarnedValueChart from '../components/charts/EarnedValueChart';
 import EvidenceGallery from '../components/evidence/EvidenceGallery';
 import EvidenceUploader from '../components/evidence/EvidenceUploader';
-import { formatTimeSpent } from '../components/tasks/TaskTimer';
 import EntityActivityTimeline from '../components/ui/EntityActivityTimeline';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
@@ -26,34 +24,6 @@ type TabId = 'tasks' | 'evidence' | 'charts' | 'history';
 
 function formatDate(d: string, locale: string) {
   return new Date(d).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-function ActiveTaskBanner({ task, onStop, isLoading, language }: { task: Task; onStop: () => void; isLoading: boolean; language: string }) {
-  return (
-    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-3">
-      <span className="relative flex h-3 w-3 shrink-0">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
-      </span>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-green-600 dark:text-green-400 font-medium">{t('project.currently_working', language as Parameters<typeof t>[1])}</p>
-        <p className="text-sm font-semibold text-green-900 dark:text-green-100 truncate">{task.name}</p>
-      </div>
-      <p className="text-lg font-mono font-bold text-green-700 dark:text-green-400">{formatTimeSpent(Number(task.time_spent_seconds) || 0)}</p>
-      <button
-        onClick={onStop}
-        disabled={isLoading}
-        className="px-3 py-1.5 bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
-        aria-label="Stop timer"
-      >
-        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-          <rect x="6" y="4" width="4" height="16" rx="1" />
-          <rect x="14" y="4" width="4" height="16" rx="1" />
-        </svg>
-        {t('project.stop', language as Parameters<typeof t>[1])}
-      </button>
-    </div>
-  );
 }
 
 export default function ProjectDetailPage() {
@@ -71,8 +41,7 @@ export default function ProjectDetailPage() {
   const { user } = useAuth();
   const changeStatus = useChangeTaskStatus();
   const createTask = useCreateTask();
-  const startTimer = useStartTimer();
-  const stopTimer = useStopTimer();
+  const swapOrder = useSwapTaskOrder();
 
   const approveSurveyMutation = useApproveSurvey();
   const rejectSurveyMutation = useRejectSurvey();
@@ -115,24 +84,6 @@ export default function ProjectDetailPage() {
     setShowTaskForm(false);
   };
 
-  // Timer handlers (same pattern as TechnicianTasksPage)
-  const handleTimerStart = (taskId: number) => {
-    startTimer.mutate({ taskId, projectId });
-  };
-
-  const handleTimerStop = (taskId: number) => {
-    stopTimer.mutate({ taskId, projectId });
-  };
-
-  const timerLoadingId = startTimer.isPending
-    ? startTimer.variables?.taskId
-    : stopTimer.isPending
-    ? stopTimer.variables?.taskId
-    : undefined;
-
-  // Find actively tracked task for the banner
-  const activeTask = (project.tasks ?? []).find((t) => t.is_tracking);
-
   const tabs: { id: TabId; label: string; count?: number }[] = [
     { id: 'tasks', label: t('project.tab_tasks', language), count: project.tasks?.length ?? 0 },
     { id: 'evidence', label: t('project.tab_evidence', language) },
@@ -142,11 +93,6 @@ export default function ProjectDetailPage() {
 
   const metrics = [
     { label: t('project.metric_spi', language), value: project.health?.spi_value != null ? Number(project.health.spi_value).toFixed(3) : '--', color: 'text-blue-600' },
-    {
-      label: t('project.metric_deviation', language),
-      value: project.health?.deviation_percent != null ? `${project.health.deviation_percent >= 0 ? '+' : ''}${Number(project.health.deviation_percent).toFixed(1)}%` : '--',
-      color: (project.health?.deviation_percent ?? 0) >= 0 ? 'text-green-600' : 'text-red-600',
-    },
     { label: t('project.metric_tasks_done', language), value: `${project.health?.completed_tasks ?? 0}/${project.health?.total_tasks ?? 0}`, color: 'text-gray-700' },
     { label: t('project.metric_overtime', language), value: project.health?.overtime_tasks ?? 0, color: (project.health?.overtime_tasks ?? 0) > 0 ? 'text-amber-600' : 'text-gray-600' },
     { label: t('project.metric_overdue', language), value: project.health?.overdue_tasks ?? 0, color: (project.health?.overdue_tasks ?? 0) > 0 ? 'text-orange-600' : 'text-gray-600' },
@@ -162,10 +108,13 @@ export default function ProjectDetailPage() {
       <div>
         <button
           onClick={() => router.back()}
-          className="text-sm text-blue-600 hover:underline mb-3 flex items-center gap-1"
+          className="inline-flex items-center gap-1.5 mb-4 text-sm font-medium px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors group"
           aria-label={t('action.back', language)}
         >
-          &larr; {t('action.back', language)}
+          <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          {t('action.back', language)}
         </button>
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -250,7 +199,7 @@ export default function ProjectDetailPage() {
                       <div className="mt-2">
                         <p className="text-xs text-amber-700 dark:text-amber-300 mb-1">
                           {id ? `Tugas survei: ${surveyDone}/${surveyTotal} selesai` : `Survey tasks: ${surveyDone}/${surveyTotal} done`}
-                          {allDone && <span className="ml-2 text-green-600 dark:text-green-400 font-semibold">{id ? '✓ Semua selesai' : '✓ All done'}</span>}
+                          {allDone && <span className="ml-2 text-green-600 dark:text-green-400 font-semibold">{id ? 'Semua selesai' : 'All done'}</span>}
                         </p>
                         <div className="h-1.5 bg-amber-200 dark:bg-amber-800 rounded-full overflow-hidden w-48">
                           <div
@@ -459,16 +408,6 @@ export default function ProjectDetailPage() {
       <div role="tabpanel">
         {activeTab === 'tasks' && (
           <div className="space-y-4">
-            {/* Active task banner */}
-            {activeTask && (
-              <ActiveTaskBanner
-                task={activeTask}
-                onStop={() => handleTimerStop(activeTask.id)}
-                isLoading={!!timerLoadingId}
-                language={language}
-              />
-            )}
-
             <div className="flex items-center justify-between">
               <ViewToggle view={taskView} onChange={setTaskView} />
               {isManager && (
@@ -495,6 +434,8 @@ export default function ProjectDetailPage() {
                 onTaskClick={setSelectedTask}
                 changingTaskId={changeStatus.isPending ? (changeStatus.variables?.id ?? undefined) : undefined}
                 userRole={userRole}
+                onSwapTasks={isManager ? (a, b) => swapOrder.mutate({ taskA: a, taskB: b, projectId }) : undefined}
+                isReordering={swapOrder.isPending}
               />
             )}
           </div>

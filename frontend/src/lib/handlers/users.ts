@@ -223,7 +223,7 @@ export async function getTechnicianDetail(request: NextRequest, id: string) {
 
     // Recent tasks (last 10)
     const recentTasks = await query(
-      `SELECT t.id, t.name, t.status, t.due_date, t.time_spent_seconds, t.is_tracking,
+      `SELECT t.id, t.name, t.status, t.due_date, t.time_spent_seconds,
               p.name AS project_name, t.updated_at
        FROM tasks t
        JOIN projects p ON p.id = t.project_id

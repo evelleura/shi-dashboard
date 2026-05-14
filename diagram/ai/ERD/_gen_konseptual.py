@@ -2,32 +2,27 @@
 # requires-python = ">=3.11"
 # dependencies = []
 # ///
-"""Chen-notation ERD generator for shi-crm (13 entities, schema-aligned).
-Compact form: entity rectangle + PK ellipse only on conceptual diagram.
-Relationships shown as diamonds with cardinality labels.
-Full attribute lists are documented in SKEMA_FISIK and Tabel 4.6-4.18 of §4.3.3."""
+"""Chen-notation ERD generator -- aligned to curated reference Gambar 4.15.
+6 entities (tb_ prefix), full attribute ovals, Indonesian relationships."""
 from __future__ import annotations
 import os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ERD_KONSEPTUAL.drawio")
 
-# --- Styles ---
 S_ENT = ("rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;"
-         "strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;")
-S_ENT_WEAK = ("rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;"
-              "strokeWidth=1.5;fontSize=11;fontStyle=1;fontColor=#000000;dashed=1;")
+         "strokeWidth=1.5;fontSize=12;fontStyle=1;fontColor=#000000;")
+S_ATTR = ("ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;"
+          "strokeWidth=1;fontSize=10;fontColor=#000000;")
 S_ATTR_PK = ("ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;"
              "strokeWidth=1;fontSize=10;fontStyle=4;fontColor=#000000;")
 S_REL = ("rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;"
          "strokeWidth=1.5;fontSize=10;fontColor=#000000;")
-S_LINE = ("endArrow=none;startArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;"
-          "strokeColor=#000000;strokeWidth=1;jettySize=auto;orthogonalLoop=1;")
-S_LINE_STRAIGHT = "endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;"
-S_CARD = "text;html=1;align=center;fontSize=10;fontStyle=1;fontColor=#000000;"
-S_CAPTION = "text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#000000;"
+S_LINE = ("endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;"
+          "strokeWidth=1;edgeStyle=orthogonalEdgeStyle;jettySize=auto;orthogonalLoop=1;")
+S_LINE_DIAG = "endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#000000;strokeWidth=1;"
+S_CARD = "text;html=1;align=center;fontSize=11;fontStyle=1;fontColor=#000000;"
 
-# --- Canvas ---
-PAGE_W, PAGE_H = 2400, 1500
+PAGE_W, PAGE_H = 1800, 1300
 
 cells: list[str] = []
 _id = [0]
@@ -45,189 +40,147 @@ def shape(x: int, y: int, w: int, h: int, label: str, style: str) -> str:
     return i
 
 
-def edge(src: str, tgt: str, *, straight: bool = False) -> str:
+def edge(src: str, tgt: str, straight: bool = False) -> str:
+    """Default: orthogonal routing (entity-relation lines).
+    straight=True: diagonal radial lines (entity-attribute spokes)."""
     i = gid()
-    s = S_LINE_STRAIGHT if straight else S_LINE
+    s = S_LINE_DIAG if straight else S_LINE
     cells.append(f'<mxCell id="{i}" value="" style="{s}" edge="1" parent="1" '
                  f'source="{src}" target="{tgt}"><mxGeometry relative="1" as="geometry"/></mxCell>')
     return i
 
 
 def card(x: int, y: int, label: str) -> str:
-    return shape(x, y, 24, 18, label, S_CARD)
+    return shape(x, y, 22, 18, label, S_CARD)
 
 
-# --- Entity definitions ---
-# (id, name_label, pk_label, x_center, y_center, weak)
-ENTITIES = [
-    # Row 1 (y=140) — Core domain: User authentication / Klien / Proyek
-    ("e_user",       "User",            "id",         300,  140, False),
-    ("e_klien",      "Klien",           "id",         900,  140, False),
-    ("e_proyek",     "Proyek",          "id",        1500,  140, False),
-    ("e_audit",      "Audit Log",       "id",        2100,  140, False),
-
-    # Row 2 (y=480) — Penugasan + Tugas + Bukti + Aktivitas
-    ("e_penugasan",  "Penugasan Proyek", "(project_id, user_id)", 600, 480, True),
-    ("e_tugas",      "Tugas",           "id",        1200,  480, False),
-    ("e_bukti",      "Bukti Tugas",     "id",        1800,  480, False),
-    ("e_aktivitas",  "Aktivitas Tugas", "id",        2100,  680, False),
-
-    # Row 3 (y=820) — Resource + Daily Report
-    ("e_material",   "Material",        "id",         300,  820, False),
-    ("e_anggaran",   "Anggaran",        "id",         900,  820, False),
-    ("e_daily",      "Daily Report",    "id",        1500,  820, False),
-
-    # Row 4 (y=1180) — Health + Eskalasi
-    ("e_health",     "Kesehatan Proyek","project_id", 900, 1180, False),
-    ("e_eskalasi",   "Eskalasi",        "id",        1500, 1180, False),
-]
-
-# Build entities
-ent_ids: dict[str, str] = {}
-for ek, name, pk_label, cx, cy, weak in ENTITIES:
-    style = S_ENT_WEAK if weak else S_ENT
-    eid = shape(cx - 90, cy - 30, 180, 60, name, style)
-    ent_ids[ek] = eid
-    # PK ellipse below entity
-    pk_id = shape(cx - 60, cy + 50, 120, 28, pk_label, S_ATTR_PK)
-    edge(eid, pk_id, straight=True)
+def entity(cx: int, cy: int, name: str) -> str:
+    return shape(cx - 70, cy - 22, 140, 44, name, S_ENT)
 
 
-def diamond(label: str, x: int, y: int) -> str:
-    return shape(x - 50, y - 25, 100, 50, label, S_REL)
+def attr_oval(cx: int, cy: int, name: str, pk: bool = False) -> str:
+    style = S_ATTR_PK if pk else S_ATTR
+    return shape(cx - 50, cy - 16, 100, 32, name, style)
 
 
-def link(ent_a: str, rel_id: str, card_a: str, ent_b: str, card_b: str,
-         card_a_xy: tuple[int, int], card_b_xy: tuple[int, int]) -> None:
-    edge(ent_ids[ent_a], rel_id)
-    edge(rel_id, ent_ids[ent_b])
-    card(*card_a_xy, card_a)
-    card(*card_b_xy, card_b)
+def diamond(cx: int, cy: int, label: str) -> str:
+    return shape(cx - 60, cy - 28, 120, 56, label, S_REL)
 
 
-# --- Relationships ---
-# Each relationship: diamond + 2 edges + 2 cardinality labels
+# ---- Layout ----
+# tb_klien (top-left), tb_proyek (top-center), tb_user (center), tb_eskalasi (bottom-left),
+# tb_tugas (bottom-center), tb_bukti (bottom-right)
 
-# 1. Klien -- memiliki (1:N) -- Proyek
-d1 = diamond("memiliki", 1200, 140)
-edge(ent_ids["e_klien"], d1)
-edge(d1, ent_ids["e_proyek"])
-card(1080, 110, "1")
-card(1340, 110, "N")
+# Entities
+e_klien    = entity(220,  170, "tb_klien")
+e_proyek   = entity(820,  220, "tb_proyek")
+e_user     = entity(820,  580, "tb_user")
+e_eskalasi = entity(220,  950, "tb_eskalasi")
+e_tugas    = entity(820,  980, "tb_tugas")
+e_bukti    = entity(1420, 980, "tb_bukti")
 
-# 2. User -- mengelola (M:N via Penugasan) -- Proyek (junction shown as weak entity)
-d2 = diamond("mengelola", 600, 280)
-edge(ent_ids["e_user"], d2)
-edge(d2, ent_ids["e_penugasan"])
-edge(ent_ids["e_penugasan"], d2)
-# Wait: Penugasan IS the relationship-as-entity in M:N. Skip diamond, just link User-Penugasan-Proyek.
-cells.pop()  # remove last edge
-cells.pop()  # remove second edge
-cells.pop()  # remove first edge
-cells.pop()  # remove diamond d2
-_id[0] -= 4
-edge(ent_ids["e_user"], ent_ids["e_penugasan"])
-edge(ent_ids["e_penugasan"], ent_ids["e_proyek"])
-card(380, 290, "1")
-card(750, 460, "N")
-card(680, 290, "M")
-card(1380, 460, "N")
+# tb_klien attributes (around 220,170): id_klien (PK), nama_klien, no_telp, alamat
+a_kl_id    = attr_oval(80,  80,  "id_klien", pk=True)
+a_kl_nama  = attr_oval(220, 50,  "nama_klien")
+a_kl_telp  = attr_oval(360, 80,  "no_telp")
+a_kl_alm   = attr_oval(80,  240, "alamat")
+for a in (a_kl_id, a_kl_nama, a_kl_telp, a_kl_alm):
+    edge(e_klien, a, straight=True)
 
-# 3. Proyek -- memiliki -- Tugas (1:N)
-d3 = diamond("memiliki", 1380, 320)
-edge(ent_ids["e_proyek"], d3)
-edge(d3, ent_ids["e_tugas"])
-card(1380, 200, "1")
-card(1320, 410, "N")
+# tb_proyek attributes (around 820,220): id_proyek (PK), nama_proyek, id_klien (FK), project_value, status, phase
+a_pr_id    = attr_oval(680, 90,  "id_proyek", pk=True)
+a_pr_nama  = attr_oval(820, 60,  "nama_proyek")
+a_pr_idkl  = attr_oval(560, 200, "id_klien")
+a_pr_val   = attr_oval(960, 90,  "project_value")
+a_pr_st    = attr_oval(1100, 200, "status")
+a_pr_ph    = attr_oval(1100, 280, "phase")
+for a in (a_pr_id, a_pr_nama, a_pr_idkl, a_pr_val, a_pr_st, a_pr_ph):
+    edge(e_proyek, a, straight=True)
 
-# 4. User -- mengerjakan -- Tugas (1:N via assigned_to)
-d4 = diamond("mengerjakan", 750, 480)
-edge(ent_ids["e_user"], d4)
-edge(d4, ent_ids["e_tugas"])
-card(420, 460, "1")
-card(1080, 460, "N")
+# tb_user attributes (around 820,580): id_user (PK), nama, role, email
+a_u_id     = attr_oval(680, 540, "id_user", pk=True)
+a_u_nama   = attr_oval(680, 620, "nama")
+a_u_role   = attr_oval(1010, 560, "role")
+a_u_email  = attr_oval(1010, 620, "email")
+for a in (a_u_id, a_u_nama, a_u_role, a_u_email):
+    edge(e_user, a, straight=True)
 
-# 5. Tugas -- memiliki -- Bukti Tugas (1:N)
-d5 = diamond("memiliki", 1500, 480)
-edge(ent_ids["e_tugas"], d5)
-edge(d5, ent_ids["e_bukti"])
-card(1290, 460, "1")
-card(1700, 460, "N")
+# tb_eskalasi attributes (around 220,950): id_eskalasi (PK), id_proyek, priority, status
+a_es_id    = attr_oval(80,  860, "id_eskalasi", pk=True)
+a_es_idpr  = attr_oval(80,  920, "id_proyek")
+a_es_pri   = attr_oval(80,  990, "priority")
+a_es_st    = attr_oval(220, 1080, "status")
+for a in (a_es_id, a_es_idpr, a_es_pri, a_es_st):
+    edge(e_eskalasi, a, straight=True)
 
-# 6. Tugas -- memiliki -- Aktivitas Tugas (1:N)
-d6 = diamond("memiliki", 1620, 580)
-edge(ent_ids["e_tugas"], d6)
-edge(d6, ent_ids["e_aktivitas"])
-card(1290, 540, "1")
-card(2030, 660, "N")
+# tb_tugas attributes (around 820,980): id_tugas (PK), due_date, id_proyek, status
+a_tg_id    = attr_oval(680, 1080, "id_tugas", pk=True)
+a_tg_due   = attr_oval(820, 1110, "due_date")
+a_tg_idpr  = attr_oval(820, 1180, "id_proyek")
+a_tg_st    = attr_oval(960, 1080, "status")
+for a in (a_tg_id, a_tg_due, a_tg_idpr, a_tg_st):
+    edge(e_tugas, a, straight=True)
 
-# 7. User -- mengunggah -- Bukti (1:N) - implicit via uploaded_by FK; omit diamond to reduce clutter
-# 8. Proyek -- memiliki -- Material (1:N)
-d8 = diamond("memiliki", 600, 820)
-edge(ent_ids["e_proyek"], d8)
-edge(d8, ent_ids["e_material"])
-card(600, 250, "1")
-card(390, 800, "N")
+# tb_bukti attributes (around 1420,980): id_bukti (PK), file_path, id_tugas
+a_bk_id    = attr_oval(1560, 920, "id_bukti", pk=True)
+a_bk_fp    = attr_oval(1700, 950, "file_path")
+a_bk_idtg  = attr_oval(1560, 1080, "id_tugas")
+for a in (a_bk_id, a_bk_fp, a_bk_idtg):
+    edge(e_bukti, a, straight=True)
 
-# 9. Proyek -- memiliki -- Anggaran (1:N)
-d9 = diamond("memiliki", 1100, 820)
-edge(ent_ids["e_proyek"], d9)
-edge(d9, ent_ids["e_anggaran"])
-card(1100, 250, "1")
-card(990, 800, "N")
+# ---- Relationships ----
 
-# 10. Proyek -- memiliki -- Daily Report (1:N)
-d10 = diamond("memiliki", 1500, 540)
-edge(ent_ids["e_proyek"], d10)
-edge(d10, ent_ids["e_daily"])
-card(1500, 250, "1")
-card(1500, 800, "N")
+# 1. tb_klien (1) -memiliki- (M) tb_proyek
+d1 = diamond(520, 195, "memiliki")
+edge(e_klien, d1)
+edge(d1, e_proyek)
+card(440, 175, "1")
+card(640, 175, "M")
 
-# 11. Tugas -- memiliki -- Daily Report (1:N optional)
-d11 = diamond("memiliki", 1320, 720)
-edge(ent_ids["e_tugas"], d11)
-edge(d11, ent_ids["e_daily"])
-card(1180, 540, "1")
-card(1380, 800, "N")
+# 2. tb_user (M) -mengelola- (M) tb_proyek (M:M)
+d2 = diamond(680, 400, "mengelola")
+edge(e_user, d2)
+edge(d2, e_proyek)
+card(700, 330, "M")
+card(700, 470, "M")
 
-# 12. Proyek -- memiliki -- Kesehatan Proyek (1:1)
-d12 = diamond("memiliki", 900, 1000)
-edge(ent_ids["e_proyek"], d12)
-edge(d12, ent_ids["e_health"])
-card(900, 250, "1")
-card(900, 1100, "1")
+# 3. tb_proyek (1) -memiliki- (M) tb_eskalasi  (use shared diamond near user-proyek-eskalasi area)
+d3 = diamond(490, 530, "memiliki")
+edge(e_proyek, d3)
+edge(d3, e_eskalasi)
+card(550, 450, "1")
+card(330, 700, "M")
 
-# 13. Tugas -- memiliki -- Eskalasi (1:N)
-d13 = diamond("memiliki", 1500, 720)
-edge(ent_ids["e_tugas"], d13)
-edge(d13, ent_ids["e_eskalasi"])
-card(1500, 540, "1")
-card(1500, 1100, "N")
+# 4. tb_user (1) -melaporkan- (M) tb_eskalasi
+d4 = diamond(490, 780, "melaporkan")
+edge(e_user, d4)
+edge(d4, e_eskalasi)
+card(620, 700, "1")
+card(360, 870, "M")
 
-# 14. Proyek -- memiliki -- Eskalasi (1:N - dual via project_id)
-d14 = diamond("memiliki", 1700, 1000)
-edge(ent_ids["e_proyek"], d14)
-edge(d14, ent_ids["e_eskalasi"])
-card(1700, 250, "1")
-card(1700, 1100, "N")
+# 5. tb_proyek (1) -memiliki- (M) tb_tugas
+d5 = diamond(1090, 600, "memiliki")
+edge(e_proyek, d5)
+edge(d5, e_tugas)
+card(1010, 350, "1")
+card(950, 900, "M")
 
-# 15. User -- melaporkan -- Eskalasi (1:N via reported_by)
-d15 = diamond("melaporkan", 600, 1180)
-edge(ent_ids["e_user"], d15)
-edge(d15, ent_ids["e_eskalasi"])
-card(420, 1170, "1")
-card(1380, 1170, "N")
+# 6. tb_user (1) -mengerjakan- (M) tb_tugas
+d6 = diamond(680, 800, "mengerjakan")
+edge(e_user, d6)
+edge(d6, e_tugas)
+card(750, 700, "1")
+card(750, 900, "M")
 
-# 16. User -- mencatat -- Audit Log (1:N via changed_by)
-d16 = diamond("mencatat", 2100, 320)
-edge(ent_ids["e_user"], d16)
-edge(d16, ent_ids["e_audit"])
-card(420, 290, "1")
-card(2100, 200, "N")
+# 7. tb_tugas (1) -memiliki- (M) tb_bukti
+d7 = diamond(1130, 980, "memiliki")
+edge(e_tugas, d7)
+edge(d7, e_bukti)
+card(1060, 960, "1")
+card(1340, 960, "M")
 
-# Build XML
 HEADER = f'''<?xml version="1.0" encoding="UTF-8"?>
-<mxGraphModel dx="2400" dy="1500" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="0" fold="1" page="1" pageScale="1" pageWidth="{PAGE_W}" pageHeight="{PAGE_H}" math="0" shadow="0" background="#FFFFFF">
+<mxGraphModel dx="{PAGE_W}" dy="{PAGE_H}" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="0" fold="1" page="1" pageScale="1" pageWidth="{PAGE_W}" pageHeight="{PAGE_H}" math="0" shadow="0" background="#FFFFFF">
   <root>
     <mxCell id="0"/>
     <mxCell id="1" parent="0"/>
@@ -239,4 +192,4 @@ xml = HEADER + "\n".join(cells) + "\n" + FOOTER
 with open(OUT, "w", encoding="utf-8") as f:
     f.write(xml)
 print(f"OK {OUT}")
-print(f"  Entities: {len(ENTITIES)} | cells: {len(cells)}")
+print(f"  Cells: {len(cells)}")

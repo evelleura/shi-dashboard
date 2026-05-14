@@ -3,6 +3,7 @@ import { authenticateRequest, authorizeRoles } from '@/lib/auth';
 import { query, getClient } from '@/lib/db';
 import { recalculateSPI } from '@/lib/spiCalculator';
 import { logChange } from './audit';
+import { createNotification } from './notifications';
 
 async function generateProjectCode(): Promise<string> {
   const now = new Date();
@@ -30,7 +31,7 @@ export async function listProjects(request: NextRequest) {
         p.duration, p.status, p.phase, p.category, p.project_value, p.survey_approved,
         p.target_description, p.created_at, p.updated_at,
         c.name AS client_name,
-        ph.spi_value, ph.status AS health_status, ph.deviation_percent,
+        ph.spi_value, ph.status AS health_status,
         ph.actual_progress, ph.planned_progress, ph.last_updated AS health_last_updated,
         ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.overtime_tasks, ph.overdue_tasks,
         dr.progress_percentage AS latest_progress,
@@ -121,7 +122,7 @@ export async function getProject(request: NextRequest, id: string) {
     const projectResult = await query(
       `SELECT p.*, c.id AS client_id_ref, c.name AS client_name, c.phone AS client_phone,
         c.email AS client_email, c.address AS client_address,
-        ph.spi_value, ph.status AS health_status, ph.deviation_percent, ph.actual_progress, ph.planned_progress,
+        ph.spi_value, ph.status AS health_status, ph.actual_progress, ph.planned_progress,
         ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.overtime_tasks, ph.overdue_tasks,
         ph.last_updated AS health_last_updated,
         u.name AS created_by_name, approver.name AS survey_approved_by_name
@@ -474,6 +475,17 @@ export async function assignTechnician(request: NextRequest, id: string) {
       'INSERT INTO project_assignments (project_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
       [projectId, user_id]
     );
+    const projRow = await query('SELECT name FROM projects WHERE id = $1', [projectId]);
+    const projectName = (projRow.rows[0]?.name as string) ?? 'Proyek';
+    await createNotification({
+      userId: parseInt(String(user_id)),
+      type: 'project_assigned',
+      title: `Kamu ditambahkan ke proyek: ${projectName}`,
+      body: 'Kamu sekarang menjadi bagian dari tim proyek ini',
+      entityType: 'project',
+      entityId: projectId,
+      projectId: projectId,
+    });
     return NextResponse.json({ success: true, message: 'Technician assigned successfully' }, { status: 201 });
   } catch (err) {
     console.error('Assign technician error:', err);

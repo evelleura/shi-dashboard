@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS tasks (
   timeline_start DATE,
   timeline_end DATE,
   notes TEXT,
-  budget DECIMAL(15,2) DEFAULT 0,
   sort_order INT NOT NULL DEFAULT 0,
   is_survey_task BOOLEAN NOT NULL DEFAULT FALSE,
   created_by INT NOT NULL,
@@ -113,48 +112,13 @@ CREATE INDEX IF NOT EXISTS idx_evidence_task ON task_evidence(task_id);
 CREATE INDEX IF NOT EXISTS idx_evidence_uploaded_by ON task_evidence(uploaded_by);
 
 -- ============================================================
--- 5. Create materials table
--- ============================================================
-CREATE TABLE IF NOT EXISTS materials (
-  id SERIAL PRIMARY KEY,
-  project_id INT NOT NULL,
-  name VARCHAR(500) NOT NULL,
-  quantity DECIMAL(10,2) NOT NULL DEFAULT 1,
-  unit VARCHAR(50) DEFAULT 'pcs',
-  unit_price DECIMAL(15,2) DEFAULT 0,
-  total_price DECIMAL(15,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-);
-
-CREATE INDEX IF NOT EXISTS idx_materials_project ON materials(project_id);
-
--- ============================================================
--- 6. Create budget_items table
--- ============================================================
-CREATE TABLE IF NOT EXISTS budget_items (
-  id SERIAL PRIMARY KEY,
-  project_id INT NOT NULL,
-  category VARCHAR(255) NOT NULL,
-  description TEXT,
-  amount DECIMAL(15,2) NOT NULL DEFAULT 0,
-  is_actual BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-);
-
-CREATE INDEX IF NOT EXISTS idx_budget_project ON budget_items(project_id);
-CREATE INDEX IF NOT EXISTS idx_budget_category ON budget_items(category);
-
--- ============================================================
--- 7. Alter daily_reports (add task_id)
+-- 5. Alter daily_reports (add task_id)
 -- ============================================================
 ALTER TABLE daily_reports ADD COLUMN IF NOT EXISTS task_id INT REFERENCES tasks(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS idx_daily_reports_task ON daily_reports(task_id);
 
 -- ============================================================
--- 8. Alter project_health (add task counter columns)
+-- 6. Alter project_health (add task counter columns)
 -- ============================================================
 ALTER TABLE project_health ADD COLUMN IF NOT EXISTS total_tasks INT DEFAULT 0;
 ALTER TABLE project_health ADD COLUMN IF NOT EXISTS completed_tasks INT DEFAULT 0;
@@ -163,7 +127,7 @@ ALTER TABLE project_health ADD COLUMN IF NOT EXISTS stuck_tasks INT DEFAULT 0;
 ALTER TABLE project_health ADD COLUMN IF NOT EXISTS overdue_tasks INT DEFAULT 0;
 
 -- ============================================================
--- 9. Set existing projects to execution phase with survey approved
+-- 7. Set existing projects to execution phase with survey approved
 -- ============================================================
 UPDATE projects SET phase = 'execution', survey_approved = TRUE WHERE phase IS NULL OR phase = 'survey';
 

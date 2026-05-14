@@ -39,7 +39,7 @@ import type {
   AuditLogResponse,
 } from '../types';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
 });
@@ -180,7 +180,6 @@ export const getProject = async (id: number): Promise<ProjectWithDetail> => {
         project_id: id,
         spi_value: Number(raw.spi_value) || 0,
         status: (raw.health_status ?? 'green') as HealthStatus,
-        deviation_percent: Number(raw.deviation_percent) || 0,
         actual_progress: Number(raw.actual_progress) || 0,
         planned_progress: Number(raw.planned_progress) || 0,
         total_tasks: Number(raw.total_tasks) || 0,
@@ -269,6 +268,11 @@ export const createBulkTasks = async (tasks: CreateTaskData[]): Promise<Task[]> 
   return res.data.data!;
 };
 
+export const reorderTask = async (id: number, sort_order: number): Promise<Task> => {
+  const res = await api.patch<ApiResponse<Task>>(`/tasks/${id}/reorder`, { sort_order });
+  return res.data.data!;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getScheduleTasks = async (): Promise<any[]> => {
   const res = await api.get('/tasks/schedule');
@@ -322,16 +326,6 @@ export const createActivity = async (data: FormData): Promise<TaskActivity> => {
   const res = await api.post<ApiResponse<TaskActivity>>('/activities', data, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
-  return res.data.data!;
-};
-
-export const startTimer = async (taskId: number): Promise<Task> => {
-  const res = await api.post<ApiResponse<Task>>(`/activities/task/${taskId}/timer/start`);
-  return res.data.data!;
-};
-
-export const stopTimer = async (taskId: number): Promise<Task> => {
-  const res = await api.post<ApiResponse<Task>>(`/activities/task/${taskId}/timer/stop`);
   return res.data.data!;
 };
 

@@ -6,7 +6,7 @@ import EvidenceUploader from '../evidence/EvidenceUploader';
 import EvidenceGallery from '../evidence/EvidenceGallery';
 import ActivityFeed from './ActivityFeed';
 import { useCreateEscalation } from '../../hooks/useEscalations';
-import { useUpdateTask } from '../../hooks/useTasks';
+import { useUpdateTask, useDeleteTask } from '../../hooks/useTasks';
 import { useTechnicians } from '../../hooks/useDashboard';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../lib/i18n';
@@ -31,7 +31,6 @@ interface EditForm {
   timeline_start: string;
   notes: string;
   depends_on: string;
-  budget: string;
 }
 
 interface Props {
@@ -51,10 +50,6 @@ const inputClass =
 
 function formatDate(dateStr: string, lang: 'id' | 'en' = 'id'): string {
   return new Date(dateStr).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-function formatCurrency(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
 }
 
 function toDateInputValue(dateStr?: string): string {
@@ -80,10 +75,14 @@ export default function TaskDetailModal({
 
   const createEscalationMutation = useCreateEscalation();
   const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
 
   // Technicians: prefer prop, fallback to internal fetch
   const { data: techniciansFromHook = [] } = useTechnicians();
   const technicians = techniciansProp ?? techniciansFromHook;
+
+  // Delete confirm state
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Edit state
   const [isEditing, setIsEditing] = useState(false);
@@ -95,15 +94,15 @@ export default function TaskDetailModal({
     timeline_start: '',
     notes: '',
     depends_on: '',
-    budget: '',
   });
   const [editError, setEditError] = useState('');
 
-  // Reset edit state when modal closes
+  // Reset edit/delete state when modal closes
   useEffect(() => {
     if (!open) {
       setIsEditing(false);
       setEditError('');
+      setConfirmDelete(false);
     }
   }, [open]);
 
@@ -162,7 +161,6 @@ export default function TaskDetailModal({
       timeline_start: toDateInputValue(task.timeline_start),
       notes: task.notes ?? '',
       depends_on: task.depends_on != null ? String(task.depends_on) : '',
-      budget: task.budget != null && Number(task.budget) > 0 ? String(task.budget) : '',
     });
     setEditError('');
     setIsEditing(true);
@@ -195,7 +193,6 @@ export default function TaskDetailModal({
       timeline_end: editForm.due_date || undefined,
       notes: editForm.notes.trim() || undefined,
       depends_on: editForm.depends_on === '' ? null : parseInt(editForm.depends_on, 10),
-      budget: editForm.budget === '' ? undefined : parseFloat(editForm.budget),
     };
 
     const pid = projectId ?? task.project_id;
@@ -247,16 +244,58 @@ export default function TaskDetailModal({
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{task.name}</h3>
             )}
             {canEdit && !isEditing && (
-              <button
-                onClick={handleEditStart}
-                className="shrink-0 flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-2.5 py-1.5 rounded-lg transition-colors"
-                aria-label={t('action.edit', language)}
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828a4 4 0 01-1.414.94l-3 1 1-3a4 4 0 01.94-1.414z" />
-                </svg>
-                {t('action.edit', language)}
-              </button>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={handleEditStart}
+                  className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-2.5 py-1.5 rounded-lg transition-colors"
+                  aria-label={t('action.edit', language)}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828a4 4 0 01-1.414.94l-3 1 1-3a4 4 0 01.94-1.414z" />
+                  </svg>
+                  {t('action.edit', language)}
+                </button>
+                {!confirmDelete ? (
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    className="flex items-center gap-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-white dark:bg-gray-700 border border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 px-2.5 py-1.5 rounded-lg transition-colors"
+                    aria-label={language === 'id' ? 'Hapus tugas' : 'Delete task'}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    {language === 'id' ? 'Hapus' : 'Delete'}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+                      {language === 'id' ? 'Yakin hapus?' : 'Delete?'}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const pid = projectId ?? task.project_id;
+                        deleteTaskMutation.mutate(
+                          { id: task.id, projectId: pid },
+                          { onSuccess: () => { setConfirmDelete(false); onClose(); } }
+                        );
+                      }}
+                      disabled={deleteTaskMutation.isPending}
+                      className="text-xs font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 px-2.5 py-1.5 rounded-lg transition-colors"
+                    >
+                      {deleteTaskMutation.isPending
+                        ? (language === 'id' ? 'Menghapus...' : 'Deleting...')
+                        : (language === 'id' ? 'Ya, Hapus' : 'Yes, Delete')}
+                    </button>
+                    <button
+                      onClick={() => setConfirmDelete(false)}
+                      disabled={deleteTaskMutation.isPending}
+                      className="text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {t('action.cancel', language)}
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -441,26 +480,6 @@ export default function TaskDetailModal({
               </p>
             )}
           </div>
-          {!isTechnician && (
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('task.budget_label', language)}</p>
-              {isEditing ? (
-                <input
-                  type="number"
-                  min="0"
-                  step="1000"
-                  value={editForm.budget}
-                  onChange={(e) => setEditForm((f) => ({ ...f, budget: e.target.value }))}
-                  placeholder="0"
-                  className={inputClass}
-                />
-              ) : (
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {Number(task.budget) > 0 ? formatCurrency(Number(task.budget)) : '--'}
-                </p>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Notes — editable inline */}

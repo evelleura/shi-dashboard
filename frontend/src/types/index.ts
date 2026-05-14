@@ -75,12 +75,9 @@ export interface Task {
   timeline_start?: string;
   timeline_end?: string;
   notes?: string;
-  budget: number;
   sort_order: number;
   is_survey_task: boolean;
-  timer_started_at?: string;
   time_spent_seconds?: number;
-  is_tracking?: boolean;
   estimated_hours?: number;
   evidence_count?: number;
   activity_count?: number;
@@ -119,7 +116,7 @@ export interface TaskActivity {
   created_at: string;
 }
 
-export type EscalationActionRequest = 'ganti_teknisi' | 'ganti_material' | 'perpanjang_deadline' | 'mediasi_client' | 'batalkan_eskalasi';
+export type EscalationActionRequest = 'ganti_teknisi' | 'ganti_alat' | 'perpanjang_deadline' | 'mediasi_client' | 'batalkan_eskalasi';
 export type EscalationActionRequestStatus = 'pending' | 'approved' | 'rejected';
 
 export interface EscalationUpdate {
@@ -169,7 +166,6 @@ export interface ProjectHealth {
   project_id: number;
   spi_value: number;
   status: HealthStatus;
-  deviation_percent: number;
   actual_progress: number;
   planned_progress: number;
   total_tasks: number;
@@ -205,7 +201,6 @@ export interface DashboardSummary {
 export interface DashboardProject extends Project {
   spi_value: number | null;
   health_status: HealthStatus | null;
-  deviation_percent: number | null;
   actual_progress: number | null;
   planned_progress: number;
   total_tasks: number;
@@ -310,6 +305,12 @@ export interface TechnicianDashboardData {
     health_status?: HealthStatus | null;
     my_task_count: number;
     my_completed: number;
+    start_date?: string;
+    end_date?: string;
+    created_at?: string;
+    next_task_name?: string | null;
+    next_task_status?: string | null;
+    next_task_due?: string | null;
   }[];
   recent_tasks: Task[];
   completed_projects?: {
@@ -322,6 +323,9 @@ export interface TechnicianDashboardData {
     health_status?: HealthStatus | null;
     my_task_count: number;
     my_completed: number;
+    start_date?: string;
+    end_date?: string;
+    updated_at?: string;
   }[];
   escalation_summary?: EscalationSummary;
 }
@@ -361,7 +365,6 @@ export interface CreateTaskData {
   timeline_start?: string;
   timeline_end?: string;
   notes?: string;
-  budget?: number;
   sort_order?: number;
   is_survey_task?: boolean;
   depends_on?: number | null;
@@ -376,7 +379,6 @@ export interface UpdateTaskData {
   timeline_start?: string;
   timeline_end?: string;
   notes?: string;
-  budget?: number;
   sort_order?: number;
   is_survey_task?: boolean;
   depends_on?: number | null;

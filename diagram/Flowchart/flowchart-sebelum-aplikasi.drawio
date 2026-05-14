@@ -88,7 +88,7 @@
         </mxCell>
 
         <!-- A -->
-        <mxCell id="A" value="Manajer Proyek Membuat Data Proyek Baru&#xa;di Aplikasi — Nama, Jadwal, Klien, Tim"
+        <mxCell id="A" value="Manajer Membuat Data Proyek Baru&#xa;di Aplikasi — Nama, Jadwal, Klien, Tim"
           style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
           vertex="1" parent="1">
           <mxGeometry x="295" y="160" width="460" height="55" as="geometry" />

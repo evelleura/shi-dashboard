@@ -330,7 +330,7 @@ export async function deleteEscalation(request: NextRequest, id: string) {
   }
 }
 
-const VALID_ACTION_REQUESTS = ['ganti_teknisi', 'ganti_material', 'perpanjang_deadline', 'mediasi_client', 'batalkan_eskalasi'];
+const VALID_ACTION_REQUESTS = ['ganti_teknisi', 'ganti_alat', 'perpanjang_deadline', 'mediasi_client', 'batalkan_eskalasi'];
 
 export async function requestAction(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);

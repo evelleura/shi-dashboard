@@ -12,6 +12,7 @@ interface Props {
   userRole?: UserRole;
   columnId?: string;
   isBlocked?: boolean;
+  sequenceNum?: number;
 }
 
 function formatDate(dateStr: string, lang: 'id' | 'en' = 'id'): string {
@@ -20,7 +21,7 @@ function formatDate(dateStr: string, lang: 'id' | 'en' = 'id'): string {
 
 export default function KanbanCard({
   task, onStatusChange, onClick,
-  isChanging, userRole, columnId, isBlocked,
+  isChanging, userRole, columnId, isBlocked, sequenceNum,
 }: Props) {
   const { language } = useLanguage();
   const isTechnician = userRole === 'technician';
@@ -43,13 +44,15 @@ export default function KanbanCard({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow ${borderClass}`}
+      className={`relative bg-white dark:bg-gray-800 rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow ${borderClass}`}
       role="listitem"
       aria-label={`Task: ${task.name}`}
     >
-      {/* Project label */}
+      {sequenceNum != null && (
+        <span className="absolute top-2.5 right-2.5 text-[10px] font-bold text-gray-400 dark:text-gray-500">#{sequenceNum}</span>
+      )}
       {task.project_name && (
-        <p className="text-[10px] font-medium text-blue-500 uppercase tracking-wide mb-1 truncate">{task.project_name}</p>
+        <p className="text-[10px] font-medium text-blue-500 uppercase tracking-wide truncate mb-1 pr-6">{task.project_name}</p>
       )}
 
       {/* Title row: name + evidence */}
@@ -122,11 +125,6 @@ export default function KanbanCard({
         />
       </div>
 
-      {!isTechnician && task.budget > 0 && (
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5">
-          {t('task.budget_label', language)}: Rp {Number(task.budget).toLocaleString(language === 'id' ? 'id-ID' : 'en-US')}
-        </p>
-      )}
     </div>
   );
 }

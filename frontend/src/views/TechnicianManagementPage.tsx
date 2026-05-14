@@ -61,7 +61,6 @@ interface TechnicianDetail {
     status: TaskStatus;
     due_date: string | null;
     time_spent_seconds: number;
-    is_tracking: boolean;
     project_name: string;
     updated_at: string;
   }[];
@@ -586,12 +585,6 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                           <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                             <td className="px-3 py-2">
                               <div className="flex items-center gap-1.5">
-                                {t.is_tracking && (
-                                  <span className="relative flex h-2 w-2 shrink-0">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-                                  </span>
-                                )}
                                 <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[200px]">{t.name}</span>
                               </div>
                             </td>

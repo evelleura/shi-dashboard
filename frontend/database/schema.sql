@@ -1,5 +1,6 @@
 -- PT Smart Home Inovasi Dashboard - Complete PostgreSQL Schema
 -- For fresh installations. Run this once to set up all tables.
+-- For upgrading older installs, run frontend/scripts/db/legacy_cleanup.sql first.
 
 -- ============================================================
 -- Users table
@@ -10,9 +11,13 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(255) UNIQUE NOT NULL,
   role VARCHAR(50) NOT NULL DEFAULT 'technician',
   password_hash VARCHAR(255) NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT role_check CHECK (role IN ('technician', 'manager', 'admin'))
 );
+
+-- Backfill for existing installs (idempotent)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
 
 -- ============================================================
 -- Clients table
@@ -106,12 +111,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   timeline_start DATE,
   timeline_end DATE,
   notes TEXT,
-  budget DECIMAL(15,2) DEFAULT 0,
   sort_order INT NOT NULL DEFAULT 0,
   is_survey_task BOOLEAN NOT NULL DEFAULT FALSE,
-  timer_started_at TIMESTAMP,
   time_spent_seconds INT DEFAULT 0,
-  is_tracking BOOLEAN DEFAULT FALSE,
   estimated_hours DECIMAL(5,1),
   depends_on INT,
   status_changed_at TIMESTAMP DEFAULT NOW(),
@@ -157,41 +159,6 @@ CREATE INDEX IF NOT EXISTS idx_evidence_task ON task_evidence(task_id);
 CREATE INDEX IF NOT EXISTS idx_evidence_uploaded_by ON task_evidence(uploaded_by);
 
 -- ============================================================
--- Materials table (project material tracking)
--- ============================================================
-CREATE TABLE IF NOT EXISTS materials (
-  id SERIAL PRIMARY KEY,
-  project_id INT NOT NULL,
-  name VARCHAR(500) NOT NULL,
-  quantity DECIMAL(10,2) NOT NULL DEFAULT 1,
-  unit VARCHAR(50) DEFAULT 'pcs',
-  unit_price DECIMAL(15,2) DEFAULT 0,
-  total_price DECIMAL(15,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-);
-
-CREATE INDEX IF NOT EXISTS idx_materials_project ON materials(project_id);
-
--- ============================================================
--- Budget items table (planned vs actual costs)
--- ============================================================
-CREATE TABLE IF NOT EXISTS budget_items (
-  id SERIAL PRIMARY KEY,
-  project_id INT NOT NULL,
-  category VARCHAR(255) NOT NULL,
-  description TEXT,
-  amount DECIMAL(15,2) NOT NULL DEFAULT 0,
-  is_actual BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-);
-
-CREATE INDEX IF NOT EXISTS idx_budget_project ON budget_items(project_id);
-CREATE INDEX IF NOT EXISTS idx_budget_category ON budget_items(category);
-
--- ============================================================
 -- Daily reports table
 -- ============================================================
 CREATE TABLE IF NOT EXISTS daily_reports (
@@ -222,7 +189,6 @@ CREATE TABLE IF NOT EXISTS project_health (
   project_id INT PRIMARY KEY,
   spi_value DECIMAL(6,4),
   status VARCHAR(50),
-  deviation_percent DECIMAL(6,2),
   actual_progress DECIMAL(5,2),
   planned_progress DECIMAL(5,2),
   total_tasks INT DEFAULT 0,
@@ -323,3 +289,21 @@ CREATE TABLE IF NOT EXISTS audit_log (
 CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id);
 CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(changed_by);
+
+-- ============================================================
+-- Notifications table (real-time alerts for technicians)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS notifications (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  type VARCHAR(50) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  body TEXT,
+  entity_type VARCHAR(50),
+  entity_id INT,
+  project_id INT,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read, created_at DESC);

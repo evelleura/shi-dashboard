@@ -21,7 +21,6 @@
  *              DELETE /api/evidence/:id       GET /api/evidence/:id/download
  * Dashboard:   GET /api/dashboard             GET /api/dashboard/technician
  *              GET /api/dashboard/search?q=&limit=
- *              GET /api/dashboard/charts/budget-status
  *              GET /api/dashboard/charts/overdue-tasks
  *              GET /api/dashboard/charts/tasks-by-due-date
  *              GET /api/dashboard/charts/tasks-by-owner
@@ -33,18 +32,12 @@
  *              GET /api/dashboard/charts/recent-activity
  *              GET /api/dashboard/technician/productivity
  *              GET /api/dashboard/technician/time-spent
- * Materials:   POST /api/materials            PATCH/DELETE /api/materials/:id
- *              GET /api/materials/project/:projectId
- * Budget:      POST /api/budget               PATCH/DELETE /api/budget/:id
- *              GET /api/budget/project/:projectId
  * Escalations: GET/POST /api/escalations      GET /api/escalations/:id
  *              PATCH /api/escalations/:id/review
  *              PATCH /api/escalations/:id/resolve
  *              GET /api/escalations/summary
  * Activities:  POST /api/activities           GET /api/activities/my/today
  *              GET /api/activities/task/:taskId
- *              POST /api/activities/task/:taskId/timer/start
- *              POST /api/activities/task/:taskId/timer/stop
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -58,8 +51,7 @@ import * as dashboard from '@/lib/handlers/dashboard';
 import * as escalations from '@/lib/handlers/escalations';
 import * as activities from '@/lib/handlers/activities';
 import * as audit from '@/lib/handlers/audit';
-import * as materials from '@/lib/handlers/materials';
-import * as budget from '@/lib/handlers/budget';
+import * as notifications from '@/lib/handlers/notifications';
 
 type Context = { params: Promise<{ route: string[] }> };
 
@@ -74,7 +66,7 @@ function methodNotAllowed() {
 async function dispatch(request: NextRequest, context: Context): Promise<NextResponse> {
   const { route } = await context.params;
   const method = request.method;
-  const [r0, r1, r2, r3, r4] = route;
+  const [r0, r1, r2, r3] = route;
 
   // ── Auth ─────────────────────────────────────────────────────────────────
   if (r0 === 'auth') {
@@ -295,40 +287,6 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       if (method === 'GET') return activities.getActivitiesByTask(request, r2);
       return methodNotAllowed();
     }
-    if (r1 === 'task' && r2 && r3 === 'timer' && r4 === 'start' && method === 'POST') {
-      return activities.startTimer(request, r2);
-    }
-    if (r1 === 'task' && r2 && r3 === 'timer' && r4 === 'stop' && method === 'POST') {
-      return activities.stopTimer(request, r2);
-    }
-    return notFound();
-  }
-
-  // ── Materials ──────────────────────────────────────────────────────────────
-  if (r0 === 'materials') {
-    if (!r1) {
-      if (method === 'POST') return materials.createMaterial(request);
-      return methodNotAllowed();
-    }
-    if (r1 === 'project' && r2) return materials.getMaterialsByProject(request, r2);
-    if (r1 && !r2) {
-      if (method === 'PATCH')  return materials.updateMaterial(request, r1);
-      if (method === 'DELETE') return materials.deleteMaterial(request, r1);
-    }
-    return notFound();
-  }
-
-  // ── Budget ─────────────────────────────────────────────────────────────────
-  if (r0 === 'budget') {
-    if (!r1) {
-      if (method === 'POST') return budget.createBudgetItem(request);
-      return methodNotAllowed();
-    }
-    if (r1 === 'project' && r2) return budget.getBudgetByProject(request, r2);
-    if (r1 && !r2) {
-      if (method === 'PATCH')  return budget.updateBudgetItem(request, r1);
-      if (method === 'DELETE') return budget.deleteBudgetItem(request, r1);
-    }
     return notFound();
   }
 
@@ -338,6 +296,17 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       if (method === 'GET') return audit.listAuditLogs(request);
       return methodNotAllowed();
     }
+    return notFound();
+  }
+
+  // ── Notifications ─────────────────────────────────────────────────────────
+  if (r0 === 'notifications') {
+    if (!r1) {
+      if (method === 'GET') return notifications.getNotifications(request);
+      return methodNotAllowed();
+    }
+    if (r1 === 'read-all' && method === 'PATCH') return notifications.markAllRead(request);
+    if (r1 && !r2 && method === 'PATCH') return notifications.markRead(request, r1);
     return notFound();
   }
 

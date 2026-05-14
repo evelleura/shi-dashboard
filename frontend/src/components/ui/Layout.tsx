@@ -328,7 +328,7 @@ export default function Layout({ children }: Props) {
                 <span className="text-gray-300 dark:text-gray-600">|</span>
                 <span>{now.toLocaleTimeString(language === 'id' ? 'id-ID' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
               </div>
-              {isManager && <NotificationBell />}
+              <NotificationBell />
               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                 <span>{user?.name}</span>
                 <span className="text-gray-300 dark:text-gray-600">|</span>

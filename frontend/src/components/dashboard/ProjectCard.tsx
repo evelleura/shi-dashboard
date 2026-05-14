@@ -73,19 +73,11 @@ export default function ProjectCard({ project }: Props) {
         </div>
 
         {/* Metrics row */}
-        <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
           <div>
             <p className="text-[10px] text-gray-400 dark:text-gray-500">SPI</p>
             <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
               {project.spi_value != null ? Number(project.spi_value).toFixed(2) : '--'}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500">Dev</p>
-            <p className={`text-xs font-bold ${(project.deviation_percent ?? 0) < 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {project.deviation_percent != null
-                ? `${project.deviation_percent >= 0 ? '+' : ''}${Number(project.deviation_percent).toFixed(1)}%`
-                : '--'}
             </p>
           </div>
           <div>

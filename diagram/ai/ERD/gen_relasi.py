@@ -145,7 +145,7 @@ def make_edge(eid: str, src: str, tgt: str, color: str, *,
 def build_tables(cells: list) -> dict[str, list[str]]:
     refs = {}
 
-    refs["users"] = make_table(cells, "T_users", "users", 30, 30, [
+    refs["users"] = make_table(cells, "T_users", "shi_users", 30, 30, [
         ("PK", "id : SERIAL NOT NULL"),
         ("NN", "name : VARCHAR(255) NOT NULL"),
         ("NN", "email : VARCHAR(255) UNIQUE NOT NULL"),
@@ -154,7 +154,7 @@ def build_tables(cells: list) -> dict[str, list[str]]:
         ("N",  "created_at : TIMESTAMP"),
     ])
 
-    refs["clients"] = make_table(cells, "T_clients", "clients", 30, 220, [
+    refs["clients"] = make_table(cells, "T_clients", "shi_clients", 30, 220, [
         ("PK", "id : SERIAL NOT NULL"),
         ("NN", "name : VARCHAR(255) NOT NULL"),
         ("N",  "address : TEXT"),
@@ -169,7 +169,7 @@ def build_tables(cells: list) -> dict[str, list[str]]:
         ("N",  "updated_at : TIMESTAMP"),
     ])
 
-    refs["projects"] = make_table(cells, "T_projects", "projects", 410, 30, [
+    refs["projects"] = make_table(cells, "T_projects", "shi_projects", 410, 30, [
         ("PK", "id : SERIAL NOT NULL"),
         ("NN", "project_code : VARCHAR(12) UNIQUE"),
         ("NN", "name : VARCHAR(255) NOT NULL"),
@@ -191,17 +191,16 @@ def build_tables(cells: list) -> dict[str, list[str]]:
         ("N",  "updated_at : TIMESTAMP"),
     ])
 
-    refs["project_assignments"] = make_table(cells, "T_pa", "project_assignments", 410, 510, [
+    refs["project_assignments"] = make_table(cells, "T_pa", "shi_project_assignments", 410, 510, [
         ("PKFK", "project_id : INT [PK, FK -> projects.id]"),
         ("PKFK", "user_id : INT [PK, FK -> users.id]"),
         ("N",    "assigned_at : TIMESTAMP"),
     ])
 
-    refs["project_health"] = make_table(cells, "T_ph", "project_health", 410, 640, [
+    refs["project_health"] = make_table(cells, "T_ph", "shi_project_health", 410, 640, [
         ("PKFK", "project_id : INT [PK, FK -> projects.id]"),
         ("N",    "spi_value : DECIMAL(6,4)"),
         ("N",    "status : VARCHAR(50)"),
-        ("N",    "deviation_percent : DECIMAL(6,2)"),
         ("N",    "actual_progress : DECIMAL(5,2)"),
         ("N",    "planned_progress : DECIMAL(5,2)"),
         ("N",    "total_tasks : INT"),
@@ -212,7 +211,7 @@ def build_tables(cells: list) -> dict[str, list[str]]:
         ("N",    "last_updated : TIMESTAMP"),
     ])
 
-    refs["tasks"] = make_table(cells, "T_tasks", "tasks", 800, 30, [
+    refs["tasks"] = make_table(cells, "T_tasks", "shi_tasks", 800, 30, [
         ("PK", "id : SERIAL NOT NULL"),
         ("FK", "project_id : INT [-> projects.id]"),
         ("NN", "name : VARCHAR(500) NOT NULL"),
@@ -223,7 +222,6 @@ def build_tables(cells: list) -> dict[str, list[str]]:
         ("N",  "timeline_start : DATE"),
         ("N",  "timeline_end : DATE"),
         ("N",  "notes : TEXT"),
-        ("N",  "budget : DECIMAL(15,2)"),
         ("N",  "sort_order : INT"),
         ("N",  "is_survey_task : BOOLEAN"),
         ("N",  "timer_started_at : TIMESTAMP"),
@@ -237,7 +235,7 @@ def build_tables(cells: list) -> dict[str, list[str]]:
         ("N",  "updated_at : TIMESTAMP"),
     ])
 
-    refs["task_evidence"] = make_table(cells, "T_te", "task_evidence", 1190, 30, [
+    refs["task_evidence"] = make_table(cells, "T_te", "shi_task_evidence", 1190, 30, [
         ("PK", "id : SERIAL NOT NULL"),
         ("FK", "task_id : INT [-> tasks.id]"),
         ("NN", "file_path : VARCHAR(1000)"),
@@ -249,83 +247,24 @@ def build_tables(cells: list) -> dict[str, list[str]]:
         ("N",  "uploaded_at : TIMESTAMP"),
     ])
 
-    refs["task_activities"] = make_table(cells, "T_ta", "task_activities", 1190, 245, [
-        ("PK", "id : SERIAL NOT NULL"),
-        ("FK", "task_id : INT [-> tasks.id]"),
-        ("FK", "user_id : INT [-> users.id]"),
-        ("NN", "message : TEXT NOT NULL"),
-        ("NN", "activity_type : VARCHAR(50)"),
-        ("N",  "file_path : VARCHAR(1000)"),
-        ("N",  "file_name : VARCHAR(500)"),
-        ("N",  "file_type : VARCHAR(50)"),
-        ("N",  "file_size : INT"),
-        ("N",  "created_at : TIMESTAMP"),
-    ])
-
-    refs["escalations"] = make_table(cells, "T_esc", "escalations", 1190, 480, [
-        ("PK", "id : SERIAL NOT NULL"),
-        ("FK", "task_id : INT [-> tasks.id]"),
-        ("FK", "project_id : INT [-> projects.id]"),
-        ("FK", "reported_by : INT [-> users.id]"),
-        ("NN", "title : VARCHAR(500)"),
-        ("NN", "description : TEXT"),
-        ("NN", "status : VARCHAR(50)"),
-        ("NN", "priority : VARCHAR(50)"),
-        ("N",  "file_path : VARCHAR(1000)"),
-        ("N",  "file_name : VARCHAR(500)"),
-        ("N",  "file_type : VARCHAR(50)"),
-        ("N",  "file_size : INT"),
-        ("FK", "resolved_by : INT [-> users.id]"),
-        ("N",  "resolved_at : TIMESTAMP"),
-        ("N",  "resolution_notes : TEXT"),
-        ("N",  "created_at : TIMESTAMP"),
-        ("N",  "updated_at : TIMESTAMP"),
-    ])
-
-    refs["materials"] = make_table(cells, "T_mat", "materials", 1580, 30, [
+    refs["materials"] = make_table(cells, "T_mat", "shi_materials", 1190, 280, [
         ("PK", "id : SERIAL NOT NULL"),
         ("FK", "project_id : INT [-> projects.id]"),
-        ("NN", "name : VARCHAR(500) NOT NULL"),
-        ("N",  "quantity : DECIMAL(10,2)"),
+        ("NN", "name : VARCHAR(255) NOT NULL"),
+        ("NN", "quantity : DECIMAL(12,2)"),
         ("N",  "unit : VARCHAR(50)"),
         ("N",  "unit_price : DECIMAL(15,2)"),
-        ("N",  "total_price : DECIMAL(15,2) GEN"),
         ("N",  "notes : TEXT"),
         ("N",  "created_at : TIMESTAMP"),
     ])
 
-    refs["budget_items"] = make_table(cells, "T_bud", "budget_items", 1580, 245, [
+    refs["budget_items"] = make_table(cells, "T_bg", "shi_budget_items", 30, 510, [
         ("PK", "id : SERIAL NOT NULL"),
         ("FK", "project_id : INT [-> projects.id]"),
-        ("NN", "category : VARCHAR(255)"),
-        ("N",  "description : TEXT"),
-        ("N",  "amount : DECIMAL(15,2)"),
-        ("N",  "is_actual : BOOLEAN"),
-        ("N",  "created_at : TIMESTAMP"),
-    ])
-
-    refs["daily_reports"] = make_table(cells, "T_dr", "daily_reports", 1580, 410, [
-        ("PK", "id : SERIAL NOT NULL"),
-        ("FK", "project_id : INT [-> projects.id]"),
-        ("FK", "task_id : INT [-> tasks.id]"),
-        ("NN", "report_date : DATE"),
-        ("NN", "progress_percentage : DECIMAL(5,2)"),
-        ("N",  "constraints : TEXT"),
-        ("FK", "created_by : INT [-> users.id]"),
-        ("N",  "created_at : TIMESTAMP"),
-    ])
-
-    refs["audit_log"] = make_table(cells, "T_al", "audit_log", 1580, 600, [
-        ("PK", "id : SERIAL NOT NULL"),
-        ("NN", "entity_type : VARCHAR(50)"),
-        ("NN", "entity_id : INT"),
-        ("N",  "entity_name : VARCHAR(255)"),
-        ("NN", "action : VARCHAR(50)"),
-        ("N",  "field_name : VARCHAR(100)"),
-        ("N",  "old_value : TEXT"),
-        ("N",  "new_value : TEXT"),
-        ("FK", "changed_by : INT [-> users.id]"),
-        ("N",  "changed_by_name : VARCHAR(255)"),
+        ("NN", "description : VARCHAR(500)"),
+        ("N",  "category : VARCHAR(100)"),
+        ("NN", "amount : DECIMAL(15,2)"),
+        ("N",  "notes : TEXT"),
         ("N",  "created_at : TIMESTAMP"),
     ])
 
@@ -371,30 +310,10 @@ def build_edges(refs: dict[str, list[str]]) -> list[str]:
     add("tasks", 0, "task_evidence", 1, "#0F9D58")
     # users.id -> task_evidence.uploaded_by (7)
     add("users", 0, "task_evidence", 7, "#795548")
-    # tasks.id -> task_activities.task_id (1)
-    add("tasks", 0, "task_activities", 1, "#388E3C")
-    # users.id -> task_activities.user_id (2)
-    add("users", 0, "task_activities", 2, "#2E7D32")
-    # tasks.id -> escalations.task_id (1)
-    add("tasks", 0, "escalations", 1, "#C62828")
-    # projects.id -> escalations.project_id (2)
-    add("projects", 0, "escalations", 2, "#AD1457")
-    # users.id -> escalations.reported_by (3)
-    add("users", 0, "escalations", 3, "#EF6C00")
-    # users.id -> escalations.resolved_by (12)
-    add("users", 0, "escalations", 12, "#E65100")
     # projects.id -> materials.project_id (1)
-    add("projects", 0, "materials", 1, "#F57C00")
+    add("projects", 0, "materials", 1, "#7CB342")
     # projects.id -> budget_items.project_id (1)
-    add("projects", 0, "budget_items", 1, "#FF8F00")
-    # projects.id -> daily_reports.project_id (1)
-    add("projects", 0, "daily_reports", 1, "#7CB342")
-    # tasks.id -> daily_reports.task_id (2)
-    add("tasks", 0, "daily_reports", 2, "#558B2F")
-    # users.id -> daily_reports.created_by (6)
-    add("users", 0, "daily_reports", 6, "#33691E")
-    # users.id -> audit_log.changed_by (8)
-    add("users", 0, "audit_log", 8, "#37474F")
+    add("projects", 0, "budget_items", 1, "#558B2F")
 
     return edges
 

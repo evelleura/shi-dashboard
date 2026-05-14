@@ -441,7 +441,7 @@ def wf_04_dashboard_ews() -> list[str]:
     # Header row
     hy = ty + 26
     headers = [("Status", 80), ("Nama Proyek", 230), ("Klien", 160),
-               ("SPI", 80), ("Deviasi", 100), ("Update Terakhir", 160)]
+               ("SPI", 80), ("Update Terakhir", 160)]
     hx = M_X + 24
     for h, w in headers:
         cells.append(box(h, hx, hy, w, 26, fill="#E0E0E0", bold=True))
@@ -887,8 +887,6 @@ def wf_09_detail_proyek() -> list[str]:
     cells += [
         text("Schedule Performance Index (SPI)", lx, pby3, 250, 18, size=10),
         text("0.69 [BEHIND]", lx + lw - 120, pby3, 120, 18, size=10, align="right", bold=True),
-        text("Deviasi: -22% terhadap Planned Value",
-             lx, pby3 + 22, lw, 18, size=10, italic=True),
     ]
 
     # Komentar global
@@ -978,8 +976,6 @@ def wf_10_laporan_kesehatan() -> list[str]:
         text("Status RAG", M_X + 200, sy + 36, 200, 18, size=10),
         box("MERAH", M_X + 200, sy + 58, 140, 32, fill="#000000",
             color="#FFFFFF", size=14, bold=True),
-        text("Deviasi", M_X + 380, sy + 36, 200, 18, size=10),
-        text("-22%", M_X + 380, sy + 54, 200, 36, size=24, bold=True),
         text("Update Terakhir", M_X + 540, sy + 36, 240, 18, size=10),
         text("07/05/2026 09:14", M_X + 540, sy + 54, 240, 36, size=14, bold=True),
         box("Interpretasi: Proyek terlambat signifikan terhadap rencana. Tindakan mitigasi diperlukan.",
@@ -1066,7 +1062,7 @@ def wf_10_laporan_kesehatan() -> list[str]:
                       M_X + 40, ry + 8, 600, 22, size=12, bold=True))
     recs = [
         "1. Eskalasi prioritas tinggi pada kendala kabel utama (Andi) - butuh resolusi < 2 hari.",
-        "2. Realokasi teknisi tambahan untuk mengejar deviasi -22% terhadap target Planned Value.",
+        "2. Realokasi teknisi tambahan untuk mengejar ketertinggalan SPI terhadap target Planned Value.",
         "3. Tinjau ulang lingkup pekerjaan minggu depan; pertimbangkan revisi tenggat selesai.",
     ]
     for i, r in enumerate(recs):

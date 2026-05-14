@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTaskActivities, createActivity, startTimer, stopTimer } from '../services/api';
-import { TASK_KEYS } from './useTasks';
+import { getTaskActivities, createActivity } from '../services/api';
 
 export const ACTIVITY_KEYS = {
   byTask: (taskId: number) => ['activities', taskId] as const,
@@ -25,32 +24,6 @@ export function useCreateActivity() {
         void qc.invalidateQueries({ queryKey: ACTIVITY_KEYS.byTask(taskId) });
       }
       void qc.invalidateQueries({ queryKey: ['tasks'] });
-      void qc.invalidateQueries({ queryKey: ['technician-dashboard'] });
-    },
-  });
-}
-
-export function useStartTimer() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ taskId }: { taskId: number; projectId: number }) => startTimer(taskId),
-    onSuccess: (_data, { taskId, projectId }) => {
-      void qc.invalidateQueries({ queryKey: TASK_KEYS.detail(taskId) });
-      void qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
-      void qc.invalidateQueries({ queryKey: ACTIVITY_KEYS.byTask(taskId) });
-      void qc.invalidateQueries({ queryKey: ['technician-dashboard'] });
-    },
-  });
-}
-
-export function useStopTimer() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ taskId }: { taskId: number; projectId: number }) => stopTimer(taskId),
-    onSuccess: (_data, { taskId, projectId }) => {
-      void qc.invalidateQueries({ queryKey: TASK_KEYS.detail(taskId) });
-      void qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
-      void qc.invalidateQueries({ queryKey: ACTIVITY_KEYS.byTask(taskId) });
       void qc.invalidateQueries({ queryKey: ['technician-dashboard'] });
     },
   });

@@ -110,7 +110,6 @@ TABLES = [
             ("timeline_start", "DATE", "-", ""),
             ("timeline_end", "DATE", "-", ""),
             ("notes", "TEXT", "-", ""),
-            ("budget", "DECIMAL", "15,2", "Default: 0"),
             ("sort_order", "INT", "-", "Default: 0"),
             ("is_survey_task", "BOOLEAN", "-", "Default: FALSE"),
             ("timer_started_at", "TIMESTAMP", "-", ""),
@@ -143,35 +142,7 @@ TABLES = [
         ],
     },
     {
-        "num": "4.12", "title": "Material", "nama": "materials", "pk": "id",
-        "fk": ["project_id (terhubung dengan projects)"],
-        "rows": [
-            ("id", "SERIAL", "-", "PK"),
-            ("project_id", "INT", "-", "FK, NOT NULL"),
-            ("name", "VARCHAR", "500", "NOT NULL"),
-            ("quantity", "DECIMAL", "10,2", "Default: 1"),
-            ("unit", "VARCHAR", "50", "Default: pcs"),
-            ("unit_price", "DECIMAL", "15,2", "Default: 0"),
-            ("total_price", "DECIMAL", "15,2", "Generated"),
-            ("notes", "TEXT", "-", ""),
-            ("created_at", "TIMESTAMP", "-", "Default: CURRENT_TIMESTAMP"),
-        ],
-    },
-    {
-        "num": "4.13", "title": "Anggaran", "nama": "budget_items", "pk": "id",
-        "fk": ["project_id (terhubung dengan projects)"],
-        "rows": [
-            ("id", "SERIAL", "-", "PK"),
-            ("project_id", "INT", "-", "FK, NOT NULL"),
-            ("category", "VARCHAR", "255", "NOT NULL"),
-            ("description", "TEXT", "-", ""),
-            ("amount", "DECIMAL", "15,2", "Default: 0"),
-            ("is_actual", "BOOLEAN", "-", "Default: FALSE"),
-            ("created_at", "TIMESTAMP", "-", "Default: CURRENT_TIMESTAMP"),
-        ],
-    },
-    {
-        "num": "4.14", "title": "Daily Report", "nama": "daily_reports", "pk": "id",
+        "num": "4.12", "title": "Daily Report", "nama": "daily_reports", "pk": "id",
         "fk": [
             "project_id (terhubung dengan projects)",
             "task_id (terhubung dengan tasks)",
@@ -189,14 +160,13 @@ TABLES = [
         ],
     },
     {
-        "num": "4.15", "title": "Kesehatan Proyek", "nama": "project_health",
+        "num": "4.13", "title": "Kesehatan Proyek", "nama": "project_health",
         "pk": "project_id",
         "fk": ["project_id (terhubung dengan projects)"],
         "rows": [
             ("project_id", "INT", "-", "PK, FK"),
             ("spi_value", "DECIMAL", "6,4", ""),
             ("status", "VARCHAR", "50", "CHECK: green|amber|red"),
-            ("deviation_percent", "DECIMAL", "6,2", ""),
             ("actual_progress", "DECIMAL", "5,2", ""),
             ("planned_progress", "DECIMAL", "5,2", ""),
             ("total_tasks", "INT", "-", "Default: 0"),
@@ -208,7 +178,7 @@ TABLES = [
         ],
     },
     {
-        "num": "4.16", "title": "Aktivitas Tugas", "nama": "task_activities",
+        "num": "4.14", "title": "Aktivitas Tugas", "nama": "task_activities",
         "pk": "id",
         "fk": [
             "task_id (terhubung dengan tasks)",
@@ -228,7 +198,7 @@ TABLES = [
         ],
     },
     {
-        "num": "4.17", "title": "Eskalasi", "nama": "escalations", "pk": "id",
+        "num": "4.15", "title": "Eskalasi", "nama": "escalations", "pk": "id",
         "fk": [
             "task_id (terhubung dengan tasks)",
             "project_id (terhubung dengan projects)",
@@ -256,7 +226,7 @@ TABLES = [
         ],
     },
     {
-        "num": "4.18", "title": "Audit Log", "nama": "audit_log", "pk": "id",
+        "num": "4.16", "title": "Audit Log", "nama": "audit_log", "pk": "id",
         "fk": ["changed_by (terhubung dengan users)"],
         "rows": [
             ("id", "SERIAL", "-", "PK"),

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -8,6 +8,7 @@ import {
   useSensor,
   useSensors,
   closestCorners,
+  useDroppable,
   type DragStartEvent,
   type DragEndEvent,
   type DragOverEvent,
@@ -97,7 +98,7 @@ function AlertIcon() {
 // Sortable wrapper for a single card
 function SortableCard({
   task, onStatusChange, onTaskClick,
-  isChanging, userRole, columnId, isBlocked,
+  isChanging, userRole, columnId, isBlocked, sequenceNum,
 }: {
   task: Task;
   onStatusChange: (taskId: number, status: TaskStatus) => void;
@@ -106,6 +107,7 @@ function SortableCard({
   userRole?: UserRole;
   columnId?: string;
   isBlocked?: boolean;
+  sequenceNum?: number;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
@@ -129,7 +131,21 @@ function SortableCard({
         userRole={userRole}
         columnId={columnId}
         isBlocked={isBlocked}
+        sequenceNum={sequenceNum}
       />
+    </div>
+  );
+}
+
+function DroppableColumn({ col, children, isOver }: { col: ColumnDef; children: React.ReactNode; isOver: boolean }) {
+  const { setNodeRef } = useDroppable({ id: col.id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`rounded-xl border border-gray-200 dark:border-gray-700 border-t-4 ${col.borderColor} min-h-[200px] flex flex-col transition-colors ${isOver ? col.dropBg + ' ring-2 ring-blue-400/40' : ''}`}
+      data-column-id={col.id}
+    >
+      {children}
     </div>
   );
 }
@@ -147,6 +163,12 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changi
   );
 
   const doneTaskIds = useMemo(() => new Set(tasks.filter((t) => t.status === 'done').map((t) => t.id)), [tasks]);
+
+  // Global sequence numbers by sort_order rank (1-based)
+  const sequenceMap = useMemo(() => {
+    const sorted = [...tasks].sort((a, b) => a.sort_order - b.sort_order);
+    return new Map(sorted.map((t, i) => [t.id, i + 1]));
+  }, [tasks]);
 
   const grouped = useMemo(() => {
     const map: Record<KanbanColumn, Task[]> = { to_do: [], in_progress: [], review: [], done: [], overtime: [], over_deadline: [] };
@@ -184,11 +206,16 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changi
 
     if (!targetColumnId) return;
 
-    const currentColumnId = getTaskColumn(draggedTask);
-    if (currentColumnId === targetColumnId) return;
-
-    // Technicians can't move to done or review
     const newStatus = COLUMN_TO_STATUS[targetColumnId];
+
+    // No-op when target column maps to the same backing status (e.g.
+    // dragging from over_deadline -> to_do, or overtime -> in_progress
+    // when the underlying task is already working_on_it). Avoids spurious
+    // requests that the backend would reject.
+    if (newStatus === draggedTask.status) return;
+
+    // Technicians can't move to done; review must use the explicit submit
+    // button so the backend evidence/dependency checks fire.
     if (isTechnician && (newStatus === 'done' || newStatus === 'review')) return;
 
     onStatusChange(draggedTask.id, newStatus);
@@ -213,10 +240,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changi
               items={colTasks.map((t) => t.id)}
               strategy={verticalListSortingStrategy}
             >
-              <div
-                className={`rounded-xl border border-gray-200 dark:border-gray-700 border-t-4 ${col.borderColor} min-h-[200px] flex flex-col transition-colors ${isOver ? col.dropBg + ' ring-2 ring-blue-400/40' : ''}`}
-                data-column-id={col.id}
-              >
+              <DroppableColumn col={col} isOver={isOver}>
                 <div className={`${col.headerBg} px-3 py-2.5 rounded-t-lg`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
@@ -245,11 +269,12 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changi
                         userRole={userRole}
                         columnId={col.id}
                         isBlocked={task.depends_on != null && !doneTaskIds.has(task.depends_on)}
+                        sequenceNum={sequenceMap.get(task.id)}
                       />
                     ))
                   )}
                 </div>
-              </div>
+              </DroppableColumn>
             </SortableContext>
           );
         })}
@@ -264,6 +289,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changi
               onStatusChange={() => {}}
               columnId={getTaskColumn(activeTask)}
               isBlocked={activeTask.depends_on != null && !doneTaskIds.has(activeTask.depends_on)}
+              sequenceNum={sequenceMap.get(activeTask.id)}
             />
           </div>
         ) : null}

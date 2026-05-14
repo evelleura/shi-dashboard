@@ -86,9 +86,9 @@ beforeEach(async () => {
 
   const due = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const task = await testPool.query(
-    `INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`,
-    [projectId, 'Test Task', 'desc', technicianId, 'to_do', due.toISOString().split('T')[0], 100000, 0, false, managerId]
+    `INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, sort_order, is_survey_task, created_by)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
+    [projectId, 'Test Task', 'desc', technicianId, 'to_do', due.toISOString().split('T')[0], 0, false, managerId]
   );
   taskId = task.rows[0].id;
 });
@@ -326,11 +326,53 @@ describe('Tasks Handler', () => {
       expect(res.status).toBe(403);
     });
 
-    it('technician cannot make invalid transition from to_do to review', async () => {
+    it('technician cannot make invalid transition from to_do to done', async () => {
       const token = makeToken(technicianId, 'technician', 'tech@test.com');
-      const req = makeRequest('PATCH', `/api/tasks/${taskId}/status`, { status: 'review' }, token);
+      const req = makeRequest('PATCH', `/api/tasks/${taskId}/status`, { status: 'done' }, token);
       const res = await tasksHandler.changeTaskStatus(req, String(taskId));
       expect(res.status).toBe(400);
+    });
+
+    it('accumulates time_spent_seconds when leaving an active status', async () => {
+      // Move into in_progress, simulate time passing, then move to review
+      const token = makeToken(technicianId, 'technician', 'tech@test.com');
+      let req = makeRequest('PATCH', `/api/tasks/${taskId}/status`, { status: 'in_progress' }, token);
+      await tasksHandler.changeTaskStatus(req, String(taskId));
+
+      // Backdate status_changed_at so the elapsed-second math has something to add
+      await testPool.query(
+        `UPDATE tasks SET status_changed_at = NOW() - INTERVAL '120 seconds' WHERE id=$1`,
+        [taskId]
+      );
+
+      req = makeRequest('PATCH', `/api/tasks/${taskId}/status`, { status: 'review' }, token);
+      const res = await tasksHandler.changeTaskStatus(req, String(taskId));
+      const body = await res.json();
+      expect(res.status).toBe(200);
+      expect(body.data.status).toBe('review');
+      // Should have accrued ~120 seconds
+      expect(Number(body.data.time_spent_seconds)).toBeGreaterThanOrEqual(110);
+    });
+
+    it('writes a task_activities row on every status change', async () => {
+      const token = makeToken(technicianId, 'technician', 'tech@test.com');
+      const req = makeRequest('PATCH', `/api/tasks/${taskId}/status`, { status: 'in_progress' }, token);
+      await tasksHandler.changeTaskStatus(req, String(taskId));
+      const acts = await testPool.query(
+        `SELECT activity_type, message FROM task_activities WHERE task_id=$1 ORDER BY id`,
+        [taskId]
+      );
+      expect(acts.rowCount).toBe(1);
+      expect(acts.rows[0].activity_type).toBe('start_work');
+    });
+
+    it('is a no-op when target status equals current status', async () => {
+      const token = makeToken(technicianId, 'technician', 'tech@test.com');
+      const req = makeRequest('PATCH', `/api/tasks/${taskId}/status`, { status: 'to_do' }, token);
+      const res = await tasksHandler.changeTaskStatus(req, String(taskId));
+      expect(res.status).toBe(200);
+      const acts = await testPool.query(`SELECT id FROM task_activities WHERE task_id=$1`, [taskId]);
+      expect(acts.rowCount).toBe(0);
     });
 
     it('returns 400 for invalid status value', async () => {

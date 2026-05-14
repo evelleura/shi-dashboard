@@ -20,7 +20,6 @@ interface ScheduleTask {
   assigned_to: number | null;
   assigned_to_name: string | null;
   time_spent_seconds: number;
-  is_tracking: boolean;
   sort_order: number;
   project_id: number;
   project_code: string;
@@ -403,12 +402,6 @@ export default function SchedulePage() {
                           {/* Task info column */}
                           <div className="w-64 shrink-0 px-4 py-2 pl-10 border-r border-gray-100 dark:border-gray-700">
                             <div className="flex items-center gap-1.5">
-                              {task.is_tracking && (
-                                <span className="relative flex h-1.5 w-1.5 shrink-0">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
-                                </span>
-                              )}
                               <span className="text-xs text-gray-800 dark:text-gray-200 truncate font-medium">{task.name}</span>
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">

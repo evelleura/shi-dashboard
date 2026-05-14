@@ -61,7 +61,8 @@
       "Bash(node run_flow.js)",
       "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"budi@shi.co.id\",\"password\":\"password123\"}')",
       "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"rizky@shi.co.id\",\"password\":\"password123\"}')",
-      "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"budi@shi.co.id\",\"password\":\"password123\"}')"
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"budi@shi.co.id\",\"password\":\"password123\"}')",
+      "Bash(bunx tsc *)"
     ]
   },
   "spinnerTipsEnabled": false,

@@ -13,9 +13,11 @@ interface Props {
   changingTaskId?: number;
   showProject?: boolean;
   userRole?: UserRole;
+  onSwapTasks?: (taskA: { id: number; sort_order: number }, taskB: { id: number; sort_order: number }) => void;
+  isReordering?: boolean;
 }
 
-type SortKey = 'name' | 'status' | 'assigned_to_name' | 'due_date' | 'time' | 'created_at';
+type SortKey = 'order' | 'name' | 'status' | 'assigned_to_name' | 'due_date' | 'time' | 'created_at';
 type RowAge = 'new' | 'recent' | 'normal' | 'stale';
 
 function formatDate(dateStr: string, lang: 'id' | 'en' = 'id'): string {
@@ -78,10 +80,11 @@ const PAGE_SIZES = [10, 25, 50];
 export default function TaskTable({
   tasks, onStatusChange, onTaskClick,
   changingTaskId, showProject = false, userRole,
+  onSwapTasks, isReordering,
 }: Props) {
   const { language } = useLanguage();
-  const [sortKey, setSortKey] = useState<SortKey>('created_at');
-  const [sortDesc, setSortDesc] = useState(true);
+  const [sortKey, setSortKey] = useState<SortKey>('order');
+  const [sortDesc, setSortDesc] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
@@ -90,12 +93,15 @@ export default function TaskTable({
     copy.sort((a, b) => {
       let cmp = 0;
       switch (sortKey) {
+        case 'order':
+          cmp = a.sort_order - b.sort_order;
+          break;
         case 'name':
           cmp = a.name.localeCompare(b.name);
           break;
         case 'status': {
-          const order: Record<string, number> = { working_on_it: 0, in_progress: 1, review: 2, to_do: 3, done: 4 };
-          cmp = (order[a.status] ?? 9) - (order[b.status] ?? 9);
+          const statusOrder: Record<string, number> = { working_on_it: 0, in_progress: 1, review: 2, to_do: 3, done: 4 };
+          cmp = (statusOrder[a.status] ?? 9) - (statusOrder[b.status] ?? 9);
           break;
         }
         case 'assigned_to_name':
@@ -126,9 +132,20 @@ export default function TaskTable({
     [sorted, safePage, pageSize],
   );
 
+  // Sequence numbers are always based on sort_order rank (not display order)
+  const sequenceMap = useMemo(() => {
+    const byOrder = [...tasks].sort((a, b) => a.sort_order - b.sort_order);
+    return new Map(byOrder.map((t, i) => [t.id, i + 1]));
+  }, [tasks]);
+
+  // Adjacent tasks in sort_order sequence for up/down reorder
+  const tasksByOrder = useMemo(() => [...tasks].sort((a, b) => a.sort_order - b.sort_order), [tasks]);
+
+  const canReorder = !!onSwapTasks && (userRole === 'manager' || userRole === 'admin') && sortKey === 'order' && !sortDesc;
+
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDesc(!sortDesc);
-    else { setSortKey(key); setSortDesc(true); }
+    else { setSortKey(key); setSortDesc(false); }
     setPage(0);
   };
 
@@ -199,6 +216,7 @@ export default function TaskTable({
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" role="table">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
+              <SortHeader label="#" field="order" className="w-12" />
               <SortHeader label={t('task.name', language)} field="name" />
               {showProject && (
                 <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('project.title', language)}</th>
@@ -206,7 +224,7 @@ export default function TaskTable({
               <SortHeader label={t('label.status', language)} field="status" />
               <SortHeader label={t('label.assignee', language)} field="assigned_to_name" />
               <SortHeader label={t('label.due_date', language)} field="due_date" />
-              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{language === 'id' ? 'Est.' : 'Est.'}</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Est.</th>
               <SortHeader label={language === 'id' ? 'Waktu' : 'Time'} field="time" />
               <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{language === 'id' ? 'Bukti' : 'Evidence'}</th>
             </tr>
@@ -230,8 +248,39 @@ export default function TaskTable({
 
               const ageBorder = !urgency ? AGE_BORDER[age] : '';
 
+              const seqNum = sequenceMap.get(task.id) ?? 0;
+              const orderIdx = tasksByOrder.findIndex((t) => t.id === task.id);
+              const prevTask = orderIdx > 0 ? tasksByOrder[orderIdx - 1] : null;
+              const nextTask = orderIdx < tasksByOrder.length - 1 ? tasksByOrder[orderIdx + 1] : null;
+
               return (
                 <tr key={task.id} className={`${urgencyBg} ${ageBorder} transition-colors`}>
+                  {/* Sequence number + reorder */}
+                  <td className="px-2 py-2.5 w-12" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex flex-col items-center gap-0.5">
+                      {canReorder && prevTask ? (
+                        <button
+                          title={t('task.move_up', language)}
+                          disabled={isReordering}
+                          onClick={() => onSwapTasks!({ id: task.id, sort_order: task.sort_order }, { id: prevTask.id, sort_order: prevTask.sort_order })}
+                          className="text-gray-300 hover:text-blue-500 disabled:opacity-30 leading-none"
+                        >
+                          &#9650;
+                        </button>
+                      ) : canReorder ? <span className="h-3.5" /> : null}
+                      <span className="text-xs font-semibold text-gray-400 dark:text-gray-500">#{seqNum}</span>
+                      {canReorder && nextTask ? (
+                        <button
+                          title={t('task.move_down', language)}
+                          disabled={isReordering}
+                          onClick={() => onSwapTasks!({ id: task.id, sort_order: task.sort_order }, { id: nextTask.id, sort_order: nextTask.sort_order })}
+                          className="text-gray-300 hover:text-blue-500 disabled:opacity-30 leading-none"
+                        >
+                          &#9660;
+                        </button>
+                      ) : canReorder ? <span className="h-3.5" /> : null}
+                    </div>
+                  </td>
                   {/* Task name */}
                   <td className="px-3 py-2.5 cursor-pointer" onClick={() => onTaskClick?.(task)}>
                     <div className="flex items-center gap-2">

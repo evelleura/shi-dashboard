@@ -38,7 +38,7 @@ const PRIORITY_ORDER: Record<EscalationPriority, number> = {
 
 const ACTION_REQUEST_LABELS: Record<EscalationActionRequest, string> = {
   ganti_teknisi:       'Ganti Teknisi',
-  ganti_material:      'Ganti Material/Alat',
+  ganti_alat:          'Ganti Alat',
   perpanjang_deadline: 'Perpanjang Deadline',
   mediasi_client:      'Mediasi ke Client',
   batalkan_eskalasi:   'Batalkan Eskalasi',

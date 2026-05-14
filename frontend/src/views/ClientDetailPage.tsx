@@ -356,8 +356,11 @@ export default function ClientDetailPage() {
     return (
       <div className="text-center py-16">
         <p className="text-red-500 text-sm">Gagal memuat data klien.</p>
-        <button onClick={() => router.back()} className="mt-4 text-blue-600 dark:text-blue-400 text-sm hover:underline">
-          ← Kembali
+        <button onClick={() => router.back()} className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors group">
+          <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Kembali
         </button>
       </div>
     );
@@ -375,14 +378,19 @@ export default function ClientDetailPage() {
   return (
     <div className="space-y-6">
       {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors group"
+        >
+          <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Kembali
+        </button>
+
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
-          <button
-            onClick={() => router.back()}
-            className="text-blue-600 dark:text-blue-400 text-sm hover:underline shrink-0 mt-1"
-          >
-            ← Kembali
-          </button>
 
           {/* Avatar / photo */}
           <div className="shrink-0 relative group">
@@ -421,7 +429,7 @@ export default function ClientDetailPage() {
 
         {/* Action buttons */}
         {isManager && (
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-start gap-2 shrink-0">
             <button
               onClick={() => setShowEdit(true)}
               className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -438,6 +446,7 @@ export default function ClientDetailPage() {
             )}
           </div>
         )}
+      </div>
       </div>
 
       {/* ── Info Card ──────────────────────────────────────────────────────── */}
@@ -653,14 +662,14 @@ export default function ClientDetailPage() {
                             className={`text-xs font-semibold ${
                               p.spi_value == null
                                 ? 'text-gray-400'
-                                : p.spi_value >= 0.95
+                                : Number(p.spi_value) >= 0.95
                                 ? 'text-green-600 dark:text-green-400'
-                                : p.spi_value >= 0.85
+                                : Number(p.spi_value) >= 0.85
                                 ? 'text-amber-600 dark:text-amber-400'
                                 : 'text-red-600 dark:text-red-400'
                             }`}
                           >
-                            {p.spi_value != null ? p.spi_value.toFixed(2) : '--'}
+                            {p.spi_value != null ? Number(p.spi_value).toFixed(2) : '--'}
                           </span>
                         </td>
                       </tr>

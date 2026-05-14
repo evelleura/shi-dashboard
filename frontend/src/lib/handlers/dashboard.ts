@@ -26,7 +26,7 @@ export async function getDashboard(request: NextRequest) {
       `SELECT p.id, p.name, p.description, p.client_id, p.start_date, p.end_date,
         p.duration, p.status, p.phase, p.project_value,
         c.name AS client_name,
-        ph.spi_value, ph.status AS health_status, ph.deviation_percent,
+        ph.spi_value, ph.status AS health_status,
         ph.actual_progress, ph.planned_progress, ph.last_updated AS health_last_updated,
         ph.total_tasks, ph.completed_tasks, ph.working_tasks, ph.overtime_tasks, ph.overdue_tasks,
         dr.constraints AS latest_constraints, dr.report_date AS last_report_date,
@@ -133,18 +133,24 @@ export async function getTechnicianDashboard(request: NextRequest) {
         [userId]
       ),
       query(
-        `SELECT p.id, p.name, p.phase, p.start_date, p.end_date, p.target_description, p.project_value,
+        `SELECT p.id, p.name, p.phase, p.start_date, p.end_date, p.created_at, p.target_description, p.project_value,
           c.name AS client_name, c.address AS client_address, c.phone AS client_phone,
           ph.spi_value, ph.status AS health_status,
           COUNT(t.id) FILTER (WHERE t.assigned_to = $1)::int AS my_task_count,
-          COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'done')::int AS my_completed
+          COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'done')::int AS my_completed,
+          (SELECT t2.name FROM tasks t2 WHERE t2.project_id = p.id AND t2.assigned_to = $1 AND t2.status != 'done' ORDER BY t2.sort_order ASC LIMIT 1) AS next_task_name,
+          (SELECT t2.status FROM tasks t2 WHERE t2.project_id = p.id AND t2.assigned_to = $1 AND t2.status != 'done' ORDER BY t2.sort_order ASC LIMIT 1) AS next_task_status,
+          (SELECT t2.due_date::text FROM tasks t2 WHERE t2.project_id = p.id AND t2.assigned_to = $1 AND t2.status != 'done' ORDER BY t2.sort_order ASC LIMIT 1) AS next_task_due
          FROM projects p
-         JOIN project_assignments pa ON pa.project_id = p.id AND pa.user_id = $1
          LEFT JOIN clients c ON c.id = p.client_id
          LEFT JOIN project_health ph ON ph.project_id = p.id
          LEFT JOIN tasks t ON t.project_id = p.id
          WHERE p.status = 'active'
-         GROUP BY p.id, p.name, p.phase, p.start_date, p.end_date, p.target_description, p.project_value,
+           AND (
+             EXISTS (SELECT 1 FROM project_assignments pa WHERE pa.project_id = p.id AND pa.user_id = $1)
+             OR EXISTS (SELECT 1 FROM tasks t2 WHERE t2.project_id = p.id AND t2.assigned_to = $1)
+           )
+         GROUP BY p.id, p.name, p.phase, p.start_date, p.end_date, p.created_at, p.target_description, p.project_value,
            c.name, c.address, c.phone, ph.spi_value, ph.status
          ORDER BY p.end_date ASC`,
         [userId]
@@ -161,7 +167,7 @@ export async function getTechnicianDashboard(request: NextRequest) {
         [userId]
       ),
       query(
-        `SELECT p.id, p.name, p.phase, p.start_date, p.end_date, p.status,
+        `SELECT p.id, p.name, p.phase, p.start_date, p.end_date, p.status, p.updated_at,
           c.name AS client_name, c.address AS client_address,
           COUNT(t.id) FILTER (WHERE t.assigned_to = $1)::int AS my_task_count,
           COUNT(t.id) FILTER (WHERE t.assigned_to = $1 AND t.status = 'done')::int AS my_completed
@@ -169,7 +175,7 @@ export async function getTechnicianDashboard(request: NextRequest) {
          JOIN project_assignments pa ON pa.project_id = p.id AND pa.user_id = $1
          LEFT JOIN clients c ON c.id = p.client_id LEFT JOIN tasks t ON t.project_id = p.id
          WHERE p.status IN ('completed', 'on-hold', 'cancelled')
-         GROUP BY p.id, p.name, p.phase, p.start_date, p.end_date, p.status, c.name, c.address
+         GROUP BY p.id, p.name, p.phase, p.start_date, p.end_date, p.status, p.updated_at, c.name, c.address
          ORDER BY p.updated_at DESC`,
         [userId]
       ),

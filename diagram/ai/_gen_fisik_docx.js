@@ -160,7 +160,6 @@ const tables = [
       ["id_proyek", "BIGINT", "20", "PK, FK"],
       ["spi_value", "DECIMAL", "5,2", ""],
       ["status", "ENUM", "'green','amber','red'", ""],
-      ["deviation_percent", "DECIMAL", "5,2", ""],
       ["actual_progress", "DECIMAL", "5,2", ""],
       ["planned_progress", "DECIMAL", "5,2", ""],
       ["total_tasks", "INT", "11", ""],

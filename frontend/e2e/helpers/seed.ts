@@ -14,7 +14,7 @@ const pool = new Pool({
 export async function resetDatabase() {
   await pool.query(`
     TRUNCATE TABLE
-      task_evidence, materials, budget_items,
+      task_evidence,
       task_activities, audit_log,
       daily_reports, project_health,
       tasks, project_assignments,
@@ -99,8 +99,8 @@ export async function seedTask(opts: {
 }) {
   const due = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const res = await pool.query(
-    `INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, budget, sort_order, is_survey_task, created_by)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+    `INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date, sort_order, is_survey_task, created_by)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
     [
       opts.projectId,
       'Test Task',
@@ -108,7 +108,6 @@ export async function seedTask(opts: {
       opts.assignedTo || null,
       opts.status || 'to_do',
       due.toISOString().split('T')[0],
-      100000,
       0,
       opts.isSurveyTask || false,
       opts.managerId,

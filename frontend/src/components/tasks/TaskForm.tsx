@@ -32,7 +32,6 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
     due_date: '',
     timeline_start: '',
     notes: '',
-    budget: '',
     is_survey_task: false,
     depends_on: '',
   });
@@ -103,7 +102,6 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
         timeline_start: form.timeline_start || undefined,
         timeline_end: form.due_date || undefined,
         notes: form.notes.trim() || undefined,
-        budget: form.budget ? parseFloat(form.budget) : undefined,
         is_survey_task: projectPhase === 'survey' ? true : form.is_survey_task,
         depends_on: form.depends_on ? parseInt(form.depends_on) : null,
       });
@@ -243,11 +241,6 @@ export default function TaskForm({ projectId, technicians, technicianMeta, exist
           </select>
         </div>
       )}
-
-      <div>
-        <label htmlFor="task-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('task.budget', language)}</label>
-        <input id="task-budget" type="number" name="budget" value={form.budget} onChange={handleChange} min={0} step={1000} placeholder="0" className={inputClass} />
-      </div>
 
       <div>
         <label htmlFor="task-notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('label.notes', language)}</label>

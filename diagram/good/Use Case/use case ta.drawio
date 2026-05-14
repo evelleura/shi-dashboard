@@ -10,7 +10,7 @@
         <mxCell id="XgjSUlyxm1ExEToaHjOL-2" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Lihat detail tugas &amp;amp; proyek" vertex="1">
           <mxGeometry height="40" width="180" x="140" y="190" as="geometry" />
         </mxCell>
-        <mxCell id="XgjSUlyxm1ExEToaHjOL-3" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="MANAJER PROYEK" vertex="1">
+        <mxCell id="XgjSUlyxm1ExEToaHjOL-3" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="MANAJER" vertex="1">
           <mxGeometry height="60" width="30" x="1040" y="-130" as="geometry" />
         </mxCell>
         <mxCell id="XgjSUlyxm1ExEToaHjOL-4" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Mengisi daily report" vertex="1">

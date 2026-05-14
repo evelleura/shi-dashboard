@@ -67,7 +67,6 @@ export function makeTask(overrides: Partial<Record<string, unknown>> = {}) {
     assigned_to: 1,
     status: 'to_do',
     due_date: due.toISOString().split('T')[0],
-    budget: 100000,
     sort_order: 0,
     is_survey_task: false,
     status_changed_at: new Date().toISOString(),

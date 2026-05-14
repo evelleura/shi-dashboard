@@ -35,7 +35,7 @@ const PRIORITY_BORDER: Record<EscalationPriority, string> = {
 
 const ACTION_REQUEST_LABELS_ID: Record<EscalationActionRequest, string> = {
   ganti_teknisi:       'Ganti Teknisi',
-  ganti_material:      'Ganti Material/Alat',
+  ganti_alat:          'Ganti Alat',
   perpanjang_deadline: 'Perpanjang Deadline',
   mediasi_client:      'Mediasi ke Client',
   batalkan_eskalasi:   'Batalkan Eskalasi',
@@ -43,7 +43,7 @@ const ACTION_REQUEST_LABELS_ID: Record<EscalationActionRequest, string> = {
 
 const ACTION_REQUEST_LABELS_EN: Record<EscalationActionRequest, string> = {
   ganti_teknisi:       'Change Technician',
-  ganti_material:      'Change Material/Equipment',
+  ganti_alat:          'Change Equipment',
   perpanjang_deadline: 'Extend Deadline',
   mediasi_client:      'Client Mediation',
   batalkan_eskalasi:   'Cancel Escalation',

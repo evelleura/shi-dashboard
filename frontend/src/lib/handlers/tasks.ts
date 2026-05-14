@@ -3,16 +3,34 @@ import { authenticateRequest, authorizeRoles } from '@/lib/auth';
 import { query, getClient } from '@/lib/db';
 import { recalculateSPI } from '@/lib/spiCalculator';
 import { logChange } from './audit';
+import { createNotification } from './notifications';
 
 const VALID_STATUSES = ['to_do', 'in_progress', 'working_on_it', 'review', 'done'];
 
+const ACTIVE_STATUSES = new Set(['in_progress', 'working_on_it']);
+
+// Allowed transitions for technicians (managers/admins are unrestricted).
+// Loosened from the original to support drag-and-drop moves that used to
+// 400 silently — e.g. dragging an overdue card from `working_on_it` to
+// `review`, or pulling a `review` card back to `in_progress`.
 const STATUS_TRANSITIONS: Record<string, string[]> = {
-  to_do: ['in_progress'],
-  in_progress: ['to_do', 'review'],
-  working_on_it: ['in_progress'],
-  review: ['in_progress'],
-  done: [],
+  to_do:         ['in_progress', 'working_on_it'],
+  in_progress:   ['to_do', 'working_on_it', 'review'],
+  working_on_it: ['to_do', 'in_progress', 'review'],
+  review:        ['in_progress', 'working_on_it'],
+  done:          [],
 };
+
+// Map a status transition to a task_activities.activity_type label.
+function activityTypeForTransition(from: string, to: string): string {
+  if (to === 'done') return 'complete';
+  if (ACTIVE_STATUSES.has(to) && !ACTIVE_STATUSES.has(from)) {
+    // First time entering an active state from to_do/review counts as start.
+    return from === 'to_do' ? 'start_work' : 'resume';
+  }
+  if (ACTIVE_STATUSES.has(from) && !ACTIVE_STATUSES.has(to)) return 'pause';
+  return 'note';
+}
 
 // Walk depends_on chain to detect circular refs (max 10 levels)
 async function hasCircularDependency(taskId: number, dependsOn: number): Promise<boolean> {
@@ -54,7 +72,7 @@ export async function createTask(request: NextRequest) {
   if (roleCheck) return roleCheck;
 
   const body = await request.json();
-  const { project_id, name, description, assigned_to, due_date, timeline_start, timeline_end, notes, budget, sort_order, is_survey_task, depends_on } = body;
+  const { project_id, name, description, assigned_to, due_date, timeline_start, timeline_end, notes, sort_order, is_survey_task, depends_on } = body;
 
   if (!project_id || !name || typeof name !== 'string' || name.trim().length === 0) {
     return NextResponse.json({ success: false, error: 'project_id and name are required' }, { status: 400 });
@@ -104,14 +122,27 @@ export async function createTask(request: NextRequest) {
     }
     const result = await query(
       `INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date,
-         timeline_start, timeline_end, notes, budget, sort_order, is_survey_task, depends_on, created_by)
-       VALUES ($1, $2, $3, $4, 'to_do', $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+         timeline_start, timeline_end, notes, sort_order, is_survey_task, depends_on, created_by)
+       VALUES ($1, $2, $3, $4, 'to_do', $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
       [project_id, name.trim(), description || null, assigned_to || null,
        due_date || null, timeline_start || null, timeline_end || null,
-       notes || null, budget || 0, taskSortOrder, is_survey_task || false,
+       notes || null, taskSortOrder, is_survey_task || false,
        depends_on || null, auth.user.userId]
     );
     await recalculateSPI(parseInt(project_id));
+    if (assigned_to) {
+      const projRow = await query('SELECT name FROM projects WHERE id = $1', [project_id]);
+      const projectName = (projRow.rows[0]?.name as string) ?? 'Proyek';
+      await createNotification({
+        userId: parseInt(String(assigned_to)),
+        type: 'task_assigned',
+        title: `Tugas baru ditugaskan: ${name.trim()}`,
+        body: `Kamu mendapat tugas baru di proyek ${projectName}`,
+        entityType: 'task',
+        entityId: result.rows[0].id as number,
+        projectId: parseInt(String(project_id)),
+      });
+    }
     const actorName1 = ((await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string) || 'Unknown';
     await logChange({
       entityType: 'task', entityId: result.rows[0].id as number, entityName: name.trim(),
@@ -157,11 +188,11 @@ export async function bulkCreateTasks(request: NextRequest) {
       }
       const result = await client.query(
         `INSERT INTO tasks (project_id, name, description, assigned_to, status, due_date,
-           timeline_start, timeline_end, notes, budget, sort_order, is_survey_task, created_by)
-         VALUES ($1, $2, $3, $4, 'to_do', $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+           timeline_start, timeline_end, notes, sort_order, is_survey_task, created_by)
+         VALUES ($1, $2, $3, $4, 'to_do', $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
         [project_id, task.name.trim(), task.description || null, task.assigned_to || null,
          task.due_date || null, task.timeline_start || null, task.timeline_end || null,
-         task.notes || null, task.budget || 0, nextOrder++, task.is_survey_task || false, auth.user.userId]
+         task.notes || null, nextOrder++, task.is_survey_task || false, auth.user.userId]
       );
       created.push(result.rows[0]);
     }
@@ -238,7 +269,7 @@ export async function updateTask(request: NextRequest, id: string) {
     }
     const row = current.rows[0] as Record<string, unknown>;
     const body = await request.json();
-    const { name, description, assigned_to, status, due_date, timeline_start, timeline_end, notes, budget, sort_order, is_survey_task, depends_on } = body;
+    const { name, description, assigned_to, status, due_date, timeline_start, timeline_end, notes, sort_order, is_survey_task, depends_on } = body;
 
     if (status !== undefined && !VALID_STATUSES.includes(status)) {
       return NextResponse.json({ success: false, error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` }, { status: 400 });
@@ -274,30 +305,72 @@ export async function updateTask(request: NextRequest, id: string) {
       }
     }
 
+    const newStatus = status !== undefined ? status : (row.status as string);
+    const oldStatus = row.status as string;
+    const statusChanged = newStatus !== oldStatus;
+    const wasActive = ACTIVE_STATUSES.has(oldStatus);
+    const accumulateTime = statusChanged && wasActive;
+
     const result = await query(
       `UPDATE tasks SET name=$1, description=$2, assigned_to=$3, status=$4, due_date=$5,
-        timeline_start=$6, timeline_end=$7, notes=$8, budget=$9, sort_order=$10,
-        is_survey_task=$11, depends_on=$12, updated_at=NOW()
-       WHERE id=$13 RETURNING *`,
+        timeline_start=$6, timeline_end=$7, notes=$8, sort_order=$9,
+        is_survey_task=$10, depends_on=$11,
+        status_changed_at = CASE WHEN $13::boolean THEN NOW() ELSE status_changed_at END,
+        time_spent_seconds = CASE
+          WHEN $14::boolean
+            THEN COALESCE(time_spent_seconds, 0)
+                 + GREATEST(EXTRACT(EPOCH FROM (NOW() - status_changed_at))::int, 0)
+          ELSE time_spent_seconds
+        END,
+        updated_at=NOW()
+       WHERE id=$12 RETURNING *`,
       [
         name !== undefined ? name : row.name,
         description !== undefined ? description : row.description,
         (assigned_to !== undefined ? assigned_to : row.assigned_to) || null,
-        status !== undefined ? status : row.status,
+        newStatus,
         (due_date !== undefined ? due_date : row.due_date) || null,
         newStart || null,
         newEnd || null,
         (notes !== undefined ? notes : row.notes) || null,
-        budget !== undefined ? budget : row.budget,
         sort_order !== undefined ? sort_order : row.sort_order,
         is_survey_task !== undefined ? is_survey_task : row.is_survey_task,
         newDependsOn || null,
         taskId,
+        statusChanged,
+        accumulateTime,
       ]
     );
 
-    if (status !== undefined && status !== row.status) {
+    if (statusChanged) {
       await recalculateSPI(row.project_id as number);
+      const updatedRow = result.rows[0] as Record<string, unknown>;
+      const activityType = activityTypeForTransition(oldStatus, newStatus);
+      const newSeconds = Number(updatedRow.time_spent_seconds ?? 0);
+      let activityMessage = `Status: ${oldStatus} -> ${newStatus}`;
+      if (accumulateTime) {
+        const minutes = Math.round(newSeconds / 60);
+        activityMessage += ` (total ${minutes} min)`;
+      }
+      await query(
+        'INSERT INTO task_activities (task_id, user_id, message, activity_type) VALUES ($1, $2, $3, $4)',
+        [taskId, auth.user.userId, activityMessage, activityType]
+      );
+    }
+
+    if (assigned_to != null && assigned_to !== row.assigned_to) {
+      const projRow = await query('SELECT name FROM projects WHERE id = $1', [row.project_id]);
+      const projectName = (projRow.rows[0]?.name as string) ?? 'Proyek';
+      const taskName = (name !== undefined ? name : row.name) as string;
+      await createNotification({
+        userId: parseInt(String(assigned_to)),
+        type: 'task_assigned',
+        title: `Tugas ditugaskan kepadamu: ${taskName}`,
+        body: `Kamu ditugaskan ke tugas ini di proyek ${projectName}`,
+        entityType: 'task',
+        entityId: taskId,
+        projectId: row.project_id as number,
+      });
     }
 
     // Log all changed fields
@@ -429,19 +502,58 @@ export async function changeTaskStatus(request: NextRequest, id: string) {
       }
     }
 
+    // No-op if same status — keeps drag-and-drop between visually-distinct
+    // but semantically identical columns (e.g. over_deadline -> to_do) silent.
+    if (currentStatus === status) {
+      const noop = await query('SELECT * FROM tasks WHERE id = $1', [taskId]);
+      return NextResponse.json({ success: true, data: noop.rows[0] });
+    }
+
+    // Auto-track work duration: if leaving an active status (in_progress /
+    // working_on_it), accumulate elapsed time since status_changed_at into
+    // time_spent_seconds. This replaces the manual play/pause timer.
+    const wasActive = ACTIVE_STATUSES.has(currentStatus);
     const result = await query(
-      'UPDATE tasks SET status=$1, updated_at=NOW(), status_changed_at=NOW() WHERE id=$2 RETURNING *',
+      wasActive
+        ? `UPDATE tasks
+             SET status = $1,
+                 time_spent_seconds = COALESCE(time_spent_seconds, 0)
+                                    + GREATEST(EXTRACT(EPOCH FROM (NOW() - status_changed_at))::int, 0),
+                 status_changed_at = NOW(),
+                 updated_at = NOW()
+           WHERE id = $2 RETURNING *`
+        : `UPDATE tasks
+             SET status = $1,
+                 status_changed_at = NOW(),
+                 updated_at = NOW()
+           WHERE id = $2 RETURNING *`,
       [status, taskId]
     );
-    if (currentStatus !== status) {
-      await recalculateSPI(task.project_id as number);
-      const actorName4 = ((await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string) || 'Unknown';
-      await logChange({
-        entityType: 'task', entityId: taskId, entityName: task.name as string,
-        action: 'update', changes: [{ field: 'status', oldValue: currentStatus, newValue: status }],
-        userId: auth.user.userId, userName: actorName4,
-      });
+
+    await recalculateSPI(task.project_id as number);
+
+    // Auto-log the status change as a task_activities entry — this replaces
+    // the manual "Started/Paused work" entries the timer button used to write.
+    const activityType = activityTypeForTransition(currentStatus, status);
+    const updatedRow = result.rows[0] as Record<string, unknown>;
+    const newSeconds = Number(updatedRow.time_spent_seconds ?? 0);
+    let activityMessage = `Status: ${currentStatus} -> ${status}`;
+    if (wasActive) {
+      const minutes = Math.round(newSeconds / 60);
+      activityMessage += ` (total ${minutes} min)`;
     }
+    await query(
+      'INSERT INTO task_activities (task_id, user_id, message, activity_type) VALUES ($1, $2, $3, $4)',
+      [taskId, auth.user.userId, activityMessage, activityType]
+    );
+
+    const actorName4 = ((await query('SELECT name FROM users WHERE id = $1', [auth.user.userId])).rows[0]?.name as string) || 'Unknown';
+    await logChange({
+      entityType: 'task', entityId: taskId, entityName: task.name as string,
+      action: 'update', changes: [{ field: 'status', oldValue: currentStatus, newValue: status }],
+      userId: auth.user.userId, userName: actorName4,
+    });
+
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.error('Change task status error:', err);
@@ -525,7 +637,7 @@ export async function getScheduleTasks(request: NextRequest) {
   try {
     const result = await query(
       `SELECT t.id, t.name, t.status, t.due_date, t.timeline_start, t.timeline_end,
-              t.assigned_to, t.time_spent_seconds, t.is_tracking, t.sort_order, t.depends_on,
+              t.assigned_to, t.time_spent_seconds, t.sort_order, t.depends_on,
               u.name AS assigned_to_name,
               p.id AS project_id, p.project_code, p.name AS project_name,
               p.start_date AS project_start, p.end_date AS project_end,
