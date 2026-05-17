@@ -128,7 +128,7 @@ Bab ini berisi kesimpulan dari keseluruhan hasil penelitian yang menjawab rumusa
 ## [JUDUL BAB] BAB II
 KAJIAN HASIL PENELITIAN DAN LANDASAN TEORI
 
-## [2.x] Kajian Hasil Penelitian
+Kajian Hasil Penelitian
 
 Kajian hasil penelitian ini memuat tinjauan terhadap beberapa penelitian terdahulu yang relevan dengan topik pengembangan fitur dashboard pada sistem project management. Penelitian-penelitian tersebut dijadikan sebagai bahan referensi dan perbandingan untuk memahami pendekatan, metode, serta hasil yang telah dicapai oleh peneliti sebelumnya. Melalui kajian ini, dapat diidentifikasi persamaan dan perbedaan antara penelitian terdahulu dengan penelitian yang dilakukan penulis, sehingga dapat diketahui posisi dan kontribusi penelitian ini terhadap pengembangan keilmuan di bidang sistem informasi manajemen proyek.
 
@@ -150,29 +150,29 @@ Penelitian yang dilakukan oleh Iqbal dkk. (2024) dengan judul "Sistem Manajemen 
 
 *Tabel 2.1 Perbandingan Penelitian Terdahulu*
 
-## [2.x] Landasan Teori
+Landasan Teori
 
 Dalam pengerjaan penelitian Tugas Akhir ini penulis menggunakan beberapa landasan teori yang menjadi acuan diantaranya sebagai berikut:
 
-## [2.2.a] Manajemen Proyek dan Sistem Monitoring
+Manajemen Proyek dan Sistem Monitoring
 
 Manajemen proyek merupakan disiplin ilmu yang mencakup proses perencanaan, pelaksanaan, dan pengendalian untuk memastikan tujuan proyek tercapai sesuai batasan waktu, biaya, dan ruang lingkup. Dalam proses pengendalian, manajer memerlukan informasi akurat sebagai dasar evaluasi dan pengambilan keputusan. Sistem monitoring berperan sebagai salah satu instrumen yang menyediakan informasi tersebut melalui pelacakan data aktivitas lapangan (Chaerul dkk., 2021). Praktik konvensional yang menggunakan alat tidak terintegrasi seperti spreadsheet terpisah sering menghambat aliran informasi dan mempersulit proses pengendalian. Oleh karena itu, penerapan project management system terpadu menjadi solusi untuk mengintegrasikan seluruh proses manajemen proyek, mulai dari pencatatan data harian hingga penyajian informasi bagi manajemen. Pengembangan fitur seperti dashboard berbasis data daily report bertujuan untuk mendukung efektivitas pengelolaan proyek secara menyeluruh, termasuk koordinasi tim, evaluasi kemajuan, dan pengambilan keputusan strategis.
 
-## [2.2.a] Dashboard Manajemen Proyek
+Dashboard Manajemen Proyek
 
 Dalam project management system, dashboard berfungsi sebagai antarmuka pengguna grafis yang memvisualisasikan data operasional secara terpusat. Berbeda dengan sistem analitik prediktif, dashboard memfasilitasi transparansi informasi dengan mengubah rekapitulasi data daily report tekstual yang diinput oleh teknisi menjadi representasi visual terstruktur, seperti grafik kemajuan fisik dan indikator ketepatan waktu terhadap rencana awal atau baseline (Silmina & Azmi, 2025). Melalui transformasi visual ini, manajer dapat memahami kondisi portofolio proyek secara komprehensif, mengevaluasi kinerja operasional berdasarkan fakta aktual, serta merumuskan keputusan tindak lanjut dengan jauh lebih efisien tanpa harus membaca laporan secara manual (Reddy, 2025).
 
-## [2.2.a] Sistem Informasi Daily Report Proyek
+Sistem Informasi Daily Report Proyek
 
 Sistem Informasi Daily Report Proyek merupakan sebuah modul esensial di dalam ekosistem Sistem Manajemen Proyek (Project Management System) yang berfungsi untuk merekam aktivitas operasional harian secara terstruktur. Dalam siklus pelaksanaan proyek, pelaporan harian bertindak sebagai sumber data utama yang mendokumentasikan rincian progres pekerjaan, alokasi waktu, status penyelesaian tugas, serta kendala teknis di lapangan. Integrasi pelaporan harian ke dalam sistem manajemen proyek bertujuan untuk melakukan sentralisasi data historis, memastikan bahwa seluruh rekam jejak operasional dapat dilacak (traceable) secara aktual dan terhindar dari risiko kehilangan atau ketidakkonsistenan data akibat pencatatan manual (Alawiyah dkk. 2022).
 
 Untuk memaksimalkan nilai dari himpunan data laporan harian tersebut, diperlukan pengembangan fitur antarmuka visual berupa dashboard pemantauan (monitoring). Fitur dashboard ini secara teknis akan mengekstrak, mengolah, dan menerjemahkan data daily report yang mentah menjadi informasi visual yang komprehensif, seperti grafik progres, metrik capaian, maupun rekapitulasi status proyek. Dengan terintegrasinya data daily report ke dalam fitur dashboard berbasis web, proses pengawasan administrasi dan evaluasi proyek oleh pihak manajemen menjadi jauh lebih efisien, terpusat, dan dapat dipantau secara langsung (real-time) berdasarkan data faktual dari lapangan.
 
-## [2.2.a] Project Health Status
+Project Health Status
 
 Status kesehatan proyek (Project Health Status) merupakan indikator evaluatif faktual yang membandingkan progres aktual di lapangan dengan rencana awal (baseline). Alih-alih menggunakan analitik prediktif yang kompleks, indikator ini berfungsi sebagai instrumen audit visual untuk mendeteksi penyimpangan jadwal sedini mungkin. Pada implementasi dashboard, status kesehatan direpresentasikan melalui metode Red-Amber-Green (RAG) yang secara otomatis mengagregasi data mentah dari daily report. Melalui visualisasi warna yang intuitif ini—seperti indikator "Hijau" untuk operasional yang linear dengan jadwal dan "Merah" untuk kondisi kritis—pihak manajemen memperoleh transparansi informasi tingkat tinggi guna memantau kelancaran proyek secara real-time tanpa harus menelusuri tumpukan laporan manual (Fonseca dkk., 2025).
 
-## [2.2.a] Early Warning System (EWS) Berbasis Schedule Performance Index
+Early Warning System (EWS) Berbasis Schedule Performance Index
 
 Dalam manajemen proyek operasional yang dinamis, Early Warning System (EWS) atau Sistem Peringatan Dini merupakan mekanisme proaktif yang diintegrasikan ke dalam perangkat lunak pemantauan untuk mendeteksi potensi penyimpangan jadwal secara otomatis. Dalam ranah sistem informasi operasional, EWS tidak dirancang menggunakan algoritma analitik prediktif yang kompleks, melainkan mengandalkan kemampuan sistem dalam mengotomatisasi pemrosesan data faktual secara real-time. Tujuan utama implementasi EWS adalah memangkas jeda waktu (information lag) antara terjadinya kendala progres di lapangan dengan sampainya peringatan tersebut kepada manajer, sehingga mitigasi keterlambatan dapat dilakukan sedini mungkin berdasarkan data yang valid.
 
@@ -200,11 +200,11 @@ Proyek berjalan lebih cepat dari target jadwal yang direncanakan (Ahead of Sched
 
 Proyek mengalami keterlambatan operasional (Behind Schedule). Kondisi matematis inilah yang bertindak sebagai pemicu utama (trigger) bagi Early Warning System untuk secara otomatis menampilkan notifikasi kritis atau merubah indikator visual dashboard menjadi peringatan warna merah.
 
-## [2.2.a] Framework Next.js
+Framework Next.js
 
 Next.js merupakan kerangka kerja (framework) front-end berbasis React yang dirancang untuk membangun antarmuka web berskala enterprise dengan performa tinggi. Keunggulan utamanya terletak pada dukungan Server-Side Rendering (SSR) dan arsitektur berbasis komponen (component-based), yang sangat ideal untuk memvisualisasikan elemen dashboard secara modular, seperti grafik progres kerja dan indikator warna Red-Amber-Green (RAG). Dalam implementasi Early Warning System (EWS) pada manajemen proyek, Next.js berperan krusial melalui mekanisme penarikan data asinkron. Framework ini mampu mengonsumsi akumulasi data daily report dan hasil kalkulasi Schedule Performance Index (SPI) dari backend secara real-time. Ketika terdeteksi perubahan status proyek menjadi kritis (misalnya ), antarmuka dashboard dapat merefleksikan peringatan visual tersebut secara instan tanpa perlu memuat ulang (refresh) keseluruhan halaman, sehingga manajer dapat memperoleh informasi operasional yang faktual secara cepat dan interaktif (Genne, 2025).
 
-## [2.2.a] Unified Modeling Language
+Unified Modeling Language
 
 UML (Unified Modeling Language) adalah bahasa pemodelan standar yang digunakan untuk memvisualisasikan, merancang, dan mendokumentasikan sistem perangkat lunak yang berorientasi objek. UML sangat berguna dalam menggambarkan kebutuhan pengguna dan alur sistem melalui berbagai diagram dan tabel data. UML menggunakan konsep desain berorientasi objek dan tidak bergantung pada bahasa pemrograman tertentu. Ini memungkinkan pemodelan sistem yang kompleks dan besar dengan cara yang terstruktur (Maggi dkk., 2020). UML mencakup berbagai jenis diagram yang dibagi menjadi diagram struktural dan diagram perilaku. Diagram kelas adalah salah satu yang paling umum digunakan untuk memodelkan tampilan desain statis dari system (Al-Fedaghi, 2021). Terdapat beberapa jenis diagram pada uml diantaranya yaitu, Use Case Diagram, Sequence Diagram, Class Diagram, dan Activity Diagram.
 
@@ -240,7 +240,7 @@ Tabel 2.5 Simbol Activity Diagram
 
 Sumber: (Khomokhoana dkk., 2025)
 
-## [2.2.a] Entity Relationship Diagram
+Entity Relationship Diagram
 
 Entity Relationship Diagram (ERD) merupakan alat pemodelan konseptual tahap awal untuk merepresentasikan entitas, atribut, dan hubungan dalam basis data secara grafis. ERD bermanfaat untuk memvisualisasikan struktur data sebelum tahap implementasi teknis dilakukan (Pulungan dkk., 2023), meminimalisir berbagai kesalahan desain, serta menjadi alat komunikasi visual yang efektif antara pengembang dan pemangku kepentingan. Secara struktural, komponen utama ERD terdiri dari entitas (objek data unik), atribut yang mendeskripsikan properti entitas beserta kunci primernya (’Afiifah dkk., 2022), dan hubungan yang menggambarkan interaksi antar entitas dalam sistem.
 
@@ -248,7 +248,7 @@ Entity Relationship Diagram (ERD) merupakan alat pemodelan konseptual tahap awal
 
 Sumber: (Pulungan dkk., 2023)
 
-## [2.2.a] Basis Data
+Basis Data
 
 Data base atau basis data merupakan kumpulan data yang memiliki format dan struktur-struktur tertentu sehingga memungkinkan sistem berbasis komputer dapat melakukan penyimpanan, pengelolaan, dan pengambilan data secara cepat. Dalam basis data juga terdapat sebuah sistem basis data, terdiri dari data secara logis saling terkait dan biasanya disimpan dalam sebuah repositori data. Karena pada sistem basis data penyimpanan data bersifat satu tempat, maka memungkinkan dalam saat bersamaan beberapa pengguna mengakses dan memperbarui basis data tersebut. Tempat untuk mengakses dan mengolah basis data ini dikenal sebagai DBMS (Basis data Management System). Sebuah sistem basis data sendiri terdiri dari 5 komponen yaitu: perangkat keras, perangkat lunak, data, prosedur, dan manusia (Hadiprakoso, 2021).
 
@@ -272,7 +272,7 @@ Manusia
 
 Komponen ini mencakup semua pengguna dari sistem basis data. Berdasarkan fungsi pekerjaan utama masing-masing terdapat empat jenis pengguna yang dapat diidentifikasi dalam sistem basis data yakni: administrator basis data, perancang basis data, analis sistem, programmer, dan pengguna akhir.
 
-## [2.2.a] Structure Query Language
+Structure Query Language
 
 Structured Query Language (SQL) merupakan bahasa pemrograman standar yang dirancang secara spesifik untuk mengelola, memanipulasi, dan mengekstraksi informasi dari Sistem Manajemen Basis Data Relasional (RDBMS). Secara fungsional, SQL memfasilitasi interaksi tingkat tinggi antara aplikasi perangkat lunak dan repositori data melalui eksekusi kueri (query) terstruktur. Instruksi dalam SQL umumnya diklasifikasikan ke dalam beberapa kategori utama, di antaranya Data Definition Language (DDL) untuk merancang skema atau struktur tabel, serta Data Manipulation Language (DML) seperti perintah SELECT, INSERT, UPDATE, dan DELETE yang bertugas memproses data operasional. Keunggulan utama SQL terletak pada kemampuannya mengeksekusi fungsi agregasi komputasional, memfilter informasi spesifik, serta mengonsolidasikan entitas dari berbagai tabel yang saling berelasi melalui operasi JOIN, sehingga memungkinkan pengambilan maupun pengolahan data berskala besar secara cepat, akurat, dan terpusat di tingkat database (Khan dkk., 2023).
 
@@ -307,11 +307,11 @@ Tahapan terakhir ini melibatkan operasional sistem secara langsung di lingkungan
 
 ## [3.n] Obyek Penelitian
 
-## [3.2.1] Gambaran Umum
+Gambaran Umum
 
 PT Smart Home Inovasi Yogyakarta (SHI) merupakan sebuah perusahaan teknologi yang berlokasi di Kabupaten Sleman, Daerah Istimewa Yogyakarta. Perusahaan ini mengkhususkan diri pada pengembangan dan implementasi solusi Smart Home serta Internet of Things (IoT). Mengusung visi sebagai penyedia solusi hunian cerdas terdepan, PT SHI menghadirkan berbagai inovasi otomasi perangkat—mulai dari sistem keamanan, pengaturan suhu, hingga efisiensi energi—guna menciptakan ekosistem hunian yang aman, nyaman, dan hemat energi bagi kliennya.
 
-## [3.2.1] Proses Bisnis dan Aktor yang Terlibat
+Proses Bisnis dan Aktor yang Terlibat
 
 Dalam sistem manajemen proyek yang diusulkan pada penelitian ini, terdapat desentralisasi wewenang pelaporan untuk memangkas birokrasi administratif. Adapun aktor utama yang terlibat dan hak aksesnya dalam proses bisnis pencatatan daily report adalah sebagai berikut:
 
@@ -1038,9 +1038,9 @@ Gambar 5.62 menampilkan implementasi antarmuka "Eskalasi Saya" yang diakses seca
 ## [JUDUL BAB] BAB VI
 PENUTUP
 
-Simpulan
+## [6.n] Simpulan
 
-Saran
+## [6.n] Saran
 
 ## [JUDUL BAB] DAFTAR PUSTAKA
 

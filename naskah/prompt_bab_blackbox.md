@@ -1,66 +1,43 @@
-# Tugas Lanjutan — Draft 15 Test Case
+# Tugas — Review Final Sub-bab 5.2.3 Pengujian
 
-Saya minta kamu **draft konten 15 baris tabel testing** untuk sub-bab 5.2.3 di naskah Dian.
+Saya sudah selesai menyusun sub-bab 5.2.3 Pengujian di naskah Dian. Sekarang minta kamu **review final terhadap naskah lengkap**.
 
-Naskah masih sama: `naskah/_dian_naskah_extracted.md`. Baca lagi kalau perlu refresh konteks.
+## Yang harus kamu lakukan
 
-## Konfirmasi yang sudah disetujui
+1. **Baca naskah lengkap** (sudah di-update): `naskah/_dian_naskah_extracted.md`
+2. **Fokus pada sub-bab 5.2.3 Pengujian** — cari heading "Pengujian" yang berada di sub-bab 5.2 (BUKAN heading "Pengujian (Testing)" di BAB III tentang metode penelitian).
+3. **Review final** terhadap:
+   - Konsistensi dengan flow naskah Dian secara keseluruhan
+   - Coherence antara intro 1 → intro 2 → tabel → closing
+   - Transisi ke sub-bab berikutnya (5.3 Inovasi Sistem)
+   - Italic markup yang konsisten (di markdown extract, italic tidak terlihat — abaikan ini, ini hanya extract teks)
+   - Apakah ada paragraf intro 5.2 awal yang perlu di-update untuk mention pengujian?
+   - Apakah Tabel 5.1 menjawab seluruh klaim kebutuhan fungsional yang Dian tulis di BAB IV?
 
-- Sub-bab: **5.2.3 Pengujian Sistem** (di bawah 5.2 Pembahasan, sambung dari 5.2.2)
-- Tabel: **Tabel 5.1 Skenario dan Hasil Pengujian Black Box**
-- 6 kolom: **No | ID Pengujian | Deskripsi Skenario | Hasil Diharapkan | Hasil Aktual | Status**
-- 15 skenario, terdistribusi: AUTH (3), MN (4), TK (4), SYS (4)
-- Kode: `TC-AUTH-01`, `TC-MN-01`, `TC-TK-01`, `TC-SYS-01`, dst
-- Status: semua **Sesuai** atau **Valid** (gunakan istilah akademik Indonesia, bukan PASS)
-- Italic istilah asing (gunakan markdown `*...*` di output supaya gampang saya proses)
+## Periksa juga (penting)
 
-## Aturan wording (penting)
+Cek Tabel 5.1 yang sudah disisipkan. 15 test case:
+- AUTH (3): TC-AUTH-01/02/03
+- MN (4): TC-MN-01/02/03/04
+- TK (4): TC-TK-01/02/03/04
+- SYS (4): TC-SYS-01/02/03/04
 
-1. **Gunakan kosakata Dian** — kata kunci yang sering dia pakai di BAB I-V: komputasi, mengomputasi, agregasi, entitas, matriks, presisi, pemrosesan, perekaman, merender, validasi, mitigasi, swamonitoring, autentikasi, kredensial, otorisasi.
-2. **Italic istilah asing**: *daily report, dashboard, Earned Value, Planned Value, Schedule Performance Index, SPI, Early Warning System, EWS, Role-Based Access Control, RBAC, kanban, task evidence, review gate, login, role, status, bug*.
-3. **Review Gate** — JANGAN bikin skenario yang seakan Teknisi klik Done → SPI langsung berubah. Yang benar: Teknisi unggah bukti → Manajer review → Manajer set Done → SISTEM kalkulasi ulang SPI. Mirror Activity Diagram Gambar 4.6.
-4. **Schedule clash validation** untuk test case Manajer Assign Teknisi — fitur unik Dian dari Sequence Diagram Gambar 4.5.
-5. **No Admin test cases** — sesuai exclusion di BAB IV.
-6. **Hasil Aktual = sama persis dengan Hasil Diharapkan** (karena memang semuanya berhasil), tapi PARAFRASE pakai kalimat singkat 5-10 kata. Jangan copy verbatim.
-7. **Status** semua "Sesuai" atau "Valid". Pilih satu, konsisten.
+Apakah ada kebutuhan fungsional Dian di BAB IV yang BELUM tercover test case-nya? Kalau ada, beri tahu — saya bisa tambah.
 
-## 15 Skenario yang harus didraft
-
-### AUTH (3)
-1. `TC-AUTH-01` Login Manajer dengan kredensial valid
-2. `TC-AUTH-02` Login Teknisi dengan kredensial valid
-3. `TC-AUTH-03` Validasi RBAC — Teknisi tidak bisa akses halaman Manajer
-
-### MN (4) — Manajer
-4. `TC-MN-01` Manajer menambah data proyek baru
-5. `TC-MN-02` Manajer menugaskan Teknisi ke proyek (dengan validasi schedule clash)
-6. `TC-MN-03` Manajer melakukan Review Gate — meninjau bukti task lalu set status Done
-7. `TC-MN-04` Manajer menanggapi laporan eskalasi dari Teknisi dengan instruksi balasan
-
-### TK (4) — Teknisi
-8. `TC-TK-01` Teknisi memperbarui status task di Kanban (to_do → working_on_it)
-9. `TC-TK-02` Teknisi mengunggah bukti pekerjaan (task evidence) pada task
-10. `TC-TK-03` Teknisi mengirim laporan eskalasi kendala lapangan
-11. `TC-TK-04` Teknisi mengakses Self-Performance Dashboard untuk melihat SPI pribadi
-
-### SYS (4) — Automasi Sistem
-12. `TC-SYS-01` Sistem mengomputasi Earned Value otomatis saat Manajer set task Done
-13. `TC-SYS-02` Sistem mengomputasi SPI dan menentukan indikator warna RAG (Red/Amber/Green) berdasarkan threshold
-14. `TC-SYS-03` Sistem mengurutkan daftar proyek di dashboard Manajer berdasarkan urgensi (kritis → teratas)
-15. `TC-SYS-04` Sistem mencegah bentrok jadwal saat Manajer menugaskan Teknisi yang sudah punya alokasi
-
-## Output yang saya butuhkan
-
-Untuk SETIAP test case, kasih saya 4 field (selain No dan ID Pengujian yang sudah saya tentukan):
+## Output
 
 ```
-TC-AUTH-01
-Deskripsi Skenario: [1 kalimat lengkap, sebutkan aksi pengguna + objek]
-Hasil Diharapkan: [1-2 kalimat detail, sebutkan respons sistem secara presisi]
-Hasil Aktual: [5-10 kata, parafrase hasil diharapkan]
-Status: Sesuai
+=== VERDICT ===
+<OK / NEEDS_TWEAK / NEEDS_ADDITION>
+
+=== ISSUES (kalau ada) ===
+<list spesifik dengan referensi paragraf/test case>
+
+=== SARAN PERBAIKAN (kalau perlu) ===
+<draft revisi spesifik>
+
+=== KESIMPULAN ===
+<1-2 kalimat>
 ```
 
-Lakukan untuk 15 test case. Jangan kasih intro atau penutup, langsung 15 blok.
-
-Yang penting: **bahasanya alami untuk gaya Dian, bukan kaku terjemahan**. Bayangkan Dian sendiri yang menulis.
+Bahasa Indonesia akademik. Spesifik, jujur. Kalau memang sudah OK, bilang OK.
