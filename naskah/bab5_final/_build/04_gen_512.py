@@ -11,20 +11,26 @@ Code is taken from frontend/src/lib/handlers/*.ts (TypeScript).
 """
 
 import re
+import json
 import shutil
+import sys
 from pathlib import Path
-from copy import deepcopy
 
 from docx import Document
 from docx.shared import Pt, RGBColor, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
-from docx.oxml.ns import qn, nsmap
+from docx.oxml.ns import qn
 
 ROOT       = Path(__file__).resolve().parents[3]
 HANDLERS   = ROOT / 'frontend/src/lib/handlers'
 TEMPLATE   = ROOT / 'naskah/bab_split/BAB_V_Implementasi_dan_Pembahasan_Sistem.docx'
 OUT_PATH   = ROOT / 'naskah/bab5_final/5.1.2 Implementasi Sistem.docx'
+HERE       = Path(__file__).resolve().parent
+CUT_JSON   = HERE / 'gemini_outputs/cut_code.json'
+
+sys.path.insert(0, str(HERE))
+from code_transform import transform_code
 
 # ── BAB IV §4.3.5 modules → handler function ───────────────────────────────
 # Format: (category, letter, module name, handler file, function name, narrative)
@@ -135,24 +141,29 @@ MODULES = [
 ]
 
 
-def extract_function(filename: str, fn_name: str) -> str:
+def get_code(filename: str, fn_name: str) -> str:
+    """Return cut+tb_*-transformed code from gemini_outputs/cut_code.json.
+    Falls back to raw extraction + transform if no Gemini cut available."""
+    if CUT_JSON.exists():
+        data = json.load(open(CUT_JSON))
+        key = f"{filename}::{fn_name}"
+        if key in data:
+            return data[key]['code']
+    # Fallback path
     text = (HANDLERS / filename).read_text()
     m = re.search(rf'^export (async )?function {fn_name}\b.*?\{{', text, re.M | re.S)
     if not m:
         raise RuntimeError(f"Function not found: {filename}:{fn_name}")
-    start = m.start()
-    depth = 0
-    i = m.end() - 1
+    start = m.start(); depth = 0; i = m.end() - 1
     while i < len(text):
         c = text[i]
         if c == '{': depth += 1
         elif c == '}':
             depth -= 1
             if depth == 0:
-                end = i + 1
-                break
+                return transform_code(text[start:i+1].rstrip())
         i += 1
-    return text[start:end].rstrip()
+    raise RuntimeError("brace mismatch")
 
 
 # ── docx helpers ────────────────────────────────────────────────────────────
@@ -283,14 +294,17 @@ def build():
     except KeyError:
         pass
     bridge.add_run(
-        "Catatan pemetaan nama: tabel tb_user, tb_klien, tb_proyek, "
-        "tb_penugasan_proyek, tb_tugas, tb_bukti, dan tb_eskalasi "
-        "sebagaimana didefinisikan pada BAB IV diimplementasikan secara "
-        "fisik dengan nama users, clients, projects, project_assignments, "
-        "tasks, task_evidence, dan escalations. Kedua skema dijembatani "
-        "melalui mekanisme view auto-updatable di PostgreSQL, sehingga "
-        "kode handler dapat mengacu pada nama implementasi tanpa "
-        "perubahan perilaku terhadap skema konseptual."
+        "Catatan pemetaan nama: listing kode pada subbab ini menggunakan "
+        "nomenklatur BAB IV (tb_user, tb_klien, tb_proyek, "
+        "tb_penugasan_proyek, tb_tugas, tb_bukti, dan tb_eskalasi) untuk "
+        "menjaga konsistensi dengan rancangan basis data. Pada penyimpanan "
+        "fisik PostgreSQL, tabel-tabel tersebut diimplementasikan dengan "
+        "nama singkat (users, clients, projects, dan seterusnya) dan "
+        "dijembatani oleh view auto-updatable, sehingga seluruh perintah "
+        "SQL yang ditampilkan tetap valid saat dieksekusi langsung pada "
+        "basis data. Nomenklatur kolom (id_user, id_klien, dan "
+        "seterusnya) telah diselaraskan dengan rancangan BAB IV melalui "
+        "alias pada view tersebut."
     )
 
     fig_no = 1
@@ -325,7 +339,7 @@ def build():
                        f"Gambar 5.{fig_no}.")
 
             # Code block
-            code = extract_function(fname, fn_name)
+            code = get_code(fname, fn_name)
             add_code_block(doc, code)
 
             # Caption

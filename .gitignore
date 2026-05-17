@@ -18,3 +18,10 @@ postgres-download.zip
 ACCOUNTS.md
 
 frontend/.next/
+
+# Office lock files
+~$*
+
+# Python bytecode
+__pycache__/
+*.pyc

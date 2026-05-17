@@ -1,0 +1,44 @@
+Ripgrep is not available. Falling back to GrepTool.
+export async function changeTaskStatus(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  // ... (validasi & error handling)
+
+  try {
+    const current = await query('SELECT * FROM tb_tugas WHERE id = $1', [taskId]);
+    const task = current.rows[0] as Record<string, unknown>;
+    if (auth.user.role === 'technician' && task.assigned_to !== auth.user.userId) {
+      return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
+    }
+    // ... (validasi & error handling)
+
+    const result = await query(
+      wasActive
+        ? `UPDATE tb_tugas
+             SET status = $1,
+                 time_spent_seconds = COALESCE(time_spent_seconds, 0)
+                                    + GREATEST(EXTRACT(EPOCH FROM (NOW() - status_changed_at))::int, 0),
+                 status_changed_at = NOW(),
+                 updated_at = NOW()
+           WHERE id = $2 RETURNING *`
+        : `UPDATE tb_tugas
+             SET status = $1,
+                 status_changed_at = NOW(),
+                 updated_at = NOW()
+           WHERE id = $2 RETURNING *`,
+      [status, taskId]
+    );
+
+    await recalculateSPI(task.project_id as number);
+    // ... (helper omitted)
+
+    await query(
+      'INSERT INTO task_activities (task_id, user_id, message, activity_type) VALUES ($1, $2, $3, $4)',
+      [taskId, auth.user.userId, activityMessage, activityType]
+    );
+
+    return NextResponse.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    // ... (validasi & error handling)
+  }
+}

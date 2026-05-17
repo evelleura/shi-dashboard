@@ -12,6 +12,7 @@ Structure:
       [Result screenshot]   caption: Gambar 5.(x+1) Hasil <OP> tb_xxx
 """
 
+import json
 import shutil
 import importlib.util
 from pathlib import Path
@@ -26,10 +27,18 @@ ROOT      = Path(__file__).resolve().parents[3]
 TEMPLATE  = ROOT / 'naskah/bab_split/BAB_V_Implementasi_dan_Pembahasan_Sistem.docx'
 OUT_PATH  = ROOT / 'naskah/bab5_final/5.2.1 Pembahasan Basis Data.docx'
 SHOTS_DIR = ROOT / 'naskah/bab5_final/screenshots'
+HERE      = Path(__file__).resolve().parent
+NARR_JSON = HERE / 'gemini_outputs/narratives.json'
 
 # load CRUD spec
-spec = importlib.util.spec_from_file_location("crud", Path(__file__).parent / "02_crud_queries.py")
+spec = importlib.util.spec_from_file_location("crud", HERE / "02_crud_queries.py")
 crud = importlib.util.module_from_spec(spec); spec.loader.exec_module(crud)
+
+# load Gemini-generated narratives if available
+GEMINI_NARRATIVES = {}
+if NARR_JSON.exists():
+    GEMINI_NARRATIVES = json.load(open(NARR_JSON))
+    print(f"[05_gen_521] Loaded {len(GEMINI_NARRATIVES)} Gemini narratives")
 
 
 def add_caption(doc, text):
@@ -103,7 +112,8 @@ def build():
 
         for op_idx, entry in enumerate(ops, start=1):
             op   = entry['op']
-            narr = entry['narr']
+            # Prefer Gemini narrative if available; fall back to inline
+            narr = GEMINI_NARRATIVES.get(f"{table}::{op}", entry['narr'])
 
             # Narrative
             np = doc.add_paragraph()
