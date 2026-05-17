@@ -382,17 +382,42 @@ def setup_db(bun: str, seed: bool = False):
     else:
         cmd = [bun, "x", "tsx", script] + args
     result = subprocess.run(
-        cmd, cwd=str(APP_DIR), check=False,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        cmd, cwd=str(APP_DIR), check=False
     )
-    # Filter out npm notice lines, print relevant output
-    for line in result.stdout.splitlines():
-        if not line.startswith("npm notice") and not line.startswith("npm warn exec"):
-            print(f"  {line}")
+    # # Filter out npm notice lines, print relevant output
+    # for line in result.stdout.splitlines():
+    #     if not line.startswith("npm notice") and not line.startswith("npm warn exec"):
+    #         print(f"  {line}")
     if result.returncode != 0:
         print("[ERROR] Schema setup failed")
         sys.exit(1)
     print("[OK] Database ready")
+
+
+def run_flow_script(bun: str):
+    """Runs the system flow playwright script."""
+    print("\n=== System Flow Script ===")
+    flow_dir = ROOT / "alur-sistem"
+
+    # 1. Install deps for the flow script
+    if not (flow_dir / "node_modules").exists() or not (flow_dir / "bun.lockb").exists():
+        print("  Installing dependencies for flow script...")
+        subprocess.run([bun, "install"], cwd=flow_dir, check=True)
+    else:
+        print("  [OK] Dependencies for flow script already installed")
+
+    # 2. Run the script
+    print("  Running automation script 'run_flow.js'...")
+    try:
+        cmd = ["node", "run_flow.js"]
+        subprocess.run(cmd, cwd=flow_dir, check=True)
+        print("  [OK] Flow script finished successfully.")
+
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Flow script failed: {e}")
+        sys.exit(1)
+
+
 
 
 # -- Services -----------------------------------------------------------------
@@ -440,6 +465,27 @@ def main():
 
     bun = find_bun()
     ensure_env()
+
+    if "--run-flow" in args:
+        # 1. PostgreSQL
+        if "--skip-db" not in args:
+            ensure_postgres()
+        
+        # 2. Dependencies (main app)
+        install_deps(bun)
+        
+        # 3. Database schema
+        if "--skip-db" not in args:
+            if "--reset-db" in args:
+                reset_database()
+            setup_db(bun, seed="--seed" in args)
+            
+        # 4. Run the flow script
+        run_flow_script(bun)
+        
+        # 5. Exit (do not start dev server)
+        print("\n[OK] --run-flow finished.")
+        return
 
     if "--clean" in args:
         print("\n=== Clean ===")
