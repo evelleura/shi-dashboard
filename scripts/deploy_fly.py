@@ -86,11 +86,13 @@ EXTRA_PATHS = [
     "/usr/local/bin",
 ]
 
-REQUIRED_ENV_KEYS = ["FLY_APP_NAME", "FLY_GITHUB_REPO", "FLY_VOLUME_NAME"]
+REQUIRED_ENV_KEYS = ["FLY_APP_NAME", "FLY_VOLUME_NAME"]
 OPTIONAL_ENV_DEFAULTS = {
     "FLY_REGION":         "sin",
     "FLY_VOLUME_SIZE_GB": "1",
     "CF_DOMAIN":          "",
+    "FLY_ENABLE_GITHUB":  "0",
+    "FLY_GITHUB_REPO":    "",
 }
 
 # Files / dirs excluded from the sandbox copy.
@@ -164,6 +166,9 @@ def load_env() -> dict:
         int(env["FLY_VOLUME_SIZE_GB"])
     except ValueError:
         err(f"FLY_VOLUME_SIZE_GB must be an int, got {env['FLY_VOLUME_SIZE_GB']!r}")
+        sys.exit(1)
+    if env["FLY_ENABLE_GITHUB"] == "1" and not env["FLY_GITHUB_REPO"]:
+        err("FLY_ENABLE_GITHUB=1 but FLY_GITHUB_REPO is empty.")
         sys.exit(1)
     # Auto-export FLY_API_TOKEN so every `fly` subprocess inherits it.
     # Lets users skip the interactive `fly auth login` browser flow.
@@ -325,10 +330,15 @@ def sync_files(env: dict, deploy_dir: Path) -> None:
     if deploy_dir.exists():
         rmtree_safe(deploy_dir)
 
+    # dirs_exist_ok=True survives the case where rmtree silently failed to
+    # remove the top-level dir itself (Windows file lock from explorer open
+    # in path, prior bun/next process, etc). copytree then merges into the
+    # empty leftover dir instead of erroring on os.makedirs(exist_ok=False).
     shutil.copytree(
         SOURCE_DIR,
         deploy_dir,
         ignore=shutil.ignore_patterns(*EXCLUDE_PATTERNS),
+        dirs_exist_ok=True,
     )
 
     if backup.exists():
@@ -445,19 +455,49 @@ def create_volume(fly: str, env: dict) -> None:
 # Phase 5 -- secrets
 # ---------------------------------------------------------------------------
 
+# .env.template values that should never reach Fly.io secrets. Any value
+# matching one of these (or wrapped in <angle brackets>) is treated as an
+# un-filled placeholder and skipped. Without this guard, a first-time user
+# who copies .env.template -> .env and runs --deploy will overwrite real
+# secrets (e.g., DATABASE_URL set by `fly postgres attach`) with the literal
+# placeholder string, breaking the release_command's DB connect.
+PLACEHOLDER_VALUES = {
+    "postgres://user:pass@host:5432/dbname",
+    "postgres://user:pass@localhost:5432/dbname",
+}
+
+
+def _is_placeholder(val: str) -> bool:
+    if not val:
+        return True
+    if val.startswith("<") and val.endswith(">"):
+        return True
+    return val in PLACEHOLDER_VALUES
+
+
 def set_fly_secrets(fly: str, env: dict) -> None:
     app = env["FLY_APP_NAME"]
-    secrets = {
+    candidates = {
         k: v for k, v in env.items()
         if v and not k.startswith("FLY_") and not k.startswith("CF_")
     }
-    if not secrets:
-        info("No application secrets to push.")
+    real = {k: v for k, v in candidates.items() if not _is_placeholder(v)}
+    skipped = sorted(set(candidates) - set(real))
+    if skipped:
+        warn(f"Skipping placeholder secret(s): {', '.join(skipped)}. "
+             f"Set real values in .env or push manually via `fly secrets set`.")
+    if not real:
+        info("No real application secrets to push.")
         return
-    info(f"Pushing {len(secrets)} secret(s) to {app} ...")
-    pairs = " ".join(f'{k}="{v}"' for k, v in secrets.items())
-    cmd   = f'{quote_path(fly)} secrets set {pairs} -a {shlex.quote(app)}'
-    r     = run_cmd(cmd)
+    info(f"Pushing {len(real)} secret(s) to {app} ...")
+    # List-form subprocess call (not shell=True). Pass each KEY=VALUE as its own
+    # argv entry so flyctl gets clean tokens. shell-string + shlex.quote breaks
+    # on Windows because cmd.exe rejects single-quoted paths like
+    # 'C:\Users\...\flyctl.EXE' -- the surrounding shlex.quote on a path
+    # containing backslashes wraps it in single quotes that cmd.exe parses as
+    # "filename, directory name, or volume label syntax is incorrect".
+    args = [fly, "secrets", "set"] + [f"{k}={v}" for k, v in real.items()] + ["-a", app]
+    r = run_cmd(args)
     if r.returncode != 0:
         warn("fly secrets set failed. Continuing -- set them manually "
              "before the next deploy.")
@@ -610,17 +650,22 @@ def main() -> None:
         PROJECT_DIR.parent / "_deploy-flyio" / env["FLY_APP_NAME"]
     )
 
+    gh_enabled = env["FLY_ENABLE_GITHUB"] == "1"
+
     info(f"Project   : {PROJECT_DIR}")
     info(f"Source    : {SOURCE_DIR}")
     info(f"Sandbox   : {deploy_dir}")
     info(f"App       : {env['FLY_APP_NAME']}")
-    info(f"Repo      : {env['FLY_GITHUB_REPO']}")
+    if gh_enabled:
+        info(f"Repo      : {env['FLY_GITHUB_REPO']}")
+    else:
+        info("Repo      : (GitHub mirror disabled; FLY_ENABLE_GITHUB=1 to enable)")
     info(f"Volume    : {env['FLY_VOLUME_NAME']} "
          f"({env['FLY_VOLUME_SIZE_GB']} GB, {env['FLY_REGION']})")
     print()
 
     fly = ensure_flyctl()
-    gh  = ensure_gh()
+    gh  = ensure_gh() if gh_enabled else None
 
     # Read-only commands return early without touching the sandbox.
     if args.open_flag:
@@ -637,7 +682,8 @@ def main() -> None:
 
     # Mutating commands require both authentications upfront.
     ensure_fly_auth(fly)
-    ensure_gh_auth(gh)
+    if gh_enabled:
+        ensure_gh_auth(gh)
 
     if args.purge_db:
         purge_db(fly, env)
@@ -652,7 +698,8 @@ def main() -> None:
 
     if args.deploy:
         sync_files(env, deploy_dir)
-        setup_github(gh, env, deploy_dir)
+        if gh_enabled:
+            setup_github(gh, env, deploy_dir)
         set_fly_secrets(fly, env)
         deploy(fly, env, deploy_dir)
         show_status(fly, env)
@@ -661,7 +708,8 @@ def main() -> None:
 
     # No flag -> full first-time pipeline.
     sync_files(env, deploy_dir)
-    setup_github(gh, env, deploy_dir)
+    if gh_enabled:
+        setup_github(gh, env, deploy_dir)
     create_app(fly, env)
     create_volume(fly, env)
     set_fly_secrets(fly, env)

@@ -13,6 +13,10 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Next.js convention: ensure public/ exists even when project has no static assets.
+# Without this, runner stage's `COPY --from=builder /app/public ./public` fails
+# because the source dir is missing in the build context.
+RUN mkdir -p public
 RUN bun run build
 
 # -------- runtime stage --------

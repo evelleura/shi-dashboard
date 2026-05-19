@@ -49,6 +49,17 @@ async function main() {
       if (userCount > 0 && !forceSeed) {
         console.log(`Seed: skipped (users table already has ${userCount} rows).`);
       } else {
+        if (forceSeed && userCount > 0) {
+          // --force-seed means "wipe and reseed". Without TRUNCATE, the seed
+          // would dup-key crash whenever ANY existing email collides with the
+          // 8 seed users (admin@shi.co.id, budi@..., diana@..., etc).
+          // CASCADE handles FK refs from project_assignments, tasks, evidence,
+          // daily_reports, activities, escalations, audit_log, notifications.
+          // RESTART IDENTITY resets the SERIAL sequence so seed IDs (1..8) are
+          // honored cleanly.
+          console.log(`Force-seed: truncating users (was ${userCount} rows) and dependent tables ...`);
+          await pool.query('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+        }
         await runSQL(path.join(scriptDir, 'seed.sql'));
         console.log('Seed data inserted.');
       }

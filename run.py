@@ -476,10 +476,13 @@ def main():
         
         # 3. Database schema
         if "--skip-db" not in args:
-            if "--reset-db" in args:
+            reset = "--reset-db" in args
+            if reset:
                 reset_database()
-            setup_db(bun, seed="--seed" in args)
-            
+            # --reset-db implies --seed: an empty freshly-created DB is useless
+            # without seed data, so always seed after reset.
+            setup_db(bun, seed=reset or "--seed" in args)
+
         # 4. Run the flow script
         run_flow_script(bun)
         
@@ -519,9 +522,12 @@ def main():
 
     # 4. Database schema
     if "--skip-db" not in args:
-        if "--reset-db" in args:
+        reset = "--reset-db" in args
+        if reset:
             reset_database()
-        setup_db(bun, seed="--seed" in args)
+        # --reset-db implies --seed: an empty freshly-created DB is useless
+        # without seed data, so always seed after reset.
+        setup_db(bun, seed=reset or "--seed" in args)
 
     if "--db-only" in args:
         return
