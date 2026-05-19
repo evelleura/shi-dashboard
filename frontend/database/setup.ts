@@ -11,13 +11,17 @@ import dotenv from 'dotenv';
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 dotenv.config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'shi_dashboard',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || '',
-});
+const pool = new Pool(
+  process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432'),
+        database: process.env.DB_NAME || 'shi_dashboard',
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD || '',
+      },
+);
 
 async function runSQL(filePath: string) {
   const sql = fs.readFileSync(filePath, 'utf-8');
@@ -33,9 +37,21 @@ async function main() {
     console.log('Schema created.');
 
     const seedArg = process.argv.includes('--seed');
-    if (seedArg) {
-      await runSQL(path.join(scriptDir, 'seed.sql'));
-      console.log('Seed data inserted.');
+    const forceSeed = process.argv.includes('--force-seed');
+    if (seedArg || forceSeed) {
+      // Idempotency guard: seed.sql contains many non-ON-CONFLICT INSERTs.
+      // Re-running it on a populated DB would duplicate-key crash. Skip
+      // unless --force-seed is passed explicitly.
+      const { rows } = await pool.query<{ n: string }>(
+        'SELECT COUNT(*)::text AS n FROM users',
+      );
+      const userCount = parseInt(rows[0].n, 10);
+      if (userCount > 0 && !forceSeed) {
+        console.log(`Seed: skipped (users table already has ${userCount} rows).`);
+      } else {
+        await runSQL(path.join(scriptDir, 'seed.sql'));
+        console.log('Seed data inserted.');
+      }
     }
 
     console.log('Database setup complete!');
