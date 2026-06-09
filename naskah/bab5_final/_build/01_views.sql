@@ -37,7 +37,8 @@ CREATE VIEW tb_tugas AS
   SELECT id AS id_tugas, project_id AS id_proyek, name, description,
          assigned_to, status, due_date, timeline_start, timeline_end,
          notes, sort_order, is_survey_task, estimated_hours,
-         status_changed_at, created_by, created_at, updated_at
+         time_spent_seconds, status_changed_at,
+         created_by, created_at, updated_at
   FROM tasks;
 
 CREATE VIEW tb_bukti AS

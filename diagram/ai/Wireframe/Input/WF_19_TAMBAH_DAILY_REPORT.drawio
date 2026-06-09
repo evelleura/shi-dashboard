@@ -1,139 +1,139 @@
-<mxfile host="65bd71144e">
-    <diagram id="wf_03" name="WF-03 Tambah Daily Report">
-        <mxGraphModel dx="2971" dy="926" grid="0" gridSize="10" guides="1" tooltips="1" connect="0" arrows="0" fold="0" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#FFFFFF" math="0" shadow="0">
-            <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
-                <mxCell id="frame_outer" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="-2" width="1203" height="762" as="geometry"/>
-                </mxCell>
-                <mxCell id="c1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DCDCDC;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" parent="1" vertex="1">
-                    <mxGeometry width="1200" height="70" as="geometry"/>
-                </mxCell>
-                <mxCell id="c2" value="" style="ellipse;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" parent="1" vertex="1">
-                    <mxGeometry x="14" y="14" width="12" height="12" as="geometry"/>
-                </mxCell>
-                <mxCell id="c3" value="" style="ellipse;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" parent="1" vertex="1">
-                    <mxGeometry x="32" y="14" width="12" height="12" as="geometry"/>
-                </mxCell>
-                <mxCell id="c4" value="" style="ellipse;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" parent="1" vertex="1">
-                    <mxGeometry x="50" y="14" width="12" height="12" as="geometry"/>
-                </mxCell>
-                <mxCell id="c5" value="Daily Report - SHI" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=10" parent="1" vertex="1">
-                    <mxGeometry x="80" y="6" width="240" height="26" as="geometry"/>
-                </mxCell>
-                <mxCell id="c6" value="&amp;lt;" style="text;html=1;align=center;fontSize=18;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="14" y="36" width="22" height="28" as="geometry"/>
-                </mxCell>
-                <mxCell id="c7" value="&amp;gt;" style="text;html=1;align=center;fontSize=18;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="40" y="36" width="22" height="28" as="geometry"/>
-                </mxCell>
-                <mxCell id="c8" value="O" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=12;fontColor=#000000;fontFamily=Comic Sans MS;align=center;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="66" y="40" width="22" height="22" as="geometry"/>
-                </mxCell>
-                <mxCell id="c9" value="https://shi-crm.id/daily-report/baru" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" parent="1" vertex="1">
-                    <mxGeometry x="96" y="38" width="988" height="26" as="geometry"/>
-                </mxCell>
-                <mxCell id="c10" value="..." style="text;html=1;align=center;fontSize=18;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="1088" y="34" width="24" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="c11" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" parent="1" vertex="1">
-                    <mxGeometry y="70" width="1200" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="c12" value="PT Smart Home Inovasi" style="text;html=1;align=left;fontSize=13;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=4;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="16" y="70" width="400" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="c13" value="Teknisi: [Nama] | Keluar" style="text;html=1;align=right;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0" parent="1" vertex="1">
-                    <mxGeometry x="760" y="70" width="424" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="c14" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" parent="1" vertex="1">
-                    <mxGeometry y="120" width="200" height="620" as="geometry"/>
-                </mxCell>
-                <mxCell id="c15" value="MENU" style="text;html=1;align=left;fontSize=10;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=16;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry y="125" width="200" height="28" as="geometry"/>
-                </mxCell>
-                <mxCell id="c16" value="  Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" parent="1" vertex="1">
-                    <mxGeometry y="156" width="200" height="34" as="geometry"/>
-                </mxCell>
-                <mxCell id="c17" value="  Tugas Saya" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" parent="1" vertex="1">
-                    <mxGeometry y="190" width="200" height="34" as="geometry"/>
-                </mxCell>
-                <mxCell id="c18" value="■ Daily Report" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry y="224" width="200" height="34" as="geometry"/>
-                </mxCell>
-                <mxCell id="c19" value="  Profil" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" parent="1" vertex="1">
-                    <mxGeometry y="258" width="200" height="34" as="geometry"/>
-                </mxCell>
-                <mxCell id="c20" value="  Keluar" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" parent="1" vertex="1">
-                    <mxGeometry y="696" width="200" height="34" as="geometry"/>
-                </mxCell>
-                <mxCell id="c21" value="Tambah Daily Report" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=1;fontSize=14;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=8;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="216" y="132" width="968" height="36" as="geometry"/>
-                </mxCell>
-                <mxCell id="c22" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=center;spacingLeft=0" parent="1" vertex="1">
-                    <mxGeometry x="224" y="180" width="952" height="558" as="geometry"/>
-                </mxCell>
-                <mxCell id="c23" value="Tanggal Laporan" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="248" y="196" width="460" height="18" as="geometry"/>
-                </mxCell>
-                <mxCell id="c24" value="07 Mei 2026 (otomatis - hari ini)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#444444;fontFamily=Comic Sans MS;align=left;spacingLeft=8" parent="1" vertex="1">
-                    <mxGeometry x="248" y="216" width="460" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="c25" value="Pilih Proyek" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="248" y="260" width="460" height="18" as="geometry"/>
-                </mxCell>
-                <mxCell id="c26" value="[Instalasi IoT Cluster A - PT XYZ]  v" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" parent="1" vertex="1">
-                    <mxGeometry x="248" y="280" width="460" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="c27" value="Pilih Tugas" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="728" y="260" width="396" height="18" as="geometry"/>
-                </mxCell>
-                <mxCell id="c28" value="[Instalasi sensor utama]  v" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" parent="1" vertex="1">
-                    <mxGeometry x="728" y="280" width="396" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="c29" value="Persentase Progres Hari Ini (%)" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="248" y="324" width="460" height="18" as="geometry"/>
-                </mxCell>
-                <mxCell id="c30" value="65" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" parent="1" vertex="1">
-                    <mxGeometry x="248" y="344" width="460" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="c31" value="(0-100, akumulatif terhadap tugas)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" parent="1" vertex="1">
-                    <mxGeometry x="248" y="376" width="460" height="16" as="geometry"/>
-                </mxCell>
-                <mxCell id="c32" value="Status Tugas Setelah Laporan" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="728" y="324" width="396" height="18" as="geometry"/>
-                </mxCell>
-                <mxCell id="c33" value="[Working On It]  v" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" parent="1" vertex="1">
-                    <mxGeometry x="728" y="344" width="396" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="c34" value="(catatan: Done hanya disetujui oleh Manajer)" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" parent="1" vertex="1">
-                    <mxGeometry x="728" y="376" width="396" height="16" as="geometry"/>
-                </mxCell>
-                <mxCell id="c35" value="Catatan / Kendala Lapangan" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="248" y="410" width="876" height="18" as="geometry"/>
-                </mxCell>
-                <mxCell id="c36" value="Tulis kendala atau catatan teknis di sini..." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" parent="1" vertex="1">
-                    <mxGeometry x="248" y="430" width="876" height="90" as="geometry"/>
-                </mxCell>
-                <mxCell id="c37" value="Unggah Bukti Pekerjaan (foto / dokumen)" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="248" y="534" width="876" height="18" as="geometry"/>
-                </mxCell>
-                <mxCell id="c38" value="Seret &amp; lepas berkas di sini, atau klik untuk memilih" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=center;spacingLeft=0;dashed=1" parent="1" vertex="1">
-                    <mxGeometry x="248" y="554" width="876" height="100" as="geometry"/>
-                </mxCell>
-                <mxCell id="c39" value="Format: .jpg .png .pdf | maks 10 MB / berkas" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" parent="1" vertex="1">
-                    <mxGeometry x="248" y="658" width="876" height="16" as="geometry"/>
-                </mxCell>
-                <mxCell id="c40" value="Batal" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=12;fontColor=#000000;fontFamily=Comic Sans MS;align=center;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="890" y="690" width="120" height="36" as="geometry"/>
-                </mxCell>
-                <mxCell id="c41" value="Kirim Laporan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=1;fontSize=12;fontColor=#FFFFFF;fontFamily=Comic Sans MS;align=center;spacingLeft=0;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="1018" y="690" width="136" height="36" as="geometry"/>
-                </mxCell>
-                <mxCell id="c42" value="" style="text;html=1;align=center;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" parent="1" vertex="1">
-                    <mxGeometry x="40" y="770" width="1120" height="20" as="geometry"/>
-                </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
+<mxfile host="Electron">
+  <diagram id="wf_03" name="WF-03 Tambah Daily Report">
+    <mxGraphModel dx="1696" dy="431" grid="0" gridSize="10" guides="1" tooltips="1" connect="0" arrows="0" fold="0" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="frame_outer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="762" width="1203" x="-2" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DCDCDC;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" value="" vertex="1">
+          <mxGeometry height="70" width="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" parent="1" style="ellipse;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="14" y="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" parent="1" style="ellipse;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="32" y="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" parent="1" style="ellipse;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="50" y="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=10;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=10" value="Daily Report - SHI" vertex="1">
+          <mxGeometry height="26" width="240" x="80" y="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" parent="1" style="text;html=1;align=center;fontSize=18;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="&amp;lt;" vertex="1">
+          <mxGeometry height="28" width="22" x="14" y="36" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" parent="1" style="text;html=1;align=center;fontSize=18;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="&amp;gt;" vertex="1">
+          <mxGeometry height="28" width="22" x="40" y="36" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=12;fontColor=#000000;fontFamily=Comic Sans MS;align=center;spacingLeft=0;fontStyle=1" value="O" vertex="1">
+          <mxGeometry height="22" width="22" x="66" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" value="https://shi-crm.id/daily-report/baru" vertex="1">
+          <mxGeometry height="26" width="988" x="96" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c10" parent="1" style="text;html=1;align=center;fontSize=18;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="..." vertex="1">
+          <mxGeometry height="30" width="24" x="1088" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="c11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" value="" vertex="1">
+          <mxGeometry height="50" width="1200" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="c12" parent="1" style="text;html=1;align=left;fontSize=13;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=4;fontStyle=1" value="PT Smart Home Inovasi" vertex="1">
+          <mxGeometry height="50" width="400" x="16" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="c13" parent="1" style="text;html=1;align=right;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0" value="Teknisi: [Nama] | Keluar" vertex="1">
+          <mxGeometry height="50" width="424" x="760" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="c14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#000000;strokeWidth=1;fontFamily=Comic Sans MS" value="" vertex="1">
+          <mxGeometry height="620" width="200" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="c15" parent="1" style="text;html=1;align=left;fontSize=10;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=16;fontStyle=1" value="MENU" vertex="1">
+          <mxGeometry height="28" width="200" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="c16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" value="  Dashboard" vertex="1">
+          <mxGeometry height="34" width="200" y="156" as="geometry" />
+        </mxCell>
+        <mxCell id="c17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" value="  Tugas Saya" vertex="1">
+          <mxGeometry height="34" width="200" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="c18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D0D0D0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12;fontStyle=1" value="■ Daily Report" vertex="1">
+          <mxGeometry height="34" width="200" y="224" as="geometry" />
+        </mxCell>
+        <mxCell id="c19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" value="  Profil" vertex="1">
+          <mxGeometry height="34" width="200" y="258" as="geometry" />
+        </mxCell>
+        <mxCell id="c20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#F0F0F0;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=12" value="  Keluar" vertex="1">
+          <mxGeometry height="34" width="200" y="696" as="geometry" />
+        </mxCell>
+        <mxCell id="c21" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=1;fontSize=14;fontColor=#000000;fontFamily=Comic Sans MS;align=left;spacingLeft=8;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 0, 0);&quot;&gt;Tambah Laporan Harian&lt;/font&gt;" vertex="1">
+          <mxGeometry height="36" width="968" x="216" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="c22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;align=center;spacingLeft=0" value="" vertex="1">
+          <mxGeometry height="558" width="952" x="224" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="c23" parent="1" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="Tanggal Laporan" vertex="1">
+          <mxGeometry height="18" width="460" x="248" y="196" as="geometry" />
+        </mxCell>
+        <mxCell id="c24" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#444444;fontFamily=Comic Sans MS;align=left;spacingLeft=8" value="07 Mei 2026 (otomatis - hari ini)" vertex="1">
+          <mxGeometry height="30" width="460" x="248" y="216" as="geometry" />
+        </mxCell>
+        <mxCell id="c25" parent="1" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="Pilih Proyek" vertex="1">
+          <mxGeometry height="18" width="460" x="248" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="c26" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" value="[Instalasi IoT Cluster A - PT XYZ]  v" vertex="1">
+          <mxGeometry height="30" width="460" x="248" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="c27" parent="1" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="Pilih Tugas" vertex="1">
+          <mxGeometry height="18" width="396" x="728" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="c28" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" value="[Instalasi sensor utama]  v" vertex="1">
+          <mxGeometry height="30" width="396" x="728" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="c29" parent="1" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="Persentase Progres Hari Ini (%)" vertex="1">
+          <mxGeometry height="18" width="460" x="248" y="324" as="geometry" />
+        </mxCell>
+        <mxCell id="c30" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" value="65" vertex="1">
+          <mxGeometry height="30" width="460" x="248" y="344" as="geometry" />
+        </mxCell>
+        <mxCell id="c31" parent="1" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" value="(0-100, akumulatif terhadap tugas)" vertex="1">
+          <mxGeometry height="16" width="460" x="248" y="376" as="geometry" />
+        </mxCell>
+        <mxCell id="c32" parent="1" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="Status Tugas Setelah Laporan" vertex="1">
+          <mxGeometry height="18" width="396" x="728" y="324" as="geometry" />
+        </mxCell>
+        <mxCell id="c33" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" value="[Working On It]  v" vertex="1">
+          <mxGeometry height="30" width="396" x="728" y="344" as="geometry" />
+        </mxCell>
+        <mxCell id="c34" parent="1" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" value="(catatan: Done hanya disetujui oleh Manajer)" vertex="1">
+          <mxGeometry height="16" width="396" x="728" y="376" as="geometry" />
+        </mxCell>
+        <mxCell id="c35" parent="1" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="Catatan / Kendala Lapangan" vertex="1">
+          <mxGeometry height="18" width="876" x="248" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="c36" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=left;spacingLeft=8" value="Tulis kendala atau catatan teknis di sini..." vertex="1">
+          <mxGeometry height="90" width="876" x="248" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="c37" parent="1" style="text;html=1;align=left;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=1" value="Unggah Bukti Pekerjaan (foto / dokumen)" vertex="1">
+          <mxGeometry height="18" width="876" x="248" y="534" as="geometry" />
+        </mxCell>
+        <mxCell id="c38" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontSize=11;fontColor=#888888;fontFamily=Comic Sans MS;align=center;spacingLeft=0;dashed=1" value="Seret &amp; lepas berkas di sini, atau klik untuk memilih" vertex="1">
+          <mxGeometry height="100" width="876" x="248" y="554" as="geometry" />
+        </mxCell>
+        <mxCell id="c39" parent="1" style="text;html=1;align=left;fontSize=9;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" value="Format: .jpg .png .pdf | maks 10 MB / berkas" vertex="1">
+          <mxGeometry height="16" width="876" x="248" y="658" as="geometry" />
+        </mxCell>
+        <mxCell id="c40" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#000000;strokeWidth=1;fontSize=12;fontColor=#000000;fontFamily=Comic Sans MS;align=center;spacingLeft=0;fontStyle=1" value="Batal" vertex="1">
+          <mxGeometry height="36" width="120" x="890" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="c41" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=1;fontSize=12;fontColor=#FFFFFF;fontFamily=Comic Sans MS;align=center;spacingLeft=0;fontStyle=1" value="Kirim Laporan" vertex="1">
+          <mxGeometry height="36" width="136" x="1018" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="c42" parent="1" style="text;html=1;align=center;fontSize=11;fontColor=#000000;fontFamily=Comic Sans MS;spacingLeft=0;fontStyle=2" value="" vertex="1">
+          <mxGeometry height="20" width="1120" x="40" y="770" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
 </mxfile>

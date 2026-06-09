@@ -141,6 +141,13 @@ export default function Layout({ children }: Props) {
 
   const isManager = user?.role === 'manager' || user?.role === 'admin';
 
+  const technicianItems: NavItem[] = [
+    { to: '/my-dashboard', label: t('nav.my_dashboard', language), icon: <DashboardIcon /> },
+    { to: '/my-projects', label: t('nav.my_projects', language), icon: <ProjectsIcon /> },
+    { to: '/my-tasks', label: t('nav.my_tasks', language), icon: <TasksIcon /> },
+    { to: '/my-escalations', label: t('nav.my_escalations', language), icon: <EscalationsIcon />, badge: openEscalations },
+  ];
+
   const navItems: NavItem[] = isManager
     ? [
         { to: '/dashboard', label: t('nav.dashboard', language), icon: <DashboardIcon /> },
@@ -157,13 +164,11 @@ export default function Layout({ children }: Props) {
               { to: '/audit-log', label: t('nav.audit_log', language), icon: <AuditIcon /> },
             ]
           : []),
+        // Manager & admin juga dapat melihat tampilan teknisi (read-only context
+        // untuk review beban kerja / mengerjakan tugas yang ditugaskan ke dirinya).
+        ...technicianItems,
       ]
-    : [
-        { to: '/my-dashboard', label: t('nav.my_dashboard', language), icon: <DashboardIcon /> },
-        { to: '/my-projects', label: t('nav.my_projects', language), icon: <ProjectsIcon /> },
-        { to: '/my-tasks', label: t('nav.my_tasks', language), icon: <TasksIcon /> },
-        { to: '/my-escalations', label: t('nav.my_escalations', language), icon: <EscalationsIcon />, badge: openEscalations },
-      ];
+    : technicianItems;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">

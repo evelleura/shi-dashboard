@@ -296,7 +296,7 @@ export default function ProjectDetailPage() {
       )}
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {metrics.map((m) => (
           <div key={m.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 text-center">
             <p className="text-xs text-gray-400 dark:text-gray-500">{m.label}</p>
