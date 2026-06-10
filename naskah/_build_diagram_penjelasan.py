@@ -279,8 +279,8 @@ def build_class():
       'Kelas User (pengguna) berfungsi sebagai lapisan autentikasi dan '
       'otorisasi pada sistem. Kelas ini merepresentasikan entitas pengguna '
       'serta mengelola hak akses berdasarkan peran yang dimiliki, yaitu '
-      'technician, manager, atau admin. Deskripsi fungsi pada kelas User '
-      'dapat dilihat pada Tabel 4.1.')
+      'technician dan manager. Deskripsi fungsi pada kelas User dapat '
+      'dilihat pada Tabel 4.1.')
     CAP(doc, 'Tabel 4.1 Kelas User')
     tabel_fungsi(doc, [
         ('login',
@@ -291,15 +291,15 @@ def build_class():
          'sistem sebelum tindakan tertentu dijalankan.'),
     ])
 
-    # ---- Client ----
-    H(doc, 'Kelas Client')
+    # ---- Klien ----
+    H(doc, 'Kelas Klien')
     P(doc,
-      'Kelas Client (klien) merepresentasikan entitas pelanggan atau '
-      'instansi pemilik proyek. Kelas ini digunakan untuk mengelola data '
-      'klien yang terdaftar dalam sistem sehingga proyek selalu memiliki '
-      'pihak penanggung jawab eksternal yang jelas. Deskripsi fungsi pada '
-      'kelas Client dapat dilihat pada Tabel 4.2.')
-    CAP(doc, 'Tabel 4.2 Kelas Client')
+      'Kelas Klien merepresentasikan entitas pelanggan atau instansi '
+      'pemilik proyek. Kelas ini digunakan untuk mengelola data klien yang '
+      'terdaftar dalam sistem sehingga proyek selalu memiliki pihak '
+      'penanggung jawab eksternal yang jelas. Deskripsi fungsi pada kelas '
+      'Klien dapat dilihat pada Tabel 4.2.')
+    CAP(doc, 'Tabel 4.2 Kelas Klien')
     tabel_fungsi(doc, [
         ('create',
          'Menambahkan dan menyimpan data profil klien baru ke dalam basis data.'),
@@ -309,15 +309,15 @@ def build_class():
          'Menghapus data klien dari sistem.'),
     ])
 
-    # ---- Project ----
-    H(doc, 'Kelas Project')
+    # ---- Proyek ----
+    H(doc, 'Kelas Proyek')
     P(doc,
-      'Kelas Project (proyek) merupakan inti utama sistem karena berfungsi '
-      'untuk mengelola koordinasi proyek, penjadwalan, fase pekerjaan, serta '
+      'Kelas Proyek merupakan inti utama sistem karena berfungsi untuk '
+      'mengelola koordinasi proyek, penjadwalan, fase pekerjaan, serta '
       'hubungan antar tugas. Kelas ini juga menjadi titik integrasi antara '
       'data klien, pengguna, tugas, hingga indikator kesehatan proyek. '
-      'Deskripsi fungsi pada kelas Project dapat dilihat pada Tabel 4.3.')
-    CAP(doc, 'Tabel 4.3 Kelas Project')
+      'Deskripsi fungsi pada kelas Proyek dapat dilihat pada Tabel 4.3.')
+    CAP(doc, 'Tabel 4.3 Kelas Proyek')
     tabel_fungsi(doc, [
         ('create',
          'Membuat catatan proyek baru beserta informasi awal seperti klien, '
@@ -334,18 +334,18 @@ def build_class():
          'Mengurutkan proyek berdasarkan tingkat urgensi dari status '
          'kesehatan (merah, kuning, hijau) pada dashboard EWS.'),
         ('getHealth',
-         'Mengambil informasi indikator kesehatan proyek dari kelas ProjectHealth.'),
+         'Mengambil informasi indikator kesehatan proyek dari kelas KesehatanProyek.'),
     ])
 
-    # ---- ProjectAssignment ----
-    H(doc, 'Kelas ProjectAssignment')
+    # ---- PenugasanProyek ----
+    H(doc, 'Kelas PenugasanProyek')
     P(doc,
-      'Kelas ProjectAssignment (penugasan proyek) berfungsi sebagai kelas '
-      'asosiasi yang menghubungkan pengguna dengan proyek tertentu secara '
-      'terstruktur. Kelas ini mencatat siapa yang ditugaskan pada proyek '
-      'tertentu dan kapan penugasan tersebut dilakukan. Deskripsi fungsi '
-      'pada kelas ProjectAssignment dapat dilihat pada Tabel 4.4.')
-    CAP(doc, 'Tabel 4.4 Kelas ProjectAssignment')
+      'Kelas PenugasanProyek berfungsi sebagai kelas asosiasi yang '
+      'menghubungkan pengguna dengan proyek tertentu secara terstruktur. '
+      'Kelas ini mencatat siapa yang ditugaskan pada proyek tertentu dan '
+      'kapan penugasan tersebut dilakukan. Deskripsi fungsi pada kelas '
+      'PenugasanProyek dapat dilihat pada Tabel 4.4.')
+    CAP(doc, 'Tabel 4.4 Kelas PenugasanProyek')
     tabel_fungsi(doc, [
         ('assign',
          'Mencatat penugasan seorang pengguna ke dalam sebuah proyek.'),
@@ -355,16 +355,16 @@ def build_class():
          'Mengambil daftar pengguna yang ditugaskan pada sebuah proyek.'),
     ])
 
-    # ---- ProjectHealth ----
-    H(doc, 'Kelas ProjectHealth')
+    # ---- KesehatanProyek ----
+    H(doc, 'Kelas KesehatanProyek')
     P(doc,
-      'Kelas ProjectHealth (kesehatan proyek) berfungsi untuk mengelola '
-      'proses komputasi EWS serta menghitung indikator kesehatan proyek. '
-      'Dengan adanya pemisahan ini, perhitungan SPI, Earned Value, dan '
-      'Planned Value dijaga konsistensinya dan tidak bercampur dengan '
-      'logika pengelolaan proyek itu sendiri. Deskripsi fungsi pada kelas '
-      'ProjectHealth dapat dilihat pada Tabel 4.5.')
-    CAP(doc, 'Tabel 4.5 Kelas ProjectHealth')
+      'Kelas KesehatanProyek berfungsi untuk mengelola proses komputasi '
+      'EWS serta menghitung indikator kesehatan proyek. Dengan adanya '
+      'pemisahan ini, perhitungan SPI, Earned Value, dan Planned Value '
+      'dijaga konsistensinya dan tidak bercampur dengan logika pengelolaan '
+      'proyek itu sendiri. Deskripsi fungsi pada kelas KesehatanProyek '
+      'dapat dilihat pada Tabel 4.5.')
+    CAP(doc, 'Tabel 4.5 Kelas KesehatanProyek')
     tabel_fungsi(doc, [
         ('calculateSPI',
          'Menghitung Schedule Performance Index berdasarkan rasio '
@@ -382,15 +382,15 @@ def build_class():
          'pengukuran (Planned Value).'),
     ])
 
-    # ---- Task ----
-    H(doc, 'Kelas Task')
+    # ---- Tugas ----
+    H(doc, 'Kelas Tugas')
     P(doc,
-      'Kelas Task (tugas) merepresentasikan unit pekerjaan atau tugas '
-      'lapangan yang harus diselesaikan dalam periode waktu tertentu. '
-      'Kelas ini menjadi titik utama interaksi teknisi dengan sistem '
-      'sekaligus sumber utama data perhitungan SPI. Deskripsi fungsi pada '
-      'kelas Task dapat dilihat pada Tabel 4.6.')
-    CAP(doc, 'Tabel 4.6 Kelas Task')
+      'Kelas Tugas merepresentasikan unit pekerjaan atau tugas lapangan '
+      'yang harus diselesaikan dalam periode waktu tertentu. Kelas ini '
+      'menjadi titik utama interaksi teknisi dengan sistem sekaligus sumber '
+      'utama data perhitungan SPI. Deskripsi fungsi pada kelas Tugas dapat '
+      'dilihat pada Tabel 4.6.')
+    CAP(doc, 'Tabel 4.6 Kelas Tugas')
     tabel_fungsi(doc, [
         ('create',
          'Menambahkan tugas baru ke dalam sebuah proyek.'),
@@ -411,15 +411,15 @@ def build_class():
          'Memeriksa apakah tugas berstatus to_do telah melewati tenggat waktu.'),
     ])
 
-    # ---- TaskEvidence ----
-    H(doc, 'Kelas TaskEvidence')
+    # ---- BuktiTugas ----
+    H(doc, 'Kelas BuktiTugas')
     P(doc,
-      'Kelas TaskEvidence (bukti) digunakan untuk mengelola dokumen atau '
-      'lampiran bukti pekerjaan yang dikirimkan oleh teknisi. Kelas ini '
-      'menjamin bahwa setiap tugas yang dilaporkan dapat diverifikasi '
-      'melalui dokumentasi pendukung. Deskripsi fungsi pada kelas TaskEvidence '
-      'dapat dilihat pada Tabel 4.7.')
-    CAP(doc, 'Tabel 4.7 Kelas TaskEvidence')
+      'Kelas BuktiTugas digunakan untuk mengelola dokumen atau lampiran '
+      'bukti pekerjaan yang dikirimkan oleh teknisi. Kelas ini menjamin '
+      'bahwa setiap tugas yang dilaporkan dapat diverifikasi melalui '
+      'dokumentasi pendukung. Deskripsi fungsi pada kelas BuktiTugas dapat '
+      'dilihat pada Tabel 4.7.')
+    CAP(doc, 'Tabel 4.7 Kelas BuktiTugas')
     tabel_fungsi(doc, [
         ('upload',
          'Mengunggah berkas bukti pekerjaan ke server dan menautkannya pada '
@@ -430,16 +430,15 @@ def build_class():
          'Menghapus berkas bukti dari sistem.'),
     ])
 
-    # ---- Escalation ----
-    H(doc, 'Kelas Escalation')
+    # ---- Eskalasi ----
+    H(doc, 'Kelas Eskalasi')
     P(doc,
-      'Kelas Escalation (eskalasi) berfungsi untuk mencatat, mengelola '
-      'prioritas, dan memantau proses komunikasi terkait kendala lapangan '
-      'yang terjadi selama pelaksanaan proyek. Kelas ini memastikan setiap '
-      'hambatan tercatat secara formal dan dapat ditindaklanjuti oleh '
-      'manajer. Deskripsi fungsi pada kelas Escalation dapat dilihat pada '
-      'Tabel 4.8.')
-    CAP(doc, 'Tabel 4.8 Kelas Escalation')
+      'Kelas Eskalasi berfungsi untuk mencatat, mengelola prioritas, dan '
+      'memantau proses komunikasi terkait kendala lapangan yang terjadi '
+      'selama pelaksanaan proyek. Kelas ini memastikan setiap hambatan '
+      'tercatat secara formal dan dapat ditindaklanjuti oleh manajer. '
+      'Deskripsi fungsi pada kelas Eskalasi dapat dilihat pada Tabel 4.8.')
+    CAP(doc, 'Tabel 4.8 Kelas Eskalasi')
     tabel_fungsi(doc, [
         ('create',
          'Membuat catatan eskalasi baru atas kendala yang dialami teknisi.'),
@@ -464,21 +463,21 @@ def build_class():
       'kelas dapat dilihat pada Tabel 4.9.')
     CAP(doc, 'Tabel 4.9 Relasi Antar Kelas')
     tabel_relasi(doc, [
-        ('User', '1 : M', 'ProjectAssignment',
+        ('User', '1 : M', 'PenugasanProyek',
          'Seorang pengguna dapat menerima banyak penugasan proyek.'),
-        ('Client', '1 : M', 'Project',
+        ('Klien', '1 : M', 'Proyek',
          'Satu klien dapat memiliki banyak proyek.'),
-        ('Project', 'M : 1', 'ProjectAssignment',
+        ('Proyek', 'M : 1', 'PenugasanProyek',
          'Satu proyek dapat memiliki banyak penugasan pengguna (relasi melalui kelas asosiasi).'),
-        ('Project', '1 : 1', 'ProjectHealth',
+        ('Proyek', '1 : 1', 'KesehatanProyek',
          'Setiap proyek memiliki tepat satu catatan kesehatan proyek.'),
-        ('Project', '1 : M', 'Task',
+        ('Proyek', '1 : M', 'Tugas',
          'Satu proyek dapat memiliki banyak tugas.'),
-        ('Task', '1 : M', 'TaskEvidence',
+        ('Tugas', '1 : M', 'BuktiTugas',
          'Satu tugas dapat memiliki banyak berkas bukti pekerjaan.'),
-        ('Task', '1 : M', 'Escalation',
+        ('Tugas', '1 : M', 'Eskalasi',
          'Satu tugas dapat memiliki banyak catatan eskalasi.'),
-        ('User', '1 : M', 'Task',
+        ('User', '1 : M', 'Tugas',
          'Seorang pengguna (teknisi) dapat ditugaskan untuk mengerjakan banyak tugas (assignee).'),
     ])
 
