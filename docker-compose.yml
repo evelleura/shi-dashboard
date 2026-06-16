@@ -1,0 +1,45 @@
+services:
+  db:
+    build:
+      context: ./frontend/database
+    container_name: shi_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shi
+    ports:
+      - "5433:5432"
+    volumes:
+      - shi_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shi"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shi_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: shi
+      JWT_SECRET: ganti-secret-ini-saat-produksi
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    volumes:
+      - shi_uploads:/app/uploads
+
+volumes:
+  shi_pgdata:
+  shi_uploads:
