@@ -1,55 +1,60 @@
-// Dasbor (Gambar 5.25 untuk manajer / 5.29 untuk teknisi).
-// Server Component — kueri langsung via lib/db.
+// Dashboard - Early Warning System (Gambar 4.20).
+// 4 kartu status + tabel proyek + panel eskalasi terbaru.
 import Link from 'next/link';
 import { Shell } from '@/components/Shell';
-import { StatusBadge } from '@/components/StatusBadge';
-import { HealthBadge } from '@/components/HealthBadge';
 import { query } from '@/lib/db';
 import type { StatusKesehatan } from '@/lib/health';
+import { TabelEWS, TabelTugasMendatang } from './tabel-client';
 
 interface BarisEWS {
-  id_proyek: number;
+  id_proyek: string;
   nama_proyek: string;
   end_date: string;
   nama_klien: string | null;
   spi_value: number | null;
   rag: StatusKesehatan | null;
-  completed_tasks: number | null;
-  total_tasks: number | null;
-  overdue_tasks: number | null;
   actual_progress: number | null;
   planned_progress: number | null;
+  completed_tasks: number | null;
+  total_tasks: number | null;
+  updated_at: string | null;
 }
 
 interface BarisRingkas {
-  proyek_aktif: number;
-  kritis: number;
-  waspada: number;
-  tepat_waktu: number;
-  tanpa_data: number;
-  rata_rata_spi: string | null;
+  total: number;
+  merah: number;
+  kuning: number;
+  hijau: number;
+}
+
+interface BarisEskalasi {
+  id_eskalasi: number;
+  title: string;
+  nama_pelapor: string;
+  nama_proyek: string;
+  created_at: string;
 }
 
 export default async function HalamanDasbor() {
   return (
-    <Shell judul="Dasbor">
+    <Shell judul="Dashboard — Early Warning System (EWS)">
       {async (u) => {
         if (u.role === 'manager') {
           const ringkas = (await query<BarisRingkas>(`
             SELECT
-              COUNT(*) FILTER (WHERE p.status = 'active')::int                                   AS proyek_aktif,
-              COUNT(*) FILTER (WHERE ph.status = 'red'   AND p.status = 'active')::int           AS kritis,
-              COUNT(*) FILTER (WHERE ph.status = 'amber' AND p.status = 'active')::int           AS waspada,
-              COUNT(*) FILTER (WHERE ph.status = 'green' AND p.status = 'active')::int           AS tepat_waktu,
-              COUNT(*) FILTER (WHERE ph.status IS NULL   AND p.status = 'active')::int           AS tanpa_data,
-              COALESCE(ROUND(AVG(ph.spi_value) FILTER (WHERE p.status='active'), 4)::text, '0') AS rata_rata_spi
+              COUNT(*) FILTER (WHERE p.status = 'active')::int                         AS total,
+              COUNT(*) FILTER (WHERE ph.status = 'red'   AND p.status='active')::int   AS merah,
+              COUNT(*) FILTER (WHERE ph.status = 'amber' AND p.status='active')::int   AS kuning,
+              COUNT(*) FILTER (WHERE ph.status = 'green' AND p.status='active')::int   AS hijau
             FROM tb_proyek p
             LEFT JOIN project_health ph ON ph.project_id = p.id_proyek`)).rows[0];
+
           const proyek = (await query<BarisEWS>(`
-            SELECT p.id_proyek, p.nama_proyek, p.end_date, c.nama_klien,
+            SELECT p.id_proyek::text AS id_proyek, p.nama_proyek, p.end_date, c.nama_klien,
                    ph.spi_value, ph.status AS rag,
-                   ph.completed_tasks, ph.total_tasks, ph.overdue_tasks,
-                   ph.actual_progress, ph.planned_progress
+                   ph.actual_progress, ph.planned_progress,
+                   ph.completed_tasks, ph.total_tasks,
+                   ph.last_updated::text AS updated_at
               FROM tb_proyek p
               LEFT JOIN tb_klien c ON c.id_klien = p.id_klien
               LEFT JOIN project_health ph ON ph.project_id = p.id_proyek
@@ -58,116 +63,120 @@ export default async function HalamanDasbor() {
                CASE ph.status WHEN 'red' THEN 1 WHEN 'amber' THEN 2 WHEN 'green' THEN 3 ELSE 4 END,
                ph.spi_value ASC NULLS LAST,
                p.end_date ASC`)).rows;
+
+          const eskalasi = (await query<BarisEskalasi>(`
+            SELECT e.id_eskalasi, e.title, e.created_at::text AS created_at,
+                   p.nama_proyek, us.nama AS nama_pelapor
+              FROM tb_eskalasi e
+              JOIN tb_tugas t   ON t.id_tugas   = e.id_tugas
+              JOIN tb_proyek p  ON p.id_proyek  = t.id_proyek
+              JOIN tb_user us   ON us.id_user   = e.id_user
+             WHERE e.status <> 'closed'
+             ORDER BY e.created_at DESC
+             LIMIT 5`)).rows;
+
           return (
             <div className="space-y-6">
-              <div className="flex flex-wrap gap-3">
-                <Link href="/projects/new" className="btn-primary">+ Proyek Baru</Link>
-                <Link href="/projects" className="btn-outline">Lihat Semua Proyek</Link>
-                <Link href="/escalations" className="btn-outline">Eskalasi</Link>
+              {/* 4 kartu status di urutan PDF: Total, Merah, Kuning, Hijau */}
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <KartuStatus label="Total Proyek"  value={ringkas.total}  badge={null} />
+                <KartuStatus label="Status Merah"  value={ringkas.merah}  badge="x" tone="red" />
+                <KartuStatus label="Status Kuning" value={ringkas.kuning} badge="!" tone="amber" />
+                <KartuStatus label="Status Hijau"  value={ringkas.hijau}  badge="✓" tone="green" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-                <Tile label="Proyek Aktif" value={ringkas.proyek_aktif} />
-                <Tile label="Kritis"       value={ringkas.kritis} tone="red" />
-                <Tile label="Waspada"      value={ringkas.waspada} tone="amber" />
-                <Tile label="Tepat Waktu"  value={ringkas.tepat_waktu} tone="green" />
-                <Tile label="Rata-rata SPI" value={Number(ringkas.rata_rata_spi).toFixed(3)} />
-              </div>
-
-              <div className="card">
-                <h2 className="mb-3 text-base font-semibold">Daftar Proyek Aktif (Dasbor EWS)</h2>
-                <p className="mb-4 text-xs text-slate-500">
-                  Diurutkan berdasarkan kekritisan: Merah → Kuning → Hijau. Dalam tiap kategori,
-                  proyek dengan SPI terkecil dan tenggat terdekat muncul lebih dahulu.
-                </p>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="text-left text-xs uppercase text-slate-500">
-                      <tr>
-                        <th className="py-2">Proyek</th>
-                        <th>Klien</th>
-                        <th>Kesehatan</th>
-                        <th>SPI</th>
-                        <th>Tugas (Selesai/Total)</th>
-                        <th>Tenggat</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {proyek.map((p) => (
-                        <tr key={p.id_proyek} className="border-t">
-                          <td className="py-2 font-medium">{p.nama_proyek}</td>
-                          <td className="text-slate-600">{p.nama_klien ?? '-'}</td>
-                          <td><HealthBadge status={p.rag} /></td>
-                          <td>{p.spi_value !== null ? Number(p.spi_value).toFixed(3) : '-'}</td>
-                          <td>{p.completed_tasks ?? 0} / {p.total_tasks ?? 0}</td>
-                          <td>{p.end_date.toString().slice(0, 10)}</td>
-                          <td>
-                            <Link href={`/projects/${p.id_proyek}`} className="text-sm text-blue-600 hover:underline">
-                              Detail
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                      {proyek.length === 0 && (
-                        <tr><td colSpan={7} className="py-6 text-center text-slate-500">Belum ada proyek aktif.</td></tr>
-                      )}
-                    </tbody>
-                  </table>
+              {/* Tabel daftar proyek */}
+              <section className="space-y-2">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">Daftar Proyek</h2>
+                  <p className="text-xs text-slate-500">Diurutkan berdasarkan status paling kritis.</p>
                 </div>
-              </div>
+                <TabelEWS proyek={proyek.map((p) => ({
+                  ...p,
+                  spi_value: p.spi_value === null ? null : Number(p.spi_value),
+                  actual_progress: p.actual_progress === null ? null : Number(p.actual_progress),
+                  planned_progress: p.planned_progress === null ? null : Number(p.planned_progress),
+                  end_date: p.end_date.toString().slice(0, 10),
+                }))} />
+              </section>
+
+              {/* Panel eskalasi terbaru */}
+              <section className="rounded-md border border-slate-200 bg-white shadow-sm">
+                <header className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-2.5">
+                  <h2 className="text-sm font-bold text-slate-900">Eskalasi Terbaru (membutuhkan tindakan)</h2>
+                  <Link href="/escalations" className="text-xs font-semibold text-blue-600 hover:underline">
+                    Lihat semua →
+                  </Link>
+                </header>
+                {eskalasi.length === 0 ? (
+                  <p className="px-4 py-6 text-center text-sm text-slate-500">Tidak ada eskalasi aktif.</p>
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {eskalasi.map((e) => (
+                      <li key={e.id_eskalasi} className="flex items-center justify-between gap-4 px-4 py-3 text-sm hover:bg-slate-50">
+                        <div className="flex-1 min-w-0">
+                          <span className="font-semibold text-slate-900">{e.nama_pelapor}</span>
+                          <span className="mx-2 text-slate-400">·</span>
+                          <span className="text-slate-700">{e.nama_proyek}</span>
+                          <span className="mx-2 text-slate-400">—</span>
+                          <span className="text-slate-600">{e.title}</span>
+                        </div>
+                        <span className="shrink-0 text-xs text-slate-500">
+                          {new Date(e.created_at).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
             </div>
           );
         }
 
-        // -------- Teknisi --------
+        // ── Teknisi: Dashboard Performa Saya (Gambar 4.23) ─────────────────
         const ringkas = (await query<{ total_tugas: number; selesai: number; dikerjakan: number; belum_mulai: number; terlambat: number }>(
           `SELECT
-              COUNT(*)::int                                                 AS total_tugas,
-              COUNT(*) FILTER (WHERE status = 'done')::int                  AS selesai,
-              COUNT(*) FILTER (WHERE status = 'working_on')::int            AS dikerjakan,
-              COUNT(*) FILTER (WHERE status = 'to_do')::int                 AS belum_mulai,
-              COUNT(*) FILTER (WHERE due_date < CURRENT_DATE AND status <> 'done')::int AS terlambat
+              COUNT(*)::int                                                  AS total_tugas,
+              COUNT(*) FILTER (WHERE status='done')::int                     AS selesai,
+              COUNT(*) FILTER (WHERE status='working_on')::int               AS dikerjakan,
+              COUNT(*) FILTER (WHERE status='to_do')::int                    AS belum_mulai,
+              COUNT(*) FILTER (WHERE due_date<CURRENT_DATE AND status<>'done')::int AS terlambat
            FROM tb_tugas WHERE id_user = $1`,
           [u.id],
         )).rows[0];
+
+        const spiSaya = (await query<{ spi: string | null }>(
+          `SELECT AVG(ph.spi_value)::text AS spi
+             FROM project_health ph
+             JOIN tb_penugasan_proyek pp ON pp.id_proyek = ph.project_id
+            WHERE pp.id_user = $1`,
+          [u.id],
+        )).rows[0];
+
         const tugas = (await query<{ id_tugas: number; nama_tugas: string; status: string; due_date: string | null; nama_proyek: string }>(
           `SELECT t.id_tugas, t.nama_tugas, t.status, t.due_date, p.nama_proyek
              FROM tb_tugas t JOIN tb_proyek p ON p.id_proyek = t.id_proyek
             WHERE t.id_user = $1
-            ORDER BY t.due_date NULLS LAST LIMIT 20`,
+            ORDER BY t.due_date NULLS LAST`,
           [u.id],
         )).rows;
+
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-              <Tile label="Total Tugas"  value={ringkas.total_tugas} />
-              <Tile label="Selesai"      value={ringkas.selesai} tone="green" />
-              <Tile label="Dikerjakan"   value={ringkas.dikerjakan} tone="amber" />
-              <Tile label="Belum Mulai"  value={ringkas.belum_mulai} />
-              <Tile label="Terlambat"    value={ringkas.terlambat} tone="red" />
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <KartuStatus
+                label="SPI Saya"
+                value={spiSaya.spi ? Number(spiSaya.spi).toFixed(2) : '—'}
+                badge={null}
+              />
+              <KartuStatus label="Tugas Selesai"  value={ringkas.selesai}     badge="✓" tone="green" />
+              <KartuStatus label="Tugas Berjalan" value={ringkas.dikerjakan}  badge="…" tone="amber" />
+              <KartuStatus label="Tugas Overdue"  value={ringkas.terlambat}   badge="!" tone="red" />
             </div>
-            <div className="card">
-              <h2 className="mb-3 text-base font-semibold">Tugas Mendatang</h2>
-              <table className="w-full text-sm">
-                <thead className="text-left text-xs uppercase text-slate-500">
-                  <tr><th className="py-2">Nama Tugas</th><th>Proyek</th><th>Tenggat</th><th>Status</th></tr>
-                </thead>
-                <tbody>
-                  {tugas.map((t) => (
-                    <tr key={t.id_tugas} className="border-t">
-                      <td className="py-2">{t.nama_tugas}</td>
-                      <td className="text-slate-600">{t.nama_proyek}</td>
-                      <td>{t.due_date ? t.due_date.slice(0, 10) : '-'}</td>
-                      <td><StatusBadge status={t.status} /></td>
-                    </tr>
-                  ))}
-                  {tugas.length === 0 && (
-                    <tr><td colSpan={4} className="py-6 text-center text-slate-500">Belum ada tugas ditugaskan.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <section className="space-y-2">
+              <h2 className="text-base font-bold text-slate-900">Tugas Saat Ini</h2>
+              <TabelTugasMendatang tugas={tugas} />
+            </section>
           </div>
         );
       }}
@@ -175,14 +184,31 @@ export default async function HalamanDasbor() {
   );
 }
 
-function Tile({ label, value, tone }: { label: string; value: number | string; tone?: 'red' | 'amber' | 'green' }) {
-  const ring = tone === 'red' ? 'text-red-600'
-    : tone === 'amber' ? 'text-amber-600'
-    : tone === 'green' ? 'text-green-600' : 'text-slate-900';
+function KartuStatus({
+  label, value, badge, tone,
+}: {
+  label: string;
+  value: number | string;
+  badge: string | null;
+  tone?: 'red' | 'amber' | 'green';
+}) {
+  const tonecls = {
+    red:   { bg: 'bg-red-100',   text: 'text-red-700' },
+    amber: { bg: 'bg-amber-100', text: 'text-amber-700' },
+    green: { bg: 'bg-green-100', text: 'text-green-700' },
+  } as const;
+  const b = tone ? tonecls[tone] : { bg: 'bg-slate-100', text: 'text-slate-700' };
   return (
-    <div className="card text-center">
-      <div className={'text-2xl font-bold ' + ring}>{value}</div>
-      <div className="text-xs text-slate-500">{label}</div>
+    <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-1 flex items-center justify-between">
+        <span className="text-xs font-semibold text-slate-600">{label}</span>
+        {badge && (
+          <span className={'flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ' + b.bg + ' ' + b.text}>
+            {badge}
+          </span>
+        )}
+      </div>
+      <div className="text-3xl font-bold tabular-nums text-slate-900">{value}</div>
     </div>
   );
 }

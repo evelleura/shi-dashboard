@@ -1,18 +1,18 @@
-# Next.js 15 (App Router) — multi-stage build
-FROM node:20-alpine AS deps
+# Next.js 15 (App Router) — multi-stage build, bun runtime.
+FROM oven/bun:1.1-alpine AS deps
 WORKDIR /app
-COPY package.json ./
-RUN npm install --legacy-peer-deps
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile || bun install
 
-FROM node:20-alpine AS builder
+FROM oven/bun:1.1-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN mkdir -p public uploads
-RUN npm run build
+RUN bun run build
 
-FROM node:20-alpine AS runner
+FROM oven/bun:1.1-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -27,4 +27,4 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/next.config.mjs ./
 
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["bun", "run", "start"]

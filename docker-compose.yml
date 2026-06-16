@@ -18,7 +18,13 @@ services:
       timeout: 5s
       retries: 10
 
+  # Container produksi Next.js. Hanya dijalankan bila profil 'app' aktif:
+  #   docker compose --profile app up -d
+  # Tujuannya supaya `docker compose up` standar hanya menjalankan DB,
+  # dan TIDAK bentrok dengan `bun run dev` yang juga memakai port 3000
+  # serta menulis ke .next pada folder kerja host.
   app:
+    profiles: ["app"]
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -37,6 +43,8 @@ services:
       NODE_ENV: production
     ports:
       - "3000:3000"
+    # PENTING: TIDAK bind-mount ./frontend agar .next host tidak
+    # menimpa hasil build di dalam image.
     volumes:
       - shi_uploads:/app/uploads
 

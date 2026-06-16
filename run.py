@@ -1,148 +1,66 @@
 """
-SHI Dashboard - Build & Run Script
-Cross-platform: Windows, macOS, Linux
-Auto-installs PostgreSQL (portable), installs deps (bun), sets up DB, runs everything.
+SHI Dashboard - Build & Run Script (Docker-based)
+
+Orkestrator sederhana untuk stack yang sudah disederhanakan:
+- PostgreSQL via Docker Compose (port 5433)
+- Next.js 15 (App Router) via bun (fallback: pnpm). npm tidak dipakai.
+
+Penggunaan:
+  python run.py              # Start DB + install deps + dev server
+  python run.py --test       # Start DB + jalankan vitest
+  python run.py --build      # Build image Next.js produksi (docker compose build)
+  python run.py --pg-only    # Hanya jalankan PostgreSQL
+  python run.py --reset-db   # Hapus volume DB lalu mulai ulang (data hilang!)
+  python run.py --stop       # Hentikan semua container
+  python run.py --install    # Hanya install dependencies (bun install)
+  python run.py --clean      # Reset node_modules + .next + .env.local + volume DB
 """
 
+import shutil
+import signal
+import socket
 import subprocess
 import sys
-import os
-import socket
-import signal
-import shutil
 import time
-import platform
-import zipfile
-import tarfile
-import stat
-import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).parent
 APP_DIR = ROOT / "frontend"
-ENV_FILE = APP_DIR / ".env.local"
-ENV_EXAMPLE = APP_DIR / ".env.example"
-PG_DIR = ROOT / "postgres"
-PG_BIN = PG_DIR / "bin"
-PG_DATA = PG_DIR / "data"
-PG_LOG = PG_DIR / "log.txt"
-
-PG_VERSION = "17.5-1"
-PLATFORM = sys.platform  # win32, darwin, linux
-ARCH = platform.machine()  # x86_64, AMD64, arm64, aarch64
-
-
-# -- Platform helpers ---------------------------------------------------------
-
-def get_pg_download_info() -> tuple[str, str]:
-    """Returns (url, filename) for the current platform's PG binary."""
-    base = "https://get.enterprisedb.com/postgresql"
-
-    if PLATFORM == "win32":
-        name = f"postgresql-{PG_VERSION}-windows-x64-binaries.zip"
-    elif PLATFORM == "darwin":
-        if ARCH == "arm64":
-            name = f"postgresql-{PG_VERSION}-osx-arm64-binaries.zip"
-        else:
-            name = f"postgresql-{PG_VERSION}-osx-binaries.zip"
-    elif PLATFORM == "linux":
-        name = f"postgresql-{PG_VERSION}-linux-x64-binaries.tar.gz"
-    else:
-        print(f"[ERROR] Unsupported platform: {PLATFORM}")
-        sys.exit(1)
-
-    return f"{base}/{name}", name
-
-
-def pg_bin_path(name: str) -> Path:
-    """Returns path to a PG binary. Uses portable postgres/bin/ if present, else system PATH or Homebrew."""
-    suffix = ".exe" if PLATFORM == "win32" else ""
-    portable = PG_BIN / f"{name}{suffix}"
-    if portable.exists():
-        return portable
-    system = shutil.which(name)
-    if system:
-        return Path(system)
-    if PLATFORM == "darwin":
-        import glob as _glob
-        for pattern in [
-            f"/Library/PostgreSQL/*/bin/{name}",
-            f"/opt/homebrew/Cellar/libpq/*/bin/{name}",
-            f"/opt/homebrew/opt/postgresql*/bin/{name}",
-            f"/opt/homebrew/Cellar/postgresql*/*/bin/{name}",
-            f"/usr/local/Cellar/libpq/*/bin/{name}",
-            f"/usr/local/opt/postgresql*/bin/{name}",
-        ]:
-            matches = sorted(_glob.glob(pattern))
-            if matches:
-                return Path(matches[-1])
-    return portable  # will fail with a clear error
-
-
-def pg_env() -> dict:
-    """Returns environment dict with library paths and password set for PG binaries."""
-    env = os.environ.copy()
-    lib_dir = str(PG_DIR / "lib")
-    if PLATFORM == "darwin":
-        env["DYLD_LIBRARY_PATH"] = lib_dir
-    elif PLATFORM == "linux":
-        env["LD_LIBRARY_PATH"] = lib_dir
-    # Pass DB password so CLI tools (psql, createdb, dropdb) don't prompt
-    env_vars = read_env()
-    if env_vars.get("DB_PASSWORD"):
-        env["PGPASSWORD"] = env_vars["DB_PASSWORD"]
-    return env
-
-
-def make_executable(path: Path):
-    """Make a file executable on Unix platforms."""
-    if PLATFORM != "win32":
-        st = path.stat()
-        path.chmod(st.st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+COMPOSE_FILE = ROOT / "docker-compose.yml"
+DB_CONTAINER = "shi_db"
+DB_PORT = 5433
+DB_USER = "postgres"
+DB_NAME = "shi"
+DB_NAME_TEST = "shi_test"
 
 
 # -- Helpers ------------------------------------------------------------------
 
 def run(cmd: list[str], cwd: Path = ROOT, check: bool = True, **kwargs) -> subprocess.CompletedProcess:
     print(f"  >>> {' '.join(str(c) for c in cmd)}")
-    # Inject PG library paths if running a PG binary
-    if len(cmd) > 0 and str(PG_BIN) in str(cmd[0]):
-        kwargs.setdefault("env", pg_env())
     return subprocess.run(cmd, cwd=cwd, check=check, **kwargs)
 
 
-def find_bun() -> str:
-    bun = shutil.which("bun")
-    if not bun:
-        print("[ERROR] bun not found. Install: https://bun.sh")
+def find(cmd: str) -> str:
+    path = shutil.which(cmd)
+    if not path:
+        print(f"[ERROR] '{cmd}' tidak ditemukan di PATH.")
         sys.exit(1)
-    return bun
+    return path
 
 
-def read_env() -> dict[str, str]:
-    env = {}
-    if ENV_FILE.exists():
-        for line in ENV_FILE.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, v = line.split("=", 1)
-                env[k.strip()] = v.strip().strip('"')
-    return env
+def docker_running() -> bool:
+    try:
+        subprocess.run(
+            ["docker", "info"], check=True,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        return True
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return False
 
 
-def ensure_env():
-    if ENV_FILE.exists():
-        return
-    if ENV_EXAMPLE.exists():
-        shutil.copy(ENV_EXAMPLE, ENV_FILE)
-        print("[CREATED] .env from .env.example")
-
-
-# -- PostgreSQL ---------------------------------------------------------------
-
-def pg_ready() -> bool:
-    env = read_env()
-    port = int(env.get("DB_PORT", "5432"))
+def port_open(port: int) -> bool:
     try:
         with socket.create_connection(("127.0.0.1", port), timeout=2):
             return True
@@ -150,298 +68,219 @@ def pg_ready() -> bool:
         return False
 
 
-def pg_installed() -> bool:
-    return pg_bin_path("pg_ctl").exists()
+def container_running(name: str) -> bool:
+    try:
+        r = subprocess.run(
+            ["docker", "ps", "--filter", f"name=^{name}$", "--format", "{{.Names}}"],
+            capture_output=True, text=True, check=True,
+        )
+        return name in r.stdout
+    except subprocess.CalledProcessError:
+        return False
 
 
-def download_postgres():
-    url, filename = get_pg_download_info()
-    download_file = ROOT / filename
-    print(f"  Downloading PostgreSQL {PG_VERSION} for {PLATFORM}/{ARCH} (~300MB)...")
+# -- Docker / PostgreSQL ------------------------------------------------------
 
-    def progress(block_num, block_size, total_size):
-        downloaded = block_num * block_size
-        if total_size > 0:
-            pct = min(100, downloaded * 100 // total_size)
-            mb = downloaded // (1024 * 1024)
-            total_mb = total_size // (1024 * 1024)
-            print(f"\r  [{pct:3d}%] {mb}/{total_mb} MB", end="", flush=True)
-
-    urllib.request.urlretrieve(url, str(download_file), reporthook=progress)
-    print()
-    return download_file
+def ensure_docker():
+    print("\n=== Docker ===")
+    find("docker")
+    if not docker_running():
+        print("[ERROR] Docker daemon tidak berjalan. Mulai Docker Desktop terlebih dahulu.")
+        sys.exit(1)
+    print("[OK] Docker tersedia")
 
 
-def extract_postgres(archive_file: Path):
-    """Extract PG archive, stripping the leading pgsql/ prefix."""
-    print("  Extracting...")
-    PG_DIR.mkdir(exist_ok=True)
-
-    if archive_file.name.endswith(".tar.gz") or archive_file.name.endswith(".tgz"):
-        # Linux: tar.gz
-        with tarfile.open(archive_file, "r:gz") as tf:
-            for member in tf.getmembers():
-                if member.name.startswith("pgsql/"):
-                    rel = member.name[len("pgsql/"):]
-                    if not rel:
-                        continue
-                    member_copy = tarfile.TarInfo(name=rel)
-                    member_copy.size = member.size
-                    member_copy.mode = member.mode
-                    member_copy.type = member.type
-                    member_copy.linkname = member.linkname
-
-                    target = PG_DIR / rel
-                    if member.isdir():
-                        target.mkdir(parents=True, exist_ok=True)
-                    elif member.issym() or member.islnk():
-                        # Handle symlinks
-                        target.parent.mkdir(parents=True, exist_ok=True)
-                        src = tf.extractfile(member)
-                        if src is None:
-                            # Symlink -- create it
-                            if target.exists() or target.is_symlink():
-                                target.unlink()
-                            os.symlink(member.linkname, str(target))
-                        else:
-                            with open(target, "wb") as dst:
-                                shutil.copyfileobj(src, dst)
-                    else:
-                        target.parent.mkdir(parents=True, exist_ok=True)
-                        src = tf.extractfile(member)
-                        if src:
-                            with open(target, "wb") as dst:
-                                shutil.copyfileobj(src, dst)
-                            # Preserve executable permissions
-                            if member.mode & 0o111:
-                                make_executable(target)
+def compose_up_db():
+    print("\n=== PostgreSQL (Docker) ===")
+    if container_running(DB_CONTAINER):
+        print(f"[OK] Container '{DB_CONTAINER}' sudah berjalan")
     else:
-        # Windows/macOS: zip
-        with zipfile.ZipFile(archive_file, "r") as zf:
-            for member in zf.infolist():
-                if member.filename.startswith("pgsql/"):
-                    rel = member.filename[len("pgsql/"):]
-                    if not rel:
-                        continue
-                    target = PG_DIR / rel
-                    if member.is_dir():
-                        target.mkdir(parents=True, exist_ok=True)
-                    else:
-                        target.parent.mkdir(parents=True, exist_ok=True)
-                        with zf.open(member) as src, open(target, "wb") as dst:
-                            shutil.copyfileobj(src, dst)
-                        # On macOS, make binaries executable
-                        if PLATFORM != "win32" and (
-                            "bin/" in member.filename or member.filename.endswith(".sh")
-                        ):
-                            make_executable(target)
+        run(["docker", "compose", "-f", str(COMPOSE_FILE), "up", "-d", "db"])
 
-    archive_file.unlink()
-    print("  [OK] Extracted to postgres/")
-
-
-def init_postgres():
-    if PG_DATA.exists():
-        return
-    print("  Initializing database cluster...")
-    run(
-        [str(pg_bin_path("initdb")), "-D", str(PG_DATA), "-U", "postgres", "-A", "trust", "--encoding=UTF8"],
-        check=True,
-        env=pg_env(),
-    )
-
-
-def start_postgres():
-    if pg_ready():
-        return
-    env_vars = read_env()
-    port = env_vars.get("DB_PORT", "5432")
-
-    # Write port to postgresql.conf if non-default
-    conf = PG_DATA / "postgresql.conf"
-    if conf.exists():
-        text = conf.read_text()
-        if f"port = {port}" not in text:
-            with open(conf, "a") as f:
-                f.write(f"\nport = {port}\n")
-
-    print("  Starting PostgreSQL...")
-    run(
-        [str(pg_bin_path("pg_ctl")), "-D", str(PG_DATA), "-l", str(PG_LOG), "start"],
-        check=True,
-        env=pg_env(),
-    )
-
-    # Wait for ready
-    for _ in range(15):
-        if pg_ready():
-            print("  [OK] PostgreSQL running")
-            return
+    # Tunggu hingga DB siap menerima koneksi.
+    print("  Menunggu PostgreSQL siap...")
+    for _ in range(30):
+        if port_open(DB_PORT):
+            # Verifikasi pg_isready di dalam container.
+            r = subprocess.run(
+                ["docker", "exec", DB_CONTAINER, "pg_isready", "-U", DB_USER],
+                capture_output=True,
+            )
+            if r.returncode == 0:
+                print(f"[OK] PostgreSQL siap di port {DB_PORT}")
+                ensure_test_db()
+                return
         time.sleep(1)
-    print("[ERROR] PostgreSQL failed to start. Check postgres/log.txt")
+    print("[ERROR] PostgreSQL tidak siap setelah 30 detik. Cek: docker logs shi_db")
     sys.exit(1)
 
 
-def stop_postgres():
-    if pg_installed() and PG_DATA.exists():
-        subprocess.run(
-            [str(pg_bin_path("pg_ctl")), "-D", str(PG_DATA), "stop", "-m", "fast"],
-            capture_output=True,
-            env=pg_env(),
-        )
-        print("  [postgres] stopped")
-
-
-def create_database():
-    env_vars = read_env()
-    dbname = env_vars.get("DB_NAME", "shi_dashboard")
-    port = env_vars.get("DB_PORT", "5432")
-
-    # Check if DB already exists
-    result = subprocess.run(
-        [str(pg_bin_path("psql")), "-U", "postgres", "-p", port, "-lqt"],
+def ensure_test_db():
+    """Pastikan database shi_test ada (untuk integration tests)."""
+    r = subprocess.run(
+        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-tAc",
+         f"SELECT 1 FROM pg_database WHERE datname='{DB_NAME_TEST}';"],
         capture_output=True, text=True,
-        env=pg_env(),
     )
-    if dbname in result.stdout:
+    if "1" in r.stdout:
         return
-
-    print(f"  Creating database '{dbname}'...")
-    run(
-        [str(pg_bin_path("createdb")), "-U", "postgres", "-p", port, dbname],
-        check=True,
-        env=pg_env(),
-    )
-
-
-def ensure_postgres():
-    print("\n=== PostgreSQL ===")
-
-    if pg_ready():
-        print("[OK] Already running")
-        create_database()
-        return
-
-    if not pg_installed():
-        archive = download_postgres()
-        extract_postgres(archive)
-
-    init_postgres()
-    start_postgres()
-    create_database()
-
-
-def reset_database():
-    env_vars = read_env()
-    dbname = env_vars.get("DB_NAME", "shi_dashboard")
-    port = env_vars.get("DB_PORT", "5432")
-    psql = str(pg_bin_path("psql"))
-    print(f"\n=== Resetting database '{dbname}' ===")
-    # Terminate active connections then drop via psql (dropdb fails if connections exist)
+    print(f"  Membuat database uji '{DB_NAME_TEST}'...")
     subprocess.run(
-        [psql, "-U", "postgres", "-p", port, "-d", "postgres", "-c",
-         f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{dbname}' AND pid <> pg_backend_pid();"],
-        capture_output=True, env=pg_env(),
+        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-c",
+         f"CREATE DATABASE {DB_NAME_TEST};"],
+        check=True, capture_output=True,
     )
+    # Terapkan skema ke shi_test menggunakan init.sql yang sudah dibake di image.
     subprocess.run(
-        [psql, "-U", "postgres", "-p", port, "-d", "postgres", "-c",
-         f"DROP DATABASE IF EXISTS \"{dbname}\";"],
-        capture_output=True, env=pg_env(),
+        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", DB_NAME_TEST,
+         "-f", "/docker-entrypoint-initdb.d/01_init.sql"],
+        check=True, capture_output=True,
     )
-    run(
-        [str(pg_bin_path("createdb")), "-U", "postgres", "-p", port, dbname],
-        check=True,
-        env=pg_env(),
-    )
-    print("[OK] Database reset")
+    print(f"  [OK] Skema diterapkan ke {DB_NAME_TEST}")
 
 
-# -- Node/Bun ----------------------------------------------------------------
+def reset_db():
+    print("\n=== Reset Database (volume dihapus) ===")
+    run(["docker", "compose", "-f", str(COMPOSE_FILE), "down", "-v"])
+    print("[OK] Volume DB dihapus")
+    compose_up_db()
 
-def install_deps(bun: str):
+
+def compose_down():
+    print("\n=== Hentikan Container ===")
+    run(["docker", "compose", "-f", str(COMPOSE_FILE), "down"])
+    print("[OK] Semua container dihentikan")
+
+
+# -- Node / bun ---------------------------------------------------------------
+
+def find_pkg_mgr() -> tuple[str, str]:
+    """Return (binary_path, name). Prefer bun, fall back to pnpm.
+
+    npm sengaja tidak dipakai — bun jauh lebih cepat untuk install + dev server.
+    """
+    for name in ("bun", "pnpm"):
+        path = shutil.which(name)
+        if path:
+            return path, name
+    print("[ERROR] Tidak menemukan 'bun' atau 'pnpm' di PATH.")
+    print("        Install bun: curl -fsSL https://bun.sh/install | bash")
+    sys.exit(1)
+
+
+def install_deps():
     print("\n=== Dependencies ===")
+    pkg, name = find_pkg_mgr()
     if (APP_DIR / "node_modules").exists():
-        print("[OK] Already installed (use --clean to reinstall)")
+        print(f"[OK] Sudah terinstal (gunakan --clean untuk install ulang via {name})")
         return
-
-    p = subprocess.Popen([bun, "install"], cwd=APP_DIR)
-    if p.wait() != 0:
-        print("[ERROR] bun install failed")
-        sys.exit(1)
-    print("  [OK] Dependencies installed")
+    run([pkg, "install"], cwd=APP_DIR)
+    print(f"[OK] Dependencies terinstal via {name}")
 
 
-def setup_db(bun: str, seed: bool = False):
-    print("\n=== Schema ===")
-    script = "database/setup.ts"
-    args = ["--seed"] if seed else []
-    # Use npx tsx directly to avoid bun's getcwd() issue on paths with spaces
-    npx = shutil.which("npx")
-    if npx:
-        cmd = [npx, "tsx", script] + args
-    else:
-        cmd = [bun, "x", "tsx", script] + args
-    result = subprocess.run(
-        cmd, cwd=str(APP_DIR), check=False
-    )
-    # # Filter out npm notice lines, print relevant output
-    # for line in result.stdout.splitlines():
-    #     if not line.startswith("npm notice") and not line.startswith("npm warn exec"):
-    #         print(f"  {line}")
-    if result.returncode != 0:
-        print("[ERROR] Schema setup failed")
-        sys.exit(1)
-    print("[OK] Database ready")
+def clean():
+    """Hapus artefak build (node_modules, .next) DAN reset DB.
+
+    --clean dipakai saat user mau benar-benar mulai dari nol: kode di-rebuild
+    ulang dan database di-recreate dari init.sql. Sebelumnya hanya menghapus
+    node_modules / .next, jadi data lama (mis. user dummy schema lama yang
+    masih pakai kolom 'name') tetap nyangkut dan menyebabkan login gagal.
+    """
+    print("\n=== Bersihkan (kode + database) ===")
+    for d in [APP_DIR / "node_modules", APP_DIR / ".next"]:
+        if d.exists():
+            shutil.rmtree(d)
+            print(f"  Hapus {d.name}")
+    # Stale .env.local dari setup lama (PG portable, DB name lama) bikin
+    # Next.js connect ke instance yang salah. Wajib dihapus.
+    stale_env = APP_DIR / ".env.local"
+    if stale_env.exists():
+        stale_env.unlink()
+        print(f"  Hapus {stale_env.name} (stale dari setup lama)")
+    # package-lock.json bekas npm — hapus agar bun/pnpm tidak bingung.
+    for f in [APP_DIR / "package-lock.json"]:
+        if f.exists():
+            f.unlink()
+            print(f"  Hapus {f.name}")
+    # Reset volume DB jika docker tersedia — pastikan schema fresh dari init.sql.
+    if docker_running():
+        print("  Reset volume DB...")
+        subprocess.run(
+            ["docker", "compose", "-f", str(COMPOSE_FILE), "down", "-v"],
+            capture_output=True,
+        )
+        print("  [OK] Volume DB dihapus (akan di-init ulang oleh init.sql saat 'up')")
 
 
-def run_flow_script(bun: str):
-    """Runs the system flow playwright script."""
-    print("\n=== System Flow Script ===")
-    flow_dir = ROOT / "alur-sistem"
+def run_tests():
+    print("\n=== Vitest ===")
+    pkg, name = find_pkg_mgr()
+    # PENTING: pakai `bun run test`, BUKAN `bun test` — `bun test` memanggil
+    # built-in runner bun yang tidak kompatibel dengan vitest.
+    r = subprocess.run([pkg, "run", "test"], cwd=str(APP_DIR))
+    if r.returncode != 0:
+        print("[ERROR] Test gagal")
+        sys.exit(r.returncode)
+    print("[OK] Semua test lulus")
 
-    # 1. Install deps for the flow script
-    if not (flow_dir / "node_modules").exists() or not (flow_dir / "bun.lockb").exists():
-        print("  Installing dependencies for flow script...")
-        subprocess.run([bun, "install"], cwd=flow_dir, check=True)
-    else:
-        print("  [OK] Dependencies for flow script already installed")
 
-    # 2. Run the script
-    print("  Running automation script 'run_flow.js'...")
+def run_build():
+    print("\n=== Build (docker compose) ===")
+    run(["docker", "compose", "-f", str(COMPOSE_FILE), "build"])
+    print("[OK] Image dibuild")
+
+
+def kill_stale_next_processes():
+    """Hentikan proses next/bun lain agar tidak bentrok di .next/."""
     try:
-        cmd = ["node", "run_flow.js"]
-        subprocess.run(cmd, cwd=flow_dir, check=True)
-        print("  [OK] Flow script finished successfully.")
+        r = subprocess.run(
+            ["pgrep", "-fl", "next-server|next dev|next build"],
+            capture_output=True, text=True,
+        )
+        if r.stdout.strip():
+            print("  [!] Mendeteksi proses Next.js lain — dihentikan agar .next/ tidak bentrok:")
+            for line in r.stdout.strip().splitlines():
+                print(f"      {line}")
+            subprocess.run(["pkill", "-f", "next-server|next dev|next build"],
+                           capture_output=True)
+            time.sleep(1)
+    except FileNotFoundError:
+        pass  # pgrep tidak ada di OS ini
 
-    except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Flow script failed: {e}")
-        sys.exit(1)
+
+def kill_stale_app_container():
+    """Hentikan container shi_app jika berjalan — memakai port 3000 yang sama."""
+    if container_running("shi_app"):
+        print("  [!] Container 'shi_app' aktif di port 3000 — dihentikan.")
+        subprocess.run(["docker", "compose", "-f", str(COMPOSE_FILE), "stop", "app"],
+                       capture_output=True)
 
 
-
-
-# -- Services -----------------------------------------------------------------
-
-def start_services(bun: str):
+def start_dev_server():
     print("\n=== Next.js Dev Server ===")
-    print("  App: http://localhost:3000")
-    print("  Ctrl+C to stop\n")
+    kill_stale_next_processes()
+    kill_stale_app_container()
+    # Bersihkan .next agar tidak ada sisa build/cache yang rusak dari run sebelumnya.
+    next_dir = APP_DIR / ".next"
+    if next_dir.exists():
+        shutil.rmtree(next_dir)
+        print("  [OK] .next/ dibersihkan")
 
-    # Use next binary directly to avoid bun run's getcwd() issue on paths with spaces
-    next_bin = APP_DIR / "node_modules" / ".bin" / "next"
-    cmd = [str(next_bin), "dev"] if next_bin.exists() else [bun, "run", "dev"]
-    app = subprocess.Popen(cmd, cwd=str(APP_DIR))
+    print(f"  App:  http://localhost:3000")
+    print(f"  DB:   localhost:{DB_PORT} (user={DB_USER}, db={DB_NAME})")
+    print("  Ctrl+C untuk berhenti\n")
+    pkg, _ = find_pkg_mgr()
+    (APP_DIR / "uploads").mkdir(exist_ok=True)
+    app = subprocess.Popen([pkg, "run", "dev"], cwd=str(APP_DIR))
 
-    def shutdown(signum=None, frame=None):
-        print("\n\nShutting down...")
+    def shutdown(*_):
+        print("\n\nMenghentikan...")
         if app.poll() is None:
             app.terminate()
             try:
                 app.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 app.kill()
-            print("  [next.js] stopped")
-        stop_postgres()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, shutdown)
@@ -449,8 +288,8 @@ def start_services(bun: str):
 
     while True:
         if app.poll() is not None:
-            print(f"[WARNING] Next.js exited ({app.returncode})")
-            shutdown()
+            print(f"[WARN] Next.js berhenti (exit {app.returncode})")
+            sys.exit(app.returncode or 0)
         time.sleep(1)
 
 
@@ -458,82 +297,42 @@ def start_services(bun: str):
 
 def main():
     args = sys.argv[1:]
-
     print("=" * 50)
-    print(f"  SHI Dashboard  ({PLATFORM}/{ARCH})")
+    print(f"  SHI Dashboard  ({sys.platform})")
     print("=" * 50)
 
-    bun = find_bun()
-    ensure_env()
-
-    if "--run-flow" in args:
-        # 1. PostgreSQL
-        if "--skip-db" not in args:
-            ensure_postgres()
-        
-        # 2. Dependencies (main app)
-        install_deps(bun)
-        
-        # 3. Database schema
-        if "--skip-db" not in args:
-            reset = "--reset-db" in args
-            if reset:
-                reset_database()
-            # --reset-db implies --seed: an empty freshly-created DB is useless
-            # without seed data, so always seed after reset.
-            setup_db(bun, seed=reset or "--seed" in args)
-
-        # 4. Run the flow script
-        run_flow_script(bun)
-        
-        # 5. Exit (do not start dev server)
-        print("\n[OK] --run-flow finished.")
+    if "--stop" in args:
+        compose_down()
         return
 
-    if "--clean" in args:
-        print("\n=== Clean ===")
-        for d in [APP_DIR / "node_modules", APP_DIR / ".next"]:
-            if d.exists():
-                shutil.rmtree(d)
-                print(f"  Removed {d.name}")
-        for f in [APP_DIR / "package-lock.json", APP_DIR / "bun.lock", APP_DIR / "bun.lockb"]:
-            if f.exists():
-                f.unlink()
+    ensure_docker()
 
-    # 1. PostgreSQL
-    if "--skip-db" not in args:
-        ensure_postgres()
+    if "--clean" in args:
+        clean()
+
+    if "--reset-db" in args:
+        reset_db()
+    else:
+        compose_up_db()
 
     if "--pg-only" in args:
-        print("\n[OK] PostgreSQL running. Ctrl+C to stop.")
-        signal.signal(signal.SIGINT, lambda *_: (stop_postgres(), sys.exit(0)))
-        signal.signal(signal.SIGTERM, lambda *_: (stop_postgres(), sys.exit(0)))
-        while True:
-            time.sleep(1)
+        print("\n[OK] PostgreSQL berjalan. Container tetap aktif sampai 'python run.py --stop'.")
+        return
 
-    # 2. Dependencies
-    install_deps(bun)
+    install_deps()
 
     if "--install" in args:
         return
 
-    # 3. Uploads dir
-    (APP_DIR / "uploads").mkdir(exist_ok=True)
-
-    # 4. Database schema
-    if "--skip-db" not in args:
-        reset = "--reset-db" in args
-        if reset:
-            reset_database()
-        # --reset-db implies --seed: an empty freshly-created DB is useless
-        # without seed data, so always seed after reset.
-        setup_db(bun, seed=reset or "--seed" in args)
-
-    if "--db-only" in args:
+    if "--build" in args:
+        run_build()
         return
 
-    # 5. Run
-    start_services(bun)
+    if "--test" in args:
+        run_tests()
+        return
+
+    start_dev_server()
 
 
 if __name__ == "__main__":
