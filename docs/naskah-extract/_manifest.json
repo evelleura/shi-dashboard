@@ -1,0 +1,2062 @@
+{
+  "source": "Naskah TA Final 4.pdf",
+  "pages": 114,
+  "metadata": {
+    "title": "",
+    "author": "user",
+    "creator": "Microsoft Word"
+  },
+  "toc": [
+    {
+      "level": 1,
+      "title": "KATA PENGANTAR",
+      "page": 5
+    },
+    {
+      "level": 1,
+      "title": "DAFTAR ISI",
+      "page": 8
+    },
+    {
+      "level": 1,
+      "title": "DAFTAR TABEL",
+      "page": 10
+    },
+    {
+      "level": 1,
+      "title": "DAFTAR GAMBAR",
+      "page": 11
+    },
+    {
+      "level": 1,
+      "title": "DAFTAR SINGKATAN",
+      "page": 13
+    },
+    {
+      "level": 1,
+      "title": "BAB I PENDAHULUAN",
+      "page": 14
+    },
+    {
+      "level": 2,
+      "title": "1.1 Latar Belakang",
+      "page": 14
+    },
+    {
+      "level": 2,
+      "title": "1.2 Rumusan Masalah",
+      "page": 15
+    },
+    {
+      "level": 2,
+      "title": "1.3 Batasan Masalah",
+      "page": 15
+    },
+    {
+      "level": 2,
+      "title": "1.4 Tujuan Penelitian",
+      "page": 16
+    },
+    {
+      "level": 2,
+      "title": "1.5 Manfaat Penelitian",
+      "page": 16
+    },
+    {
+      "level": 2,
+      "title": "1.6 Sistematika Penulisan",
+      "page": 16
+    },
+    {
+      "level": 1,
+      "title": "BAB II KAJIAN HASIL PENELITIAN DAN LANDASAN TEORI",
+      "page": 18
+    },
+    {
+      "level": 2,
+      "title": "2.1 Kajian Hasil Penelitian",
+      "page": 18
+    },
+    {
+      "level": 2,
+      "title": "2.2 Landasan Teori",
+      "page": 22
+    },
+    {
+      "level": 3,
+      "title": "2.2.1 Manajemen Proyek",
+      "page": 22
+    },
+    {
+      "level": 3,
+      "title": "2.2.2 Dashboard Manajemen Proyek",
+      "page": 22
+    },
+    {
+      "level": 3,
+      "title": "2.2.3 Sistem Informasi Laporan Harian Proyek",
+      "page": 22
+    },
+    {
+      "level": 3,
+      "title": "2.2.4 Status Kesehatan Proyek",
+      "page": 23
+    },
+    {
+      "level": 3,
+      "title": "2.2.5 Early Warning System Berbasis Schedule Performance Index",
+      "page": 23
+    },
+    {
+      "level": 3,
+      "title": "2.2.6 Framework Next.js",
+      "page": 25
+    },
+    {
+      "level": 3,
+      "title": "2.2.7 Unified Modeling Language",
+      "page": 25
+    },
+    {
+      "level": 3,
+      "title": "2.2.8 Entity Relationship Diagram",
+      "page": 30
+    },
+    {
+      "level": 3,
+      "title": "2.2.9 Basis Data PostgreSQL",
+      "page": 31
+    },
+    {
+      "level": 3,
+      "title": "2.2.10 Structure Query Language",
+      "page": 32
+    },
+    {
+      "level": 3,
+      "title": "2.2.11 Black Box Testing",
+      "page": 32
+    },
+    {
+      "level": 1,
+      "title": "BAB III METODE PENELITIAN",
+      "page": 33
+    },
+    {
+      "level": 2,
+      "title": "3.1 Metode Penelitian",
+      "page": 33
+    },
+    {
+      "level": 2,
+      "title": "3.2 Obyek Penelitian",
+      "page": 35
+    },
+    {
+      "level": 1,
+      "title": "BAB IV  ANALISIS DAN PERANCANGAN",
+      "page": 36
+    },
+    {
+      "level": 2,
+      "title": "4.1 Analisis Sistem",
+      "page": 36
+    },
+    {
+      "level": 2,
+      "title": "4.2 Analisa Kebutuhan",
+      "page": 40
+    },
+    {
+      "level": 3,
+      "title": "4.2.1 Analisa Kebutuhan User",
+      "page": 40
+    },
+    {
+      "level": 3,
+      "title": "4.2.2 Analisa Kebutuhan Fungsional",
+      "page": 41
+    },
+    {
+      "level": 3,
+      "title": "4.2.3 Analisa Kebutuhan Non Fungsional",
+      "page": 41
+    },
+    {
+      "level": 2,
+      "title": "4.3 Perancangan Sistem",
+      "page": 42
+    },
+    {
+      "level": 3,
+      "title": "4.3.1 Perancangan Model Proses",
+      "page": 42
+    },
+    {
+      "level": 4,
+      "title": "4.3.1.1 Model Use Case Diagram",
+      "page": 42
+    },
+    {
+      "level": 4,
+      "title": "4.3.1.2 Model Activity Diagram",
+      "page": 44
+    },
+    {
+      "level": 4,
+      "title": "4.3.1.3 Model Sequence Diagram",
+      "page": 49
+    },
+    {
+      "level": 4,
+      "title": "4.3.1.4 Model Class Diagram",
+      "page": 53
+    },
+    {
+      "level": 3,
+      "title": "4.3.2 Perancangan Model Data",
+      "page": 58
+    },
+    {
+      "level": 3,
+      "title": "4.3.3 Perancangan Fisik Basis Data",
+      "page": 60
+    },
+    {
+      "level": 3,
+      "title": "4.3.4 Perancangan Relasi Antar Tabel",
+      "page": 64
+    },
+    {
+      "level": 3,
+      "title": "4.3.5 Perancangan Antarmuka",
+      "page": 66
+    },
+    {
+      "level": 3,
+      "title": "4.3.5.1 Antarmuka Data Input",
+      "page": 66
+    },
+    {
+      "level": 3,
+      "title": "4.3.5.2 Antarmuka Data Proses",
+      "page": 68
+    },
+    {
+      "level": 3,
+      "title": "4.3.5.3 Antarmuka Data Output",
+      "page": 71
+    },
+    {
+      "level": 3,
+      "title": "4.3.5.4 Antarmuka Navigasi Struktur Data",
+      "page": 74
+    },
+    {
+      "level": 2,
+      "title": "4.4 Rancangan Anggaran Pengembangan Sistem",
+      "page": 75
+    },
+    {
+      "level": 1,
+      "title": "BAB V IMPLEMENTASI DAN PEMBAHASAN SISTEM",
+      "page": 77
+    },
+    {
+      "level": 2,
+      "title": "5.1 Implementasi",
+      "page": 77
+    },
+    {
+      "level": 3,
+      "title": "5.1.1 Implementasi Basis Data",
+      "page": 77
+    },
+    {
+      "level": 3,
+      "title": "5.1.2 Implementasi Sistem",
+      "page": 79
+    },
+    {
+      "level": 2,
+      "title": "5.2 Pembahasan",
+      "page": 87
+    },
+    {
+      "level": 3,
+      "title": "5.2.1 Pembahasan Basis Data",
+      "page": 87
+    },
+    {
+      "level": 3,
+      "title": "5.2.2 Pembahasan Sistem",
+      "page": 91
+    },
+    {
+      "level": 3,
+      "title": "5.2.3 Pengujian",
+      "page": 100
+    },
+    {
+      "level": 2,
+      "title": "5.3 Inovasi Sistem",
+      "page": 105
+    },
+    {
+      "level": 1,
+      "title": "BAB VI PENUTUP",
+      "page": 109
+    },
+    {
+      "level": 2,
+      "title": "6.1 Simpulan",
+      "page": 109
+    },
+    {
+      "level": 2,
+      "title": "6.2 Saran",
+      "page": 109
+    },
+    {
+      "level": 1,
+      "title": "DAFTAR PUSTAKA",
+      "page": 110
+    }
+  ],
+  "chapters": [
+    {
+      "title": "KATA PENGANTAR",
+      "slug": "kata-pengantar",
+      "start": 5,
+      "end": 7
+    },
+    {
+      "title": "DAFTAR ISI",
+      "slug": "daftar-isi",
+      "start": 8,
+      "end": 9
+    },
+    {
+      "title": "DAFTAR TABEL",
+      "slug": "daftar-tabel",
+      "start": 10,
+      "end": 10
+    },
+    {
+      "title": "DAFTAR GAMBAR",
+      "slug": "daftar-gambar",
+      "start": 11,
+      "end": 12
+    },
+    {
+      "title": "DAFTAR SINGKATAN",
+      "slug": "daftar-singkatan",
+      "start": 13,
+      "end": 13
+    },
+    {
+      "title": "BAB I PENDAHULUAN",
+      "slug": "bab-i-pendahuluan",
+      "start": 14,
+      "end": 17
+    },
+    {
+      "title": "BAB II KAJIAN HASIL PENELITIAN DAN LANDASAN TEORI",
+      "slug": "bab-ii-kajian-hasil-penelitian-dan-landasan-teori",
+      "start": 18,
+      "end": 32
+    },
+    {
+      "title": "BAB III METODE PENELITIAN",
+      "slug": "bab-iii-metode-penelitian",
+      "start": 33,
+      "end": 35
+    },
+    {
+      "title": "BAB IV  ANALISIS DAN PERANCANGAN",
+      "slug": "bab-iv-analisis-dan-perancangan",
+      "start": 36,
+      "end": 76
+    },
+    {
+      "title": "BAB V IMPLEMENTASI DAN PEMBAHASAN SISTEM",
+      "slug": "bab-v-implementasi-dan-pembahasan-sistem",
+      "start": 77,
+      "end": 108
+    },
+    {
+      "title": "BAB VI PENUTUP",
+      "slug": "bab-vi-penutup",
+      "start": 109,
+      "end": 109
+    },
+    {
+      "title": "DAFTAR PUSTAKA",
+      "slug": "daftar-pustaka",
+      "start": 110,
+      "end": 114
+    }
+  ],
+  "images": [
+    {
+      "file": "page-001-img00.jpeg",
+      "page": 1,
+      "xref": 11,
+      "ext": "jpeg",
+      "w": 465,
+      "h": 466
+    },
+    {
+      "file": "page-003-img00.jpeg",
+      "page": 3,
+      "xref": 22,
+      "ext": "jpeg",
+      "w": 242,
+      "h": 181
+    },
+    {
+      "file": "page-003-img01.png",
+      "page": 3,
+      "xref": 23,
+      "ext": "png",
+      "w": 254,
+      "h": 227
+    },
+    {
+      "file": "page-004-img00.png",
+      "page": 4,
+      "xref": 27,
+      "ext": "png",
+      "w": 1095,
+      "h": 1326
+    },
+    {
+      "file": "page-005-img00.jpeg",
+      "page": 5,
+      "xref": 32,
+      "ext": "jpeg",
+      "w": 294,
+      "h": 262
+    },
+    {
+      "file": "page-030-img00.png",
+      "page": 30,
+      "xref": 339,
+      "ext": "png",
+      "w": 215,
+      "h": 109
+    },
+    {
+      "file": "page-031-img00.png",
+      "page": 31,
+      "xref": 341,
+      "ext": "png",
+      "w": 180,
+      "h": 180
+    },
+    {
+      "file": "page-031-img01.png",
+      "page": 31,
+      "xref": 342,
+      "ext": "png",
+      "w": 114,
+      "h": 114
+    },
+    {
+      "file": "page-031-img02.png",
+      "page": 31,
+      "xref": 343,
+      "ext": "png",
+      "w": 209,
+      "h": 104
+    },
+    {
+      "file": "page-031-img03.png",
+      "page": 31,
+      "xref": 344,
+      "ext": "png",
+      "w": 198,
+      "h": 4
+    },
+    {
+      "file": "page-033-img00.jpeg",
+      "page": 33,
+      "xref": 349,
+      "ext": "jpeg",
+      "w": 448,
+      "h": 412,
+      "figure": "3.1",
+      "caption": "Metode Penelitian"
+    },
+    {
+      "file": "page-037-img00.png",
+      "page": 37,
+      "xref": 354,
+      "ext": "png",
+      "w": 576,
+      "h": 942,
+      "figure": "4.1",
+      "caption": "Bagan Alur Sistem yang Berjalan"
+    },
+    {
+      "file": "page-039-img00.png",
+      "page": 39,
+      "xref": 358,
+      "ext": "png",
+      "w": 602,
+      "h": 1030,
+      "figure": "4.2",
+      "caption": "Bagan Alur Sistem yang Diusulkan"
+    },
+    {
+      "file": "page-043-img00.png",
+      "page": 43,
+      "xref": 364,
+      "ext": "png",
+      "w": 1062,
+      "h": 667,
+      "figure": "4.3",
+      "caption": "Diagram Use Case"
+    },
+    {
+      "file": "page-044-img00.png",
+      "page": 44,
+      "xref": 367,
+      "ext": "png",
+      "w": 527,
+      "h": 381
+    },
+    {
+      "file": "page-045-img00.png",
+      "page": 45,
+      "xref": 370,
+      "ext": "png",
+      "w": 702,
+      "h": 592
+    },
+    {
+      "file": "page-046-img00.png",
+      "page": 46,
+      "xref": 373,
+      "ext": "png",
+      "w": 662,
+      "h": 752,
+      "figure": "4.6",
+      "caption": "Activity Diagram Pelaporan Progres Harian, Validasi Tugas, & Kalkukasi"
+    },
+    {
+      "file": "page-047-img00.png",
+      "page": 47,
+      "xref": 376,
+      "ext": "png",
+      "w": 692,
+      "h": 452
+    },
+    {
+      "file": "page-048-img00.png",
+      "page": 48,
+      "xref": 379,
+      "ext": "png",
+      "w": 702,
+      "h": 602
+    },
+    {
+      "file": "page-049-img00.png",
+      "page": 49,
+      "xref": 382,
+      "ext": "png",
+      "w": 820,
+      "h": 380
+    },
+    {
+      "file": "page-050-img00.png",
+      "page": 50,
+      "xref": 385,
+      "ext": "png",
+      "w": 825,
+      "h": 465
+    },
+    {
+      "file": "page-051-img00.png",
+      "page": 51,
+      "xref": 388,
+      "ext": "png",
+      "w": 920,
+      "h": 605
+    },
+    {
+      "file": "page-052-img00.png",
+      "page": 52,
+      "xref": 391,
+      "ext": "png",
+      "w": 857,
+      "h": 361
+    },
+    {
+      "file": "page-053-img00.png",
+      "page": 53,
+      "xref": 394,
+      "ext": "png",
+      "w": 920,
+      "h": 461,
+      "figure": "4.13",
+      "caption": "Sequence Diagram Pengajuan & Penanganan Eskalasi"
+    },
+    {
+      "file": "page-054-img00.png",
+      "page": 54,
+      "xref": 397,
+      "ext": "png",
+      "w": 1462,
+      "h": 962,
+      "figure": "4.14",
+      "caption": "Class Diagram"
+    },
+    {
+      "file": "page-059-img00.png",
+      "page": 59,
+      "xref": 404,
+      "ext": "png",
+      "w": 1102,
+      "h": 839,
+      "figure": "4.15",
+      "caption": "Entity Relationship Diagram"
+    },
+    {
+      "file": "page-065-img00.jpeg",
+      "page": 65,
+      "xref": 412,
+      "ext": "jpeg",
+      "w": 1130,
+      "h": 823,
+      "figure": "4.16",
+      "caption": "Perancangan Relasi Antar Tabel"
+    },
+    {
+      "file": "page-066-img00.png",
+      "page": 66,
+      "xref": 414,
+      "ext": "png",
+      "w": 1042,
+      "h": 493
+    },
+    {
+      "file": "page-067-img00.png",
+      "page": 67,
+      "xref": 416,
+      "ext": "png",
+      "w": 1097,
+      "h": 680
+    },
+    {
+      "file": "page-068-img00.png",
+      "page": 68,
+      "xref": 418,
+      "ext": "png",
+      "w": 1100,
+      "h": 721
+    },
+    {
+      "file": "page-069-img00.png",
+      "page": 69,
+      "xref": 420,
+      "ext": "png",
+      "w": 1102,
+      "h": 696
+    },
+    {
+      "file": "page-070-img00.png",
+      "page": 70,
+      "xref": 422,
+      "ext": "png",
+      "w": 1102,
+      "h": 666
+    },
+    {
+      "file": "page-071-img00.png",
+      "page": 71,
+      "xref": 424,
+      "ext": "png",
+      "w": 1102,
+      "h": 698
+    },
+    {
+      "file": "page-072-img00.png",
+      "page": 72,
+      "xref": 426,
+      "ext": "png",
+      "w": 1102,
+      "h": 684
+    },
+    {
+      "file": "page-073-img00.png",
+      "page": 73,
+      "xref": 428,
+      "ext": "png",
+      "w": 1094,
+      "h": 694
+    },
+    {
+      "file": "page-074-img00.png",
+      "page": 74,
+      "xref": 430,
+      "ext": "png",
+      "w": 1102,
+      "h": 698
+    },
+    {
+      "file": "page-075-img00.png",
+      "page": 75,
+      "xref": 432,
+      "ext": "png",
+      "w": 203,
+      "h": 714,
+      "figure": "4.26",
+      "caption": "Bilah Navigasi Struktur Data"
+    },
+    {
+      "file": "page-077-img00.png",
+      "page": 77,
+      "xref": 436,
+      "ext": "png",
+      "w": 1102,
+      "h": 320
+    },
+    {
+      "file": "page-078-img00.png",
+      "page": 78,
+      "xref": 438,
+      "ext": "png",
+      "w": 1102,
+      "h": 657
+    },
+    {
+      "file": "page-079-img00.png",
+      "page": 79,
+      "xref": 440,
+      "ext": "png",
+      "w": 1102,
+      "h": 149
+    },
+    {
+      "file": "page-079-img01.png",
+      "page": 79,
+      "xref": 441,
+      "ext": "png",
+      "w": 1102,
+      "h": 449
+    },
+    {
+      "file": "page-080-img00.jpeg",
+      "page": 80,
+      "xref": 443,
+      "ext": "jpeg",
+      "w": 1102,
+      "h": 753
+    },
+    {
+      "file": "page-081-img00.jpeg",
+      "page": 81,
+      "xref": 446,
+      "ext": "jpeg",
+      "w": 1102,
+      "h": 701,
+      "figure": "5.6",
+      "caption": "Input Data Proyek"
+    },
+    {
+      "file": "page-082-img00.jpeg",
+      "page": 82,
+      "xref": 448,
+      "ext": "jpeg",
+      "w": 998,
+      "h": 1053,
+      "figure": "5.7",
+      "caption": "Pencatatan Laporan Harian"
+    },
+    {
+      "file": "page-083-img00.png",
+      "page": 83,
+      "xref": 450,
+      "ext": "png",
+      "w": 1076,
+      "h": 907,
+      "figure": "5.8",
+      "caption": "Perubahan Statur Tugas & Pemicu SPI"
+    },
+    {
+      "file": "page-084-img00.jpeg",
+      "page": 84,
+      "xref": 452,
+      "ext": "jpeg",
+      "w": 1053,
+      "h": 1352,
+      "figure": "5.9",
+      "caption": "Perhitungan SPI"
+    },
+    {
+      "file": "page-085-img00.jpeg",
+      "page": 85,
+      "xref": 455,
+      "ext": "jpeg",
+      "w": 940,
+      "h": 263,
+      "figure": "5.10",
+      "caption": "Klasifikasi Kesehatan Proyek"
+    },
+    {
+      "file": "page-086-img00.jpeg",
+      "page": 86,
+      "xref": 457,
+      "ext": "jpeg",
+      "w": 1102,
+      "h": 1045,
+      "figure": "5.11",
+      "caption": "Pengurutan Berdasarkan Kekritisan"
+    },
+    {
+      "file": "page-087-img00.png",
+      "page": 87,
+      "xref": 459,
+      "ext": "png",
+      "w": 1102,
+      "h": 415
+    },
+    {
+      "file": "page-088-img00.png",
+      "page": 88,
+      "xref": 462,
+      "ext": "png",
+      "w": 1102,
+      "h": 239
+    },
+    {
+      "file": "page-088-img01.png",
+      "page": 88,
+      "xref": 463,
+      "ext": "png",
+      "w": 1102,
+      "h": 156
+    },
+    {
+      "file": "page-088-img02.png",
+      "page": 88,
+      "xref": 464,
+      "ext": "png",
+      "w": 1102,
+      "h": 255
+    },
+    {
+      "file": "page-089-img00.png",
+      "page": 89,
+      "xref": 466,
+      "ext": "png",
+      "w": 1102,
+      "h": 325
+    },
+    {
+      "file": "page-089-img01.png",
+      "page": 89,
+      "xref": 467,
+      "ext": "png",
+      "w": 1102,
+      "h": 156
+    },
+    {
+      "file": "page-089-img02.png",
+      "page": 89,
+      "xref": 468,
+      "ext": "png",
+      "w": 1102,
+      "h": 419
+    },
+    {
+      "file": "page-090-img00.png",
+      "page": 90,
+      "xref": 470,
+      "ext": "png",
+      "w": 1102,
+      "h": 222
+    },
+    {
+      "file": "page-090-img01.png",
+      "page": 90,
+      "xref": 471,
+      "ext": "png",
+      "w": 1102,
+      "h": 156
+    },
+    {
+      "file": "page-091-img00.png",
+      "page": 91,
+      "xref": 473,
+      "ext": "png",
+      "w": 1102,
+      "h": 403
+    },
+    {
+      "file": "page-091-img01.png",
+      "page": 91,
+      "xref": 474,
+      "ext": "png",
+      "w": 1102,
+      "h": 446
+    },
+    {
+      "file": "page-092-img00.jpeg",
+      "page": 92,
+      "xref": 476,
+      "ext": "jpeg",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-093-img00.jpeg",
+      "page": 93,
+      "xref": 478,
+      "ext": "jpeg",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-094-img00.png",
+      "page": 94,
+      "xref": 480,
+      "ext": "png",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-095-img00.png",
+      "page": 95,
+      "xref": 482,
+      "ext": "png",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-096-img00.png",
+      "page": 96,
+      "xref": 484,
+      "ext": "png",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-097-img00.jpeg",
+      "page": 97,
+      "xref": 486,
+      "ext": "jpeg",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-098-img00.jpeg",
+      "page": 98,
+      "xref": 488,
+      "ext": "jpeg",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-099-img00.png",
+      "page": 99,
+      "xref": 490,
+      "ext": "png",
+      "w": 1055,
+      "h": 659
+    },
+    {
+      "file": "page-100-img00.jpeg",
+      "page": 100,
+      "xref": 492,
+      "ext": "jpeg",
+      "w": 1055,
+      "h": 659,
+      "figure": "5.31",
+      "caption": "Halaman Tugas Teknisi"
+    },
+    {
+      "file": "page-106-img00.jpeg",
+      "page": 106,
+      "xref": 499,
+      "ext": "jpeg",
+      "w": 1085,
+      "h": 681,
+      "figure": "5.32",
+      "caption": "Halaman Schedule Performance Index (SPI)"
+    },
+    {
+      "file": "page-107-img00.png",
+      "page": 107,
+      "xref": 501,
+      "ext": "png",
+      "w": 1078,
+      "h": 674,
+      "figure": "5.33",
+      "caption": "Halaman Review Gate"
+    },
+    {
+      "file": "page-108-img00.png",
+      "page": 108,
+      "xref": 503,
+      "ext": "png",
+      "w": 1100,
+      "h": 749,
+      "figure": "5.34",
+      "caption": "Halaman Dashboard Performa Teknisi"
+    },
+    {
+      "file": "page-113-img00.jpeg",
+      "page": 113,
+      "xref": 509,
+      "ext": "jpeg",
+      "w": 1030,
+      "h": 1371
+    }
+  ],
+  "figures": [
+    {
+      "id": "3.1",
+      "title": "Metode Penelitian .................................................................................... 20",
+      "page": 11
+    },
+    {
+      "id": "4.1",
+      "title": "Bagan Alur Sistem yang Berjalan ........................................................... 24",
+      "page": 11
+    },
+    {
+      "id": "4.2",
+      "title": "Bagan Alur Sistem yang Diusulkan ........................................................ 26",
+      "page": 11
+    },
+    {
+      "id": "4.3",
+      "title": "Diagram Use Case ................................................................................... 30",
+      "page": 11
+    },
+    {
+      "id": "4.4",
+      "title": "Activity Diagram Autentikasi .................................................................. 31",
+      "page": 11
+    },
+    {
+      "id": "4.5",
+      "title": "Activity Diagram Pengelolaan Proyek .................................................... 32",
+      "page": 11
+    },
+    {
+      "id": "4.6",
+      "title": "Activity Diagram Pelaporan Progres Harian, Validasi Tugas, &",
+      "page": 11
+    },
+    {
+      "id": "4.7",
+      "title": "Activity Diagram Dashboard EWS ......................................................... 34",
+      "page": 11
+    },
+    {
+      "id": "4.8",
+      "title": "Activity Diagram Pengajuan & Penanganan Eskalasi ............................. 35",
+      "page": 11
+    },
+    {
+      "id": "4.9",
+      "title": "Sequence Diagram Autentikasi ............................................................... 36",
+      "page": 11
+    },
+    {
+      "id": "4.10",
+      "title": "Sequence Diagram Pengelolaan Proyek ............................................... 37",
+      "page": 11
+    },
+    {
+      "id": "4.11",
+      "title": "Sequence Diagram Pelaporan Progres Harian, Validasi Tugas, &",
+      "page": 11
+    },
+    {
+      "id": "4.12",
+      "title": "Sequence Diagram Dashboard Early Warning System ......................... 39",
+      "page": 11
+    },
+    {
+      "id": "4.13",
+      "title": "Sequence Diagram Pengajuan & Penanganan Eskalasi ........................ 40",
+      "page": 11
+    },
+    {
+      "id": "4.14",
+      "title": "Class Diagram ...................................................................................... 41",
+      "page": 11
+    },
+    {
+      "id": "4.15",
+      "title": "Entity Relationship Diagram ................................................................. 46",
+      "page": 11
+    },
+    {
+      "id": "4.16",
+      "title": "Perancangan Relasi Antar Tabel ........................................................... 52",
+      "page": 11
+    },
+    {
+      "id": "4.17",
+      "title": "Halaman Login ...................................................................................... 53",
+      "page": 11
+    },
+    {
+      "id": "4.18",
+      "title": "Halaman Tambah Proyek ...................................................................... 54",
+      "page": 11
+    },
+    {
+      "id": "4.19",
+      "title": "Halaman Tambah Laporan Proyek ........................................................ 55",
+      "page": 11
+    },
+    {
+      "id": "4.20",
+      "title": "Halaman Dashboard Early Warning System ......................................... 56",
+      "page": 11
+    },
+    {
+      "id": "4.21",
+      "title": "Halaman Data Proyek............................................................................ 57",
+      "page": 11
+    },
+    {
+      "id": "4.23",
+      "title": "Halaman Dashboard Performa Teknisi ................................................. 59",
+      "page": 11
+    },
+    {
+      "id": "4.24",
+      "title": "Halaman Detail Proyek ......................................................................... 60",
+      "page": 11
+    },
+    {
+      "id": "4.25",
+      "title": "Halaman Laporan Kesehatan Proyek .................................................... 61",
+      "page": 11
+    },
+    {
+      "id": "4.26",
+      "title": "Bilah Navigasi Struktur Data ................................................................ 62",
+      "page": 11
+    },
+    {
+      "id": "5.1",
+      "title": "Struktur Tabel Pengguna ......................................................................... 64",
+      "page": 11
+    },
+    {
+      "id": "5.2",
+      "title": "Struktur Tabel Proyek ............................................................................. 65",
+      "page": 11
+    },
+    {
+      "id": "5.3",
+      "title": "Struktur Tabel Penugasan Proyek ........................................................... 66",
+      "page": 11
+    },
+    {
+      "id": "5.4",
+      "title": "Struktur Tabel Kesehatan Proyek ............................................................ 66",
+      "page": 11
+    },
+    {
+      "id": "5.5",
+      "title": "Otentikasi Sistem .................................................................................... 67",
+      "page": 11
+    },
+    {
+      "id": "5.6",
+      "title": "Input Data Proyek ................................................................................... 68",
+      "page": 11
+    },
+    {
+      "id": "5.7",
+      "title": "Pencatatan Laporan Harian ..................................................................... 69",
+      "page": 11
+    },
+    {
+      "id": "5.8",
+      "title": "Perubahan Statur Tugas & Pemicu SPI ................................................... 70",
+      "page": 11
+    },
+    {
+      "id": "5.9",
+      "title": "Perhitungan SPI ....................................................................................... 71",
+      "page": 11
+    },
+    {
+      "id": "5.10",
+      "title": "Klasifikasi Kesehatan Proyek................................................................ 72",
+      "page": 11
+    },
+    {
+      "id": "5.11",
+      "title": "Pengurutan Berdasarkan Kekritisan ...................................................... 73",
+      "page": 11
+    },
+    {
+      "id": "5.12",
+      "title": "COUNT FILTER per kategori RAG ..................................................... 74",
+      "page": 11
+    },
+    {
+      "id": "5.13",
+      "title": "Kueri INSERT — Transaksi Tabel tb_proyek ...................................... 75",
+      "page": 12
+    },
+    {
+      "id": "5.14",
+      "title": "Hasil eksekusi INSERT — Transaksi Tabel tb_proyek ........................ 75",
+      "page": 12
+    },
+    {
+      "id": "5.15",
+      "title": "Kueri SELECT — Transaksi Laporan Harian ...................................... 75",
+      "page": 12
+    },
+    {
+      "id": "5.16",
+      "title": "Hasil eksekusi SELECT — Transaksi Laporan Harian ........................ 76",
+      "page": 12
+    },
+    {
+      "id": "5.17",
+      "title": "Kueri UPSERT — Rekalkulasi SPI dan project_health ....................... 76",
+      "page": 12
+    },
+    {
+      "id": "5.18",
+      "title": "Hasil eksekusi UPSERT — Rekalkulasi SPI dan project_health ......... 76",
+      "page": 12
+    },
+    {
+      "id": "5.19",
+      "title": "Kueri SELECT — Rekalkulasi SPI dan project_health ........................ 77",
+      "page": 12
+    },
+    {
+      "id": "5.20",
+      "title": "Hasil eksekusi SELECT — Rekalkulasi SPI dan project_health .......... 77",
+      "page": 12
+    },
+    {
+      "id": "5.21",
+      "title": "Kueri SELECT — Penayangan Dashboard EWS ................................. 78",
+      "page": 12
+    },
+    {
+      "id": "5.22",
+      "title": "Hasil eksekusi SELECT — Penayangan Dashboard EWS ................... 78",
+      "page": 12
+    },
+    {
+      "id": "5.23",
+      "title": "Halaman Beranda .................................................................................. 79",
+      "page": 12
+    },
+    {
+      "id": "5.24",
+      "title": "Halaman Login ...................................................................................... 80",
+      "page": 12
+    },
+    {
+      "id": "5.25",
+      "title": "Halaman Dashboard Manajer ................................................................ 81",
+      "page": 12
+    },
+    {
+      "id": "5.26",
+      "title": "Halaman Proyek .................................................................................... 82",
+      "page": 12
+    },
+    {
+      "id": "5.27",
+      "title": "Halaman Detail Proyek ......................................................................... 83",
+      "page": 12
+    },
+    {
+      "id": "5.28",
+      "title": "Halaman Laporan Keseluruhan Proyek................................................. 84",
+      "page": 12
+    },
+    {
+      "id": "5.29",
+      "title": "Halaman Dashboard Teknisi ................................................................. 85",
+      "page": 12
+    },
+    {
+      "id": "5.30",
+      "title": "Halaman Proyek per Teknisi ................................................................. 86",
+      "page": 12
+    },
+    {
+      "id": "5.31",
+      "title": "Halaman Tugas Teknisi ......................................................................... 87",
+      "page": 12
+    },
+    {
+      "id": "5.32",
+      "title": "Halaman Schedule Performance Index (SPI) ........................................ 93",
+      "page": 12
+    },
+    {
+      "id": "5.33",
+      "title": "Halaman Review Gate ........................................................................... 94",
+      "page": 12
+    },
+    {
+      "id": "5.34",
+      "title": "Halaman Dashboard Performa Teknisi ................................................. 95",
+      "page": 12
+    },
+    {
+      "id": "3.1",
+      "title": "Metode Penelitian",
+      "page": 33
+    },
+    {
+      "id": "4.1",
+      "title": "Bagan Alur Sistem yang Berjalan",
+      "page": 37
+    },
+    {
+      "id": "4.2",
+      "title": "Bagan Alur Sistem yang Diusulkan",
+      "page": 39
+    },
+    {
+      "id": "4.3",
+      "title": "menunjukkan diagram use case Dashboard Laporan Harian Proyek",
+      "page": 42
+    },
+    {
+      "id": "4.3",
+      "title": "Diagram Use Case",
+      "page": 43
+    },
+    {
+      "id": "4.4",
+      "title": "menunjukkan alur autentikasi pengguna pada sistem. Proses",
+      "page": 44
+    },
+    {
+      "id": "4.4",
+      "title": "Activity Diagram Autentikasi",
+      "page": 44
+    },
+    {
+      "id": "4.5",
+      "title": "mendeskripsikan alur penambahan proyek baru oleh Manajer.",
+      "page": 45
+    },
+    {
+      "id": "4.6",
+      "title": "ini mengilustrasikan siklus penugasan, pelaporan, dan validasi",
+      "page": 45
+    },
+    {
+      "id": "4.5",
+      "title": "Activity Diagram Pengelolaan Proyek",
+      "page": 45
+    },
+    {
+      "id": "4.6",
+      "title": "Activity Diagram Pelaporan Progres Harian, Validasi Tugas, & Kalkukasi",
+      "page": 46
+    },
+    {
+      "id": "4.7",
+      "title": "memvisualisasikan alur sistematis dalam proses pemantauan EWS.",
+      "page": 47
+    },
+    {
+      "id": "4.7",
+      "title": "Activity Diagram Dashboard EWS",
+      "page": 47
+    },
+    {
+      "id": "4.8",
+      "title": "menjelaskan alur komunikasi dua arah dalam proses pengajuan dan",
+      "page": 48
+    },
+    {
+      "id": "4.8",
+      "title": "Activity Diagram Pengajuan & Penanganan Eskalasi",
+      "page": 48
+    },
+    {
+      "id": "4.9",
+      "title": "memodelkan alur kronologis proses autentikasi pengguna pada",
+      "page": 49
+    },
+    {
+      "id": "4.9",
+      "title": "Sequence Diagram Autentikasi",
+      "page": 49
+    },
+    {
+      "id": "4.10",
+      "title": "memodelkan alur kronologis penambahan proyek baru beserta",
+      "page": 50
+    },
+    {
+      "id": "4.10",
+      "title": "Sequence Diagram Pengelolaan Proyek",
+      "page": 50
+    },
+    {
+      "id": "4.11",
+      "title": "mendeskripsikan alur sistematis pelaporan progres harian dan",
+      "page": 51
+    },
+    {
+      "id": "4.11",
+      "title": "Sequence Diagram Pelaporan Progres Harian, Validasi Tugas, &",
+      "page": 51
+    },
+    {
+      "id": "4.12",
+      "title": "mengilustrasikan alur interaksi sistematis dalam memuat",
+      "page": 52
+    },
+    {
+      "id": "4.13",
+      "title": "mengilustrasikan alur komunikasi sistematis dua arah dalam",
+      "page": 52
+    },
+    {
+      "id": "4.12",
+      "title": "Sequence Diagram Dashboard Early Warning System",
+      "page": 52
+    },
+    {
+      "id": "4.13",
+      "title": "Sequence Diagram Pengajuan & Penanganan Eskalasi",
+      "page": 53
+    },
+    {
+      "id": "4.14",
+      "title": "Class Diagram",
+      "page": 54
+    },
+    {
+      "id": "4.15",
+      "title": "Entity Relationship Diagram",
+      "page": 59
+    },
+    {
+      "id": "4.16",
+      "title": "Perancangan Relasi Antar Tabel",
+      "page": 65
+    },
+    {
+      "id": "4.17",
+      "title": "merepresentasikan rancangan antarmuka halaman masuk sebagai",
+      "page": 66
+    },
+    {
+      "id": "4.17",
+      "title": "Halaman Login",
+      "page": 66
+    },
+    {
+      "id": "4.18",
+      "title": "merepresentasikan rancangan antarmuka penambahan proyek",
+      "page": 66
+    },
+    {
+      "id": "4.19",
+      "title": "merepresentasikan rancangan antarmuka halaman penambahan",
+      "page": 67
+    },
+    {
+      "id": "4.18",
+      "title": "Halaman Tambah Proyek",
+      "page": 67
+    },
+    {
+      "id": "4.20",
+      "title": "merepresentasikan rancangan antarmuka utama Dashboard EWS",
+      "page": 68
+    },
+    {
+      "id": "4.19",
+      "title": "Halaman Tambah Laporan Proyek",
+      "page": 68
+    },
+    {
+      "id": "4.20",
+      "title": "Halaman Dashboard Early Warning System",
+      "page": 69
+    },
+    {
+      "id": "4.21",
+      "title": "merepresentasikan rancangan antarmuka halaman Data Proyek",
+      "page": 69
+    },
+    {
+      "id": "4.21",
+      "title": "Halaman Data Proyek",
+      "page": 70
+    },
+    {
+      "id": "4.22",
+      "title": "merepresentasikan antarmuka Kanban Penugasan Proyek yang",
+      "page": 70
+    },
+    {
+      "id": "4.23",
+      "title": "merepresentasikan rancangan antarmuka \"Dashboard Performa",
+      "page": 71
+    },
+    {
+      "id": "4.22",
+      "title": "Halaman Kanban Penugasan Proyek",
+      "page": 71
+    },
+    {
+      "id": "4.24",
+      "title": "menampilkan rancangan antarmuka halaman \"Detail Proyek\"",
+      "page": 72
+    },
+    {
+      "id": "4.23",
+      "title": "Halaman Dashboard Performa Teknisi",
+      "page": 72
+    },
+    {
+      "id": "4.25",
+      "title": "merepresentasikan antarmuka halaman \"Laporan Kesehatan",
+      "page": 73
+    },
+    {
+      "id": "4.24",
+      "title": "Halaman Detail Proyek",
+      "page": 73
+    },
+    {
+      "id": "4.26",
+      "title": "merepresentasikan rancangan bilah navigasi utama (sidebar",
+      "page": 74
+    },
+    {
+      "id": "4.25",
+      "title": "Halaman Laporan Kesehatan Proyek",
+      "page": 74
+    },
+    {
+      "id": "4.26",
+      "title": "Bilah Navigasi Struktur Data",
+      "page": 75
+    },
+    {
+      "id": "5.1",
+      "title": "menampilkan tabel pusat autentikasi yang menyimpan atribut",
+      "page": 77
+    },
+    {
+      "id": "5.1",
+      "title": "Struktur Tabel Pengguna",
+      "page": 77
+    },
+    {
+      "id": "5.2",
+      "title": "merepresentasikan struktur dari tabel proyek yang berfungsi",
+      "page": 78
+    },
+    {
+      "id": "5.2",
+      "title": "Struktur Tabel Proyek",
+      "page": 78
+    },
+    {
+      "id": "5.3",
+      "title": "menampilkan tabel relasi banyak-ke-banyak (M:N) antara entitas",
+      "page": 78
+    },
+    {
+      "id": "5.4",
+      "title": "menampilkan tabel Kesehatan Proyek sebagai media penyimpanan",
+      "page": 79
+    },
+    {
+      "id": "5.4",
+      "title": "Struktur Tabel Kesehatan Proyek",
+      "page": 79
+    },
+    {
+      "id": "5.3",
+      "title": "Struktur Tabel Penugasan Proyek",
+      "page": 79
+    },
+    {
+      "id": "5.5",
+      "title": "merepresentasikan implementasi logika autentikasi API. Sistem",
+      "page": 80
+    },
+    {
+      "id": "5.6",
+      "title": "mengilustrasikan logika API penambahan proyek baru. Eksekusi fungsi",
+      "page": 80
+    },
+    {
+      "id": "5.5",
+      "title": "Otentikasi Sistem",
+      "page": 80
+    },
+    {
+      "id": "5.6",
+      "title": "Input Data Proyek",
+      "page": 81
+    },
+    {
+      "id": "5.7",
+      "title": "Pencatatan Laporan Harian",
+      "page": 82
+    },
+    {
+      "id": "5.8",
+      "title": "Perubahan Statur Tugas & Pemicu SPI",
+      "page": 83
+    },
+    {
+      "id": "5.9",
+      "title": "Perhitungan SPI",
+      "page": 84
+    },
+    {
+      "id": "5.10",
+      "title": "Klasifikasi Kesehatan Proyek",
+      "page": 85
+    },
+    {
+      "id": "5.11",
+      "title": "Pengurutan Berdasarkan Kekritisan",
+      "page": 86
+    },
+    {
+      "id": "5.12",
+      "title": "COUNT FILTER per kategori RAG",
+      "page": 87
+    },
+    {
+      "id": "5.13",
+      "title": "dan Gambar 5.14.",
+      "page": 87
+    },
+    {
+      "id": "5.13",
+      "title": "Kueri INSERT — Transaksi Tabel tb_proyek",
+      "page": 88
+    },
+    {
+      "id": "5.14",
+      "title": "Hasil eksekusi INSERT — Transaksi Tabel tb_proyek",
+      "page": 88
+    },
+    {
+      "id": "5.15",
+      "title": "dan Gambar 5.16.",
+      "page": 88
+    },
+    {
+      "id": "5.15",
+      "title": "Kueri SELECT — Transaksi Laporan Harian",
+      "page": 88
+    },
+    {
+      "id": "5.16",
+      "title": "Hasil eksekusi SELECT — Transaksi Laporan Harian",
+      "page": 89
+    },
+    {
+      "id": "5.17",
+      "title": "dan Gambar 5.18.",
+      "page": 89
+    },
+    {
+      "id": "5.18",
+      "title": "Hasil eksekusi UPSERT — Rekalkulasi SPI dan project_health",
+      "page": 89
+    },
+    {
+      "id": "5.17",
+      "title": "Kueri UPSERT — Rekalkulasi SPI dan project_health",
+      "page": 89
+    },
+    {
+      "id": "5.19",
+      "title": "dan Gambar 5.20.",
+      "page": 90
+    },
+    {
+      "id": "5.19",
+      "title": "Kueri SELECT — Rekalkulasi SPI dan project_health",
+      "page": 90
+    },
+    {
+      "id": "5.20",
+      "title": "Hasil eksekusi SELECT — Rekalkulasi SPI dan project_health",
+      "page": 90
+    },
+    {
+      "id": "5.21",
+      "title": "dan Gambar 5.22.",
+      "page": 90
+    },
+    {
+      "id": "5.21",
+      "title": "Kueri SELECT — Penayangan Dashboard EWS",
+      "page": 91
+    },
+    {
+      "id": "5.22",
+      "title": "Hasil eksekusi SELECT — Penayangan Dashboard EWS",
+      "page": 91
+    },
+    {
+      "id": "5.23",
+      "title": "menampilkan halaman beranda sebagai gerbang akses utama",
+      "page": 92
+    },
+    {
+      "id": "5.24",
+      "title": "mengilustrasikan implementasi antarmuka halaman autentikasi",
+      "page": 92
+    },
+    {
+      "id": "5.23",
+      "title": "Halaman Beranda",
+      "page": 92
+    },
+    {
+      "id": "5.25",
+      "title": "menampilkan Dashboard Manajer sebagai pusat pemantauan",
+      "page": 93
+    },
+    {
+      "id": "5.24",
+      "title": "Halaman Login",
+      "page": 93
+    },
+    {
+      "id": "5.26",
+      "title": "menampilkan halaman \"Proyek\" berformat tabel interaktif yang",
+      "page": 94
+    },
+    {
+      "id": "5.25",
+      "title": "Halaman Dashboard Manajer",
+      "page": 94
+    },
+    {
+      "id": "5.27",
+      "title": "menampilkan halaman Detail Proyek yang berfungsi sebagai",
+      "page": 95
+    },
+    {
+      "id": "5.26",
+      "title": "Halaman Proyek",
+      "page": 95
+    },
+    {
+      "id": "5.28",
+      "title": "menampilkan halaman antarmuka Halaman Laporan Keseluruhan",
+      "page": 96
+    },
+    {
+      "id": "5.27",
+      "title": "Halaman Detail Proyek",
+      "page": 96
+    },
+    {
+      "id": "5.29",
+      "title": "menampilkan antarmuka dashboard khusus untuk pengguna",
+      "page": 97
+    },
+    {
+      "id": "5.28",
+      "title": "Halaman Laporan Keseluruhan Proyek",
+      "page": 97
+    },
+    {
+      "id": "5.29",
+      "title": "Halaman Dashboard Teknisi",
+      "page": 98
+    },
+    {
+      "id": "5.30",
+      "title": "menampilkan halaman antarmuka \"Proyek Saya\" yang diakses",
+      "page": 98
+    },
+    {
+      "id": "5.31",
+      "title": "menampilkan antarmuka \"Tugas Saya\" yang dirancang untuk",
+      "page": 99
+    },
+    {
+      "id": "5.30",
+      "title": "Halaman Proyek per Teknisi",
+      "page": 99
+    },
+    {
+      "id": "5.31",
+      "title": "Halaman Tugas Teknisi",
+      "page": 100
+    },
+    {
+      "id": "5.32",
+      "title": "Halaman Schedule Performance Index (SPI)",
+      "page": 106
+    },
+    {
+      "id": "5.33",
+      "title": "Halaman Review Gate",
+      "page": 107
+    },
+    {
+      "id": "5.34",
+      "title": "Halaman Dashboard Performa Teknisi",
+      "page": 108
+    }
+  ],
+  "tables": [
+    {
+      "id": "2.1",
+      "title": "Perbandingan Penelitian Terdahulu .............................................................. 7",
+      "page": 10
+    },
+    {
+      "id": "2.2",
+      "title": "Simbol Use Case Diagram ......................................................................... 13",
+      "page": 10
+    },
+    {
+      "id": "2.3",
+      "title": "Simbol Sequence Diagram ......................................................................... 14",
+      "page": 10
+    },
+    {
+      "id": "2.4",
+      "title": "Simbol Class Diagram ................................................................................ 15",
+      "page": 10
+    },
+    {
+      "id": "2.5",
+      "title": "Simbol Activity Diagram ............................................................................ 16",
+      "page": 10
+    },
+    {
+      "id": "2.6",
+      "title": "Entity Relationship Diagram ...................................................................... 17",
+      "page": 10
+    },
+    {
+      "id": "4.1",
+      "title": "Kelas User ................................................................................................... 42",
+      "page": 10
+    },
+    {
+      "id": "4.2",
+      "title": "Kelas Klien .................................................................................................. 42",
+      "page": 10
+    },
+    {
+      "id": "4.3",
+      "title": "Kelas Proyek ............................................................................................... 43",
+      "page": 10
+    },
+    {
+      "id": "4.4",
+      "title": "Kelas Penugasan Proyek ............................................................................. 43",
+      "page": 10
+    },
+    {
+      "id": "4.5",
+      "title": "Kelas Kesehatan Proyek.............................................................................. 44",
+      "page": 10
+    },
+    {
+      "id": "4.6",
+      "title": "Kelas Tugas ................................................................................................. 44",
+      "page": 10
+    },
+    {
+      "id": "4.7",
+      "title": "Kelas BuktiTugas ........................................................................................ 45",
+      "page": 10
+    },
+    {
+      "id": "4.8",
+      "title": "Kelas Eskalasi ............................................................................................. 45",
+      "page": 10
+    },
+    {
+      "id": "4.9",
+      "title": "Tabel User ................................................................................................... 48",
+      "page": 10
+    },
+    {
+      "id": "4.10",
+      "title": "Tabel Klien ................................................................................................ 48",
+      "page": 10
+    },
+    {
+      "id": "4.11",
+      "title": "Tabel Proyek ............................................................................................. 48",
+      "page": 10
+    },
+    {
+      "id": "4.12",
+      "title": "Tabel Penugasan Proyek ........................................................................... 49",
+      "page": 10
+    },
+    {
+      "id": "4.13",
+      "title": "Tabel Tugas ............................................................................................... 49",
+      "page": 10
+    },
+    {
+      "id": "4.14",
+      "title": "Tabel Bukti ................................................................................................ 50",
+      "page": 10
+    },
+    {
+      "id": "4.15",
+      "title": "Tabel Eskalasi ........................................................................................... 50",
+      "page": 10
+    },
+    {
+      "id": "4.7",
+      "title": "Rancangan Anggaran Pengembangan Sistem ............................................. 63",
+      "page": 10
+    },
+    {
+      "id": "5.1",
+      "title": "Pengujian Black Box Sistem ....................................................................... 87",
+      "page": 10
+    },
+    {
+      "id": "2.1",
+      "title": "Perbandingan Penelitian Terdahulu",
+      "page": 20
+    },
+    {
+      "id": "2.2",
+      "title": "Simbol Use Case Diagram",
+      "page": 26
+    },
+    {
+      "id": "2.3",
+      "title": "Simbol Sequence Diagram",
+      "page": 27
+    },
+    {
+      "id": "2.4",
+      "title": "Simbol Class Diagram",
+      "page": 28
+    },
+    {
+      "id": "2.5",
+      "title": "Simbol Activity Diagram",
+      "page": 29
+    },
+    {
+      "id": "2.6",
+      "title": "Entity Relationship Diagram",
+      "page": 30
+    },
+    {
+      "id": "4.1",
+      "title": "Kelas User",
+      "page": 55
+    },
+    {
+      "id": "4.2",
+      "title": "Kelas Klien",
+      "page": 55
+    },
+    {
+      "id": "4.3",
+      "title": "Kelas Proyek",
+      "page": 56
+    },
+    {
+      "id": "4.4",
+      "title": "Kelas Penugasan Proyek",
+      "page": 56
+    },
+    {
+      "id": "4.5",
+      "title": "Kelas Kesehatan Proyek",
+      "page": 57
+    },
+    {
+      "id": "4.6",
+      "title": "Kelas Tugas",
+      "page": 57
+    },
+    {
+      "id": "4.7",
+      "title": "Kelas BuktiTugas",
+      "page": 58
+    },
+    {
+      "id": "4.8",
+      "title": "Kelas Eskalasi",
+      "page": 58
+    },
+    {
+      "id": "4.9",
+      "title": "Tabel User",
+      "page": 61
+    },
+    {
+      "id": "4.10",
+      "title": "Tabel Klien",
+      "page": 61
+    },
+    {
+      "id": "4.11",
+      "title": "Tabel Proyek",
+      "page": 61
+    },
+    {
+      "id": "4.12",
+      "title": "Tabel Penugasan Proyek",
+      "page": 62
+    },
+    {
+      "id": "4.13",
+      "title": "Tabel Tugas",
+      "page": 62
+    },
+    {
+      "id": "4.14",
+      "title": "Tabel Bukti",
+      "page": 63
+    },
+    {
+      "id": "4.15",
+      "title": "Tabel Eskalasi",
+      "page": 63
+    },
+    {
+      "id": "4.7",
+      "title": "Rancangan Anggaran Pengembangan Sistem",
+      "page": 76
+    },
+    {
+      "id": "5.1",
+      "title": "Pengujian Black Box Sistem",
+      "page": 100
+    }
+  ]
+}
