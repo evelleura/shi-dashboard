@@ -25,3 +25,5 @@ frontend/.next/
 # Python bytecode
 __pycache__/
 *.pyc
+
+frontend_backup/.next/

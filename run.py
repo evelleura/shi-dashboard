@@ -21,7 +21,8 @@ Penggunaan:
   python run.py --reset-db   # Hapus volume DB lalu mulai ulang (data hilang!)
   python run.py --stop       # Hentikan semua container
   python run.py --install    # Hanya install dependencies (bun install)
-  python run.py --clean      # Reset node_modules + .next + .env.local + volume DB
+  python run.py --clean      # Nuke total: node_modules + .next + .env.local +
+                             #   reset volume DB + muat skema + SEED + dev server
 """
 
 import os
@@ -203,15 +204,22 @@ def load_schema(db_name: str):
 
 
 def seed_db():
-    """Isi data contoh. Hanya frontend_backup yang punya script db:seed."""
+    """Isi data contoh. Hanya frontend_backup yang punya script db:seed.
+
+    PAKAI --force-seed (TRUNCATE users CASCADE lalu reseed), BUKAN --seed biasa.
+    Alasannya: schema.sql baris ~264 selalu meng-insert 1 user default
+    (admin@shi.co.id), jadi guard idempotent di setup.ts ("skip kalau users > 0")
+    SELALU melewati seed -> 8 user fixture (budi/diana/teknisi) tak pernah masuk
+    -> login gagal 401. Force-seed membersihkan baris default itu dulu, lalu
+    memuat seed.sql lengkap. Semua password fixture: 'password123'.
+    """
     if APP_DIR.name != "frontend_backup":
         print("  [skip] --seed hanya tersedia untuk frontend_backup")
         return
-    print("\n=== Seed Data (frontend_backup) ===")
+    print("\n=== Seed Data (frontend_backup, force) ===")
     pkg, _ = find_pkg_mgr()
-    # setup.ts punya guard idempotent (skip kalau tabel users sudah terisi).
-    run([pkg, "run", "db:seed"], cwd=APP_DIR, env=db_env(DB_NAME))
-    print("[OK] Seed selesai")
+    run([pkg, "run", "db:seed", "--", "--force-seed"], cwd=APP_DIR, env=db_env(DB_NAME))
+    print("[OK] Seed selesai (8 user, password: password123)")
 
 
 def reset_db():
@@ -257,7 +265,7 @@ def clean():
     """Hapus artefak build (node_modules, .next) DAN reset DB.
 
     --clean dipakai saat user mau benar-benar mulai dari nol: kode di-rebuild
-    ulang dan database di-recreate dari init.sql. Sebelumnya hanya menghapus
+    ulang dan database di-recreate dari skema app dir aktif. Sebelumnya hanya menghapus
     node_modules / .next, jadi data lama (mis. user dummy schema lama yang
     masih pakai kolom 'name') tetap nyangkut dan menyebabkan login gagal.
     """
@@ -277,7 +285,7 @@ def clean():
         if f.exists():
             f.unlink()
             print(f"  Hapus {f.name}")
-    # Reset volume DB jika docker tersedia — pastikan schema fresh dari init.sql.
+    # Reset volume DB jika docker tersedia — skema fresh dimuat run.py saat 'up'.
     if docker_running():
         print("  Reset volume DB...")
         subprocess.run(
@@ -426,7 +434,9 @@ def main():
         run_tests()
         return
 
-    if "--seed" in args:
+    # --clean = mulai dari nol: volume DB sudah dihapus (lihat clean()), skema
+    # baru saja dimuat ulang -> sekalian seed supaya langsung bisa login.
+    if "--seed" in args or "--clean" in args:
         seed_db()
 
     start_dev_server()

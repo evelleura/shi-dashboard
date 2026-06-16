@@ -1,5 +1,25 @@
 # Project Memory: PT Smart Home Inovasi Dashboard
 
+## >> Memory Graph (LOAD THIS FIRST)
+
+The thesis `docs/Naskah TA Final 4.pdf` (Naskah TA Final 4, 114 pages) is extracted
+into an LLM-friendly memory graph. **At session start, load it before reasoning about
+the thesis, data model, diagrams, or academic spec:**
+
+- **Entry point:** `docs/naskah-extract/graph/_graph.md` (navigation hub + mermaid overview + node catalog)
+- **Graph data:** `docs/naskah-extract/graph/graph.json` (78 nodes, 89 edges, queryable)
+- **Narrative nodes:** `docs/naskah-extract/graph/nodes/*.md` (cross-linked `[[node-id]]` wikilinks)
+- **MUST READ:** `docs/naskah-extract/graph/nodes/divergences.md` -- the naskah (academic spec)
+  does NOT fully match the running code or the older data model below. Reconcile before editing either side.
+- **Full text/images:** `docs/naskah-extract/{bab,text,images}/` + `docs/naskah-extract/_manifest.json`
+- **Regenerate:** `python docs/naskah-extract/extract.py`
+
+Key divergences naskah-vs-code: frontend (Next.js in naskah vs Vite+React in code), SPI source
+(EV/PV vs task-ratio), daily report (manual % in naskah vs task-derived in code, feature removed),
+materials/budget (dropped in naskah), escalation (added in naskah), roles (2 vs 3). The data model
+section below is the OLDER spec; `docs/naskah-extract/graph/nodes/data-model.md` holds the naskah's
+8-class / 7-table model.
+
 ## Project Overview
 **Title:** Dashboard Development for Project Management System Based on Daily Reports
 **Author:** Dian Putri Iswandi (5220311118)
