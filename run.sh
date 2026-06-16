@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # SHI Dashboard - Build & Run wrapper (macOS/Linux)
 # Usage:
-#   ./run.sh              # auto-install PG + deps + schema + run all
+#   ./run.sh              # auto-install PG + deps + schema + run all (frontend_backup)
+#   ./run.sh --new        # use frontend/ instead of frontend_backup/
 #   ./run.sh --seed       # also seed test data
 #   ./run.sh --clean      # clean reinstall node_modules
 #   ./run.sh --db-only    # only start postgres + run schema

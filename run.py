@@ -1,21 +1,30 @@
 """
 SHI Dashboard - Build & Run Script (Docker-based)
 
-Orkestrator sederhana untuk stack yang sudah disederhanakan:
-- PostgreSQL via Docker Compose (port 5433)
+Orkestrator sederhana untuk stack:
+- PostgreSQL polos via Docker Compose (port 5433). Skema TIDAK di-bake ke image;
+  run.py memuat skema app dir aktif (idempotent) setelah DB siap.
 - Next.js 15 (App Router) via bun (fallback: pnpm). npm tidak dipakai.
 
+Default app dir: frontend_backup/ (skema database/schema.sql, tabel bhs Inggris).
+Tambahkan --new untuk pakai frontend/ (skema database/init.sql, tabel bhs Indonesia).
+run.py meng-inject DB_HOST/PORT/USER/PASSWORD/NAME ke dev server + db:setup
+supaya app nyambung ke Postgres docker (default db.ts = port 5432 / DB_NAME kosong).
+
 Penggunaan:
-  python run.py              # Start DB + install deps + dev server
-  python run.py --test       # Start DB + jalankan vitest
-  python run.py --build      # Build image Next.js produksi (docker compose build)
-  python run.py --pg-only    # Hanya jalankan PostgreSQL
+  python run.py              # DB + skema + install deps + dev server (frontend_backup)
+  python run.py --new        # Sama, tapi pakai frontend/ bukan frontend_backup/
+  python run.py --seed       # Sama + seed data contoh (frontend_backup saja)
+  python run.py --test       # DB + skema (db uji) + jalankan vitest
+  python run.py --build      # Build image Next.js produksi (app dir aktif)
+  python run.py --pg-only    # Hanya jalankan PostgreSQL + muat skema
   python run.py --reset-db   # Hapus volume DB lalu mulai ulang (data hilang!)
   python run.py --stop       # Hentikan semua container
   python run.py --install    # Hanya install dependencies (bun install)
   python run.py --clean      # Reset node_modules + .next + .env.local + volume DB
 """
 
+import os
 import shutil
 import signal
 import socket
@@ -25,13 +34,46 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-APP_DIR = ROOT / "frontend"
+APP_DIR = ROOT / "frontend_backup"  # default; --new switches to ROOT/"frontend"
 COMPOSE_FILE = ROOT / "docker-compose.yml"
 DB_CONTAINER = "shi_db"
+DB_HOST = "127.0.0.1"
 DB_PORT = 5433
 DB_USER = "postgres"
+DB_PASSWORD = "postgres"
 DB_NAME = "shi"
 DB_NAME_TEST = "shi_test"
+JWT_DEV_SECRET = "dev-secret-shi"  # hanya untuk dev lokal
+
+
+def db_env(db_name: str) -> dict:
+    """Env DB_* yang di-inject ke proses node/bun (dev server, db:setup, seed).
+
+    frontend_backup/src/lib/db.ts default DB_NAME kosong + port 5432, jadi WAJIB
+    di-inject agar nyambung ke Postgres docker (host 5433). frontend pun butuh
+    DB_PORT=5433 karena defaultnya 5432.
+    """
+    return {
+        **os.environ,
+        "DB_HOST": DB_HOST,
+        "DB_PORT": str(DB_PORT),
+        "DB_USER": DB_USER,
+        "DB_PASSWORD": DB_PASSWORD,
+        "DB_NAME": db_name,
+        "JWT_SECRET": os.environ.get("JWT_SECRET", JWT_DEV_SECRET),
+    }
+
+
+def schema_file() -> Path:
+    """File skema SQL milik app dir aktif.
+
+    frontend_backup pakai database/schema.sql (tabel bhs Inggris: users, projects).
+    frontend pakai database/init.sql (tabel bhs Indonesia: tb_user, tb_klien).
+    Keduanya idempotent (CREATE TABLE IF NOT EXISTS).
+    """
+    if APP_DIR.name == "frontend":
+        return APP_DIR / "database" / "init.sql"
+    return APP_DIR / "database" / "schema.sql"
 
 
 # -- Helpers ------------------------------------------------------------------
@@ -108,35 +150,68 @@ def compose_up_db():
             )
             if r.returncode == 0:
                 print(f"[OK] PostgreSQL siap di port {DB_PORT}")
-                ensure_test_db()
                 return
         time.sleep(1)
     print("[ERROR] PostgreSQL tidak siap setelah 30 detik. Cek: docker logs shi_db")
     sys.exit(1)
 
 
-def ensure_test_db():
-    """Pastikan database shi_test ada (untuk integration tests)."""
+def ensure_database(name: str):
+    """Pastikan database `name` ada (db utama 'shi' otomatis dibuat image,
+    tapi 'shi_test' perlu dibuat manual)."""
     r = subprocess.run(
         ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-tAc",
-         f"SELECT 1 FROM pg_database WHERE datname='{DB_NAME_TEST}';"],
+         f"SELECT 1 FROM pg_database WHERE datname='{name}';"],
         capture_output=True, text=True,
     )
     if "1" in r.stdout:
         return
-    print(f"  Membuat database uji '{DB_NAME_TEST}'...")
+    print(f"  Membuat database '{name}'...")
     subprocess.run(
         ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-c",
-         f"CREATE DATABASE {DB_NAME_TEST};"],
+         f"CREATE DATABASE {name};"],
         check=True, capture_output=True,
     )
-    # Terapkan skema ke shi_test menggunakan init.sql yang sudah dibake di image.
+
+
+def load_schema(db_name: str):
+    """Muat skema app dir aktif ke `db_name` lewat docker psql.
+
+    DB sekarang Postgres polos (bukan image yang sudah di-bake), jadi skema HARUS
+    dimuat dari run.py. Pakai docker cp + psql -f supaya tidak ada masalah stdin
+    newline di Windows. File skema idempotent -> aman dijalankan ulang.
+    """
+    sql = schema_file()
+    if not sql.exists():
+        print(f"[ERROR] File skema tidak ditemukan: {sql}")
+        sys.exit(1)
+    print(f"  Memuat skema '{sql.name}' -> db '{db_name}'...")
     subprocess.run(
-        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", DB_NAME_TEST,
-         "-f", "/docker-entrypoint-initdb.d/01_init.sql"],
+        ["docker", "cp", str(sql), f"{DB_CONTAINER}:/tmp/{sql.name}"],
         check=True, capture_output=True,
     )
-    print(f"  [OK] Skema diterapkan ke {DB_NAME_TEST}")
+    r = subprocess.run(
+        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", db_name,
+         "-v", "ON_ERROR_STOP=1", "-f", f"/tmp/{sql.name}"],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        print(f"[ERROR] Gagal memuat skema ke {db_name}:")
+        print(r.stderr.strip())
+        sys.exit(1)
+    print(f"  [OK] Skema dimuat ke {db_name}")
+
+
+def seed_db():
+    """Isi data contoh. Hanya frontend_backup yang punya script db:seed."""
+    if APP_DIR.name != "frontend_backup":
+        print("  [skip] --seed hanya tersedia untuk frontend_backup")
+        return
+    print("\n=== Seed Data (frontend_backup) ===")
+    pkg, _ = find_pkg_mgr()
+    # setup.ts punya guard idempotent (skip kalau tabel users sudah terisi).
+    run([pkg, "run", "db:seed"], cwd=APP_DIR, env=db_env(DB_NAME))
+    print("[OK] Seed selesai")
 
 
 def reset_db():
@@ -209,7 +284,7 @@ def clean():
             ["docker", "compose", "-f", str(COMPOSE_FILE), "down", "-v"],
             capture_output=True,
         )
-        print("  [OK] Volume DB dihapus (akan di-init ulang oleh init.sql saat 'up')")
+        print("  [OK] Volume DB dihapus (skema dimuat ulang oleh run.py saat 'up')")
 
 
 def run_tests():
@@ -217,7 +292,9 @@ def run_tests():
     pkg, name = find_pkg_mgr()
     # PENTING: pakai `bun run test`, BUKAN `bun test` — `bun test` memanggil
     # built-in runner bun yang tidak kompatibel dengan vitest.
-    r = subprocess.run([pkg, "run", "test"], cwd=str(APP_DIR))
+    # Inject DB_* (db uji) — file test frontend_backup yang TIDAK meng-hardcode
+    # env akan ikut ke Postgres docker.
+    r = subprocess.run([pkg, "run", "test"], cwd=str(APP_DIR), env=db_env(DB_NAME_TEST))
     if r.returncode != 0:
         print("[ERROR] Test gagal")
         sys.exit(r.returncode)
@@ -226,8 +303,12 @@ def run_tests():
 
 def run_build():
     print("\n=== Build (docker compose) ===")
-    run(["docker", "compose", "-f", str(COMPOSE_FILE), "build"])
-    print("[OK] Image dibuild")
+    # Context build service 'app' di compose pakai ${APP_CONTEXT}. Arahkan ke
+    # app dir aktif supaya `--build` membangun image yang benar.
+    ctx = "./frontend" if APP_DIR.name == "frontend" else "./frontend_backup"
+    env = {**os.environ, "APP_CONTEXT": ctx}
+    run(["docker", "compose", "-f", str(COMPOSE_FILE), "build", "app"], env=env)
+    print(f"[OK] Image dibuild dari {ctx}")
 
 
 def kill_stale_next_processes():
@@ -266,12 +347,14 @@ def start_dev_server():
         shutil.rmtree(next_dir)
         print("  [OK] .next/ dibersihkan")
 
-    print(f"  App:  http://localhost:3000")
+    print(f"  App:  http://localhost:3000  (dir: {APP_DIR.name})")
     print(f"  DB:   localhost:{DB_PORT} (user={DB_USER}, db={DB_NAME})")
     print("  Ctrl+C untuk berhenti\n")
     pkg, _ = find_pkg_mgr()
     (APP_DIR / "uploads").mkdir(exist_ok=True)
-    app = subprocess.Popen([pkg, "run", "dev"], cwd=str(APP_DIR))
+    # Inject DB_* supaya app nyambung ke Postgres docker (port 5433), bukan
+    # default 5432 / DB_NAME kosong yang ada di db.ts.
+    app = subprocess.Popen([pkg, "run", "dev"], cwd=str(APP_DIR), env=db_env(DB_NAME))
 
     def shutdown(*_):
         print("\n\nMenghentikan...")
@@ -296,9 +379,13 @@ def start_dev_server():
 # -- Main ---------------------------------------------------------------------
 
 def main():
+    global APP_DIR
     args = sys.argv[1:]
+    if "--new" in args:
+        APP_DIR = ROOT / "frontend"
     print("=" * 50)
     print(f"  SHI Dashboard  ({sys.platform})")
+    print(f"  App dir: {APP_DIR.name}")
     print("=" * 50)
 
     if "--stop" in args:
@@ -315,8 +402,12 @@ def main():
     else:
         compose_up_db()
 
+    # DB adalah Postgres polos -> muat skema app dir aktif (idempotent).
+    ensure_database(DB_NAME)
+    load_schema(DB_NAME)
+
     if "--pg-only" in args:
-        print("\n[OK] PostgreSQL berjalan. Container tetap aktif sampai 'python run.py --stop'.")
+        print("\n[OK] PostgreSQL berjalan + skema dimuat. Container aktif sampai 'python run.py --stop'.")
         return
 
     install_deps()
@@ -329,8 +420,14 @@ def main():
         return
 
     if "--test" in args:
+        # DB uji terpisah, skema sama dengan app dir aktif.
+        ensure_database(DB_NAME_TEST)
+        load_schema(DB_NAME_TEST)
         run_tests()
         return
+
+    if "--seed" in args:
+        seed_db()
 
     start_dev_server()
 

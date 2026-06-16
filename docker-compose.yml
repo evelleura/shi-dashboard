@@ -1,7 +1,9 @@
 services:
   db:
-    build:
-      context: ./frontend/database
+    # Postgres polos. Skema TIDAK di-bake di sini — run.py memuat skema app dir
+    # aktif (frontend_backup/database/schema.sql atau frontend/database/init.sql)
+    # setelah DB siap, supaya satu DB bisa melayani kedua app dir.
+    image: postgres:17-alpine
     container_name: shi_db
     restart: unless-stopped
     environment:
@@ -26,7 +28,8 @@ services:
   app:
     profiles: ["app"]
     build:
-      context: ./frontend
+      # Diarahkan run.py via APP_CONTEXT (./frontend_backup default, ./frontend saat --new).
+      context: ${APP_CONTEXT:-./frontend_backup}
       dockerfile: Dockerfile
     container_name: shi_app
     restart: unless-stopped
