@@ -1,30 +1,42 @@
-// Koneksi pool ke PostgreSQL.
-import { Pool, type QueryResult, type QueryResultRow } from 'pg';
+import { Pool } from "pg";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var _pgPool: Pool | undefined;
+// Prevent multiple Pool instances during hot reload in development
+const globalForPg = globalThis as unknown as {
+  pgPool: Pool | undefined;
+};
+
+// Fly Postgres `attach` injects DATABASE_URL. Local dev uses split DB_* vars.
+const poolConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    }
+  : {
+      host: process.env.DB_HOST || "localhost",
+      port: parseInt(process.env.DB_PORT || "5432"),
+      database: process.env.DB_NAME || "",
+      user: process.env.DB_USER || "postgres",
+      password: process.env.DB_PASSWORD || "",
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    };
+
+const pool = globalForPg.pgPool ?? new Pool(poolConfig);
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPg.pgPool = pool;
 }
 
-function buildPool(): Pool {
-  return new Pool({
-    host: process.env.DB_HOST ?? '127.0.0.1',
-    port: Number(process.env.DB_PORT ?? 5432),
-    user: process.env.DB_USER ?? 'postgres',
-    password: process.env.DB_PASSWORD ?? 'postgres',
-    database: process.env.DB_NAME ?? 'shi',
-    max: 10,
-    idleTimeoutMillis: 30_000,
-  });
-}
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
+});
 
-export const pool: Pool = global._pgPool ?? buildPool();
-if (process.env.NODE_ENV !== 'production') global._pgPool = pool;
+export const query = <T = unknown>(text: string, params?: unknown[]) =>
+  pool.query<T & Record<string, unknown>>(text, params);
 
-// Helper kueri parameterized agar aman dari SQL injection.
-export async function query<T extends QueryResultRow = QueryResultRow>(
-  text: string,
-  params: unknown[] = [],
-): Promise<QueryResult<T>> {
-  return pool.query<T>(text, params as never[]);
-}
+export const getClient = () => pool.connect();
+
+export default pool;

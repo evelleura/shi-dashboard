@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audit Divergensi - Naskah TA Final 4 vs frontend_backup</title>
+<style>
+  :root{
+    --paper:#faf8f3;        /* warm paper */
+    --card:#ffffff;
+    --ink:#1f2329;          /* near-black text */
+    --muted:#6b7280;        /* secondary text */
+    --line:#e7e2d8;         /* hairline */
+    --line2:#efeae0;
+    --anchor:#1d4ed8;       /* single accent hue */
+    --anchor-soft:#eef2ff;
+    /* severity */
+    --no:#c0392b;  --no-bg:#fdecea;
+    --part:#b7791f; --part-bg:#fcf3e3;
+    --yes:#1f8a4c; --yes-bg:#e9f6ee;
+    --extra:#3b5bdb; --extra-bg:#eef1fd;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,"Cascadia Code",Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:15.5px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* header */
+  header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fffdf9,var(--paper))}
+  .hd{padding:48px 0 34px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--anchor);margin:0 0 14px}
+  h1{font-family:var(--serif);font-weight:600;font-size:40px;line-height:1.12;margin:0 0 12px;letter-spacing:-.01em}
+  .lead{font-size:17px;color:var(--muted);max-width:64ch;margin:0}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+  .pill{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .pill b{color:var(--anchor)}
+
+  /* sticky nav */
+  nav.toc{position:sticky;top:0;z-index:20;background:rgba(250,248,243,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.toc .wrap{display:flex;flex-wrap:wrap;gap:4px;padding-top:10px;padding-bottom:10px}
+  nav.toc a{font-size:13px;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:7px}
+  nav.toc a:hover{color:var(--ink);background:var(--anchor-soft)}
+
+  main{padding:40px 0 80px}
+  section{margin:0 0 52px;scroll-margin-top:62px}
+  h2{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+  h2 .num{color:var(--anchor);font-family:var(--mono);font-size:15px;margin-right:10px;vertical-align:middle}
+  .sub{color:var(--muted);margin:0 0 20px;max-width:72ch}
+
+  /* badges */
+  .badge{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:6px;white-space:nowrap;border:1px solid}
+  .b-no{color:var(--no);background:var(--no-bg);border-color:#f2c9c2}
+  .b-part{color:var(--part);background:var(--part-bg);border-color:#ecd9ad}
+  .b-yes{color:var(--yes);background:var(--yes-bg);border-color:#bfe4cc}
+  .b-extra{color:var(--extra);background:var(--extra-bg);border-color:#c9d2f6}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:18px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:26px}
+  .legend div{font-size:13px;color:var(--muted)}
+
+  /* tables */
+  .tbl{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14.5px}
+  .tbl th,.tbl td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+  .tbl thead th{background:#f6f2ea;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .tbl tbody tr:last-child td{border-bottom:none}
+  .tbl tbody tr:hover{background:#fbf9f4}
+  .tbl td.k{font-weight:600;white-space:nowrap}
+  .col-naskah{color:#7a5c1e}
+  .col-code{color:#324}
+  code,.m{font-family:var(--mono);font-size:.86em;background:#f3efe7;border:1px solid var(--line2);border-radius:4px;padding:1px 5px;color:#33373d}
+  .cite{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  /* callout */
+  .note{display:flex;gap:14px;padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin:20px 0}
+  .note .bar{width:4px;border-radius:4px;flex:0 0 4px;background:var(--anchor)}
+  .note.warn .bar{background:var(--part)}
+  .note h4{margin:0 0 4px;font-size:15px}
+  .note p{margin:0;color:var(--muted);font-size:14px}
+
+  ul.tight{margin:6px 0 0;padding-left:20px}
+  ul.tight li{margin:5px 0}
+  ul.tight li b{font-weight:600}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}h1{font-size:32px}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .card h4{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
+
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:13px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <p class="eyebrow">Audit Konsistensi &middot; Spec vs Kode</p>
+    <h1>Naskah TA Final 4 &nbsp;vs&nbsp; <span style="color:var(--anchor)">frontend_backup/</span></h1>
+    <p class="lead">Perbandingan spesifikasi akademik (naskah, bentuk LLM-friendly &mdash; bukan PDF) terhadap implementasi nyata di <code>frontend_backup/</code>. Semua temuan diverifikasi langsung ke kode, bukan menyalin <code>divergences.md</code> lama.</p>
+    <div class="pills">
+      <span class="pill">Sumber spec: <b>docs/naskah-extract/graph</b></span>
+      <span class="pill">Kode: <b>frontend_backup/</b> (Next.js 15)</span>
+      <span class="pill"><b>8</b> bentrok</span>
+      <span class="pill"><b>~15</b> fitur extra</span>
+      <span class="pill"><b>3</b> catatan lama dikoreksi</span>
+      <span class="pill">2026-06-17</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#ringkasan">Ringkasan</a>
+    <a href="#basi">Catatan Basi</a>
+    <a href="#bentrok">A. Bentrok</a>
+    <a href="#extra">B. Fitur Extra</a>
+    <a href="#cocok">C. Cocok</a>
+    <a href="#rekom">Rekomendasi</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section id="ringkasan">
+    <h2><span class="num">00</span>Ringkasan</h2>
+    <p class="sub">Inti temuan dalam tiga kalimat.</p>
+    <div class="note">
+      <div class="bar"></div>
+      <div>
+        <h4>frontend_backup justru lebih dekat ke naskah daripada yang dicatat</h4>
+        <p><code>divergences.md</code> di memory graph ditulis untuk kode <em>lama</em> (Vite+React+Express, materials/budget, tanpa eskalasi). <code>frontend_backup/</code> berbeda: Next.js, ada eskalasi, materials/budget sudah dibuang &mdash; tiga hal itu kini <b>cocok</b> dengan naskah. Yang tersisa adalah 8 pertentangan nyata (dominan: enum status, penamaan skema, peran admin, laporan harian) plus belasan fitur tambahan di luar scope akademik.</p>
+      </div>
+    </div>
+    <div class="legend">
+      <div><span class="badge b-no">Bentrok</span> &nbsp;kode bertentangan dengan naskah</div>
+      <div><span class="badge b-extra">Extra</span> &nbsp;ada di kode, tak ada di naskah</div>
+      <div><span class="badge b-yes">Cocok</span> &nbsp;sesuai naskah</div>
+      <div><span class="badge b-part">Basi</span> &nbsp;catatan lama yang sudah tak berlaku</div>
+    </div>
+  </section>
+
+  <section id="basi">
+    <h2><span class="num">01</span>Catatan lama yang sudah TIDAK berlaku</h2>
+    <p class="sub">Tiga divergensi di <code>divergences.md</code> ditulis untuk basis kode lain. Untuk <code>frontend_backup/</code> ketiganya sudah selaras dengan naskah &mdash; perlu dikoreksi di graph.</p>
+    <table class="tbl">
+      <thead><tr><th>Klaim divergences.md</th><th>Realita frontend_backup</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Frontend = Vite + React 19 (beda dari naskah yang Next.js/SSR)</td>
+          <td>Next.js 15 App Router. <span class="cite">next.config.ts, app/</span></td>
+          <td><span class="badge b-yes">Cocok</span></td>
+        </tr>
+        <tr>
+          <td>Fitur eskalasi <em>absent</em> di kode</td>
+          <td>Ada penuh: tabel <code>escalations</code>, handler <code>escalations.ts</code>, <code>useEscalations</code>, UI "Eskalasi". <span class="cite">schema.sql:230</span></td>
+          <td><span class="badge b-yes">Cocok</span></td>
+        </tr>
+        <tr>
+          <td>Materials + budget masih ada di kode</td>
+          <td>Sudah dibuang. Tak ada tabel <code>materials</code>/<code>budget_items</code>, tak ada handler/UI.</td>
+          <td><span class="badge b-yes">Cocok</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="bentrok">
+    <h2><span class="num">02</span>A &middot; Bertentangan (kode lawan naskah)</h2>
+    <p class="sub">Delapan titik di mana kode dan naskah benar-benar berbeda isi, bukan sekadar tambahan.</p>
+    <table class="tbl">
+      <thead><tr><th style="width:34px">#</th><th>Aspek</th><th class="col-naskah">Naskah Final 4</th><th class="col-code">frontend_backup</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td class="k">Peran (role)</td>
+          <td class="col-naskah">enum 2: <code>technician</code>, <code>manager</code>. Admin hanya narasi 4.1.2, bukan aktor use case.</td>
+          <td class="col-code">3 peran, admin <b>fungsional</b>: UserManagementPage, AuditLog, di-seed, gate <code>['manager','admin']</code>. <span class="cite">schema.sql:16, :264 &middot; tasks.ts:489</span></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td class="k">Laporan harian</td>
+          <td class="col-naskah">Teknisi input <b>persentase progres manual</b> tiap hari = sumber EV (functional req inti, 4.2.2).</td>
+          <td class="col-code"><b>Tak ada endpoint/UI input.</b> Tabel <code>daily_reports</code> hanya dibaca sebagai <em>fallback</em> SPI saat proyek 0 tugas. EV faktual = % tugas selesai. <span class="cite">spiCalculator.ts:94-106, :135</span></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td class="k">Status tugas</td>
+          <td class="col-naskah">enum 3: <code>to_do</code>, <code>working_on_it</code>, <code>done</code>.</td>
+          <td class="col-code">enum 5: tambah <code>in_progress</code> &amp; <code>review</code>. <span class="cite">schema.sql:127 &middot; tasks.ts:8,16-22</span></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td class="k">Enum eskalasi</td>
+          <td class="col-naskah">status <code>open/handled/closed</code>; priority <code>low/medium/high</code>; FK ke <code>tb_tugas</code> saja.</td>
+          <td class="col-code">status <code>open/in_review/resolved</code>; priority tambah <code>critical</code>; FK <code>task_id</code>+<code>project_id</code>; plus <code>description</code>, file, <code>resolution_notes</code>. <span class="cite">schema.sql:248-253</span></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td class="k">Status proyek</td>
+          <td class="col-naskah"><code>active/completed/on-hold</code>.</td>
+          <td class="col-code">tambah <code>cancelled</code>. <span class="cite">schema.sql:77</span></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td class="k">Penamaan skema</td>
+          <td class="col-naskah">Bahasa Indonesia: <code>tb_user</code>, <code>id_user</code>, <code>nama</code>, <code>nama_proyek</code> (Tabel 4.9-4.15).</td>
+          <td class="col-code">Bahasa Inggris: <code>users</code>, <code>id</code>, <code>name</code>. Seluruh skema fisik beda nama dari naskah.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td class="k">project_health</td>
+          <td class="col-naskah">Kelas saja (Tabel 4.5), TANPA tabel fisik &mdash; 4.3.3 cuma merinci 7 tabel.</td>
+          <td class="col-code">Tabel <code>project_health</code> nyata (denormalized untuk performa dashboard). <span class="cite">schema.sql:188</span></td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td class="k">project_value (rupiah)</td>
+          <td class="col-naskah">Entitas finansial dikecualikan (batasan masalah no.6).</td>
+          <td class="col-code">Masih ada field <code>project_value DECIMAL(15,2)</code> di <code>projects</code>. <span class="cite">schema.sql:66</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="extra">
+    <h2><span class="num">03</span>B &middot; Fitur extra di kode, tak ada di naskah</h2>
+    <p class="sub">Ada di <code>frontend_backup/</code> tapi di luar scope akademik naskah. Bukan "salah" &mdash; tapi kalau naskah jadi acuan, ini surplus yang perlu dijelaskan atau disembunyikan saat demo TA.</p>
+    <div class="grid2">
+      <div class="card">
+        <h4><span class="badge b-extra">Extra</span> Tabel baru</h4>
+        <ul class="tight">
+          <li><code>audit_log</code> + AuditLogPage <span class="cite">schema.sql:275</span></li>
+          <li><code>notifications</code> + NotificationBell <span class="cite">schema.sql:296</span></li>
+          <li><code>task_activities</code> (field journal: arrival/start_work/pause/resume) <span class="cite">schema.sql:207</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="badge b-extra">Extra</span> Kolom tugas</h4>
+        <ul class="tight">
+          <li>Time tracking: <code>time_spent_seconds</code>, <code>estimated_hours</code>, TaskTimer</li>
+          <li>Dependency: <code>depends_on</code> + cek circular</li>
+          <li>Timeline: <code>timeline_start/end</code> + Calendar/Timeline page + cek double-booking</li>
+          <li><code>is_survey_task</code> (tasking survei granular)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="badge b-extra">Extra</span> Kolom proyek &amp; klien</h4>
+        <ul class="tight">
+          <li>Proyek: <code>project_code</code>, <code>category</code> (8 jenis), <code>target_description</code></li>
+          <li>Klien: <code>latitude/longitude/photo</code> + Leaflet MapPreview</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="badge b-extra">Extra</span> UX &amp; lain-lain</h4>
+        <ul class="tight">
+          <li>i18n multi-bahasa (<code>useLanguage</code>, <code>i18n.ts</code>)</li>
+          <li>Dark theme (<code>useTheme</code>)</li>
+          <li>SPI Trend chart, productivity &amp; time-spent charts</li>
+          <li><code>is_active</code> (soft-delete user)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="cocok">
+    <h2><span class="num">04</span>C &middot; Yang sudah cocok dengan naskah</h2>
+    <p class="sub">Bagian inti EWS sudah selaras &mdash; tidak perlu diubah.</p>
+    <table class="tbl">
+      <thead><tr><th>Konsep</th><th>Kesesuaian</th></tr></thead>
+      <tbody>
+        <tr><td class="k">SPI = EV / PV</td><td>EV = % tugas selesai, PV = hari berjalan / durasi. Rekonsiliasi dua framing naskah. <span class="cite">spiCalculator.ts:24-39, 135-140</span> <span class="badge b-yes">Cocok</span></td></tr>
+        <tr><td class="k">RAG threshold</td><td>green &ge;0.95, amber &ge;0.85, red &lt;0.85. <span class="cite">spiCalculator.ts:47-51</span> <span class="badge b-yes">Cocok</span></td></tr>
+        <tr><td class="k">Review gate</td><td>Teknisi tak bisa ke <code>done</code> (mentok <code>review</code>); manajer/admin approve. <span class="cite">tasks.ts:16-22, 467-491</span> <span class="badge b-yes">Cocok</span></td></tr>
+        <tr><td class="k">Two-phase survey&rarr;execution</td><td>enum <code>phase</code> + <code>survey_approved</code> + gate fase di status-change. <span class="cite">schema.sql:78 &middot; tasks.ts:472-481</span> <span class="badge b-yes">Cocok</span></td></tr>
+        <tr><td class="k">Computed states</td><td>overtime &amp; over-deadline dari perbandingan tanggal, bukan self-report. <span class="cite">spiCalculator.ts:70-78</span> <span class="badge b-yes">Cocok</span></td></tr>
+        <tr><td class="k">Bukti per tugas</td><td>Upload evidence ke tabel <code>task_evidence</code>. <span class="badge b-yes">Cocok</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="rekom">
+    <h2><span class="num">05</span>Rekomendasi rekonsiliasi</h2>
+    <p class="sub">Tentukan sisi mana yang otoritatif per item sebelum mengedit. Dua jalur:</p>
+    <div class="grid2">
+      <div class="card">
+        <h4>Jika NASKAH yang acuan (mode aman TA)</h4>
+        <ul class="tight">
+          <li>Update <code>divergences.md</code> + <code>graph.json</code>: tandai tech-stack, eskalasi, materials sebagai <b>resolved</b> untuk frontend_backup.</li>
+          <li>Selaraskan naskah ke realita: tulis status tugas 5, enum eskalasi, peran admin, <code>project_health</code> sbagai tabel &mdash; atau sebaliknya pangkas kode.</li>
+          <li>Putuskan nasib laporan harian: naskah mewajibkan input % manual; kode menurunkannya dari status tugas. Salah satu harus mengalah.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Jika KODE yang acuan</h4>
+        <ul class="tight">
+          <li>Naskah perlu revisi: penamaan tabel (Inggris), 3&rarr;5 status, +admin, +cancelled, +critical, tabel kesehatan/audit/notifikasi/aktivitas.</li>
+          <li>Fitur extra (map, timer, dependency, i18n) perlu masuk batang tubuh atau dinyatakan sebagai pengembangan lanjutan.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note warn">
+      <div class="bar"></div>
+      <div>
+        <h4>Catatan untuk sidang</h4>
+        <p>Selisih paling rawan ditanya penguji: (2) laporan harian manual yang dijanjikan naskah tapi tak ada di UI, dan (1) peran admin yang muncul di kode tapi tak ada di use case. Siapkan jawaban untuk keduanya.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Audit Divergensi &middot; PT Smart Home Inovasi Dashboard EWS</span>
+    <span>Naskah TA Final 4 (Dian Putri Iswandi, 5220311118) vs frontend_backup/ &middot; 2026-06-17</span>
+  </div>
+</footer>
+
+</body>
+</html>

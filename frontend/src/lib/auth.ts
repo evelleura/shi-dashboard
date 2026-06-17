@@ -1,46 +1,64 @@
-// Modul autentikasi: hash password + token JWT.
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { NextRequest, NextResponse } from 'next/server';
 
-export type Peran = 'manager' | 'technician';
-
-export interface PenggunaSesi {
-  id: number;
+export interface JwtPayload {
+  userId: number;
   email: string;
-  nama: string;
-  role: Peran;
+  // Naskah = 2 peran. DB CHECK (tb_user.role) + validasi register/createUser membatasi ke
+  // technician|manager, jadi 'admin' tak pernah terbit saat runtime; tipe dibuat permisif
+  // agar selaras dengan UserRole lama dan tidak memaksa ubah banyak perbandingan UI.
+  role: 'teknisi' | 'manajer';
 }
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'SecretDian';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? '7d';
+export interface AuthResult {
+  user: JwtPayload | null;
+  errorResponse: NextResponse;
+}
 
-export async function hashPassword(plain: string): Promise<string> {
-  if (!plain || plain.length < 6) {
-    throw new Error('Password minimal 6 karakter');
+export function authenticateRequest(request: NextRequest): AuthResult {
+  const authHeader = request.headers.get('authorization');
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      user: null,
+      errorResponse: NextResponse.json(
+        { success: false, error: 'No token provided' },
+        { status: 401 }
+      ),
+    };
   }
-  return bcrypt.hash(plain, 10);
-}
 
-export async function verifyPassword(plain: string, hash: string): Promise<boolean> {
-  if (!plain || !hash) return false;
-  return bcrypt.compare(plain, hash);
-}
+  const token = authHeader.split(' ')[1];
 
-export function signToken(payload: PenggunaSesi): string {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN as any });
-}
-
-export function verifyToken(token: string): PenggunaSesi | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as PenggunaSesi & { iat?: number; exp?: number };
-    return { id: decoded.id, email: decoded.email, nama: decoded.nama, role: decoded.role };
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'secret'
+    ) as JwtPayload;
+    return {
+      user: payload,
+      errorResponse: null as never,
+    };
   } catch {
-    return null;
+    return {
+      user: null,
+      errorResponse: NextResponse.json(
+        { success: false, error: 'Invalid or expired token' },
+        { status: 401 }
+      ),
+    };
   }
 }
 
-export function pastikanPeran(user: PenggunaSesi | null, peran: Peran): asserts user is PenggunaSesi {
-  if (!user) throw new Error('Belum login');
-  if (user.role !== peran) throw new Error(`Hak akses ditolak: butuh peran ${peran}`);
+export function authorizeRoles(
+  user: JwtPayload,
+  roles: string[]
+): NextResponse | null {
+  if (!roles.includes(user.role)) {
+    return NextResponse.json(
+      { success: false, error: 'Access denied' },
+      { status: 403 }
+    );
+  }
+  return null;
 }

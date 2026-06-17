@@ -227,6 +227,24 @@ def seed_db():
     print("[OK] SPI semua proyek di-backfill (tidak ada yang kosong)")
 
 
+def backfill_spi_frontend():
+    """Lengkapi project_health SEMUA proyek di db 'shi' (frontend) lewat
+    recalculateSPI milik app, supaya tak ada SPI kosong di dashboard/laporan.
+
+    init.sql hanya pra-isi sebagian project_health; proyek lain yang punya
+    tugas/laporan tapi tak ter-seed akan tampil SPI '-'. Idempotent. Hanya untuk
+    app dir 'frontend' (frontend_backup ditangani seed_db lewat --seed) dan hanya
+    jika dependency sudah terpasang (butuh bunx tsx)."""
+    if APP_DIR.name != "frontend":
+        return
+    script = APP_DIR / "database" / "backfill-spi.ts"
+    if not script.exists() or not (APP_DIR / "node_modules").exists():
+        return
+    pkg, _ = find_pkg_mgr()
+    print("  Backfill SPI semua proyek (frontend)...")
+    run([pkg, "run", "db:backfill-spi"], cwd=APP_DIR, env=db_env(DB_NAME))
+
+
 def reset_db():
     print("\n=== Reset Database (volume dihapus) ===")
     run(["docker", "compose", "-f", str(COMPOSE_FILE), "down", "-v"])
@@ -427,6 +445,9 @@ def main():
 
     if "--install" in args:
         return
+
+    # Lengkapi SPI semua proyek (frontend) setelah deps siap -> tak ada SPI kosong.
+    backfill_spi_frontend()
 
     if "--build" in args:
         run_build()

@@ -1,0 +1,103 @@
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import type { DashboardProject } from '../../types';
+import StatusBadge from '../ui/StatusBadge';
+import ProgressBar from '../ui/ProgressBar';
+
+interface Props {
+  project: DashboardProject;
+}
+
+const borderColor: Record<string, string> = {
+  red: 'border-l-red-500',
+  amber: 'border-l-yellow-500',
+  green: 'border-l-green-500',
+};
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+export default function ProjectCard({ project }: Props) {
+  const router = useRouter();
+  const borderClass = project.health_status ? borderColor[project.health_status] : 'border-l-gray-300';
+  const taskProgress = project.total_tasks > 0
+    ? Math.round((project.completed_tasks / project.total_tasks) * 100)
+    : 0;
+
+  const goToProject = () => router.push(`/projects/${project.id}`);
+
+  return (
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={goToProject}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToProject(); } }}
+      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 border-l-4 ${borderClass} p-4 hover:shadow-md transition-shadow cursor-pointer`}
+    >
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">{project.name}</h3>
+            {project.client_name && project.client_id && (
+              <Link
+                href={`/clients/${project.client_id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs text-blue-500 hover:text-blue-700 hover:underline mt-0.5 block w-fit"
+              >
+                {project.client_name}
+              </Link>
+            )}
+            {project.client_name && !project.client_id && (
+              <span className="text-xs text-gray-500 mt-0.5 block w-fit">{project.client_name}</span>
+            )}
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+              {formatDate(project.start_date)} -- {formatDate(project.end_date)}
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+            <StatusBadge status={project.health_status} />
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+              project.phase === 'survey' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+            }`}>
+              {project.phase === 'survey' ? 'Survey' : 'Execution'}
+            </span>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="mt-3">
+          <ProgressBar
+            actual={project.actual_progress ?? 0}
+            planned={project.planned_progress ?? 0}
+          />
+        </div>
+
+        {/* Metrics row */}
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500">SPI</p>
+            <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
+              {project.spi_value != null ? Number(project.spi_value).toFixed(2) : '--'}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500">Tasks</p>
+            <p className="text-xs font-bold text-gray-700">
+              {project.completed_tasks}/{project.total_tasks}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500">Done</p>
+            <p className="text-xs font-bold text-gray-700">{taskProgress}%</p>
+          </div>
+        </div>
+
+        {/* Value */}
+        {Number(project.project_value) > 0 && (
+          <p className="mt-2 text-[10px] text-gray-400 dark:text-gray-500 text-right">
+            Rp {Number(project.project_value).toLocaleString('id-ID')}
+          </p>
+        )}
+    </div>
+  );
+}

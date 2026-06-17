@@ -2,47 +2,29 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-html { color-scheme: light; }
-html.dark { color-scheme: dark; }
-
-body {
-  background: #f8fafc;
-  color: #0f172a;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+/* Smooth theme transition */
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
-/* Animasi kecil */
+/* Toast slide-in animation */
 @keyframes slide-in {
-  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0)   scale(1);    }
 }
-.animate-slide-in { animation: slide-in 0.2s ease-out both; }
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.animate-slide-in {
+  animation: slide-in 0.2s ease-out both;
 }
-.animate-fade-in { animation: fade-in 0.3s ease-out both; }
 
-/* Utility class kustom (Tailwind v4: wajib via @layer components). */
-@layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50;
-  }
-  .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50;
-  }
-  .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50;
-  }
-  .input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200;
-  }
-  .label {
-    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600;
-  }
-  .card {
-    @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
-  }
-  .muted { color: #64748b; }
+/* Recharts tooltip needs dark overrides */
+.dark .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+.dark .recharts-default-tooltip .recharts-tooltip-label {
+  color: #cbd5e1 !important;
 }
