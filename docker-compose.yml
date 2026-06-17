@@ -10,6 +10,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: shi
+      # Samakan zona waktu DB dengan aplikasi (WIB) supaya NOW()/CURRENT_DATE
+      # cocok dengan "hari ini" yang dihitung browser -> laporan harian tidak
+      # meleset 1 hari karena beda UTC vs WIB.
+      TZ: Asia/Jakarta
+      PGTZ: Asia/Jakarta
     ports:
       - "5433:5432"
     volumes:

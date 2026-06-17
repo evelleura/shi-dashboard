@@ -6,9 +6,24 @@ interface Props {
   title: string;
   children: ReactNode;
   maxWidth?: string;
+  /** Close when the Escape key is pressed. Default true.
+   *  Set false for data-entry forms so a stray Escape (e.g. dismissing the
+   *  browser autofill dropdown) doesn't wipe a half-filled form. */
+  closeOnEscape?: boolean;
+  /** Close when the dark backdrop is clicked. Default true.
+   *  Set false for data-entry forms to avoid losing input on a misclick. */
+  closeOnOverlayClick?: boolean;
 }
 
-export default function Modal({ open, onClose, title, children, maxWidth = 'max-w-lg' }: Props) {
+export default function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  maxWidth = 'max-w-lg',
+  closeOnEscape = true,
+  closeOnOverlayClick = true,
+}: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +36,7 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
     }
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && closeOnEscape) onClose();
     };
 
     document.addEventListener('keydown', handleEscape);
@@ -37,12 +52,12 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
     };
-  }, [open, onClose]);
+  }, [open, onClose, closeOnEscape]);
 
   if (!open) return null;
 
   const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === overlayRef.current) onClose();
+    if (closeOnOverlayClick && e.target === overlayRef.current) onClose();
   };
 
   return (

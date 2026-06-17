@@ -424,6 +424,37 @@ export const getTechnicianTimeSpent = async (params?: DateRange): Promise<TechTi
   return res.data.data!;
 };
 
+export interface ReportActivityProject {
+  id: number;
+  project_code: string;
+  name: string;
+  client_name: string | null;
+  status: string;
+  phase: string;
+  start_date: string;
+  end_date: string;
+  project_value: number | string | null;
+  spi_value: number | string | null;
+  health_status: string | null;
+  total_tasks: number;
+  completed_tasks: number;
+  activity_count: number;
+  tasks_worked: number;
+  tasks_completed: number;
+}
+
+export interface ReportActivityData {
+  projects: ReportActivityProject[];
+  summary: { project_count: number; total_activities: number; tasks_worked: number; tasks_completed: number };
+}
+
+export const getReportActivity = async (startDate: string, endDate: string): Promise<ReportActivityData> => {
+  const res = await api.get<ApiResponse<ReportActivityData>>('/dashboard/report-activity', {
+    params: { start_date: startDate, end_date: endDate },
+  });
+  return res.data.data!;
+};
+
 // ==================== Escalations ====================
 
 export const getEscalations = async (params?: { status?: string; project_id?: number }): Promise<Escalation[]> => {

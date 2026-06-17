@@ -164,9 +164,9 @@ export default function Layout({ children }: Props) {
               { to: '/audit-log', label: t('nav.audit_log', language), icon: <AuditIcon /> },
             ]
           : []),
-        // Manager & admin juga dapat melihat tampilan teknisi (read-only context
-        // untuk review beban kerja / mengerjakan tugas yang ditugaskan ke dirinya).
-        ...technicianItems,
+        // Manajer/Admin TIDAK memakai tampilan teknisi (My Dashboard/Projects/
+        // Tasks/Escalations). Endpoint-nya khusus teknisi (mis. /users/me/projects
+        // -> 403 untuk manajer), jadi item-item itu sengaja tidak ditampilkan.
       ]
     : technicianItems;
 

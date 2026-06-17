@@ -168,7 +168,9 @@ export async function listTechnicians(request: NextRequest) {
 export async function getTechnicianDetail(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['admin']);
+  // Managers can list technicians (listTechnicians), so they must also be able
+  // to open a technician's detail — keep both endpoints on the same roles.
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
   if (roleCheck) return roleCheck;
 
   const techId = parseInt(id);

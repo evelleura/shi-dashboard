@@ -8,6 +8,7 @@
     "start": "next start",
     "db:setup": "bunx tsx database/setup.ts",
     "db:seed": "bunx tsx database/setup.ts --seed",
+    "db:backfill-spi": "bunx tsx database/backfill-spi.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

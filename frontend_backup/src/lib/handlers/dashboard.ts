@@ -761,3 +761,63 @@ export async function technicianTimeSpent(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
+
+/**
+ * Period report data — projects that had TASK ACTIVITY within [start_date, end_date].
+ * "Activity" = task_activities log entries OR task status changes in the window.
+ * Powers the harian/mingguan/bulanan PDF so each period shows different data.
+ */
+export async function reportActivity(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+  const roleCheck = authorizeRoles(auth.user, ['manager', 'admin']);
+  if (roleCheck) return roleCheck;
+
+  const { searchParams } = request.nextUrl;
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+  if (!startDate || !endDate) {
+    return NextResponse.json({ success: false, error: 'start_date and end_date are required' }, { status: 400 });
+  }
+
+  try {
+    // Activity is taken purely from the task_activities log (the user picked
+    // "aktivitas tugas di periode"). end is inclusive of the whole end day.
+    const result = await query(
+      `WITH acts AS (
+         SELECT t.project_id,
+                COUNT(ta.id)::int AS activity_count,
+                COUNT(DISTINCT ta.task_id)::int AS tasks_worked,
+                COUNT(DISTINCT ta.task_id) FILTER (WHERE ta.activity_type = 'complete')::int AS tasks_completed
+         FROM tasks t
+         JOIN task_activities ta ON ta.task_id = t.id
+         WHERE ta.created_at >= $1::date AND ta.created_at < ($2::date + INTERVAL '1 day')
+         GROUP BY t.project_id
+       )
+       SELECT p.id, p.project_code, p.name, c.name AS client_name, p.status, p.phase,
+              p.start_date, p.end_date, p.project_value,
+              ph.spi_value, ph.status AS health_status,
+              COALESCE(ph.total_tasks, 0)::int AS total_tasks,
+              COALESCE(ph.completed_tasks, 0)::int AS completed_tasks,
+              a.activity_count, a.tasks_worked, a.tasks_completed
+       FROM acts a
+       JOIN projects p ON p.id = a.project_id
+       LEFT JOIN clients c ON c.id = p.client_id
+       LEFT JOIN project_health ph ON ph.project_id = p.id
+       ORDER BY a.activity_count DESC, p.name ASC`,
+      [startDate, endDate]
+    );
+
+    const projects = result.rows as Record<string, unknown>[];
+    const summary = {
+      project_count: projects.length,
+      total_activities: projects.reduce((s, p) => s + Number(p.activity_count || 0), 0),
+      tasks_worked: projects.reduce((s, p) => s + Number(p.tasks_worked || 0), 0),
+      tasks_completed: projects.reduce((s, p) => s + Number(p.tasks_completed || 0), 0),
+    };
+    return NextResponse.json({ success: true, data: { projects, summary } });
+  } catch (err) {
+    console.error('Report activity error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}

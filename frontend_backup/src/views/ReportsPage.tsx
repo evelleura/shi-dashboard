@@ -1,10 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDashboard } from '../hooks/useDashboard';
 import { useProjects, useUpdateProject } from '../hooks/useProjects';
 import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import * as XLSX from 'xlsx';
+import { getReportActivity, type ReportActivityData, type ReportActivityProject } from '../services/api';
 import type { DashboardProject, UpdateProjectData } from '../types';
 
 type ReportType = 'summary' | 'health' | 'tasks';
@@ -79,36 +80,246 @@ function ActionButtons({ project, onView, onEdit }: { project: DashboardProject;
   );
 }
 
-function PrintButton({ contentRef }: { contentRef: React.RefObject<HTMLDivElement | null> }) {
-  const handlePrint = () => {
-    if (!contentRef.current) return;
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    printWindow.document.write(`
-      <html><head><title>SHI Report</title>
-      <style>
-        body { font-family: system-ui, sans-serif; margin: 20px; color: #111; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background: #f5f5f5; font-weight: 600; }
-        h1 { font-size: 18px; } h2 { font-size: 14px; margin-top: 24px; }
-        @media print { body { margin: 0; } }
-      </style></head><body>
-      <h1>PT Smart Home Inovasi - Report</h1>
-      <p style="color:#666;font-size:12px">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-      ${contentRef.current.innerHTML}
-      </body></html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
+// ── Formal company report ────────────────────────────────────────────────────
+// Company identity for the letterhead (kop surat). Domain matches the app's
+// seed emails (*@shi.co.id); address is the case-study HQ in Yogyakarta.
+const COMPANY = {
+  name: 'PT SMART HOME INOVASI',
+  tagline: 'Smart Home & IoT Solutions',
+  address: 'Jl. Ringroad Utara No. 88, Condongcatur, Depok, Sleman, Yogyakarta 55281',
+  phone: '(0274) 884-200',
+  email: 'info@shi.co.id',
+  web: 'www.shi.co.id',
+};
+
+const HEALTH_LABEL: Record<string, string> = { green: 'Sehat', amber: 'Waspada', red: 'Kritis' };
+const STATUS_LABEL: Record<string, string> = { active: 'Aktif', completed: 'Selesai', 'on-hold': 'Tertunda', cancelled: 'Dibatalkan' };
+const PHASE_LABEL: Record<string, string> = { survey: 'Survei', execution: 'Pengerjaan' };
+
+function escapeHtml(s: unknown): string {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+}
+
+type PeriodWindow = { startYmd: string; endYmd: string; range: string; label: string };
+
+function ymd(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function ymdToDate(s: string): Date {
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
+}
+
+const fmtId = (d: Date) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const lastOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+
+/**
+ * Build a report window straight from a free [start, end] date range and derive
+ * a friendly label: a single day -> "Harian", a Mon–Sun span -> "Mingguan",
+ * a full calendar month -> "Bulanan", anything else -> "Rentang Kustom".
+ */
+function computeRangeWindow(startYmd: string, endYmd: string): PeriodWindow {
+  let a = ymdToDate(startYmd), b = ymdToDate(endYmd);
+  if (a > b) { const t = a; a = b; b = t; }
+  const diffDays = Math.round((b.getTime() - a.getTime()) / 86400000);
+  const sameDay = diffDays === 0;
+  const isWeek = a.getDay() === 1 && diffDays === 6;
+  const isMonth = a.getDate() === 1 && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear() && b.getDate() === lastOfMonth(b);
+
+  let label: string, range: string;
+  if (sameDay) {
+    label = 'Harian';
+    range = a.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  } else if (isWeek) {
+    label = 'Mingguan'; range = `${fmtId(a)} – ${fmtId(b)}`;
+  } else if (isMonth) {
+    label = 'Bulanan'; range = a.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  } else {
+    label = 'Rentang Kustom'; range = `${fmtId(a)} – ${fmtId(b)}`;
+  }
+  return { startYmd: ymd(a), endYmd: ymd(b), range, label };
+}
+
+function buildReportHTML(data: ReportActivityData, periodLabel: string, periodRange: string): string {
+  const now = new Date();
+  const tanggal = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  const waktu = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+  const projects = data.projects;
+  const s = data.summary;
+  let spiSum = 0, spiCount = 0;
+  for (const p of projects) {
+    if (p.spi_value != null) { spiSum += Number(p.spi_value); spiCount++; }
+  }
+  const avgSpi = spiCount > 0 ? (spiSum / spiCount).toFixed(2) : '-';
+
+  const healthCell = (h: string | null) => {
+    const label = h ? (HEALTH_LABEL[h] ?? h) : 'N/A';
+    const color = h === 'red' ? '#b91c1c' : h === 'amber' ? '#b45309' : h === 'green' ? '#15803d' : '#6b7280';
+    const bg = h === 'red' ? '#fee2e2' : h === 'amber' ? '#fef3c7' : h === 'green' ? '#dcfce7' : '#f3f4f6';
+    return `<span class="badge" style="color:${color};background:${bg}">${label}</span>`;
+  };
+
+  const rows = projects.length
+    ? projects.map((p: ReportActivityProject, i: number) => `<tr>
+      <td class="c">${i + 1}</td>
+      <td class="mono">${escapeHtml(p.project_code)}</td>
+      <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
+      <td>${escapeHtml(STATUS_LABEL[p.status] ?? p.status)}<div class="sub">${escapeHtml(PHASE_LABEL[p.phase] ?? p.phase)}</div></td>
+      <td class="c">${healthCell(p.health_status)}</td>
+      <td class="c mono">${p.spi_value != null ? Number(p.spi_value).toFixed(2) : '-'}</td>
+      <td class="c"><strong>${p.activity_count}</strong></td>
+      <td class="c">${p.tasks_worked}</td>
+      <td class="c">${p.tasks_completed}</td>
+    </tr>`).join('')
+    : `<tr><td colspan="9" style="text-align:center;padding:22px;color:#6b7280">Tidak ada aktivitas tugas pada periode ini.</td></tr>`;
+
+  return `<!doctype html><html lang="id"><head><meta charset="utf-8">
+<title>Laporan ${periodLabel} Aktivitas Proyek - ${COMPANY.name}</title>
+<style>
+  * { box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 14mm 12mm; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #1f2937; font-size: 11px; line-height: 1.45; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 9px; font-size: 9px; font-weight: 700; }
+  /* Kop surat */
+  .kop { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; }
+  .logo { width: 58px; height: 58px; border-radius: 12px; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; letter-spacing: 1px; flex: 0 0 auto; }
+  .kop .co { line-height: 1.3; }
+  .kop .co .nm { font-size: 19px; font-weight: 800; color: #111827; letter-spacing: .5px; }
+  .kop .co .tg { font-size: 10px; color: #2563eb; font-weight: 600; margin-bottom: 2px; }
+  .kop .co .ad { font-size: 9.5px; color: #4b5563; }
+  .rule { border: 0; border-top: 3px solid #1e3a8a; margin: 0; }
+  .rule2 { border: 0; border-top: 1px solid #1e3a8a; margin: 2px 0 16px; }
+  /* Title */
+  .title { text-align: center; margin: 6px 0 2px; font-size: 15px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; letter-spacing: .5px; }
+  .subtitle { text-align: center; font-size: 10.5px; color: #4b5563; margin-bottom: 14px; }
+  .intro { margin: 0 0 12px; text-align: justify; }
+  /* Summary */
+  .sech { font-size: 12px; font-weight: 700; margin: 16px 0 7px; color: #1e3a8a; }
+  .cards { display: flex; gap: 8px; margin-bottom: 4px; }
+  .card { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 6px; text-align: center; }
+  .card .v { font-size: 17px; font-weight: 800; }
+  .card .l { font-size: 8.5px; color: #6b7280; text-transform: uppercase; letter-spacing: .3px; margin-top: 1px; }
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  thead { display: table-header-group; }
+  th { background: #1e3a8a; color: #fff; font-size: 9.5px; font-weight: 700; padding: 6px 5px; text-align: left; border: 1px solid #1e3a8a; text-transform: uppercase; }
+  td { padding: 5px; border: 1px solid #d1d5db; vertical-align: top; font-size: 10px; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tr { page-break-inside: avoid; }
+  .c { text-align: center; } .r { text-align: right; } .mono { font-family: 'Courier New', monospace; }
+  .nowrap { white-space: nowrap; } .sub { font-size: 8.5px; color: #6b7280; }
+  tfoot td { background: #eef2ff; font-weight: 800; border: 1px solid #c7d2fe; }
+  /* Legend + signature */
+  .legend { font-size: 9px; color: #4b5563; margin-top: 8px; }
+  .legend b { color: #1f2937; }
+  .ttd { margin-top: 34px; display: flex; justify-content: flex-end; }
+  .ttd .box { text-align: center; width: 220px; font-size: 10.5px; }
+  .ttd .sp { height: 58px; }
+  .ttd .nm { font-weight: 700; text-decoration: underline; }
+  .foot { margin-top: 26px; border-top: 1px solid #e5e7eb; padding-top: 6px; font-size: 8.5px; color: #9ca3af; display: flex; justify-content: space-between; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+</style></head>
+<body>
+  <div class="kop">
+    <div class="logo">SHI</div>
+    <div class="co">
+      <div class="tg">${escapeHtml(COMPANY.tagline)}</div>
+      <div class="nm">${escapeHtml(COMPANY.name)}</div>
+      <div class="ad">${escapeHtml(COMPANY.address)}</div>
+      <div class="ad">Telp: ${escapeHtml(COMPANY.phone)} &nbsp;|&nbsp; Email: ${escapeHtml(COMPANY.email)} &nbsp;|&nbsp; ${escapeHtml(COMPANY.web)}</div>
+    </div>
+  </div>
+  <hr class="rule"><hr class="rule2">
+
+  <div class="title">LAPORAN AKTIVITAS PROYEK</div>
+  <div class="subtitle">Laporan ${periodLabel} &middot; Periode: ${periodRange} &middot; Dicetak ${tanggal} pukul ${waktu} WIB</div>
+
+  <p class="intro">Bersama ini kami sampaikan laporan ${periodLabel.toLowerCase()} aktivitas pengerjaan proyek
+  PT Smart Home Inovasi untuk periode <strong>${periodRange}</strong>. Pada periode ini tercatat aktivitas pada
+  <strong>${s.project_count} proyek</strong>, dengan <strong>${s.total_activities} catatan aktivitas</strong>,
+  <strong>${s.tasks_worked} tugas</strong> dikerjakan, dan <strong>${s.tasks_completed} tugas</strong> diselesaikan,
+  sebagai bahan evaluasi dan pengambilan keputusan manajemen.</p>
+
+  <div class="sech">Ringkasan Eksekutif</div>
+  <div class="cards">
+    <div class="card"><div class="v" style="color:#1e3a8a">${s.project_count}</div><div class="l">Proyek Aktif</div></div>
+    <div class="card"><div class="v" style="color:#2563eb">${s.total_activities}</div><div class="l">Catatan Aktivitas</div></div>
+    <div class="card"><div class="v" style="color:#b45309">${s.tasks_worked}</div><div class="l">Tugas Dikerjakan</div></div>
+    <div class="card"><div class="v" style="color:#15803d">${s.tasks_completed}</div><div class="l">Tugas Selesai</div></div>
+    <div class="card"><div class="v" style="color:#1f2937">${avgSpi}</div><div class="l">Rata-rata SPI</div></div>
+  </div>
+
+  <div class="sech">Rincian Aktivitas per Proyek</div>
+  <table>
+    <thead><tr>
+      <th class="c">No</th><th>Kode</th><th>Proyek / Klien</th><th>Status / Fase</th>
+      <th class="c">Kesehatan</th><th class="c">SPI</th><th class="c">Aktivitas</th><th class="c">Dikerjakan</th><th class="c">Selesai</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr>
+      <td colspan="6" class="r">TOTAL</td>
+      <td class="c">${s.total_activities}</td><td class="c">${s.tasks_worked}</td><td class="c">${s.tasks_completed}</td>
+    </tr></tfoot>
+  </table>
+
+  <div class="legend">
+    <b>Catatan:</b> Aktivitas = jumlah catatan kerja teknisi pada periode; Dikerjakan = tugas yang berubah status;
+    Selesai = tugas yang diselesaikan pada periode. &nbsp;&middot;&nbsp;
+    <b>SPI:</b> &ge; 0,95 <b style="color:#15803d">Sehat</b>, 0,85&ndash;0,94 <b style="color:#b45309">Waspada</b>, &lt; 0,85 <b style="color:#b91c1c">Kritis</b>.
+  </div>
+
+  <div class="ttd">
+    <div class="box">
+      Yogyakarta, ${tanggal}<br>Dibuat oleh,
+      <div class="sp"></div>
+      <div class="nm">( Manajer Proyek )</div>
+      <div class="sub">PT Smart Home Inovasi</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>${escapeHtml(COMPANY.name)} &mdash; Dokumen Internal / Rahasia</span>
+    <span>Dicetak otomatis oleh Sistem Dashboard SHI pada ${tanggal} ${waktu} WIB</span>
+  </div>
+</body></html>`;
+}
+
+function PrintButton({ win }: { win: PeriodWindow }) {
+  const [loading, setLoading] = useState(false);
+  const handlePrint = async () => {
+    // Open the window synchronously (popup-blocker friendly), then fill it once
+    // the period activity data arrives.
+    const w = window.open('', '_blank');
+    if (!w) return;
+    w.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:Arial,sans-serif;padding:48px;color:#374151">Menyiapkan laporan…</body>');
+    const { startYmd, endYmd, range, label } = win;
+    setLoading(true);
+    try {
+      const data = await getReportActivity(startYmd, endYmd);
+      w.document.open();
+      w.document.write(buildReportHTML(data, label, range));
+      w.document.close();
+      w.focus();
+      setTimeout(() => { try { w.print(); } catch { /* ignore */ } }, 350);
+    } catch {
+      w.document.open();
+      w.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:Arial,sans-serif;padding:48px;color:#b91c1c">Gagal memuat data laporan. Tutup jendela ini lalu coba lagi.</body>');
+      w.document.close();
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <button onClick={handlePrint} className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-1.5 transition-colors">
+    <button onClick={handlePrint} disabled={loading} className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-60">
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
       </svg>
-      Print / PDF
+      {loading ? 'Menyiapkan…' : 'Print / PDF'}
     </button>
   );
 }
@@ -120,6 +331,22 @@ export default function ReportsPage() {
   const router = useRouter();
   const [tab, setTab] = useState<ReportType>('summary');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState<string>(() => ymd(new Date(new Date().getFullYear(), new Date().getMonth(), 1)));
+  const [endDate, setEndDate] = useState<string>(() => ymd(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)));
+  const reportWindow = useMemo(() => computeRangeWindow(startDate, endDate), [startDate, endDate]);
+  const applyPreset = (p: 'hari' | 'minggu' | 'bulan') => {
+    const now = new Date();
+    if (p === 'hari') {
+      const d = ymd(now); setStartDate(d); setEndDate(d);
+    } else if (p === 'minggu') {
+      const s = new Date(now); const dow = s.getDay(); s.setDate(now.getDate() + (dow === 0 ? -6 : 1 - dow));
+      const e = new Date(s); e.setDate(s.getDate() + 6);
+      setStartDate(ymd(s)); setEndDate(ymd(e));
+    } else {
+      setStartDate(ymd(new Date(now.getFullYear(), now.getMonth(), 1)));
+      setEndDate(ymd(new Date(now.getFullYear(), now.getMonth() + 1, 0)));
+    }
+  };
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Edit modal state
@@ -222,7 +449,37 @@ export default function ReportsPage() {
               Saving...
             </span>
           )}
-          <PrintButton contentRef={contentRef} />
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {/* Preset cepat -> mengisi kedua tanggal */}
+            <div className="flex items-center rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+              {([['hari', 'Hari Ini'], ['minggu', 'Minggu Ini'], ['bulan', 'Bulan Ini']] as const).map(([k, lbl]) => (
+                <button
+                  key={k}
+                  onClick={() => applyPreset(k)}
+                  className="text-[11px] font-medium px-2 py-1.5 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 border-r border-gray-200 dark:border-gray-700 last:border-r-0 transition-colors"
+                >
+                  {lbl}
+                </button>
+              ))}
+            </div>
+            {/* Rentang tanggal bebas (selalu bisa pilih 2 tanggal) */}
+            <label className="text-[11px] text-gray-500 dark:text-gray-400">Dari</label>
+            <input
+              type="date" value={startDate} max={endDate} onChange={(e) => setStartDate(e.target.value)}
+              className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Tanggal mulai laporan"
+            />
+            <label className="text-[11px] text-gray-500 dark:text-gray-400">Sampai</label>
+            <input
+              type="date" value={endDate} min={startDate} onChange={(e) => setEndDate(e.target.value)}
+              className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Tanggal akhir laporan"
+            />
+            <span className="text-[11px] font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded px-2 py-1 whitespace-nowrap" title="Rentang & jenis laporan terpilih">
+              {reportWindow.label} · {reportWindow.range}
+            </span>
+            <PrintButton win={reportWindow} />
+          </div>
           <button onClick={handleExcelExport} className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 border border-green-200 dark:border-green-800 rounded-lg px-3 py-1.5 transition-colors">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             Export Excel

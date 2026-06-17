@@ -220,6 +220,11 @@ def seed_db():
     pkg, _ = find_pkg_mgr()
     run([pkg, "run", "db:seed", "--", "--force-seed"], cwd=APP_DIR, env=db_env(DB_NAME))
     print("[OK] Seed selesai (8 user, password: password123)")
+    # seed.sql hanya mengisi project_health utk sebagian proyek -> sisanya tampil
+    # SPI "-". Recompute SPI SEMUA proyek (termasuk tanpa task / non-aktif) pakai
+    # logika app (recalculateSPI) supaya tidak ada SPI kosong di dashboard/laporan.
+    run([pkg, "run", "db:backfill-spi"], cwd=APP_DIR, env=db_env(DB_NAME))
+    print("[OK] SPI semua proyek di-backfill (tidak ada yang kosong)")
 
 
 def reset_db():

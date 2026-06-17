@@ -227,6 +227,7 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       return methodNotAllowed();
     }
     if (r1 === 'search' && method === 'GET') return dashboard.globalSearch(request);
+    if (r1 === 'report-activity' && method === 'GET') return dashboard.reportActivity(request);
     if (r1 === 'technician' && r2 === 'productivity' && method === 'GET') return dashboard.technicianProductivity(request);
     if (r1 === 'technician' && r2 === 'time-spent'   && method === 'GET') return dashboard.technicianTimeSpent(request);
     if (r1 === 'technician' && !r2) {

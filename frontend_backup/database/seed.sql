@@ -1055,3 +1055,50 @@ UPDATE escalations SET
   resolved_at = CURRENT_TIMESTAMP - INTERVAL '7 days',
   resolution_notes = 'Deadline diperpanjang 5 hari. Cuaca sudah membaik, lanjutkan instalasi.'
 WHERE title = 'Hujan deras 3 hari berturut-turut';
+
+-- ============================================================================
+-- DEMO TASK ACTIVITY  (agar laporan Harian/Mingguan/Bulanan punya data nyata)
+-- Hanya menambah baris task_activities (tidak mengubah status tugas) -> SPI aman.
+-- Idempotent: hapus baris seed lama (prefix '[seed]'). Tanggal relatif ke saat
+-- di-seed: hari ini, awal minggu ini, awal bulan ini, sehingga jumlah aktivitas
+-- bertambah dari periode harian -> mingguan -> bulanan.
+-- ============================================================================
+DELETE FROM task_activities WHERE message LIKE '[seed]%';
+
+-- HARI INI (laporan harian + mingguan + bulanan)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Tiba di lokasi proyek', 'arrival',
+       CURRENT_DATE + TIME '08:05' + (INTERVAL '11 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id LIMIT 5;
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Mulai pengerjaan instalasi', 'start_work',
+       CURRENT_DATE + TIME '09:30' + (INTERVAL '13 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id LIMIT 5;
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Dokumentasi foto progres', 'photo',
+       CURRENT_DATE + TIME '13:15' + (INTERVAL '17 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id LIMIT 3;
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Tugas selesai dikerjakan', 'complete',
+       CURRENT_DATE + TIME '15:40' + (INTERVAL '19 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id LIMIT 2;
+
+-- AWAL MINGGU INI (laporan mingguan + bulanan)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Pengerjaan kabel & perangkat', 'start_work',
+       date_trunc('week', CURRENT_DATE) + TIME '10:00' + (INTERVAL '20 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id OFFSET 5 LIMIT 6;
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Catatan kendala material', 'note',
+       date_trunc('week', CURRENT_DATE) + INTERVAL '1 day' + TIME '14:00' + (INTERVAL '15 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id OFFSET 9 LIMIT 5;
+
+-- AWAL BULAN INI (laporan bulanan saja)
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Survei & persiapan lokasi', 'note',
+       date_trunc('month', CURRENT_DATE) + INTERVAL '3 days' + TIME '09:00' + (INTERVAL '25 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id OFFSET 14 LIMIT 8;
+INSERT INTO task_activities (task_id, user_id, message, activity_type, created_at)
+SELECT id, assigned_to, '[seed] Pemasangan perangkat utama', 'complete',
+       date_trunc('month', CURRENT_DATE) + INTERVAL '6 days' + TIME '11:00' + (INTERVAL '22 minutes' * row_number() OVER (ORDER BY id))
+FROM tasks WHERE assigned_to IS NOT NULL ORDER BY id OFFSET 22 LIMIT 6;
