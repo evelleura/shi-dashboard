@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useDashboard } from '../hooks/useDashboard';
 import { useProjects, useUpdateProject } from '../hooks/useProjects';
@@ -6,14 +7,15 @@ import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import * as XLSX from 'xlsx';
 import { getReportActivity, type ReportActivityData, type ReportActivityProject } from '../services/api';
-import type { DashboardProject, UpdateProjectData } from '../types';
+import type { DashboardProject, DashboardSummary, UpdateProjectData } from '../types';
 
-type ReportType = 'summary' | 'health' | 'tasks';
+type ReportType = 'summary' | 'health' | 'tasks' | 'activity';
 
 const REPORT_TABS: { key: ReportType; label: string; icon: string }[] = [
   { key: 'summary', label: 'Project Summary', icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
   { key: 'health', label: 'Health Status', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
   { key: 'tasks', label: 'Task Completion', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4' },
+  { key: 'activity', label: 'Aktivitas (Periode)', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
 ];
 
 function formatDate(d: string) {
@@ -142,42 +144,22 @@ function computeRangeWindow(startYmd: string, endYmd: string): PeriodWindow {
   return { startYmd: ymd(a), endYmd: ymd(b), range, label };
 }
 
-function buildReportHTML(data: ReportActivityData, periodLabel: string, periodRange: string): string {
+function reportHealthBadge(h: string | null): string {
+  const label = h ? (HEALTH_LABEL[h] ?? h) : 'N/A';
+  const color = h === 'red' ? '#b91c1c' : h === 'amber' ? '#b45309' : h === 'green' ? '#15803d' : '#6b7280';
+  const bg = h === 'red' ? '#fee2e2' : h === 'amber' ? '#fef3c7' : h === 'green' ? '#dcfce7' : '#f3f4f6';
+  return `<span class="badge" style="color:${color};background:${bg}">${label}</span>`;
+}
+
+// Shared formal-report skeleton: kop surat (letterhead) + title/subtitle + caller
+// body + signature block + footer. Every PDF report (ringkasan, kesehatan,
+// tugas, aktivitas) is built on top of this so the letterhead stays consistent.
+function reportShell(opts: { title: string; subtitle: string; introHTML: string; bodyHTML: string; legendHTML?: string }): string {
   const now = new Date();
   const tanggal = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const waktu = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-  const projects = data.projects;
-  const s = data.summary;
-  let spiSum = 0, spiCount = 0;
-  for (const p of projects) {
-    if (p.spi_value != null) { spiSum += Number(p.spi_value); spiCount++; }
-  }
-  const avgSpi = spiCount > 0 ? (spiSum / spiCount).toFixed(2) : '-';
-
-  const healthCell = (h: string | null) => {
-    const label = h ? (HEALTH_LABEL[h] ?? h) : 'N/A';
-    const color = h === 'red' ? '#b91c1c' : h === 'amber' ? '#b45309' : h === 'green' ? '#15803d' : '#6b7280';
-    const bg = h === 'red' ? '#fee2e2' : h === 'amber' ? '#fef3c7' : h === 'green' ? '#dcfce7' : '#f3f4f6';
-    return `<span class="badge" style="color:${color};background:${bg}">${label}</span>`;
-  };
-
-  const rows = projects.length
-    ? projects.map((p: ReportActivityProject, i: number) => `<tr>
-      <td class="c">${i + 1}</td>
-      <td class="mono">${escapeHtml(p.project_code)}</td>
-      <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
-      <td>${escapeHtml(STATUS_LABEL[p.status] ?? p.status)}<div class="sub">${escapeHtml(PHASE_LABEL[p.phase] ?? p.phase)}</div></td>
-      <td class="c">${healthCell(p.health_status)}</td>
-      <td class="c mono">${p.spi_value != null ? Number(p.spi_value).toFixed(2) : '-'}</td>
-      <td class="c"><strong>${p.activity_count}</strong></td>
-      <td class="c">${p.tasks_worked}</td>
-      <td class="c">${p.tasks_completed}</td>
-    </tr>`).join('')
-    : `<tr><td colspan="9" style="text-align:center;padding:22px;color:#6b7280">Tidak ada aktivitas tugas pada periode ini.</td></tr>`;
-
   return `<!doctype html><html lang="id"><head><meta charset="utf-8">
-<title>Laporan ${periodLabel} Aktivitas Proyek - ${COMPANY.name}</title>
+<title>${escapeHtml(opts.title)} - ${COMPANY.name}</title>
 <style>
   * { box-sizing: border-box; }
   @page { size: A4 portrait; margin: 14mm 12mm; }
@@ -235,16 +217,59 @@ function buildReportHTML(data: ReportActivityData, periodLabel: string, periodRa
   </div>
   <hr class="rule"><hr class="rule2">
 
-  <div class="title">LAPORAN AKTIVITAS PROYEK</div>
-  <div class="subtitle">Laporan ${periodLabel} &middot; Periode: ${periodRange} &middot; Dicetak ${tanggal} pukul ${waktu} WIB</div>
+  <div class="title">${opts.title}</div>
+  <div class="subtitle">${opts.subtitle} &middot; Dicetak ${tanggal} pukul ${waktu} WIB</div>
 
-  <p class="intro">Bersama ini kami sampaikan laporan ${periodLabel.toLowerCase()} aktivitas pengerjaan proyek
+  ${opts.introHTML}
+  ${opts.bodyHTML}
+  ${opts.legendHTML ?? ''}
+
+  <div class="ttd">
+    <div class="box">
+      Yogyakarta, ${tanggal}<br>Dibuat oleh,
+      <div class="sp"></div>
+      <div class="nm">( Manajer Proyek )</div>
+      <div class="sub">PT Smart Home Inovasi</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>${escapeHtml(COMPANY.name)} &mdash; Dokumen Internal / Rahasia</span>
+    <span>Dicetak otomatis oleh Sistem Dashboard SHI pada ${tanggal} ${waktu} WIB</span>
+  </div>
+</body></html>`;
+}
+
+function buildReportHTML(data: ReportActivityData, periodLabel: string, periodRange: string): string {
+  const projects = data.projects;
+  const s = data.summary;
+  let spiSum = 0, spiCount = 0;
+  for (const p of projects) {
+    if (p.spi_value != null) { spiSum += Number(p.spi_value); spiCount++; }
+  }
+  const avgSpi = spiCount > 0 ? (spiSum / spiCount).toFixed(2) : '-';
+
+  const rows = projects.length
+    ? projects.map((p: ReportActivityProject, i: number) => `<tr>
+      <td class="c">${i + 1}</td>
+      <td class="mono">${escapeHtml(p.project_code)}</td>
+      <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
+      <td>${escapeHtml(STATUS_LABEL[p.status] ?? p.status)}<div class="sub">${escapeHtml(PHASE_LABEL[p.phase] ?? p.phase)}</div></td>
+      <td class="c">${reportHealthBadge(p.health_status)}</td>
+      <td class="c mono">${p.spi_value != null ? Number(p.spi_value).toFixed(2) : '-'}</td>
+      <td class="c"><strong>${p.activity_count}</strong></td>
+      <td class="c">${p.tasks_worked}</td>
+      <td class="c">${p.tasks_completed}</td>
+    </tr>`).join('')
+    : `<tr><td colspan="9" style="text-align:center;padding:22px;color:#6b7280">Tidak ada aktivitas tugas pada periode ini.</td></tr>`;
+
+  const introHTML = `<p class="intro">Bersama ini kami sampaikan laporan ${periodLabel.toLowerCase()} aktivitas pengerjaan proyek
   PT Smart Home Inovasi untuk periode <strong>${periodRange}</strong>. Pada periode ini tercatat aktivitas pada
   <strong>${s.project_count} proyek</strong>, dengan <strong>${s.total_activities} catatan aktivitas</strong>,
   <strong>${s.tasks_worked} tugas</strong> dikerjakan, dan <strong>${s.tasks_completed} tugas</strong> diselesaikan,
-  sebagai bahan evaluasi dan pengambilan keputusan manajemen.</p>
+  sebagai bahan evaluasi dan pengambilan keputusan manajemen.</p>`;
 
-  <div class="sech">Ringkasan Eksekutif</div>
+  const bodyHTML = `<div class="sech">Ringkasan Eksekutif</div>
   <div class="cards">
     <div class="card"><div class="v" style="color:#1e3a8a">${s.project_count}</div><div class="l">Proyek Aktif</div></div>
     <div class="card"><div class="v" style="color:#2563eb">${s.total_activities}</div><div class="l">Catatan Aktivitas</div></div>
@@ -264,47 +289,174 @@ function buildReportHTML(data: ReportActivityData, periodLabel: string, periodRa
       <td colspan="6" class="r">TOTAL</td>
       <td class="c">${s.total_activities}</td><td class="c">${s.tasks_worked}</td><td class="c">${s.tasks_completed}</td>
     </tr></tfoot>
-  </table>
+  </table>`;
 
-  <div class="legend">
+  const legendHTML = `<div class="legend">
     <b>Catatan:</b> Aktivitas = jumlah catatan kerja teknisi pada periode; Dikerjakan = tugas yang berubah status;
     Selesai = tugas yang diselesaikan pada periode. &nbsp;&middot;&nbsp;
     <b>SPI:</b> &ge; 0,95 <b style="color:#15803d">Sehat</b>, 0,85&ndash;0,94 <b style="color:#b45309">Waspada</b>, &lt; 0,85 <b style="color:#b91c1c">Kritis</b>.
-  </div>
+  </div>`;
 
-  <div class="ttd">
-    <div class="box">
-      Yogyakarta, ${tanggal}<br>Dibuat oleh,
-      <div class="sp"></div>
-      <div class="nm">( Manajer Proyek )</div>
-      <div class="sub">PT Smart Home Inovasi</div>
-    </div>
-  </div>
-
-  <div class="foot">
-    <span>${escapeHtml(COMPANY.name)} &mdash; Dokumen Internal / Rahasia</span>
-    <span>Dicetak otomatis oleh Sistem Dashboard SHI pada ${tanggal} ${waktu} WIB</span>
-  </div>
-</body></html>`;
+  return reportShell({
+    title: 'LAPORAN AKTIVITAS PROYEK',
+    subtitle: `Laporan ${periodLabel} &middot; Periode: ${periodRange}`,
+    introHTML, bodyHTML, legendHTML,
+  });
 }
 
-function PrintButton({ win }: { win: PeriodWindow }) {
+const spiLegendHTML = `<div class="legend"><b>Keterangan SPI</b> (Schedule Performance Index = Earned Value / Planned Value):
+  &ge; 0,95 <b style="color:#15803d">Sehat</b> (sesuai/lebih cepat dari jadwal),
+  0,85&ndash;0,94 <b style="color:#b45309">Waspada</b> (sedikit terlambat),
+  &lt; 0,85 <b style="color:#b91c1c">Kritis</b> (terlambat signifikan).</div>`;
+
+// Build a formal snapshot report (kop surat + tidy table) for the active tab:
+// ringkasan seluruh proyek, status kesehatan, atau progres penyelesaian tugas.
+// Uses the data already loaded on the page (no period filter -> potret terkini).
+function buildProjectsReportHTML(tab: ReportType, projects: DashboardProject[], summary?: DashboardSummary): string {
+  const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  const spi = (v: unknown) => (v != null ? Number(v).toFixed(3) : '-');
+  const rupiah = (v: unknown) => (Number(v) > 0 ? `Rp ${Number(v).toLocaleString('id-ID')}` : '-');
+  const tasksCell = (p: DashboardProject) => (p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '-');
+  const greens = projects.filter((p) => p.health_status === 'green').length;
+  const ambers = projects.filter((p) => p.health_status === 'amber').length;
+  const reds = projects.filter((p) => p.health_status === 'red').length;
+  const avgSpi = summary?.avg_spi != null ? Number(summary.avg_spi).toFixed(3) : '-';
+
+  if (tab === 'health') {
+    const active = projects.filter((p) => p.status === 'active').sort((a, b) => {
+      const order: Record<string, number> = { red: 0, amber: 1, green: 2 };
+      return (order[a.health_status ?? ''] ?? 3) - (order[b.health_status ?? ''] ?? 3);
+    });
+    const aGreen = active.filter((p) => p.health_status === 'green').length;
+    const aAmber = active.filter((p) => p.health_status === 'amber').length;
+    const aRed = active.filter((p) => p.health_status === 'red').length;
+    const rows = active.map((p, i) => `<tr>
+      <td class="c">${i + 1}</td>
+      <td class="mono">${escapeHtml(p.project_code)}</td>
+      <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
+      <td class="c">${reportHealthBadge(p.health_status)}</td>
+      <td class="c mono">${spi(p.spi_value)}</td>
+      <td class="c">${p.actual_progress != null ? `${Number(p.actual_progress).toFixed(1)}%` : '-'}</td>
+      <td class="c">${p.planned_progress != null ? `${Number(p.planned_progress).toFixed(1)}%` : '-'}</td>
+      <td class="c">${tasksCell(p)}</td>
+    </tr>`).join('') || `<tr><td colspan="8" style="text-align:center;padding:22px;color:#6b7280">Tidak ada proyek aktif.</td></tr>`;
+    const body = `<div class="sech">Ringkasan Eksekutif</div>
+      <div class="cards">
+        <div class="card"><div class="v" style="color:#1e3a8a">${active.length}</div><div class="l">Proyek Aktif</div></div>
+        <div class="card"><div class="v" style="color:#15803d">${aGreen}</div><div class="l">Sehat</div></div>
+        <div class="card"><div class="v" style="color:#b45309">${aAmber}</div><div class="l">Waspada</div></div>
+        <div class="card"><div class="v" style="color:#b91c1c">${aRed}</div><div class="l">Kritis</div></div>
+        <div class="card"><div class="v" style="color:#1f2937">${avgSpi}</div><div class="l">Rata-rata SPI</div></div>
+      </div>
+      <div class="sech">Status Kesehatan per Proyek (urut prioritas)</div>
+      <table>
+        <thead><tr><th class="c">No</th><th>Kode</th><th>Proyek / Klien</th><th class="c">Kesehatan</th><th class="c">SPI</th><th class="c">Aktual</th><th class="c">Rencana</th><th class="c">Tugas</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    return reportShell({
+      title: 'LAPORAN STATUS KESEHATAN PROYEK',
+      subtitle: 'Potret kesehatan jadwal seluruh proyek aktif',
+      introHTML: `<p class="intro">Bersama ini kami sampaikan laporan status kesehatan jadwal seluruh proyek aktif PT Smart Home Inovasi per <strong>${tgl}</strong>, diurutkan berdasarkan prioritas penanganan (Kritis &rarr; Waspada &rarr; Sehat), sebagai bahan evaluasi dan pengambilan keputusan manajemen.</p>`,
+      bodyHTML: body, legendHTML: spiLegendHTML,
+    });
+  }
+
+  if (tab === 'tasks') {
+    const withTasks = projects.filter((p) => p.total_tasks > 0);
+    const rows = withTasks.map((p, i) => {
+      const pct = Math.round((p.completed_tasks / p.total_tasks) * 100);
+      return `<tr>
+        <td class="c">${i + 1}</td>
+        <td class="mono">${escapeHtml(p.project_code)}</td>
+        <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
+        <td class="c">${reportHealthBadge(p.health_status)}</td>
+        <td class="c">${p.completed_tasks}</td>
+        <td class="c">${p.total_tasks}</td>
+        <td class="c"><strong>${pct}%</strong></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="7" style="text-align:center;padding:22px;color:#6b7280">Belum ada tugas tercatat.</td></tr>`;
+    const body = `<div class="sech">Ringkasan Eksekutif</div>
+      <div class="cards">
+        <div class="card"><div class="v" style="color:#1e3a8a">${summary?.total_tasks ?? 0}</div><div class="l">Total Tugas</div></div>
+        <div class="card"><div class="v" style="color:#15803d">${summary?.completed_tasks ?? 0}</div><div class="l">Selesai</div></div>
+        <div class="card"><div class="v" style="color:#2563eb">${(summary?.in_progress_tasks ?? 0) + (summary?.working_tasks ?? 0)}</div><div class="l">Dikerjakan</div></div>
+        <div class="card"><div class="v" style="color:#b91c1c">${summary?.overtime_tasks ?? 0}</div><div class="l">Lewat Tenggat</div></div>
+      </div>
+      <div class="sech">Progres Penyelesaian Tugas per Proyek</div>
+      <table>
+        <thead><tr><th class="c">No</th><th>Kode</th><th>Proyek / Klien</th><th class="c">Kesehatan</th><th class="c">Selesai</th><th class="c">Total</th><th class="c">Persentase</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    return reportShell({
+      title: 'LAPORAN PROGRES PENYELESAIAN TUGAS',
+      subtitle: 'Potret penyelesaian tugas seluruh proyek',
+      introHTML: `<p class="intro">Bersama ini kami sampaikan laporan progres penyelesaian tugas seluruh proyek PT Smart Home Inovasi per <strong>${tgl}</strong>, sebagai bahan pemantauan beban kerja dan capaian tim teknisi.</p>`,
+      bodyHTML: body, legendHTML: spiLegendHTML,
+    });
+  }
+
+  // default: summary (semua proyek)
+  const totalValue = projects.reduce((acc, p) => acc + (Number(p.project_value) || 0), 0);
+  const rows = projects.map((p, i) => `<tr>
+    <td class="c">${i + 1}</td>
+    <td class="mono">${escapeHtml(p.project_code)}</td>
+    <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
+    <td>${escapeHtml(STATUS_LABEL[p.status] ?? p.status)}<div class="sub">${escapeHtml(PHASE_LABEL[p.phase] ?? p.phase)}</div></td>
+    <td class="c">${reportHealthBadge(p.health_status)}</td>
+    <td class="c mono">${spi(p.spi_value)}</td>
+    <td class="c">${tasksCell(p)}</td>
+    <td class="nowrap">${formatDate(p.start_date)} &ndash; ${formatDate(p.end_date)}</td>
+    <td class="r mono">${rupiah(p.project_value)}</td>
+  </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;padding:22px;color:#6b7280">Belum ada proyek.</td></tr>`;
+  const body = `<div class="sech">Ringkasan Eksekutif</div>
+    <div class="cards">
+      <div class="card"><div class="v" style="color:#1e3a8a">${projects.length}</div><div class="l">Total Proyek</div></div>
+      <div class="card"><div class="v" style="color:#15803d">${greens}</div><div class="l">Sehat</div></div>
+      <div class="card"><div class="v" style="color:#b45309">${ambers}</div><div class="l">Waspada</div></div>
+      <div class="card"><div class="v" style="color:#b91c1c">${reds}</div><div class="l">Kritis</div></div>
+      <div class="card"><div class="v" style="color:#1f2937">${avgSpi}</div><div class="l">Rata-rata SPI</div></div>
+    </div>
+    <div class="sech">Rincian Seluruh Proyek</div>
+    <table>
+      <thead><tr><th class="c">No</th><th>Kode</th><th>Proyek / Klien</th><th>Status / Fase</th><th class="c">Kesehatan</th><th class="c">SPI</th><th class="c">Tugas</th><th>Jadwal</th><th class="r">Nilai Kontrak</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td colspan="8" class="r">TOTAL NILAI KONTRAK</td><td class="r mono">Rp ${totalValue.toLocaleString('id-ID')}</td></tr></tfoot>
+    </table>`;
+  return reportShell({
+    title: 'LAPORAN RINGKASAN PROYEK',
+    subtitle: 'Potret seluruh proyek PT Smart Home Inovasi',
+    introHTML: `<p class="intro">Bersama ini kami sampaikan laporan ringkasan seluruh proyek PT Smart Home Inovasi per <strong>${tgl}</strong>, mencakup <strong>${projects.length} proyek</strong> beserta status, kesehatan jadwal (SPI), capaian tugas, dan nilai kontrak, sebagai bahan evaluasi dan pengambilan keputusan manajemen.</p>`,
+    bodyHTML: body, legendHTML: spiLegendHTML,
+  });
+}
+
+function PrintButton({ tab, win, projects, summary }: { tab: ReportType; win: PeriodWindow; projects: DashboardProject[]; summary?: DashboardSummary }) {
   const [loading, setLoading] = useState(false);
   const handlePrint = async () => {
-    // Open the window synchronously (popup-blocker friendly), then fill it once
-    // the period activity data arrives.
+    // Open the window synchronously (popup-blocker friendly), then fill it.
     const w = window.open('', '_blank');
     if (!w) return;
+    const finish = (html: string) => {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(() => { try { w.print(); } catch { /* ignore */ } }, 350);
+    };
+
+    // Snapshot tabs render synchronously from data already loaded on the page.
+    if (tab !== 'activity') {
+      finish(buildProjectsReportHTML(tab, projects, summary));
+      return;
+    }
+
+    // Activity tab needs the period data fetched first.
     w.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:Arial,sans-serif;padding:48px;color:#374151">Menyiapkan laporan…</body>');
     const { startYmd, endYmd, range, label } = win;
     setLoading(true);
     try {
       const data = await getReportActivity(startYmd, endYmd);
-      w.document.open();
-      w.document.write(buildReportHTML(data, label, range));
-      w.document.close();
-      w.focus();
-      setTimeout(() => { try { w.print(); } catch { /* ignore */ } }, 350);
+      finish(buildReportHTML(data, label, range));
     } catch {
       w.document.open();
       w.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:Arial,sans-serif;padding:48px;color:#b91c1c">Gagal memuat data laporan. Tutup jendela ini lalu coba lagi.</body>');
@@ -334,6 +486,11 @@ export default function ReportsPage() {
   const [startDate, setStartDate] = useState<string>(() => ymd(new Date(new Date().getFullYear(), new Date().getMonth(), 1)));
   const [endDate, setEndDate] = useState<string>(() => ymd(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)));
   const reportWindow = useMemo(() => computeRangeWindow(startDate, endDate), [startDate, endDate]);
+  const { data: activityData, isFetching: activityLoading } = useQuery({
+    queryKey: ['report-activity', reportWindow.startYmd, reportWindow.endYmd],
+    queryFn: () => getReportActivity(reportWindow.startYmd, reportWindow.endYmd),
+    enabled: tab === 'activity',
+  });
   const applyPreset = (p: 'hari' | 'minggu' | 'bulan') => {
     const now = new Date();
     if (p === 'hari') {
@@ -450,35 +607,41 @@ export default function ReportsPage() {
             </span>
           )}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Preset cepat -> mengisi kedua tanggal */}
-            <div className="flex items-center rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
-              {([['hari', 'Hari Ini'], ['minggu', 'Minggu Ini'], ['bulan', 'Bulan Ini']] as const).map(([k, lbl]) => (
-                <button
-                  key={k}
-                  onClick={() => applyPreset(k)}
-                  className="text-[11px] font-medium px-2 py-1.5 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 border-r border-gray-200 dark:border-gray-700 last:border-r-0 transition-colors"
-                >
-                  {lbl}
-                </button>
-              ))}
-            </div>
-            {/* Rentang tanggal bebas (selalu bisa pilih 2 tanggal) */}
-            <label className="text-[11px] text-gray-500 dark:text-gray-400">Dari</label>
-            <input
-              type="date" value={startDate} max={endDate} onChange={(e) => setStartDate(e.target.value)}
-              className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Tanggal mulai laporan"
-            />
-            <label className="text-[11px] text-gray-500 dark:text-gray-400">Sampai</label>
-            <input
-              type="date" value={endDate} min={startDate} onChange={(e) => setEndDate(e.target.value)}
-              className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Tanggal akhir laporan"
-            />
-            <span className="text-[11px] font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded px-2 py-1 whitespace-nowrap" title="Rentang & jenis laporan terpilih">
-              {reportWindow.label} · {reportWindow.range}
-            </span>
-            <PrintButton win={reportWindow} />
+            {/* Pemilih rentang tanggal hanya relevan untuk laporan Aktivitas (berbasis periode).
+                Tab lain adalah potret terkini sehingga langsung dicetak. */}
+            {tab === 'activity' && (
+              <>
+                {/* Preset cepat -> mengisi kedua tanggal */}
+                <div className="flex items-center rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                  {([['hari', 'Hari Ini'], ['minggu', 'Minggu Ini'], ['bulan', 'Bulan Ini']] as const).map(([k, lbl]) => (
+                    <button
+                      key={k}
+                      onClick={() => applyPreset(k)}
+                      className="text-[11px] font-medium px-2 py-1.5 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 border-r border-gray-200 dark:border-gray-700 last:border-r-0 transition-colors"
+                    >
+                      {lbl}
+                    </button>
+                  ))}
+                </div>
+                {/* Rentang tanggal bebas (selalu bisa pilih 2 tanggal) */}
+                <label className="text-[11px] text-gray-500 dark:text-gray-400">Dari</label>
+                <input
+                  type="date" value={startDate} max={endDate} onChange={(e) => setStartDate(e.target.value)}
+                  className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Tanggal mulai laporan"
+                />
+                <label className="text-[11px] text-gray-500 dark:text-gray-400">Sampai</label>
+                <input
+                  type="date" value={endDate} min={startDate} onChange={(e) => setEndDate(e.target.value)}
+                  className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Tanggal akhir laporan"
+                />
+                <span className="text-[11px] font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded px-2 py-1 whitespace-nowrap" title="Rentang & jenis laporan terpilih">
+                  {reportWindow.label} · {reportWindow.range}
+                </span>
+              </>
+            )}
+            <PrintButton tab={tab} win={reportWindow} projects={allProjects} summary={summary} />
           </div>
           <button onClick={handleExcelExport} className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 border border-green-200 dark:border-green-800 rounded-lg px-3 py-1.5 transition-colors">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
@@ -657,6 +820,47 @@ export default function ReportsPage() {
                 })}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── ACTIVITY TAB (periode) ───────────────────────────────────── */}
+        {tab === 'activity' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Aktivitas Proyek &middot; {reportWindow.label}</h2>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500">{reportWindow.range}</span>
+            </div>
+            {activityLoading ? (
+              <div className="px-4 py-10 text-center text-xs text-gray-400">Memuat aktivitas…</div>
+            ) : !activityData || activityData.projects.length === 0 ? (
+              <div className="px-4 py-10 text-center text-xs text-gray-400">Tidak ada aktivitas tugas pada rentang tanggal ini. Pilih rentang lain di atas.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-gray-50 dark:bg-gray-900">
+                    <tr>
+                      {['Code', 'Project', 'Client', 'Health', 'SPI', 'Activities', 'Worked', 'Done'].map((h) => (
+                        <th key={h} className="px-3 py-2 text-left font-medium text-gray-500 dark:text-gray-400 uppercase">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                    {activityData.projects.map((p) => (
+                      <tr key={p.id} className="hover:bg-blue-50/50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors group" onClick={() => router.push(`/projects/${p.id}`)}>
+                        <td className="px-3 py-2.5 font-mono text-gray-500 dark:text-gray-400">{p.project_code}</td>
+                        <td className="px-3 py-2.5 font-medium text-blue-600 dark:text-blue-400 max-w-[200px] truncate group-hover:underline">{p.name}</td>
+                        <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.client_name ?? '-'}</td>
+                        <td className="px-3 py-2.5"><HealthBadge status={p.health_status} /></td>
+                        <td className="px-3 py-2.5 text-gray-700 dark:text-gray-300 font-mono">{p.spi_value != null ? Number(p.spi_value).toFixed(3) : '-'}</td>
+                        <td className="px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300">{p.activity_count}</td>
+                        <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.tasks_worked}</td>
+                        <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.tasks_completed}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
