@@ -1,69 +1,83 @@
 'use client';
 
-import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
-type Theme = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'system';
+type Resolved = 'light' | 'dark';
 
 const STORAGE_KEY = 'shi-theme';
 
-function getSystemTheme(): Theme {
+function systemTheme(): Resolved {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-function getStoredTheme(): Theme | null {
-  if (typeof window === 'undefined') return null;
+function readMode(): ThemeMode {
+  if (typeof window === 'undefined') return 'system';
   const v = localStorage.getItem(STORAGE_KEY);
-  return v === 'dark' || v === 'light' ? v : null;
+  // Default 'system' (ikut OS). Nilai lama 'light'/'dark' tetap valid (override eksplisit).
+  return v === 'light' || v === 'dark' || v === 'system' ? v : 'system';
 }
 
-function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-  if (theme === 'dark') {
-    root.classList.add('dark');
-  } else {
-    root.classList.remove('dark');
-  }
+function resolve(m: ThemeMode): Resolved {
+  return m === 'system' ? systemTheme() : m;
 }
 
-// External store so all consumers share the same state
-let currentTheme: Theme = 'light';
+function apply(r: Resolved) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.classList.toggle('dark', r === 'dark');
+}
+
+// External store -> semua consumer berbagi state yang sama (mode + resolusi).
+let mode: ThemeMode = 'system';
+let resolved: Resolved = 'light';
 const listeners = new Set<() => void>();
+const notify = () => listeners.forEach((l) => l());
+
+function setMode(next: ThemeMode) {
+  mode = next;
+  resolved = resolve(next);
+  if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, next);
+  apply(resolved);
+  notify();
+}
+
+// Inisialisasi sisi-klien: baca mode tersimpan + IKUTI perubahan tema OS saat
+// mode 'system' (live, tanpa reload). FOUC dicegah oleh skrip inline di layout.tsx.
+if (typeof window !== 'undefined') {
+  mode = readMode();
+  resolved = resolve(mode);
+  apply(resolved);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (mode === 'system') {
+      resolved = systemTheme();
+      apply(resolved);
+      notify();
+    }
+  });
+}
 
 function subscribe(cb: () => void) {
   listeners.add(cb);
-  return () => listeners.delete(cb);
+  return () => {
+    listeners.delete(cb);
+  };
 }
-
+// Snapshot = primitif stabil "mode:resolved" -> berubah saat mode ATAU resolusi berubah.
 function getSnapshot() {
-  return currentTheme;
+  return `${mode}:${resolved}`;
 }
-
-function setThemeValue(t: Theme) {
-  currentTheme = t;
-  applyTheme(t);
-  localStorage.setItem(STORAGE_KEY, t);
-  listeners.forEach((cb) => cb());
-}
-
-// Initialize on first import (client only)
-if (typeof window !== 'undefined') {
-  const stored = getStoredTheme();
-  currentTheme = stored ?? getSystemTheme();
-  // Apply immediately to avoid flash
-  applyTheme(currentTheme);
+function getServerSnapshot() {
+  return 'system:light';
 }
 
 export function useTheme() {
-  const theme = useSyncExternalStore(subscribe, getSnapshot, () => 'light' as Theme);
+  const snap = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [m, r] = snap.split(':') as [ThemeMode, Resolved];
 
-  const toggle = useCallback(() => {
-    setThemeValue(theme === 'dark' ? 'light' : 'dark');
-  }, [theme]);
+  const setTheme = useCallback((next: ThemeMode) => setMode(next), []);
+  // Toggle cepat (tombol navbar) -> set override eksplisit light/dark dari tema aktif.
+  const toggle = useCallback(() => setMode(r === 'dark' ? 'light' : 'dark'), [r]);
 
-  const setTheme = useCallback((t: Theme) => {
-    setThemeValue(t);
-  }, []);
-
-  return { theme, toggle, setTheme, isDark: theme === 'dark' };
+  return { theme: m, resolvedTheme: r, isDark: r === 'dark', setTheme, toggle };
 }

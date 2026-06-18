@@ -7,8 +7,9 @@ export const metadata: Metadata = {
   description: 'PT Smart Home Inovasi - Project Management Dashboard',
 };
 
-// Inline script to prevent flash of wrong theme (runs before React hydrates)
-const themeScript = `(function(){try{var t=localStorage.getItem('shi-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
+// Inline script to prevent flash of wrong theme (runs before React hydrates).
+// Mode tersimpan: 'light' | 'dark' | 'system' (default 'system' = ikut OS).
+const themeScript = `(function(){try{var m=localStorage.getItem('shi-theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(m==='dark'||((m==='system'||!m)&&d)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
