@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LandingPage from '@/views/LandingPage';
+import { roleHome } from '@/lib/rbac';
 import type { UserRole } from '@/types';
 
 function getStoredUser(): { role: UserRole } | null {
@@ -21,10 +22,8 @@ export default function Page() {
 
   useEffect(() => {
     const user = getStoredUser();
-    if (user?.role === 'teknisi') {
-      router.replace('/my-dashboard');
-    } else if (user) {
-      router.replace('/dashboard');
+    if (user) {
+      router.replace(roleHome(user.role));
     } else {
       setShowLanding(true);
     }

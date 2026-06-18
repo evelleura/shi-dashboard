@@ -25,7 +25,6 @@ export default function SummaryCards({ summary, onFilter, activeFilter }: Props)
       : 'text-red-600';
 
   const inProgressCount = (summary.in_progress_tasks ?? 0) + (summary.working_tasks ?? 0);
-  const reviewCount = summary.review_tasks ?? 0;
 
   const cards: {
     label: string;
@@ -38,13 +37,24 @@ export default function SummaryCards({ summary, onFilter, activeFilter }: Props)
     tooltip: string;
   }[] = [
     {
+      label: id ? 'Total Proyek' : 'All Projects',
+      value: summary.total_projects,
+      color: 'text-slate-700 dark:text-slate-200',
+      bg: 'bg-slate-100 dark:bg-slate-700/40',
+      ringColor: 'ring-slate-400',
+      action: () => router.push('/projects'),
+      tooltip: id
+        ? `Seluruh proyek (aktif ${summary.active_projects}, selesai ${summary.completed_projects ?? 0}, ditunda ${summary.onhold_projects ?? 0})`
+        : 'All projects across all statuses',
+    },
+    {
       label: id ? 'Proyek Aktif' : 'Active Projects',
       value: summary.active_projects,
       color: 'text-blue-600',
       bg: 'bg-blue-50 dark:bg-blue-900/30',
       ringColor: 'ring-blue-400',
       action: () => router.push('/projects'),
-      tooltip: id ? 'Lihat semua proyek' : 'View all projects',
+      tooltip: id ? 'Proyek sedang berjalan (dipantau EWS)' : 'Active projects (EWS-monitored)',
     },
     {
       label: id ? 'Kritis' : 'Critical',
@@ -77,13 +87,13 @@ export default function SummaryCards({ summary, onFilter, activeFilter }: Props)
       tooltip: id ? 'Filter proyek on track' : 'Filter on-track projects',
     },
     {
-      label: id ? 'Total Tugas' : 'Total Tasks',
+      label: id ? 'Tugas Aktif' : 'Active Tasks',
       value: summary.total_tasks,
       color: 'text-indigo-600',
       bg: 'bg-indigo-50 dark:bg-indigo-900/30',
       ringColor: 'ring-indigo-400',
       action: () => router.push('/projects'),
-      tooltip: id ? 'Lihat semua proyek & tugas' : 'View all projects & tasks',
+      tooltip: id ? 'Total tugas di proyek aktif' : 'Tasks in active projects',
     },
     {
       label: id ? 'Dikerjakan' : 'In Progress',
@@ -95,13 +105,13 @@ export default function SummaryCards({ summary, onFilter, activeFilter }: Props)
       tooltip: id ? 'Tugas sedang dikerjakan' : 'Tasks in progress',
     },
     {
-      label: 'Review',
-      value: reviewCount,
-      color: reviewCount > 0 ? 'text-purple-600' : 'text-gray-600 dark:text-gray-400',
-      bg: reviewCount > 0 ? 'bg-purple-50 dark:bg-purple-900/30' : 'bg-gray-50 dark:bg-gray-700',
-      ringColor: 'ring-purple-400',
+      label: id ? 'Proyek Selesai' : 'Completed',
+      value: summary.completed_projects ?? 0,
+      color: 'text-teal-600 dark:text-teal-400',
+      bg: 'bg-teal-50 dark:bg-teal-900/30',
+      ringColor: 'ring-teal-400',
       action: () => router.push('/projects'),
-      tooltip: id ? 'Tugas menunggu review' : 'Tasks awaiting review',
+      tooltip: id ? 'Proyek yang sudah selesai (riwayat)' : 'Completed projects (history)',
     },
     {
       label: id ? 'Terlambat' : 'Overtime',

@@ -20,6 +20,8 @@ import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import type { Task, TaskStatus, CreateTaskData } from '../types';
 import { useAuth } from '../hooks/useAuth';
+import { usePermissions } from '../hooks/usePermissions';
+import { PERMISSIONS } from '../lib/rbac';
 
 type TabId = 'tasks' | 'evidence' | 'charts' | 'laporan' | 'history';
 
@@ -55,8 +57,10 @@ export default function ProjectDetailPage() {
   const [rejectReason, setRejectReason] = useState('');
 
 
+  const { can } = usePermissions();
   const userRole = user?.role;
-  const isManager = userRole === 'manajer';
+  // "isManager" = kapabilitas kelola proyek (manajer + admin), bukan if-peran.
+  const isManager = can(PERMISSIONS.PROJECT_MANAGE);
   const isTechnician = userRole === 'teknisi';
 
   if (isLoading) {

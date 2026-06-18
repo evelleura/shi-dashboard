@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateRequest } from '@/lib/auth';
+import { authenticateRequest, requirePermission } from '@/lib/auth';
+import { PERMISSIONS } from '@/lib/rbac';
 import { query } from '@/lib/db';
 
 // Helper: log a change (call from other handlers)
@@ -21,10 +22,12 @@ export async function logChange(opts: {
   }
 }
 
-// GET /api/audit - list audit logs
+// GET /api/audit - list audit logs (eksklusif admin: jejak perubahan sistem)
 export async function listAuditLogs(request: NextRequest) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
+  const permCheck = requirePermission(auth.user, PERMISSIONS.AUDIT_VIEW);
+  if (permCheck) return permCheck;
 
   const params = request.nextUrl.searchParams;
   const entityType = params.get('entity_type');

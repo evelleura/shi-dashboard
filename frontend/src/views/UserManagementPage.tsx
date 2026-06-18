@@ -12,6 +12,7 @@ import type { User, UserRole } from '../types';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const ROLE_BADGE: Record<UserRole, string> = {
+  admin: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
   manajer: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
   teknisi: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
 };
@@ -304,6 +305,7 @@ export default function UserManagementPage() {
           aria-label={language === 'id' ? 'Filter berdasarkan peran' : 'Filter by role'}
         >
           <option value="all">{t('user.all_roles', language)}</option>
+          <option value="admin">{t('role.admin', language)}</option>
           <option value="manajer">{t('role.manajer', language)}</option>
           <option value="teknisi">{t('role.teknisi', language)}</option>
         </select>
@@ -448,6 +450,7 @@ export default function UserManagementPage() {
             >
               <option value="teknisi">{t('role.teknisi', language)}</option>
               <option value="manajer">{t('role.manajer', language)}</option>
+              <option value="admin">{t('role.admin', language)}</option>
             </select>
           </div>
           <div className="flex gap-3 pt-2">
@@ -516,6 +519,7 @@ export default function UserManagementPage() {
             >
               <option value="teknisi">{t('role.teknisi', language)}</option>
               <option value="manajer">{t('role.manajer', language)}</option>
+              <option value="admin">{t('role.admin', language)}</option>
             </select>
           </div>
 

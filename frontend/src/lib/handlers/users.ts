@@ -1,13 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateRequest, authorizeRoles } from '@/lib/auth';
+import { authenticateRequest, authorizeRoles, requirePermission } from '@/lib/auth';
 import { query } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { logChange } from './audit';
+import { PERMISSIONS, ASSIGNABLE_ROLES, ROLES, isRole } from '@/lib/rbac';
+
+// Validasi peran yang dapat diberikan admin (teknisi|manajer|admin).
+const ASSIGNABLE_ROLES_MSG = `role must be one of: ${ASSIGNABLE_ROLES.join(', ')}`;
+
+/**
+ * Pagar "admin terakhir": cegah sistem kehilangan seluruh admin aktif lewat
+ * hapus/nonaktifkan. Mengembalikan true jika `targetId` adalah satu-satunya
+ * admin aktif yang tersisa.
+ */
+async function isLastActiveAdmin(targetId: number): Promise<boolean> {
+  const target = await query<{ role: string }>('SELECT role FROM tb_user WHERE id_user = $1', [targetId]);
+  if (target.rowCount === 0 || target.rows[0].role !== ROLES.ADMIN) return false;
+  const others = await query<{ cnt: number }>(
+    "SELECT COUNT(*)::int AS cnt FROM tb_user WHERE role = 'admin' AND is_active = TRUE AND id_user != $1",
+    [targetId]
+  );
+  return others.rows[0].cnt === 0;
+}
 
 export async function listUsers(request: NextRequest) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manajer']);
+  const roleCheck = requirePermission(auth.user, PERMISSIONS.USER_MANAGE);
   if (roleCheck) return roleCheck;
 
   try {
@@ -258,7 +277,7 @@ export async function getTechnicianDetail(request: NextRequest, id: string) {
 export async function createUser(request: NextRequest) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manajer']);
+  const roleCheck = requirePermission(auth.user, PERMISSIONS.USER_MANAGE);
   if (roleCheck) return roleCheck;
 
   const body = await request.json();
@@ -267,9 +286,8 @@ export async function createUser(request: NextRequest) {
   if (!name || !email || !password || !role) {
     return NextResponse.json({ success: false, error: 'name, email, password, and role are required' }, { status: 400 });
   }
-  const allowedRoles = ['teknisi', 'manajer'];
-  if (!allowedRoles.includes(role)) {
-    return NextResponse.json({ success: false, error: 'role must be one of: technician, manager' }, { status: 400 });
+  if (!isRole(role) || !ASSIGNABLE_ROLES.includes(role)) {
+    return NextResponse.json({ success: false, error: ASSIGNABLE_ROLES_MSG }, { status: 400 });
   }
   if (password.length < 6) {
     return NextResponse.json({ success: false, error: 'password must be at least 6 characters' }, { status: 400 });
@@ -307,7 +325,7 @@ export async function createUser(request: NextRequest) {
 export async function updateUser(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manajer']);
+  const roleCheck = requirePermission(auth.user, PERMISSIONS.USER_MANAGE);
   if (roleCheck) return roleCheck;
 
   const userId = parseInt(id);
@@ -318,9 +336,8 @@ export async function updateUser(request: NextRequest, id: string) {
   const body = await request.json();
   const { name, email, role } = body;
 
-  const allowedRoles = ['teknisi', 'manajer'];
-  if (role !== undefined && !allowedRoles.includes(role)) {
-    return NextResponse.json({ success: false, error: 'role must be one of: technician, manager' }, { status: 400 });
+  if (role !== undefined && (!isRole(role) || !ASSIGNABLE_ROLES.includes(role))) {
+    return NextResponse.json({ success: false, error: ASSIGNABLE_ROLES_MSG }, { status: 400 });
   }
 
   try {
@@ -329,6 +346,11 @@ export async function updateUser(request: NextRequest, id: string) {
       return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
     }
     const row = current.rows[0] as Record<string, unknown>;
+
+    // Pagar admin terakhir: jangan menurunkan peran satu-satunya admin aktif.
+    if (role !== undefined && row.role === ROLES.ADMIN && role !== ROLES.ADMIN && (await isLastActiveAdmin(userId))) {
+      return NextResponse.json({ success: false, error: 'Tidak bisa menurunkan peran admin terakhir yang aktif' }, { status: 400 });
+    }
 
     if (email !== undefined && email !== row.email) {
       const emailCheck = await query('SELECT id_user FROM tb_user WHERE email = $1 AND id_user != $2', [email, userId]);
@@ -373,7 +395,7 @@ export async function updateUser(request: NextRequest, id: string) {
 export async function resetUserPassword(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manajer']);
+  const roleCheck = requirePermission(auth.user, PERMISSIONS.USER_MANAGE);
   if (roleCheck) return roleCheck;
 
   const userId = parseInt(id);
@@ -418,7 +440,7 @@ export async function resetUserPassword(request: NextRequest, id: string) {
 export async function deleteUser(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manajer']);
+  const roleCheck = requirePermission(auth.user, PERMISSIONS.USER_MANAGE);
   if (roleCheck) return roleCheck;
 
   const userId = parseInt(id);
@@ -435,6 +457,10 @@ export async function deleteUser(request: NextRequest, id: string) {
       return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
     }
     const row = current.rows[0] as { id: number; name: string };
+
+    if (await isLastActiveAdmin(userId)) {
+      return NextResponse.json({ success: false, error: 'Tidak bisa menghapus admin terakhir yang aktif' }, { status: 400 });
+    }
 
     await query('DELETE FROM tb_user WHERE id_user = $1', [userId]);
 
@@ -458,7 +484,7 @@ export async function deleteUser(request: NextRequest, id: string) {
 export async function deactivateUser(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manajer']);
+  const roleCheck = requirePermission(auth.user, PERMISSIONS.USER_MANAGE);
   if (roleCheck) return roleCheck;
 
   const userId = parseInt(id);
@@ -475,6 +501,11 @@ export async function deactivateUser(request: NextRequest, id: string) {
       return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
     }
     const row = current.rows[0] as { id: number; name: string; role: string };
+
+    // Pagar admin terakhir: sistem harus selalu punya >=1 admin aktif.
+    if (await isLastActiveAdmin(userId)) {
+      return NextResponse.json({ success: false, error: 'Tidak bisa menonaktifkan admin terakhir yang aktif' }, { status: 400 });
+    }
 
     if (row.role === 'manajer') {
       const activeManagers = await query(
@@ -509,7 +540,7 @@ export async function deactivateUser(request: NextRequest, id: string) {
 export async function activateUser(request: NextRequest, id: string) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const roleCheck = authorizeRoles(auth.user, ['manajer']);
+  const roleCheck = requirePermission(auth.user, PERMISSIONS.USER_MANAGE);
   if (roleCheck) return roleCheck;
 
   const userId = parseInt(id);

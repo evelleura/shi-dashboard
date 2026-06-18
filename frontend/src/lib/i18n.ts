@@ -15,6 +15,7 @@ export const translations = {
     'nav.technicians': 'Teknisi',
     'nav.users': 'Pengguna',
     'nav.audit_log': 'Log Aktivitas',
+    'nav.section_admin': 'Administrasi',
     'nav.my_dashboard': 'Dashboard Saya',
     'nav.my_projects': 'Proyek Saya',
     'nav.my_tasks': 'Tugas Saya',
@@ -72,8 +73,14 @@ export const translations = {
     'health.red': 'Kritis',
 
     // Role labels
+    'role.admin': 'Admin',
     'role.manajer': 'Manajer',
     'role.teknisi': 'Teknisi',
+
+    // Akses ditolak (gerbang rute RBAC)
+    'forbidden.title': 'Akses ditolak',
+    'forbidden.message': 'Anda tidak punya izin mengakses halaman ini. Hubungi admin bila ini keliru.',
+    'forbidden.back_home': 'Kembali ke beranda',
 
     // Tasks
     'task.title': 'Tugas',
@@ -378,6 +385,7 @@ export const translations = {
     'nav.technicians': 'Technicians',
     'nav.users': 'Users',
     'nav.audit_log': 'Activity Log',
+    'nav.section_admin': 'Administration',
     'nav.my_dashboard': 'My Dashboard',
     'nav.my_projects': 'My Projects',
     'nav.my_tasks': 'My Tasks',
@@ -438,6 +446,11 @@ export const translations = {
     'role.admin': 'Admin',
     'role.manajer': 'Manager',
     'role.teknisi': 'Technician',
+
+    // Access denied (RBAC route gate)
+    'forbidden.title': 'Access denied',
+    'forbidden.message': 'You do not have permission to view this page. Contact an admin if this is a mistake.',
+    'forbidden.back_home': 'Back to home',
 
     // Tasks
     'task.title': 'Tasks',

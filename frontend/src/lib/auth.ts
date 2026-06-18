@@ -1,13 +1,15 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
+import { type Role, type Permission, roleCan, satisfiesAnyRole } from '@/lib/rbac';
 
 export interface JwtPayload {
   userId: number;
   email: string;
-  // Naskah = 2 peran. DB CHECK (tb_user.role) + validasi register/createUser membatasi ke
-  // technician|manager, jadi 'admin' tak pernah terbit saat runtime; tipe dibuat permisif
-  // agar selaras dengan UserRole lama dan tidak memaksa ubah banyak perbandingan UI.
-  role: 'teknisi' | 'manajer';
+  role: Role;
+}
+
+function forbidden(): NextResponse {
+  return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
 }
 
 export interface AuthResult {
@@ -50,15 +52,29 @@ export function authenticateRequest(request: NextRequest): AuthResult {
   }
 }
 
+/**
+ * Gerbang berbasis daftar-peran (legacy, hierarchy-aware).
+ * Admin memenuhi 'manajer' lewat hierarki peran, jadi seluruh endpoint manajer
+ * otomatis terbuka utk admin tanpa mengubah pemanggil. Untuk endpoint baru,
+ * lebih disukai `requirePermission`.
+ */
 export function authorizeRoles(
   user: JwtPayload,
   roles: string[]
 ): NextResponse | null {
-  if (!roles.includes(user.role)) {
-    return NextResponse.json(
-      { success: false, error: 'Access denied' },
-      { status: 403 }
-    );
-  }
+  if (!satisfiesAnyRole(user.role, roles)) return forbidden();
+  return null;
+}
+
+/**
+ * Gerbang berbasis kapabilitas (disukai). Memetakan peran -> kapabilitas via
+ * matriks RBAC terpusat. Endpoint eksklusif-admin (kelola pengguna, log audit)
+ * memakai ini sehingga manajer tertolak 403 sementara admin lolos.
+ */
+export function requirePermission(
+  user: JwtPayload,
+  permission: Permission
+): NextResponse | null {
+  if (!roleCan(user.role, permission)) return forbidden();
   return null;
 }

@@ -1,5 +1,6 @@
 // === Enums / Union Types ===
-export type UserRole = 'teknisi' | 'manajer';
+// UserRole bersumber tunggal dari kebijakan RBAC (src/lib/rbac.ts) -> 'teknisi' | 'manajer' | 'admin'.
+export type { Role as UserRole } from '@/lib/rbac';
 export type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'cancelled';
 export type ProjectPhase = 'survey' | 'execution';
 export type ProjectCategory = 'instalasi' | 'maintenance' | 'perbaikan' | 'upgrade' | 'monitoring' | 'security' | 'networking' | 'lainnya';
@@ -181,6 +182,8 @@ export interface ProjectHealth {
 export interface DashboardSummary {
   total_projects: number;
   active_projects: number;
+  completed_projects: number;
+  onhold_projects: number;
   total_red: number;
   total_amber: number;
   total_green: number;

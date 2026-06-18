@@ -11,7 +11,8 @@
 --   lapisan UI/tipe TS TIDAK berubah. Tabel pendukung (daily_reports,
 --   project_health, dst) tetap nama Inggris karena bukan bagian 7 tabel naskah.
 --
---   Enum sesuai naskah (persis): role(technician,manager) - Tabel 4.9;
+--   Enum peran: role(teknisi,manajer,admin) - Tabel 4.9 (admin = tier kontrol
+--     penuh di atas manajer; lihat src/lib/rbac.ts utk kebijakan otorisasi);
 --   tb_tugas.status(to_do,working_on_it,done) - Tabel 4.13;
 --   tb_proyek.status(active,completed,on-hold) - Tabel 4.11;
 --   tb_eskalasi.status(open,handled,closed) priority(low,medium,high) - Tabel 4.15.
@@ -21,7 +22,7 @@
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- Tabel 4.9  tb_user  (autentikasi + otorisasi; 2 peran sesuai use case)
+-- Tabel 4.9  tb_user  (autentikasi + otorisasi; 3 peran: teknisi|manajer|admin)
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tb_user (
   id_user      SERIAL PRIMARY KEY,
@@ -31,8 +32,13 @@ CREATE TABLE IF NOT EXISTS tb_user (
   role         VARCHAR(20)  NOT NULL DEFAULT 'teknisi',
   is_active    BOOLEAN      NOT NULL DEFAULT TRUE,
   created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT role_check CHECK (role IN ('teknisi', 'manajer'))
+  CONSTRAINT role_check CHECK (role IN ('teknisi', 'manajer', 'admin'))
 );
+
+-- Migrasi idempotent: pastikan CHECK peran mencakup 'admin' walau tabel sudah
+-- ada (CREATE TABLE IF NOT EXISTS tidak memperbarui constraint lama 2-peran).
+ALTER TABLE tb_user DROP CONSTRAINT IF EXISTS role_check;
+ALTER TABLE tb_user ADD CONSTRAINT role_check CHECK (role IN ('teknisi', 'manajer', 'admin'));
 
 -- ---------------------------------------------------------------------
 -- Tabel 4.10  tb_klien
@@ -298,11 +304,12 @@ DO $seed$
 BEGIN
 IF NOT EXISTS (SELECT 1 FROM tb_user) THEN
 
-  -- 1. USERS (3 manajer, 5 teknisi). 'admin@shi.co.id' kini berperan manager.
+  -- 1. USERS (2 admin, 1 manajer, 5 teknisi). admin@shi.co.id + diana@shi.co.id
+  --    = peran 'admin' (kontrol penuh: kelola pengguna + log audit). budi = manajer.
   INSERT INTO tb_user (nama, email, password, role) VALUES
-    ('Administrator SHI', 'admin@shi.co.id',  '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'manajer'),
+    ('Administrator SHI', 'admin@shi.co.id',  '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'admin'),
     ('Budi Santoso',      'budi@shi.co.id',   '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'manajer'),
-    ('Diana Kusuma',      'diana@shi.co.id',  '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'manajer'),
+    ('Diana Kusuma',      'diana@shi.co.id',  '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'admin'),
     ('Rizky Ramadhan',    'rizky@shi.co.id',  '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'teknisi'),
     ('Andi Wijaya',       'andi@shi.co.id',   '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'teknisi'),
     ('Reza Pratama',      'reza@shi.co.id',   '$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6', 'teknisi'),

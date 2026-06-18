@@ -57,6 +57,8 @@ export async function getDashboard(request: NextRequest) {
       query(
         `SELECT COUNT(*)::int AS total_projects,
           COUNT(*) FILTER (WHERE p.status = 'active')::int AS active_projects,
+          COUNT(*) FILTER (WHERE p.status = 'completed')::int AS completed_projects,
+          COUNT(*) FILTER (WHERE p.status = 'on-hold')::int AS onhold_projects,
           COUNT(*) FILTER (WHERE ph.status = 'red' AND p.status = 'active')::int AS total_red,
           COUNT(*) FILTER (WHERE ph.status = 'amber' AND p.status = 'active')::int AS total_amber,
           COUNT(*) FILTER (WHERE ph.status = 'green' AND p.status = 'active')::int AS total_green,
@@ -545,7 +547,7 @@ export async function chartProjectCategories(request: NextRequest) {
     const result = await query(
       `SELECT category, COUNT(*)::int AS count
        FROM tb_proyek
-       WHERE status = 'active'${dateClause}
+       WHERE 1=1${dateClause}
        GROUP BY category
        ORDER BY count DESC`,
       params

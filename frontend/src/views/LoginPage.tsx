@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
+import { roleHome } from "../lib/rbac";
 import SHILogo from "../components/ui/SHILogo";
 
 function FloatingParticle({ delay, x, y, size }: { delay: number; x: number; y: number; size: number }) {
@@ -40,11 +41,7 @@ export default function LoginPage() {
 
     try {
       const user = await login(form.email, form.password);
-      if (user.role === "manajer") {
-        router.push("/dashboard");
-      } else {
-        router.push("/my-dashboard");
-      }
+      router.push(roleHome(user.role));
     } catch {
       setError("Email atau kata sandi salah.");
     } finally {

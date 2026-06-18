@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { query } from '@/lib/db';
+import { SELF_REGISTER_ROLES, ROLES, isRole } from '@/lib/rbac';
 
 export async function login(request: NextRequest) {
   const body = await request.json();
@@ -49,8 +50,8 @@ export async function register(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Name, email, and password are required' }, { status: 400 });
   }
 
-  const allowedRoles = ['teknisi', 'manajer'];
-  const userRole = allowedRoles.includes(role) ? role : 'teknisi';
+  // Pendaftaran mandiri TIDAK boleh membuat admin (cegah eskalasi hak). Default teknisi.
+  const userRole = isRole(role) && SELF_REGISTER_ROLES.includes(role) ? role : ROLES.TEKNISI;
 
   try {
     const existing = await query('SELECT id_user FROM tb_user WHERE email = $1', [email]);

@@ -3,7 +3,8 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDashboard } from '../../hooks/useDashboard';
 import { useNotifications, useMarkNotificationRead, useMarkAllRead } from '../../hooks/useNotifications';
-import { useAuth } from '../../hooks/useAuth';
+import { usePermissions } from '../../hooks/usePermissions';
+import { PERMISSIONS } from '../../lib/rbac';
 import type { AppNotification } from '../../hooks/useNotifications';
 
 // ── Manager-derived alerts (existing logic) ─────────────────────────────────
@@ -42,11 +43,11 @@ export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { user } = useAuth();
-  const isManager = user?.role === 'manajer';
+  const { can } = usePermissions();
+  // Hanya peran berkapabilitas dashboard (manajer + admin) yang fetch alert sistem.
+  // Teknisi: jangan fetch endpoint manajer-only supaya tidak memicu 403.
+  const isManager = can(PERMISSIONS.DASHBOARD_VIEW);
 
-  // Hanya manajer yang butuh data dashboard (untuk alert sistem). Teknisi: jangan fetch
-  // endpoint manajer-only supaya tidak memicu 403.
   const { data: dashData } = useDashboard(undefined, isManager);
   const { data: notifData } = useNotifications();
   const markRead = useMarkNotificationRead();

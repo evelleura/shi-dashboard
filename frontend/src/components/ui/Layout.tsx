@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useEscalationSummary } from '../../hooks/useEscalations';
+import { navItemsForRole, type NavIconKey } from '../../lib/rbac';
 import GlobalSearchBar from './GlobalSearchBar';
 import NotificationBell from './NotificationBell';
 import SHILogo from './SHILogo';
@@ -13,13 +14,6 @@ import type { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
-}
-
-interface NavItem {
-  to: string;
-  label: string;
-  icon: ReactNode;
-  badge?: number;
 }
 
 function DashboardIcon() {
@@ -140,35 +134,23 @@ export default function Layout({ children }: Props) {
     router.push('/login');
   };
 
-  const isManager = user?.role === 'manajer';
+  // Navbar digerakkan kapabilitas RBAC (bukan if-peran): admin = superset
+  // manajer + menu eksklusif (Pengguna, Log Audit). Lihat src/lib/rbac.ts.
+  const NAV_ICONS: Record<NavIconKey, ReactNode> = {
+    dashboard: <DashboardIcon />,
+    projects: <ProjectsIcon />,
+    tasks: <TasksIcon />,
+    schedule: <ScheduleIcon />,
+    timeline: <TimelineIcon />,
+    clients: <ClientsIcon />,
+    reports: <ReportsIcon />,
+    escalations: <EscalationsIcon />,
+    technicians: <TechniciansIcon />,
+    users: <UsersIcon />,
+    audit: <AuditIcon />,
+  };
 
-  const technicianItems: NavItem[] = [
-    { to: '/my-dashboard', label: t('nav.my_dashboard', language), icon: <DashboardIcon /> },
-    { to: '/my-projects', label: t('nav.my_projects', language), icon: <ProjectsIcon /> },
-    { to: '/my-tasks', label: t('nav.my_tasks', language), icon: <TasksIcon /> },
-    { to: '/my-escalations', label: t('nav.my_escalations', language), icon: <EscalationsIcon />, badge: openEscalations },
-  ];
-
-  const navItems: NavItem[] = isManager
-    ? [
-        { to: '/dashboard', label: t('nav.dashboard', language), icon: <DashboardIcon /> },
-        { to: '/projects', label: t('nav.projects', language), icon: <ProjectsIcon /> },
-        { to: '/schedule', label: t('nav.schedule', language), icon: <ScheduleIcon /> },
-        { to: '/timeline', label: t('nav.timeline', language), icon: <TimelineIcon /> },
-        { to: '/clients', label: t('nav.clients', language), icon: <ClientsIcon /> },
-        { to: '/reports', label: t('nav.reports', language), icon: <ReportsIcon /> },
-        { to: '/escalations', label: t('nav.escalations', language), icon: <EscalationsIcon />, badge: openEscalations },
-        ...(isManager
-          ? [
-              { to: '/technicians', label: t('nav.technicians', language), icon: <TechniciansIcon /> },
-              { to: '/users', label: t('nav.users', language), icon: <UsersIcon /> },
-              { to: '/audit-log', label: t('nav.audit_log', language), icon: <AuditIcon /> },
-            ]
-          : []),
-        // Manajer TIDAK memakai tampilan teknisi (Dashboard Saya/Proyek Saya/dst):
-        // endpoint-nya khusus teknisi (mis. /users/me/projects -> 403 utk manajer).
-      ]
-    : technicianItems;
+  const navItems = user?.role ? navItemsForRole(user.role) : [];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
@@ -195,27 +177,36 @@ export default function Layout({ children }: Props) {
 
           {/* Nav Links */}
           <nav className="flex-1 px-3 py-4 space-y-1">
-            {navItems.map((item) => {
+            {navItems.map((item, idx) => {
               const isActive = pathname === item.to;
+              const badge = item.badge === 'escalations' ? openEscalations : undefined;
+              // Pemisah + label saat masuk blok menu eksklusif admin.
+              const startAdmin = item.section === 'admin' && navItems[idx - 1]?.section !== 'admin';
               return (
-                <Link
-                  key={item.to}
-                  href={item.to}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                    isActive
-                      ? 'bg-blue-600 text-white font-medium'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                  }`}
-                >
-                  {item.icon}
-                  {item.label}
-                  {item.badge != null && item.badge > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center" aria-label={`${item.badge} open`}>
-                      {item.badge}
-                    </span>
+                <Fragment key={item.to}>
+                  {startAdmin && (
+                    <p className="px-3 pt-4 pb-1 mt-2 border-t border-slate-800 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      {t('nav.section_admin', language)}
+                    </p>
                   )}
-                </Link>
+                  <Link
+                    href={item.to}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+                      isActive
+                        ? 'bg-blue-600 text-white font-medium'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    }`}
+                  >
+                    {NAV_ICONS[item.icon]}
+                    {t(item.labelKey, language)}
+                    {badge != null && badge > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center" aria-label={`${badge} open`}>
+                        {badge}
+                      </span>
+                    )}
+                  </Link>
+                </Fragment>
               );
             })}
 

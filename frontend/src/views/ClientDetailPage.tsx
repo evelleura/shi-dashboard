@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useClient, useUpdateClient, useDeleteClient, useUploadClientPhoto } from '../hooks/useClients';
-import { useAuth } from '../hooks/useAuth';
+import { usePermissions } from '../hooks/usePermissions';
+import { PERMISSIONS } from '../lib/rbac';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import Modal from '../components/ui/Modal';
@@ -309,12 +310,12 @@ export default function ClientDetailPage() {
   const rawId = Array.isArray(params?.slug) ? params.slug[1] : (params?.id as string | undefined);
   const clientId = rawId ? parseInt(rawId, 10) : 0;
 
-  const { user } = useAuth();
+  const { can } = usePermissions();
   const { language } = useLanguage();
   const locale = language === 'id' ? 'id-ID' : 'en-US';
 
-  const isManager = user?.role === 'manajer';
-  // 2 peran (naskah): manajer mewarisi kapabilitas admin -> tab Riwayat tampil utk manajer.
+  // Kapabilitas kelola klien (manajer + admin). Tab Riwayat ikut kapabilitas ini.
+  const isManager = can(PERMISSIONS.CLIENT_MANAGE);
   const isAdmin = isManager;
 
   const { data: client, isLoading, isError } = useClient(clientId);
