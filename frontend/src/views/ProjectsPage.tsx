@@ -6,26 +6,13 @@ import { useClients } from '../hooks/useClients';
 import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
 import ProjectForm from '../components/projects/ProjectForm';
-import DataTable, { type Column, type RowAge } from '../components/ui/DataTable';
+import DataTable, { type Column } from '../components/ui/DataTable';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import type { DashboardProject, CreateProjectData } from '../types';
 
 function formatDate(dateStr: string, locale: string) {
   return new Date(dateStr).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-function getProjectAge(p: DashboardProject): RowAge {
-  const created = p.created_at ? new Date(p.created_at).getTime() : 0;
-  const updated = p.updated_at ? new Date(p.updated_at).getTime() : created;
-  const latest = Math.max(created, updated);
-  const now = Date.now();
-  const hoursAgo = (now - latest) / (1000 * 60 * 60);
-  if (hoursAgo < 24) return 'new';
-  if (hoursAgo < 24 * 7) return 'recent';
-  // Stale: no tasks completed and older than 14 days
-  if (hoursAgo > 24 * 14 && p.completed_tasks === 0 && p.total_tasks > 0) return 'stale';
-  return 'normal';
 }
 
 function PencilIcon() {
@@ -241,11 +228,15 @@ export default function ProjectsPage() {
             </select>
           );
         }
+        // Status = siklus hidup proyek. Sengaja BUKAN palet merah/kuning/hijau
+        // supaya tidak rancu dengan Kesehatan SPI (EWS). Warna netral + label teks.
+        // Status = siklus hidup -> palet NETRAL/dingin (biru/abu), BUKAN RAG.
+        // RAG (merah/amber/hijau) khusus Kesehatan/SPI -> tak pernah tertukar.
         const statusStyles: Record<string, string> = {
-          active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-          completed: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-          'on-hold': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-          cancelled: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+          active: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+          completed: 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200',
+          'on-hold': 'bg-stone-200 text-stone-700 dark:bg-stone-600/50 dark:text-stone-200',
+          cancelled: 'bg-gray-200 text-gray-500 line-through dark:bg-gray-700 dark:text-gray-400',
         };
         const statusLabel: Record<string, string> = {
           active: t('status.active', language),
@@ -271,13 +262,17 @@ export default function ProjectsPage() {
     },
     {
       key: 'health_status',
-      label: language === 'id' ? 'Kesehatan' : 'Health',
+      label: language === 'id' ? 'Kesehatan (SPI)' : 'Health (SPI)',
+      // Pil Kesehatan = performa jadwal (RAG) SETIAP proyek. Proyek selesai umumnya
+      // On Track (SPI ~1.0, tugas tuntas) -> JANGAN tampil N/A. 'Belum Dinilai'
+      // hanya saat proyek terlalu baru (PV < 5%, data belum cukup). Merah hanya
+      // muncul di proyek aktif yg tertinggal (selesai SPI 1.0 -> tak pernah merah).
       render: (p) => <StatusBadge status={p.health_status ?? null} />,
       sortValue: (p) => {
         const order: Record<string, number> = { red: 0, amber: 1, green: 2 };
         return order[p.health_status ?? ''] ?? 3;
       },
-      exportValue: (p) => p.health_status ?? 'N/A',
+      exportValue: (p) => p.health_status ?? 'Belum Dinilai',
     },
     {
       key: 'spi_value',
@@ -446,13 +441,78 @@ export default function ProjectsPage() {
         columns={columns}
         data={filtered}
         rowKey={(p) => p.id}
-        rowAge={getProjectAge}
+        rowStripe={(p) => {
+          // Warna LATAR + garis kiri baris = KESEHATAN (EWS) utk proyek AKTIF ->
+          // bervariasi & bermakna (merah menonjol minta tindakan, hijau kalem aman).
+          // Non-aktif = garis netral tanpa wash (selesai=slate, ditunda=stone).
+          if (p.status === 'active') return (p.health_status as string | null) ?? 'gray';
+          if (p.status === 'completed') return 'slate';
+          if (p.status === 'on-hold') return 'stone';
+          return null;
+        }}
         onRowClick={handleRowClick}
         defaultSortKey="project_code"
         defaultSortDesc={true}
         exportFileName="projects"
         emptyMessage={t('projects.no_found', language)}
       />
+
+      {/* Legend warna -- pisahkan jelas STATUS (siklus hidup) vs KESEHATAN/SPI (EWS). */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-xs">
+        <p className="font-semibold text-gray-700 dark:text-gray-300 mb-3">
+          {language === 'id' ? 'Keterangan Warna' : 'Color Legend'}
+        </p>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+          {/* Status proyek */}
+          <div>
+            <p className="font-medium text-gray-500 dark:text-gray-400 mb-2">
+              {language === 'id' ? 'Status Proyek (badge - siklus hidup)' : 'Project Status (badge - lifecycle)'}
+            </p>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">{t('status.active', language)}</span>
+                <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'sedang dikerjakan' : 'in progress'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200">{t('status.completed', language)}</span>
+                <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'pekerjaan tuntas' : 'work finished'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-stone-200 text-stone-700 dark:bg-stone-600/50 dark:text-stone-200">{t('status.on_hold', language)}</span>
+                <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'dijeda sementara' : 'paused'}</span>
+              </div>
+            </div>
+          </div>
+          {/* Kesehatan / SPI (EWS) */}
+          <div>
+            <p className="font-medium text-gray-500 dark:text-gray-400 mb-2">
+              {language === 'id' ? 'Kesehatan / SPI (pil semua + sorot baris aktif)' : 'Health / SPI (pill for all + active-row tint)'}
+            </p>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-5 h-4 rounded-sm border-l-4 border-l-emerald-400 bg-emerald-50/60 dark:bg-emerald-900/20" />
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><span className="w-2 h-2 rounded-full bg-green-500" />On Track</span>
+                <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'SPI >= 0.95, aman' : 'SPI >= 0.95, on track'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-5 h-4 rounded-sm border-l-4 border-l-amber-400 bg-amber-50/70 dark:bg-amber-900/25" />
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><span className="w-2 h-2 rounded-full bg-yellow-500" />Warning</span>
+                <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'SPI 0.85-0.95, waspada' : 'SPI 0.85-0.95, caution'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-5 h-4 rounded-sm border-l-4 border-l-red-500 bg-red-50/80 dark:bg-red-900/30" />
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><span className="w-2 h-2 rounded-full bg-red-500" />Critical</span>
+                <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'SPI < 0.85, perlu tindakan' : 'SPI < 0.85, act now'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="text-gray-400 dark:text-gray-500 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 leading-relaxed">
+          {language === 'id'
+            ? 'Pil KESEHATAN = performa jadwal (SPI) tiap proyek. Warna LATAR baris menyorot proyek AKTIF (lampu lalu lintas: hijau aman, amber waspada, merah perlu tindakan). Proyek SELESAI/ditunda: latar netral (kalem) tapi pil tetap tampil -> "Selesai + On Track" = tuntas tepat jadwal (SPI ~1.0), bukan N/A. STATUS dipisah di badge NETRAL (biru/abu) supaya tak tertukar warna dengan kesehatan. "Belum Dinilai" = proyek terlalu baru (durasi berjalan < 5%).'
+            : 'The HEALTH pill = each project schedule performance (SPI). The row background highlights ACTIVE projects (traffic light: green = safe, amber = caution, red = act now). COMPLETED/paused projects keep a neutral (calm) background but still show a pill -> "Done + On Track" = finished on schedule (SPI ~1.0), not N/A. STATUS lives in a NEUTRAL badge (blue/grey) so it never clashes with health. "Not Yet Rated" = project too new (< 5% elapsed).'}
+        </p>
+      </div>
 
       {/* Create Project Modal */}
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title={t('projects.create_title', language)} maxWidth="max-w-xl">

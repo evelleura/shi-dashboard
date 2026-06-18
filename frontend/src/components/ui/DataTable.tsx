@@ -34,6 +34,9 @@ export interface DataTableProps<T> {
   rowKey: (row: T) => string | number;
   /** Determine row age for color coding */
   rowAge?: (row: T) => RowAge;
+  /** Subtle left-border stripe per row. Overrides the rowAge stripe when
+   *  provided. Return a STRIPE_COLORS token (e.g. status proyek) or null. */
+  rowStripe?: (row: T) => string | null;
   /** Custom row click handler */
   onRowClick?: (row: T) => void;
   /** Extra row classes */
@@ -80,6 +83,21 @@ const AGE_LEGEND: { key: RowAge; label: string; dot: string }[] = [
   { key: 'stale',  label: 'Stale (no progress)', dot: 'bg-gray-300' },
 ];
 
+// Stripe + wash latar baris. Token -> warna; pemanggil memetakan maknanya.
+// KESEHATAN (EWS): garis + wash lembut -> baris berisiko langsung terpindai,
+//   yang sehat tetap "ijo" tapi kalem. STATUS non-aktif: garis tepi SAJA (tanpa
+//   wash) -> penanda netral, beda jelas dari baris aktif yang ber-wash.
+const STRIPE_COLORS: Record<string, string> = {
+  green: 'border-l-4 border-l-emerald-400 bg-emerald-50/60 dark:bg-emerald-900/20',
+  amber: 'border-l-4 border-l-amber-400 bg-amber-50/70 dark:bg-amber-900/25',
+  red:   'border-l-4 border-l-red-500 bg-red-50/80 dark:bg-red-900/30',
+  gray:  'border-l-4 border-l-gray-300 dark:border-l-gray-600',
+  slate: 'border-l-4 border-l-slate-400 dark:border-l-slate-500',
+  stone: 'border-l-4 border-l-stone-400 dark:border-l-stone-500',
+  rose:  'border-l-4 border-l-rose-400 dark:border-l-rose-500',
+  blue:  'border-l-4 border-l-blue-400 dark:border-l-blue-500',
+};
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function DataTable<T>({
@@ -87,6 +105,7 @@ export default function DataTable<T>({
   data,
   rowKey,
   rowAge,
+  rowStripe,
   onRowClick,
   rowClass,
   defaultSortKey,
@@ -213,7 +232,7 @@ export default function DataTable<T>({
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           <span>{sorted.length} row{sorted.length !== 1 ? 's' : ''}</span>
-          {rowAge && (
+          {rowAge && !rowStripe && (
             <div className="hidden sm:flex items-center gap-3">
               <span className="text-gray-300">|</span>
               {AGE_LEGEND.map((l) => (
@@ -336,7 +355,9 @@ export default function DataTable<T>({
             ) : (
               paginated.map((row, idx) => {
                 const age = rowAge?.(row) ?? 'normal';
-                const ageClass = AGE_COLORS[age];
+                const stripe = rowStripe?.(row);
+                // Health stripe wins when provided; else fall back to age stripe.
+                const ageClass = rowStripe ? (stripe ? STRIPE_COLORS[stripe] : '') : AGE_COLORS[age];
                 const extra = rowClass?.(row) ?? '';
                 return (
                   <tr
