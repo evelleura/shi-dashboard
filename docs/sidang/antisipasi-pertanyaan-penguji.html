@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antisipasi Pertanyaan Penguji - Sidang TA Dian</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --ink:#1b2330; --muted:#5c6675;
+    --line:#e4e8ee; --line2:#eef1f5;
+    --accent:#2563eb; --accent-soft:#eaf1ff;
+    --you:#b45309; --you-soft:#fff7ed;
+    --green:#15803d; --green-soft:#e8f6ec;
+    --amber:#b45309; --amber-soft:#fdf3e3;
+    --red:#c0241c; --red-soft:#fdeceb;
+    --purple:#7c3aed; --purple-soft:#f3ecff;
+    --codebg:#f3f5f8;
+    --mono:ui-monospace,"Cascadia Code","Consolas",monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+       line-height:1.62;font-size:clamp(14.5px,1vw + 12px,16px);-webkit-text-size-adjust:100%}
+  .wrap{width:100%;max-width:1040px;margin:0 auto;padding:0 clamp(13px,4vw,24px)}
+
+  header.top{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;
+       padding:clamp(22px,4vw,34px) 0 clamp(20px,3vw,28px);box-shadow:0 2px 14px rgba(20,40,90,.18)}
+  header.top h1{margin:0 0 6px;font-size:clamp(20px,4.4vw,27px);letter-spacing:-.3px;line-height:1.18}
+  header.top p{margin:2px 0;opacity:.93;font-size:clamp(13px,2.4vw,15px)}
+  .pill-row{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+       padding:4px 11px;border-radius:30px;font-size:12.5px;font-weight:600}
+
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);
+       backdrop-filter:blur(6px);border-bottom:1px solid var(--line);
+       padding:8px 0;box-shadow:0 1px 8px rgba(0,0,0,.04)}
+  nav.toc .wrap{display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;
+       scrollbar-width:thin;-webkit-overflow-scrolling:touch;
+       mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}
+  nav.toc .wrap::-webkit-scrollbar{height:5px}
+  nav.toc .wrap::-webkit-scrollbar-thumb{background:#cbd5e6;border-radius:5px}
+  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;
+       padding:5px 10px;border-radius:7px;font-weight:600;white-space:nowrap;flex:0 0 auto}
+  nav.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+
+  section{padding:clamp(18px,3vw,26px) 0 4px;scroll-margin-top:58px}
+  .sec-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+       padding:clamp(16px,3.2vw,28px);margin-bottom:18px;box-shadow:0 1px 3px rgba(20,40,90,.04)}
+  h2{font-size:clamp(18px,3.4vw,22px);margin:0 0 12px;letter-spacing:-.3px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+  h2 .num{background:var(--accent);color:#fff;min-width:34px;height:34px;padding:0 8px;border-radius:9px;
+       display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+  h3{font-size:clamp(15px,2.6vw,17px);margin:20px 0 8px;color:#13203a}
+  p{margin:9px 0}
+  a{color:var(--accent)}
+  ul,ol{margin:9px 0;padding-left:22px}
+  li{margin:5px 0}
+  strong{color:#13203a}
+
+  .box{border-radius:11px;padding:12px 15px;margin:12px 0;border:1px solid;font-size:14.5px}
+  .box .lbl{font-weight:800;font-size:11px;letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px}
+  .box.warn{background:var(--red-soft);border-color:#f3c9c5;color:#7c1812}
+  .box.warn .lbl{color:var(--red)}
+  .box.note{background:var(--accent-soft);border-color:#cfe0fb;color:#1c3a73}
+  .box.note .lbl{color:var(--accent)}
+  .box.tip{background:var(--green-soft);border-color:#c4e6cd;color:#15532c}
+  .box.tip .lbl{color:var(--green)}
+  .box.say{background:var(--you-soft);border-color:#fadcb6;color:#7a4708}
+  .box.say .lbl{color:var(--you)}
+  .box.say p{margin:6px 0;font-style:italic;font-size:15px}
+
+  /* ---- Q&A block ---- */
+  .qa{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;
+       padding:14px 16px;margin:14px 0;background:#fbfcfe;transition:.15s}
+  .qa.trap{border-left-color:var(--red)}
+  .qa.trap .qn{background:var(--red)}
+  .q{font-weight:700;color:#13203a;font-size:15.5px;margin:0;display:flex;gap:10px;align-items:flex-start}
+  .qn{flex:0 0 auto;background:var(--accent);color:#fff;font-size:12px;font-weight:800;
+       border-radius:6px;padding:2px 8px;margin-top:1px;letter-spacing:.5px}
+  .a{margin-top:10px}
+  .a p:first-child{margin-top:0}
+  .tag-trap{display:inline-block;background:var(--red-soft);color:var(--red);border:1px solid #f0c4c0;
+       font-size:10.5px;font-weight:800;letter-spacing:.4px;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle}
+
+  /* ---- tables ---- */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:13px 0;border-radius:10px}
+  table{width:100%;border-collapse:collapse;margin:0;font-size:clamp(13px,2.4vw,14px);background:#fff;
+       border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th{background:#f0f3f8;text-align:left;padding:9px 12px;font-size:11.5px;
+       text-transform:uppercase;letter-spacing:.4px;color:#3a4763;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.mono,th.mono{font-family:var(--mono);font-size:.9em}
+
+  .rag{display:inline-block;padding:2px 9px;border-radius:30px;font-size:11px;font-weight:800;letter-spacing:.3px;white-space:nowrap}
+  .rag.r{background:var(--red-soft);color:var(--red);border:1px solid #f0c4c0}
+  .rag.a{background:var(--amber-soft);color:var(--amber);border:1px solid #f0d9af}
+  .rag.g{background:var(--green-soft);color:var(--green);border:1px solid #bfe3c9}
+  code.inl{background:var(--codebg);border:1px solid var(--line);border-radius:5px;
+       padding:1.5px 6px;font-family:var(--mono);font-size:.85em;color:#0f3d2e;word-break:break-word}
+  .kbd{font-family:var(--mono);background:#fff;border:1px solid #c7cfdb;border-bottom-width:2px;
+       border-radius:5px;padding:1px 7px;font-size:12.5px;font-weight:600;white-space:nowrap}
+
+  /* ---- golden-rules grid ---- */
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0}
+  .rule{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .rule b{display:block;color:var(--accent);font-size:13px;margin-bottom:3px}
+  .rule.no b{color:var(--red)}
+
+  /* ---- practice mode ---- */
+  #practice{position:fixed;right:clamp(14px,3vw,26px);bottom:clamp(14px,3vw,26px);z-index:80;
+       background:var(--accent);color:#fff;border:0;border-radius:30px;padding:12px 18px;font-family:var(--sans);
+       font-weight:800;font-size:13.5px;cursor:pointer;box-shadow:0 6px 22px rgba(37,99,235,.42)}
+  #practice:hover{background:#1e54d4}
+  body.quiz .qa .a,body.quiz .qa .box.say{display:none}
+  body.quiz .qa{cursor:pointer}
+  body.quiz .qa.show .a,body.quiz .qa.show .box.say{display:block}
+  body.quiz .qa::after{content:"klik untuk lihat jawaban aman";display:block;margin-top:8px;
+       font-size:12px;font-weight:700;color:var(--accent)}
+  body.quiz .qa.show::after{display:none}
+
+  footer{padding:28px 0 90px;color:var(--muted);font-size:13px;text-align:center}
+
+  @media (max-width:540px){
+    .sec-card{padding:15px}
+    .rules{grid-template-columns:1fr}
+  }
+  @media print{
+    nav.toc,#practice{display:none!important}
+    header.top{box-shadow:none}
+    .sec-card,.qa{break-inside:avoid;box-shadow:none}
+    a{color:#1b2330;text-decoration:none}
+    body{font-size:11pt;background:#fff}
+    .box.say{background:#fff7ed!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Antisipasi Pertanyaan Penguji &mdash; Persiapan Sidang</h1>
+    <p>Pengembangan Fitur Dashboard pada Sistem Manajemen Proyek Berdasarkan Data Laporan Harian &middot; PT Smart Home Inovasi</p>
+    <p>Dian Putri Iswandi (5220311118) &middot; Universitas Teknologi Yogyakarta</p>
+    <div class="pill-row">
+      <span class="pill">Pertanyaan + jawaban aman</span>
+      <span class="pill">Kotak oranye = boleh diucapkan</span>
+      <span class="pill">Tanda JEBAKAN = hati-hati</span>
+      <span class="pill">Ada Mode Latihan</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#emas">Aturan Emas</a>
+    <a href="#lb">A. Latar Belakang</a>
+    <a href="#tujuan">B. Tujuan</a>
+    <a href="#batas">C. Batasan</a>
+    <a href="#metode">D. Metode</a>
+    <a href="#teori">E. Teori &amp; Metrik</a>
+    <a href="#rancang">F. Perancangan</a>
+    <a href="#tech">G. Teknologi</a>
+    <a href="#fitur">H. Fitur Inti</a>
+    <a href="#uji">I. Pengujian</a>
+    <a href="#baru">J. Kebaruan</a>
+    <a href="#batasdiri">K. Keterbatasan</a>
+    <a href="#jebakan">L. Jebakan</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ===================== ATURAN EMAS ===================== -->
+<section id="emas">
+  <div class="sec-card">
+    <h2><span class="num">!</span> Aturan emas saat menjawab</h2>
+    <p>Cara menjawab sama pentingnya dengan isi jawaban. Penguji menilai ketenangan dan kejujuran,
+       bukan cuma kebenaran teknis. Pegang lima hal ini:</p>
+    <div class="rules">
+      <div class="rule"><b>Jawab singkat, lalu berhenti</b>Sampaikan inti 2&ndash;3 kalimat. Diam setelahnya. Jangan menggali lubang sendiri dengan terus bicara.</div>
+      <div class="rule"><b>Akui keterbatasan dengan jujur</b>Kalau ada yang belum sempurna (3 hasil uji gagal), akui terus arahkan ke saran perbaikan. Penguji menghargai kejujuran.</div>
+      <div class="rule"><b>Kembalikan ke tujuan &amp; batasan</b>Kalau pertanyaan di luar lingkup, jawab: "Itu di luar batasan masalah; fokus penelitian ini adalah ...".</div>
+      <div class="rule no"><b>Jangan berdebat</b>Kalau penguji mengoreksi, catat dan terima. "Terima kasih masukannya, akan saya perbaiki." Bukan adu argumen.</div>
+      <div class="rule no"><b>Jangan mengarang</b>Tidak tahu? Katakan: "Sejauh ini belum saya dalami, akan saya pelajari." Lebih aman daripada jawaban palsu.</div>
+    </div>
+    <div class="box note">
+      <span class="lbl">Cara pakai halaman ini</span>
+      Tiap pertanyaan punya <strong>jawaban aman</strong> (penjelasan) dan kotak oranye <strong>"boleh diucapkan"</strong>
+      (kalimat siap pakai). Tanda <span class="tag-trap">JEBAKAN</span> = pertanyaan yang gampang menjebak; baca peringatan merahnya.
+      Tombol biru <strong>"Mode Latihan"</strong> di pojok kanan bawah menyembunyikan jawaban supaya bisa kuis diri sendiri.
+    </div>
+  </div>
+</section>
+
+<!-- ===================== A. LATAR BELAKANG ===================== -->
+<section id="lb">
+  <div class="sec-card">
+    <h2><span class="num">A</span> Latar belakang &amp; masalah</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Coba jelaskan singkat latar belakang penelitian Anda.</p>
+      <div class="a">
+        <p>PT Smart Home Inovasi (SHI) adalah perusahaan jasa Smart Home dan IoT di Sleman, Yogyakarta. Mereka sudah
+           punya sistem laporan harian, tapi punya tiga kelemahan: (1) hanya manajer yang bisa akses, teknisi melapor
+           lewat WhatsApp lalu manajer mengetik ulang manual ke spreadsheet; (2) tidak ada dashboard ringkasan kondisi
+           seluruh proyek; (3) tidak ada indikator risiko terukur, sehingga deteksi masalah bersifat reaktif, bukan preventif.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"PT SHI sudah punya laporan harian, tapi teknisi melapor lewat WhatsApp lalu manajer mengetik ulang ke spreadsheet.
+           Tidak ada dashboard ringkasan dan tidak ada indikator risiko, jadi masalah baru ketahuan setelah terlambat.
+           Penelitian saya mengembangkan fitur dashboard yang memberi akses langsung ke teknisi dan menampilkan status
+           kesehatan proyek otomatis sebagai peringatan dini."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa dampak nyata dari masalah itu bagi perusahaan?</p>
+      <div class="a">
+        <p>Karena deteksi keterlambatan lambat, manajer sering baru bertindak setelah proyek sudah jauh tertinggal.
+           Akibatnya efisiensi operasional turun dan kepuasan pelanggan ikut menurun karena penyelesaian molor.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Tanpa peringatan dini, manajer baru sadar proyek bermasalah setelah terlambat. Penanganannya jadi reaktif,
+           menambah keterlambatan, dan menurunkan kepuasan pelanggan. Dashboard ini bertujuan menggeser penanganan dari
+           reaktif menjadi preventif."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== B. TUJUAN ===================== -->
+<section id="tujuan">
+  <div class="sec-card">
+    <h2><span class="num">B</span> Rumusan masalah, tujuan, manfaat</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa rumusan masalah dan tujuan penelitian Anda?</p>
+      <div class="a">
+        <p><strong>Rumusan masalah:</strong> Bagaimana mengembangkan fitur dashboard yang mampu memvisualisasikan indikator
+           kesehatan proyek berdasarkan data laporan harian di PT SHI?</p>
+        <p><strong>Tujuan:</strong> Mengembangkan fitur dashboard yang mengolah data laporan harian secara otomatis menjadi
+           indikator visual status kesehatan proyek.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Rumusan masalahnya: bagaimana mengembangkan dashboard yang memvisualisasikan kesehatan proyek dari data laporan harian.
+           Tujuannya membangun dashboard yang mengubah laporan harian menjadi indikator visual status proyek secara otomatis."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa manfaat praktisnya untuk PT SHI?</p>
+      <div class="a">
+        <p>Teknisi melapor langsung tanpa perantara (memangkas birokrasi), manajer punya satu layar untuk memantau seluruh
+           proyek, dan proyek kritis otomatis naik ke urutan teratas sehingga prioritas penanganan jelas dan berbasis data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== C. BATASAN ===================== -->
+<section id="batas">
+  <div class="sec-card">
+    <h2><span class="num">C</span> Batasan masalah</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa saja batasan masalah penelitian ini?</p>
+      <div class="a">
+        <ul>
+          <li>Data terbatas pada laporan harian dan jadwal baseline proyek.</li>
+          <li>Penilaian performa jadwal murni memakai metrik <strong>SPI</strong> (tanpa machine learning / AI).</li>
+          <li>Dua hak akses: <strong>Manajer</strong> dan <strong>Teknisi</strong>.</li>
+          <li>Sistem tidak mengelola laporan keuangan, pengadaan material, maupun manajemen SDM.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Kenapa keuangan, material, dan SDM tidak dikelola?</p>
+      <div class="a">
+        <p>Karena fokus penelitian adalah <strong>performa jadwal</strong> dari data laporan harian, bukan aspek biaya atau
+           logistik. Memasukkan keuangan/material akan memperluas lingkup melampaui rumusan masalah. Aspek biaya justru
+           dicantumkan sebagai saran pengembangan ke depan.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Itu sengaja saya batasi. Fokus penelitian ini performa jadwal lewat SPI dari laporan harian. Aspek biaya dan material
+           saya cantumkan di saran pengembangan, bukan di lingkup sekarang, supaya penelitian tetap terarah."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Kenapa hanya dua hak akses, tidak ada admin?</p>
+      <div class="a">
+        <p>Karena alur bisnis pelaporan harian hanya melibatkan dua aktor inti: teknisi sebagai sumber data lapangan, dan
+           manajer sebagai pengawas. Peran admin untuk data master memang disebut sebagai konsep, tetapi berada di luar
+           batasan use case penelitian ini.</p>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Hati-hati</span>
+        Jangan bilang "ada admin penuh". Di naskah, admin hanya disebut konseptual untuk data master, <strong>tidak</strong>
+        masuk ke enum peran maupun diagram use case. Cukup: dua peran inti, admin di luar lingkup.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== D. METODE ===================== -->
+<section id="metode">
+  <div class="sec-card">
+    <h2><span class="num">D</span> Metodologi</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa metode penelitian dan apa metode pengembangan Anda? (sering tertukar)</p>
+      <div class="a">
+        <p>Dua hal berbeda, jangan dibalik:</p>
+        <ul>
+          <li><strong>Metode penelitian</strong> = pendekatan studinya: <strong>studi kasus</strong> di PT SHI (penelitian pengembangan / terapan). Data dikumpulkan lewat observasi, wawancara, dan studi pustaka.</li>
+          <li><strong>Metode pengembangan sistem</strong> = cara membangun sistemnya: <strong>SDLC (System Development Life Cycle) model Waterfall</strong>, lima tahap berurutan.</li>
+        </ul>
+        <p>Singkatnya: studi kasus itu <em>pendekatan penelitiannya</em>, Waterfall itu <em>model pengembangan sistemnya</em>.
+           Dua lapisan berbeda, bukan saling menggantikan.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Metode penelitian saya studi kasus di PT SHI, dengan data dari observasi dan wawancara. Untuk membangun sistemnya,
+           metode pengembangan yang saya pakai SDLC model Waterfall. Jadi studi kasus itu pendekatan penelitiannya, Waterfall itu
+           model pengembangan sistemnya."</p>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Jangan salah term</span>
+        "Studi kasus" itu <strong>metode penelitian</strong>; "Waterfall" itu <strong>metode pengembangan</strong>. Beda lapisan.
+        Di BAB III (Metode Penelitian) Anda menjabarkan kerangka pengembangannya yaitu SDLC Waterfall &mdash; jadi kalau penguji
+        menunjuk ke situ, jawab: konteks penelitiannya studi kasus, model pengembangannya Waterfall.
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Jelaskan lima tahap Waterfall yang Anda lalui.</p>
+      <div class="a">
+        <p>Saya memakai <strong>SDLC model Waterfall</strong>, lima tahap berurutan:</p>
+        <ol>
+          <li><strong>Analisa Kebutuhan</strong> &mdash; observasi + wawancara dengan PT SHI, merumuskan aliran data laporan harian.</li>
+          <li><strong>Pemodelan (Desain)</strong> &mdash; ERD untuk basis data, UML untuk logika/alur, wireframe untuk antarmuka.</li>
+          <li><strong>Implementasi</strong> &mdash; konstruksi kode dengan Next.js + algoritma kalkulasi SPI dan status kesehatan.</li>
+          <li><strong>Pengujian</strong> &mdash; Black Box, fokus pada keakuratan integrasi data laporan harian menjadi indikator.</li>
+          <li><strong>Pemeliharaan</strong> &mdash; evaluasi pasca-implementasi dan perbaikan minor.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="qa trap">
+      <p class="q"><span class="qn">T</span> Kenapa pakai SDLC Waterfall, bukan TOGAF? <span class="tag-trap">JEBAKAN</span></p>
+      <div class="a">
+        <p>Kuncinya: keduanya beda ranah, bukan sekadar beda pilihan model.</p>
+        <ul>
+          <li><strong>SDLC Waterfall</strong> = metode <strong>pengembangan perangkat lunak</strong> &mdash; langkah membangun satu sistem/aplikasi, dari analisis kebutuhan sampai pemeliharaan.</li>
+          <li><strong>TOGAF</strong> = kerangka <strong>arsitektur enterprise</strong> (lewat siklus ADM) &mdash; untuk merancang dan menyelaraskan keseluruhan arsitektur TI sebuah organisasi dengan strategi bisnisnya.</li>
+        </ul>
+        <p>Penelitian ini mengembangkan <strong>satu fitur</strong> (dashboard) pada sistem yang sudah berjalan di PT SHI &mdash;
+           ini pekerjaan pengembangan perangkat lunak, bukan perancangan arsitektur TI seluruh perusahaan. Jadi SDLC Waterfall yang
+           relevan; TOGAF terlalu luas (over-scoped) untuk lingkup satu fitur. Di antara model SDLC sendiri, Waterfall dipilih
+           karena kebutuhan sudah jelas dan stabil dari wawancara, lingkup tunggal, dan alur linier menjamin integrasi data laporan
+           harian matang per tahap sebelum dikalkulasi jadi indikator.</p>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Jangan salah term</span>
+        TOGAF itu <strong>kerangka arsitektur enterprise</strong>, bukan model SDLC. Waterfall itu <strong>model pengembangan</strong>
+        di dalam SDLC. Beda kategori &mdash; jangan menyebut keduanya "sama-sama metode pengembangan sistem".
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"TOGAF itu kerangka arsitektur enterprise untuk menata keseluruhan TI sebuah organisasi, sedangkan penelitian saya
+           mengembangkan satu fitur dashboard pada sistem yang sudah ada. Jadi yang relevan metode pengembangan perangkat lunak,
+           yaitu SDLC model Waterfall. TOGAF terlalu luas untuk lingkup satu fitur."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Bagaimana Anda mengumpulkan data dan kebutuhan?</p>
+      <div class="a">
+        <p>Lewat <strong>observasi</strong> proses berjalan di PT SHI dan <strong>wawancara</strong> dengan pihak perusahaan
+           pada tahap analisa kebutuhan, dilengkapi <strong>studi pustaka</strong> dari tujuh penelitian terdahulu sebagai pembanding pendekatan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== E. TEORI ===================== -->
+<section id="teori">
+  <div class="sec-card">
+    <h2><span class="num">E</span> Landasan teori &amp; metrik</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa itu SPI dan bagaimana rumusnya?</p>
+      <div class="a">
+        <p><strong>SPI (Schedule Performance Index)</strong> adalah indikator efisiensi waktu pelaksanaan proyek dari
+           Earned Value Management. Rumusnya:</p>
+        <p style="text-align:center"><code class="inl">SPI = Earned Value (EV) / Planned Value (PV)</code></p>
+        <ul>
+          <li><code class="inl">SPI = 1</code> &rarr; tepat jadwal.</li>
+          <li><code class="inl">SPI &gt; 1</code> &rarr; lebih cepat dari rencana.</li>
+          <li><code class="inl">SPI &lt; 1</code> &rarr; terlambat &rarr; memicu peringatan dini.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa itu EV dan PV?</p>
+      <div class="a">
+        <p><strong>PV (Planned Value)</strong> = bobot pekerjaan yang seharusnya selesai pada titik waktu pemantauan,
+           dari jadwal awal: <code class="inl">PV = (hari berjalan / total durasi proyek) x 100%</code>.</p>
+        <p><strong>EV (Earned Value)</strong> = bobot pekerjaan yang faktual sudah selesai di lapangan, diakumulasi otomatis
+           dari tugas yang sudah disetujui selesai.</p>
+        <p>SPI membandingkan keduanya: realisasi (EV) versus rencana (PV).</p>
+      </div>
+    </div>
+
+    <div class="qa trap">
+      <p class="q"><span class="qn">T</span> EV Anda dari mana &mdash; persentase yang diketik teknisi, atau dari tugas? <span class="tag-trap">JEBAKAN</span></p>
+      <div class="a">
+        <p>Ini titik paling penting untuk dijawab konsisten. Jawab: <strong>EV dihitung otomatis dari bobot tugas yang sudah
+           disetujui selesai oleh manajer</strong> (lewat review gate), bukan dari angka persentase yang diketik bebas. Laporan
+           harian teknisi berisi progres tugas dan catatan kendala kualitatif. Pendekatan berbasis tugas ini lebih objektif
+           karena menghindari bias laporan diri.</p>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Kenapa ini jebakan</span>
+        Di satu bagian naskah tertulis teknisi "menginput persentase progres". Tapi metode <code class="inl">computeEarnedValue</code>
+        di kelas Kesehatan menyatakan EV dihitung "berdasarkan tugas yang telah selesai". Yang Anda demokan adalah versi
+        <strong>berbasis tugas</strong>. Pertahankan versi itu &mdash; lebih objektif dan konsisten dengan demo. Jangan
+        mengaku EV dari persen ketik manual.
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"EV dihitung sistem dari bobot tugas yang sudah diverifikasi selesai oleh manajer, bukan dari persen yang diketik teknisi.
+           Laporan harian berisi progres dan catatan kendala. Saya pilih berbasis tugas supaya nilainya objektif dan tidak bergantung
+           penilaian subjektif teknisi."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Indikator warna RAG: ambang 0,95 dan 0,85 dari mana?</p>
+      <div class="a">
+        <p>Ambang itu adalah pita toleransi terhadap nilai SPI ideal (= 1):</p>
+        <div class="tw"><table>
+          <tr><th>Warna</th><th>SPI</th><th>Arti</th></tr>
+          <tr><td><span class="rag g">Hijau</span></td><td class="mono">&ge; 0,95</td><td>on track (deviasi &lt; 5%)</td></tr>
+          <tr><td><span class="rag a">Kuning</span></td><td class="mono">0,85 &ndash; 0,95</td><td>perlu perhatian (deviasi 5&ndash;15%)</td></tr>
+          <tr><td><span class="rag r">Merah</span></td><td class="mono">&lt; 0,85</td><td>kritis, tertinggal jadwal</td></tr>
+        </table></div>
+        <p>Pita ini adalah konvensi toleransi yang umum dipakai pada pemantauan proyek: deviasi di bawah 5% dianggap aman,
+           5&ndash;15% mulai diwaspadai, di atas 15% kritis. Nilainya bisa dikonfigurasi sesuai kebijakan perusahaan.</p>
+      </div>
+      <div class="box tip">
+        <span class="lbl">Aman</span>
+        Kalau ditekan "kenapa bukan angka lain", jawab jujur: ini ambang toleransi praktis dan bisa disesuaikan kebijakan PT SHI;
+        yang dijaga adalah konsistensinya, bukan angka mutlaknya.
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> PV = hari berjalan / total durasi. Bukankah itu mengasumsikan progres linier?</p>
+      <div class="a">
+        <p>Benar. Itu asumsi <strong>baseline linier</strong> &mdash; bobot kerja dianggap terdistribusi merata sepanjang durasi.
+           Ini penyederhanaan yang lazim dipakai untuk garis dasar jadwal di EVM. Untuk lebih presisi, baseline bisa diperhalus
+           dengan bobot per tugas, dan itu masuk ke ruang pengembangan lanjut.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Betul, PV memakai asumsi progres linier sebagai baseline jadwal, yang umum di EVM. Untuk versi lanjut bisa diperhalus
+           dengan pembobotan per tugas. Untuk lingkup penelitian ini, baseline linier sudah cukup menggambarkan rencana ideal."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa itu EWS dan bagaimana ia memicu peringatan?</p>
+      <div class="a">
+        <p><strong>EWS (Early Warning System)</strong> memproses progres aktual terkomputasi menjadi indikator peringatan otomatis
+           berbasis SPI. Pemicunya <code class="inl">SPI &lt; 1</code>: proyek diberi warna kuning atau merah, lalu proyek paling
+           kritis otomatis diurutkan ke atas dashboard supaya manajer langsung melihat prioritas penanganan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== F. PERANCANGAN ===================== -->
+<section id="rancang">
+  <div class="sec-card">
+    <h2><span class="num">F</span> Perancangan sistem</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Diagram apa saja yang Anda buat?</p>
+      <div class="a">
+        <p>Flowchart sistem berjalan dan sistem diusulkan; Use Case Diagram (dua aktor: Teknisi, Manajer); Class Diagram;
+           ERD dan diagram relasi tabel; serta Activity Diagram dan Sequence Diagram untuk alur-alur utama (login, review gate,
+           EWS, eskalasi, dan lainnya).</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Jelaskan model data Anda &mdash; ada berapa tabel?</p>
+      <div class="a">
+        <p>Ada <strong>8 kelas</strong> pada class diagram dan <strong>7 tabel fisik</strong> pada basis data:</p>
+        <p class="tw" style="font-family:var(--mono);font-size:13px">tb_user, tb_klien, tb_proyek, tb_penugasan_proyek, tb_tugas, tb_bukti, tb_eskalasi</p>
+        <p>Relasi inti: satu klien punya banyak proyek; satu proyek punya banyak tugas; satu tugas punya banyak bukti dan
+           bisa memunculkan eskalasi; user dan proyek berelasi M:N lewat tabel penugasan.</p>
+      </div>
+    </div>
+
+    <div class="qa trap">
+      <p class="q"><span class="qn">T</span> Kenapa kelasnya 8 tapi tabel fisik cuma 7? <span class="tag-trap">JEBAKAN</span></p>
+      <div class="a">
+        <p>Karena kelas kedelapan, <strong>Kesehatan Proyek</strong>, adalah kelas <strong>komputasi</strong>, bukan entitas yang
+           perlu tabel sendiri. Nilainya (SPI, status warna) dihitung dari data tugas dan jadwal yang sudah ada di tabel lain.
+           Saya pisahkan jadi kelas tersendiri agar logika EWS tidak membebani kelas Proyek, tapi secara fisik ia tidak menyimpan
+           data permanen sendiri.</p>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Hati-hati</span>
+        Penguji yang teliti bisa menghitung selisih 8 vs 7. Jawaban aman: kelas Kesehatan = kelas turunan/komputasi (hasil hitung
+        dari tabel lain), jadi tidak punya tabel fisik. Bukan tabel yang "lupa dibuat".
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Kelas kedelapan, Kesehatan Proyek, adalah kelas komputasi. Ia menghitung SPI dan status warna dari data tugas dan jadwal
+           yang sudah tersimpan di tabel lain, jadi tidak butuh tabel fisik sendiri. Saya pisahkan supaya logika perhitungan EWS rapi,
+           terlepas dari kelas Proyek."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== G. TEKNOLOGI ===================== -->
+<section id="tech">
+  <div class="sec-card">
+    <h2><span class="num">G</span> Implementasi &amp; teknologi</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Teknologi apa yang Anda pakai?</p>
+      <div class="a">
+        <p>Antarmuka web dengan <strong>Next.js</strong> (berbasis React), basis data <strong>PostgreSQL</strong>, dan unggahan
+           bukti disimpan di penyimpanan lokal server. Algoritma kalkulasi SPI dan status kesehatan dijalankan di sisi server.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Kenapa memilih Next.js?</p>
+      <div class="a">
+        <p>Next.js mendukung <strong>Server-Side Rendering</strong> sehingga halaman dashboard yang berat data dapat dirender
+           efisien dan responsif. Ia berbasis React jadi antarmukanya dinamis, dan satu framework menangani sisi tampilan
+           sekaligus logika data, menyederhanakan pengembangan fitur dashboard.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Saya pilih Next.js karena Server-Side Rendering-nya membuat dashboard yang padat data terasa cepat dan responsif,
+           berbasis React untuk antarmuka dinamis, dan satu framework menangani tampilan dan data sekaligus."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Kenapa PostgreSQL, bukan MySQL atau yang lain?</p>
+      <div class="a">
+        <p>Karena PostgreSQL relasional, kuat menjaga integritas data lewat foreign key dan tipe data yang ketat &mdash; penting
+           untuk model data berelasi seperti proyek, tugas, bukti, dan eskalasi. Ia juga andal untuk query agregasi yang dipakai
+           dashboard.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Bagaimana keamanan akses (RBAC) diterapkan?</p>
+      <div class="a">
+        <p>Setiap pengguna punya peran (teknisi atau manajer) yang dicek di sisi server pada setiap permintaan. Teknisi hanya
+           bisa mengakses halaman dan aksi miliknya; akses ke dashboard manajer diblokir. Ini sudah diuji: teknisi yang mencoba
+           membuka dashboard manajer lewat URL langsung ditolak (TC-AUTH-03 valid).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== H. FITUR INTI ===================== -->
+<section id="fitur">
+  <div class="sec-card">
+    <h2><span class="num">H</span> Fitur inti</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Kenapa teknisi tidak boleh menandai tugas "Selesai" sendiri?</p>
+      <div class="a">
+        <p>Ini mekanisme <strong>review gate</strong>: pemisahan antara pelaksana dan peninjau. Teknisi mengerjakan dan mengunggah
+           bukti, lalu manajer memverifikasi bukti sebelum menyetujui status "Selesai". Tujuannya menjaga objektivitas data &mdash;
+           penyelesaian harus diverifikasi, bukan diklaim sepihak. Persetujuan inilah yang memicu perhitungan ulang SPI.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Karena saya pisahkan peran pelaksana dan peninjau. Teknisi mengunggah bukti, manajer yang memverifikasi lalu menyetujui
+           selesai. Ini menjaga data tetap objektif; status selesai tidak bisa diklaim sepihak. Persetujuan itu yang memicu update SPI."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa itu fase survei lalu eksekusi?</p>
+      <div class="a">
+        <p>Proyek dimulai pada fase <strong>survei</strong>; teknisi hanya mengerjakan tugas survei lebih dulu. Setelah survei
+           selesai dan manajer menyetujuinya, proyek pindah ke fase <strong>eksekusi</strong>. Ini mencerminkan alur kerja nyata
+           PT SHI: survei lokasi dulu sebelum instalasi.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa fitur eskalasi dan kenapa ada?</p>
+      <div class="a">
+        <p>Eskalasi adalah jalur resmi bagi teknisi melaporkan kendala lapangan dengan prioritas (rendah/sedang/tinggi).
+           Tiket muncul di dashboard manajer, manajer mengirim instruksi penanganan, lalu tiket ditandai ditangani. Konsep ini
+           terinspirasi indeks keterlambatan manajemen vs produksi (MDI/PDI) dari Luthan dkk. (2023) &mdash; memisahkan kendala
+           yang butuh keputusan manajemen dari kendala teknis lapangan.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Bagaimana dashboard menentukan urutan proyek?</p>
+      <div class="a">
+        <p>Dengan <strong>pengurutan berdasarkan kekritisan</strong>: proyek merah (kritis) di atas, lalu kuning, lalu hijau.
+           Jadi yang paling butuh perhatian selalu terlihat lebih dulu tanpa manajer perlu mencari.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Status "Overtime" dan "Over Deadline" itu diisi manual?</p>
+      <div class="a">
+        <p>Bukan. Keduanya <strong>dihitung otomatis</strong> dari perbandingan tanggal: tugas yang sedang dikerjakan tapi lewat
+           tenggat = Overtime; tugas yang masih "to do" tapi lewat tenggat = Over Deadline. Status objektif seperti ini lebih
+           andal daripada status manual seperti "macet" yang bergantung laporan diri. Di basis data status tugas tetap tiga
+           (to do, sedang dikerjakan, selesai); dua status itu hanya tampilan terhitung.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== I. PENGUJIAN ===================== -->
+<section id="uji">
+  <div class="sec-card">
+    <h2><span class="num">I</span> Pengujian</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Metode pengujian apa? Kenapa Black Box, bukan White Box?</p>
+      <div class="a">
+        <p><strong>Black Box testing</strong>: menguji kesesuaian input&ndash;output dari sudut pandang pengguna tanpa melihat
+           struktur kode internal. Sesuai dengan tujuan saya, yaitu memvalidasi <strong>fungsi</strong> fitur dari perspektif
+           manajer dan teknisi &mdash; apakah laporan harian benar berubah menjadi indikator yang tepat. White Box lebih cocok
+           untuk pengujian struktur kode, yang di luar fokus penelitian ini.</p>
+      </div>
+    </div>
+
+    <div class="qa trap">
+      <p class="q"><span class="qn">T</span> Hasilnya 83,33% &mdash; ada 3 yang gagal. Berarti sistem belum layak? <span class="tag-trap">JEBAKAN</span></p>
+      <div class="a">
+        <p>Justru sebaliknya, ini menunjukkan pengujian yang jujur dan menyeluruh. Dari 18 skenario, <strong>15 valid</strong>.
+           Tiga yang gagal adalah <strong>bug minor non-blokir</strong>, bukan kegagalan fungsi inti. Semua fungsi utama
+           &mdash; hitung EV otomatis, hitung SPI, render warna RAG, pengurutan kritis, dan review gate &mdash; <strong>valid</strong>.
+           Ketiga temuan sudah saya dokumentasikan dan masuk ke saran perbaikan.</p>
+        <div class="tw"><table>
+          <tr><th>Kode</th><th>Temuan</th><th>Sifat</th></tr>
+          <tr><td class="mono">TC-MN-04</td><td>Indikator EWS belum update otomatis, perlu refresh</td><td>UX, minor</td></tr>
+          <tr><td class="mono">TC-TK-03</td><td>Validasi tipe file unggahan belum ketat</td><td>Keamanan, minor</td></tr>
+          <tr><td class="mono">TC-TK-06</td><td>Klik ganda bisa membuat laporan duplikat</td><td>Idempotency, minor</td></tr>
+        </table></div>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Dari 18 skenario, 15 valid. Tiga yang gagal adalah bug minor di sisi pengalaman pengguna dan validasi, bukan di fungsi
+           inti. Perhitungan SPI, warna RAG, pengurutan kritis, dan review gate semua valid. Ketiganya sudah saya dokumentasikan
+           sebagai temuan dan masuk ke saran perbaikan &mdash; ini bagian dari pengujian yang jujur."</p>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Jangan</span>
+        Jangan menyembunyikan atau menyepelekan ketiga temuan secara berlebihan. Akui apa adanya, lalu tegaskan fungsi inti aman.
+        Mengaku jujur jauh lebih kuat di mata penguji daripada berkelit.
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Jelaskan kenapa EWS belum real-time (TC-MN-04).</p>
+      <div class="a">
+        <p>Setelah manajer menyetujui tugas selesai, nilai SPI dan warna sudah dihitung ulang di server, tapi tampilan dashboard
+           belum otomatis menarik data terbaru &mdash; perlu refresh halaman. Penyebabnya cache data di sisi tampilan belum
+           di-invalidasi otomatis setelah persetujuan. Solusinya menambahkan invalidasi/refresh data setelah aksi review gate,
+           dan ini sudah saya identifikasi.</p>
+      </div>
+      <div class="box tip">
+        <span class="lbl">Saat demo</span>
+        Setelah menandai tugas selesai, <strong>refresh halaman</strong> sebelum menunjukkan perubahan warna. Jangan menjanjikan
+        "berubah seketika tanpa refresh" &mdash; itu yang tercatat belum jalan.
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Sistem menerima file .exe (TC-TK-03). Bukankah ini lubang keamanan?</p>
+      <div class="a">
+        <p>Betul, itu temuan yang saya catat. Saat ini validasi tipe file unggahan belum ketat, sehingga ekstensi yang tidak
+           seharusnya bisa lolos. Perbaikannya: membatasi unggahan hanya pada gambar dan dokumen dengan daftar putih ekstensi
+           dan pemeriksaan tipe file di sisi server. Ini sudah masuk daftar perbaikan.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Ya, itu temuan jujur dari pengujian. Validasi tipe file saya belum ketat. Perbaikannya membatasi unggahan ke gambar
+           dan dokumen lewat daftar putih dan pengecekan di server. Sudah saya catat sebagai perbaikan prioritas."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Kenapa bisa terjadi laporan ganda saat klik cepat (TC-TK-06)?</p>
+      <div class="a">
+        <p>Karena tombol kirim belum dinonaktifkan setelah klik pertama, jadi pada koneksi lambat klik berulang diproses sebagai
+           beberapa permintaan terpisah. Solusinya menonaktifkan tombol setelah klik pertama dan menambah penjagaan idempotency
+           di sisi server agar permintaan ganda dianggap satu.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== J. KEBARUAN ===================== -->
+<section id="baru">
+  <div class="sec-card">
+    <h2><span class="num">J</span> Kontribusi &amp; kebaruan</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa kebaruan penelitian Anda dibanding penelitian terdahulu?</p>
+      <div class="a">
+        <p>Gabungan tiga hal dalam satu sistem terintegrasi: (1) <strong>akses langsung teknisi</strong> untuk lapor harian
+           (memangkas perantara manual); (2) <strong>EWS otomatis berbasis SPI</strong> langsung dari data laporan harian; dan
+           (3) <strong>pengurutan proyek berdasarkan kekritisan</strong> &mdash; semuanya dalam konteks perusahaan
+           <strong>Smart Home / IoT</strong>, bukan konstruksi seperti kebanyakan penelitian sebelumnya.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Azkia dan Hakim sudah membuat dashboard juga. Apa bedanya?</p>
+      <div class="a">
+        <p>Azkia dkk. (2024) memakai EVM tapi di atas Google Looker Studio dan Spreadsheet &mdash; masih bergantung input manual
+           terpisah. Hakim (2025) membuat dashboard dan report tapi tanpa peringatan dini terukur. Sistem saya
+           <strong>terintegrasi penuh</strong> dalam satu aplikasi: teknisi input langsung, EV dihitung otomatis dari tugas
+           tervalidasi, dan EWS plus pengurutan kritis berjalan otomatis tanpa olah data manual di luar sistem.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Penelitian terdahulu kebanyakan masih bertumpu pada alat terpisah seperti Spreadsheet atau Looker, atau dashboard tanpa
+           peringatan dini terukur. Sistem saya menyatukannya: input langsung dari teknisi, EV otomatis dari tugas yang diverifikasi,
+           dan peringatan dini berbasis SPI dengan pengurutan kritis, dalam konteks Smart Home dan IoT."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== K. KETERBATASAN ===================== -->
+<section id="batasdiri">
+  <div class="sec-card">
+    <h2><span class="num">K</span> Keterbatasan &amp; pengembangan</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa keterbatasan sistem Anda?</p>
+      <div class="a">
+        <p>Penilaian terbatas pada metrik SPI (jadwal), belum mencakup biaya. Baseline PV memakai asumsi linier. Tiga temuan
+           uji (refresh EWS, validasi file, klik ganda) masih perlu perbaikan. Sistem juga belum menyertakan notifikasi otomatis
+           dan aplikasi mobile untuk teknisi.</p>
+      </div>
+      <div class="box tip">
+        <span class="lbl">Aman</span>
+        Menjawab keterbatasan dengan tenang dan lengkap justru memberi kesan menguasai. Tutup dengan: "semua ini sudah saya
+        petakan di saran pengembangan."
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Apa rencana pengembangan ke depan?</p>
+      <div class="a">
+        <p>Tiga hal sesuai saran di naskah: <strong>aplikasi mobile</strong> untuk teknisi di lapangan, <strong>notifikasi
+           otomatis</strong> saat proyek masuk status kritis, dan <strong>integrasi aspek biaya</strong> proyek (CPI di samping SPI).
+           Ditambah perbaikan tiga temuan uji.</p>
+      </div>
+    </div>
+
+    <div class="qa trap">
+      <p class="q"><span class="qn">T</span> Apakah sistem ini sudah dipakai PT SHI / sudah diuji untuk 100+ proyek? <span class="tag-trap">JEBAKAN</span></p>
+      <div class="a">
+        <p>Jujur saja: sistem ini adalah <strong>purwarupa fungsional</strong> hasil penelitian yang sudah diuji Black Box dengan
+           data uji representatif. Tahap pemeliharaan/operasional langsung di PT SHI adalah bagian dari rencana lanjut. Soal skala,
+           desainnya mendukung banyak proyek (agregasi dan pengurutan di sisi server, basis data relasional ber-index), tetapi
+           <strong>uji beban formal untuk ratusan proyek belum dilakukan</strong>.</p>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Jangan over-claim</span>
+        Jangan bilang "sudah dipakai penuh di PT SHI" atau "sudah teruji 100+ proyek" kalau memang belum. Akui statusnya purwarupa
+        dan uji beban belum dilakukan. Klaim berlebih mudah dipatahkan satu pertanyaan lanjutan.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== L. JEBAKAN ===================== -->
+<section id="jebakan">
+  <div class="sec-card">
+    <h2><span class="num">L</span> Menghadapi pertanyaan jebakan</h2>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Penguji menemukan dua bagian naskah yang tampak bertentangan. Bagaimana?</p>
+      <div class="a">
+        <p>Tetap tenang. Jelaskan mana yang merupakan <strong>desain final yang Anda implementasikan</strong> (yang Anda demokan),
+           dan akui bila ada bagian teks yang perlu diselaraskan. Contoh tersering: teks "teknisi input persentase" versus EV
+           berbasis tugas. Jawab: "Desain final saya menghitung EV dari tugas yang diverifikasi; bagian teks yang menyebut input
+           persentase akan saya selaraskan." Mengakui dan menunjuk versi final lebih kuat daripada memaksakan dua hal yang bertabrakan.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Terima kasih koreksinya. Yang saya implementasikan dan uji adalah versi berbasis tugas; bagian penulisan yang berbeda
+           akan saya selaraskan dengan implementasi final. Terima kasih, saya catat."</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <p class="q"><span class="qn">T</span> Penguji menanyakan sesuatu yang benar-benar tidak Anda kuasai.</p>
+      <div class="a">
+        <p>Jangan mengarang. Akui terus tawarkan arah. Kalau masih bisa dikaitkan ke lingkup, kembalikan ke batasan masalah.</p>
+      </div>
+      <div class="box say">
+        <span class="lbl">Boleh diucapkan</span>
+        <p>"Untuk yang itu sejujurnya belum saya dalami, Pak/Bu. Akan saya pelajari lebih lanjut. Sejauh ini fokus penelitian saya
+           ada pada [tujuan/batasan], jadi hal tersebut berada di luar lingkup yang saya kerjakan."</p>
+      </div>
+    </div>
+
+    <div class="box note">
+      <span class="lbl">Penutup &mdash; ingat ini saja kalau panik</span>
+      Tiga kalimat penyelamat: <strong>(1)</strong> "Fokus penelitian ini adalah dashboard kesehatan proyek dari laporan harian
+      memakai SPI." <strong>(2)</strong> "EV dihitung otomatis dari tugas yang diverifikasi manajer." <strong>(3)</strong>
+      "Tiga temuan uji sudah saya dokumentasikan dan masuk saran perbaikan." Tarik napas, jawab pelan, berhenti.
+    </div>
+  </div>
+</section>
+
+<footer>
+  Bahan latihan sidang internal &middot; selaras naskah TA Final &amp; demo <code class="inl">frontend/</code> &middot;
+  bukan dokumen yang diserahkan ke penguji.
+</footer>
+
+</div>
+
+<button id="practice" type="button">Mode Latihan: sembunyikan jawaban</button>
+
+<script>
+(function(){
+  var btn = document.getElementById('practice');
+  btn.addEventListener('click', function(){
+    var on = document.body.classList.toggle('quiz');
+    btn.textContent = on ? 'Mode Latihan: AKTIF (klik untuk tampilkan semua)' : 'Mode Latihan: sembunyikan jawaban';
+    if(!on){ // reveal all when leaving practice mode
+      var shown = document.querySelectorAll('.qa.show');
+      for(var i=0;i<shown.length;i++) shown[i].classList.remove('show');
+    }
+  });
+  // in practice mode, click a question card to reveal just that one
+  var cards = document.querySelectorAll('.qa');
+  for(var i=0;i<cards.length;i++){
+    cards[i].addEventListener('click', function(){
+      if(document.body.classList.contains('quiz')) this.classList.toggle('show');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

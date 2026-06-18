@@ -1,0 +1,12 @@
+[
+  {
+    "kind": "console:error",
+    "url": "http://localhost:3100/projects/1",
+    "text": "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  },
+  {
+    "kind": "reqfail",
+    "url": "http://localhost:3100/my-dashboard?_rsc=utQopaZyVbfSG9h2",
+    "text": "net::ERR_ABORTED"
+  }
+]

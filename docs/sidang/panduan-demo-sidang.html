@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan Demo Sidang - Dashboard SHI</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --ink:#1b2330; --muted:#5c6675;
+    --line:#e4e8ee; --line2:#eef1f5;
+    --accent:#2563eb; --accent-soft:#eaf1ff;
+    --you:#b45309; --you-soft:#fff7ed;
+    --green:#15803d; --green-soft:#e8f6ec;
+    --amber:#b45309; --amber-soft:#fdf3e3;
+    --red:#c0241c; --red-soft:#fdeceb;
+    --purple:#7c3aed; --purple-soft:#f3ecff;
+    --codebg:#f3f5f8; --codeink:#243;
+    --mono:ui-monospace,"Cascadia Code","Consolas",monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+       line-height:1.62;font-size:clamp(14.5px,1vw + 12px,16px);
+       -webkit-text-size-adjust:100%}
+  .wrap{width:100%;max-width:1080px;margin:0 auto;padding:0 clamp(13px,4vw,24px)}
+
+  /* ---- header ---- */
+  header.top{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;
+       padding:clamp(22px,4vw,34px) 0 clamp(20px,3vw,28px);box-shadow:0 2px 14px rgba(20,40,90,.18)}
+  header.top h1{margin:0 0 6px;font-size:clamp(20px,4.4vw,27px);letter-spacing:-.3px;line-height:1.18}
+  header.top p{margin:2px 0;opacity:.93;font-size:clamp(13px,2.4vw,15px)}
+  .pill-row{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+       padding:4px 11px;border-radius:30px;font-size:12.5px;font-weight:600}
+
+  /* ---- sticky nav (scrollable, never hidden) ---- */
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);
+       backdrop-filter:blur(6px);border-bottom:1px solid var(--line);
+       padding:8px 0;box-shadow:0 1px 8px rgba(0,0,0,.04)}
+  nav.toc .wrap{display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;
+       scrollbar-width:thin;-webkit-overflow-scrolling:touch;
+       scroll-snap-type:x proximity;mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}
+  nav.toc .wrap::-webkit-scrollbar{height:5px}
+  nav.toc .wrap::-webkit-scrollbar-thumb{background:#cbd5e6;border-radius:5px}
+  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;
+       padding:5px 10px;border-radius:7px;font-weight:600;white-space:nowrap;scroll-snap-align:start;flex:0 0 auto}
+  nav.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+
+  /* ---- sections ---- */
+  section{padding:clamp(20px,3vw,30px) 0 8px;scroll-margin-top:56px}
+  .sec-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+       padding:clamp(16px,3.2vw,28px);margin-bottom:20px;box-shadow:0 1px 3px rgba(20,40,90,.04)}
+  h2{font-size:clamp(18px,3.4vw,22px);margin:0 0 4px;letter-spacing:-.3px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+  h2 .num{background:var(--accent);color:#fff;width:34px;height:34px;border-radius:9px;
+       display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  h2 .sub{font-size:12px;font-weight:600;color:var(--muted);background:var(--line2);
+       padding:3px 9px;border-radius:6px}
+  h3{font-size:clamp(15px,2.6vw,17px);margin:22px 0 8px;color:#13203a}
+  h4{font-size:14px;margin:16px 0 6px;color:#33405a;text-transform:uppercase;letter-spacing:.4px}
+  p{margin:9px 0}
+  a{color:var(--accent)}
+  ul,ol{margin:9px 0;padding-left:22px}
+  li{margin:5px 0}
+  hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+
+  /* ---- callouts ---- */
+  .box{border-radius:11px;padding:13px 16px;margin:15px 0;border:1px solid;font-size:14.5px}
+  .box .lbl{font-weight:800;font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px}
+  .box.warn{background:var(--red-soft);border-color:#f3c9c5;color:#7c1812}
+  .box.warn .lbl{color:var(--red)}
+  .box.note{background:var(--accent-soft);border-color:#cfe0fb;color:#1c3a73}
+  .box.note .lbl{color:var(--accent)}
+  .box.tip{background:var(--green-soft);border-color:#c4e6cd;color:#15532c}
+  .box.tip .lbl{color:var(--green)}
+  .box.say{background:var(--you-soft);border-color:#fadcb6;color:#7a4708}
+  .box.say .lbl{color:var(--you)}
+  .box.say p{margin:6px 0;font-style:italic}
+
+  /* ---- step list ---- */
+  .steps{counter-reset:s;list-style:none;padding:0;margin:14px 0}
+  .steps>li{counter-increment:s;position:relative;padding:12px 14px 12px 50px;
+       margin:9px 0;background:#fbfcfe;border:1px solid var(--line);border-radius:10px}
+  .steps>li::before{content:counter(s);position:absolute;left:12px;top:11px;
+       background:var(--accent);color:#fff;width:26px;height:26px;border-radius:50%;
+       display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px}
+  .steps>li b{color:#13203a}
+
+  /* ---- code / command ---- */
+  code.inl{background:var(--codebg);border:1px solid var(--line);border-radius:5px;
+       padding:1.5px 6px;font-family:var(--mono);font-size:.86em;color:#0f3d2e;word-break:break-word}
+  .cmd{background:#0f1729;color:#e6edf7;border-radius:10px;padding:14px 16px;margin:12px 0;
+       font-family:var(--mono);font-size:clamp(12px,2.4vw,13.5px);overflow-x:auto;position:relative;line-height:1.7}
+  .cmd .c{color:#7d8aa3}.cmd .g{color:#7ee2a8}.cmd .y{color:#f5d987}
+  .cmd b.tag{display:inline-block;background:#27407a;color:#cfe0ff;font-family:var(--sans);
+       font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;margin-bottom:8px;letter-spacing:.5px}
+  pre.code{background:var(--codebg);border:1px solid var(--line);border-left:4px solid var(--accent);
+       border-radius:8px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);
+       font-size:clamp(11.5px,2.3vw,13px);line-height:1.62;color:#26303f;margin:10px 0;position:relative}
+  pre.code .cm{color:#8a93a3}pre.code .kw{color:#a4471f}pre.code .fn{color:#1d57c4}
+  .fileref{font-family:var(--mono);font-size:.82em;background:#11203f;color:#bcd2ff;
+       padding:2px 8px;border-radius:5px;font-weight:600;white-space:nowrap}
+
+  /* ---- copy affordances ---- */
+  .copybtn{position:absolute;top:8px;right:8px;z-index:2;background:#27407a;color:#dce8ff;
+       border:1px solid #3a5694;border-radius:7px;font-family:var(--sans);font-size:11px;font-weight:700;
+       padding:4px 10px;cursor:pointer;letter-spacing:.3px;opacity:.92;transition:.15s}
+  pre.code .copybtn{background:#e7edf6;color:#2a4575;border-color:#cdd8ea}
+  .copybtn:hover{opacity:1;transform:translateY(-1px)}
+  .copybtn.ok{background:#15803d!important;color:#fff!important;border-color:#15803d!important}
+  /* inline / cell copy targets */
+  .cp{cursor:copy;position:relative}
+  td.cp{transition:background .15s}
+  td.cp:hover{background:var(--accent-soft)}
+  td.cp::after{content:"salin";position:absolute;top:50%;right:8px;transform:translateY(-50%);
+       font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:.4px;color:var(--accent);
+       background:#fff;border:1px solid #cfe0fb;border-radius:20px;padding:1px 7px;opacity:0;transition:.15s;pointer-events:none}
+  td.cp:hover::after{opacity:1}
+  td.cp.ok{background:var(--green-soft)!important}
+  td.cp.ok::after{content:"tersalin";color:var(--green);border-color:#bfe3c9;opacity:1}
+  .chip{display:inline-flex;align-items:center;gap:7px;cursor:copy;background:#fbfcfe;border:1px solid #cfd9e8;
+       border-radius:9px;padding:7px 10px;margin:4px 6px 4px 0;font-family:var(--mono);font-size:12.5px;
+       color:#16263f;transition:.15s;max-width:100%}
+  .chip:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .chip .k{font-family:var(--sans);font-weight:700;color:var(--muted);font-size:11px;letter-spacing:.2px}
+  .chip .v{word-break:break-all}
+  .chip::after{content:"\29C9";color:var(--accent);font-size:13px;margin-left:2px}
+  .chip.ok{border-color:var(--green);background:var(--green-soft)}
+  .chip.ok::after{content:"\2713";color:var(--green)}
+
+  /* ---- tables ---- */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;border-radius:10px}
+  .tw table{margin:0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:clamp(13px,2.4vw,14px);background:#fff;
+       border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th{background:#f0f3f8;text-align:left;padding:9px 12px;font-size:12px;
+       text-transform:uppercase;letter-spacing:.4px;color:#3a4763;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.mono,th.mono{font-family:var(--mono);font-size:.92em}
+
+  /* ---- data card (copy-paste) ---- */
+  .dcard{background:#fbfcfe;border:1px dashed #c5d2e6;border-radius:11px;padding:8px 4px;margin:14px 0}
+  .dcard table{margin:0;border:0;background:transparent}
+  .dcard th{background:transparent;width:34%;color:#5c6675;font-weight:700;text-transform:none;
+       letter-spacing:0;font-size:13px;border-bottom:1px solid var(--line2)}
+  .dcard td{font-family:var(--mono);font-size:12.5px;color:#16263f;border-bottom:1px solid var(--line2);overflow-wrap:anywhere;word-break:break-word}
+
+  /* ---- RAG badges ---- */
+  .rag{display:inline-block;padding:2px 9px;border-radius:30px;font-size:11.5px;font-weight:800;letter-spacing:.3px;white-space:nowrap}
+  .rag.r{background:var(--red-soft);color:var(--red);border:1px solid #f0c4c0}
+  .rag.a{background:var(--amber-soft);color:var(--amber);border:1px solid #f0d9af}
+  .rag.g{background:var(--green-soft);color:var(--green);border:1px solid #bfe3c9}
+  .rag.s{background:var(--purple-soft);color:var(--purple);border:1px solid #ddc9f7}
+  .rag.n{background:#eef1f5;color:#5c6675;border:1px solid #dde3ec}
+
+  .kbd{font-family:var(--mono);background:#fff;border:1px solid #c7cfdb;border-bottom-width:2px;
+       border-radius:5px;padding:1px 7px;font-size:12.5px;font-weight:600;white-space:nowrap}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;
+       background:#fbfcfe;border:1px solid var(--line);border-radius:11px;padding:14px}
+  .flow .node{background:#fff;border:1px solid #cdd8ea;border-radius:9px;padding:8px 12px;
+       font-size:12.5px;font-weight:600;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.04);flex:1 1 130px;min-width:120px}
+  .flow .node small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+  .flow .arr{color:var(--accent);font-weight:800;font-size:18px;flex:0 0 auto}
+
+  /* ---- collapsible info ---- */
+  details.acc{background:#fbfcfe;border:1px solid var(--line);border-radius:11px;margin:12px 0;overflow:hidden}
+  details.acc>summary{cursor:pointer;list-style:none;padding:13px 16px;font-weight:700;color:#13203a;
+       display:flex;align-items:center;gap:10px;font-size:14.5px;user-select:none}
+  details.acc>summary::-webkit-details-marker{display:none}
+  details.acc>summary::before{content:"\25B8";color:var(--accent);font-size:13px;transition:.18s;flex:0 0 auto}
+  details.acc[open]>summary::before{transform:rotate(90deg)}
+  details.acc>summary:hover{background:var(--accent-soft)}
+  details.acc .body{padding:2px 16px 14px}
+
+  /* ---- checklist ---- */
+  .chk{list-style:none;padding:0;margin:12px 0}
+  .chk li{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);
+       border-radius:9px;margin:7px 0;background:#fff;cursor:pointer;transition:.12s;font-size:14px}
+  .chk li:hover{border-color:var(--accent)}
+  .chk li.done{background:var(--green-soft);border-color:#bfe3c9}
+  .chk .bx{flex:0 0 auto;width:20px;height:20px;border:2px solid #b9c4d6;border-radius:6px;margin-top:1px;
+       display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:800}
+  .chk li.done .bx{background:var(--green);border-color:var(--green)}
+  .chk li.done .tx{color:#15532c;text-decoration:line-through;text-decoration-color:#9ccfae}
+
+  /* ---- floating Data Cepat ---- */
+  #fab{position:fixed;right:clamp(14px,3vw,26px);bottom:clamp(14px,3vw,26px);z-index:80;
+       background:var(--accent);color:#fff;border:0;border-radius:30px;padding:13px 18px;font-family:var(--sans);
+       font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 6px 22px rgba(37,99,235,.42);display:flex;align-items:center;gap:8px}
+  #fab:hover{background:#1e54d4}
+  #fab .ic{font-size:16px}
+  #drawer{position:fixed;inset:0 0 0 auto;width:min(420px,100%);background:#fff;z-index:90;
+       transform:translateX(102%);transition:transform .26s cubic-bezier(.4,0,.2,1);
+       box-shadow:-8px 0 32px rgba(20,40,90,.22);display:flex;flex-direction:column}
+  #drawer.open{transform:translateX(0)}
+  #drawer .dh{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:16px 18px;
+       display:flex;align-items:center;justify-content:space-between;flex:0 0 auto}
+  #drawer .dh b{font-size:16px}#drawer .dh small{display:block;opacity:.9;font-size:12px;font-weight:400}
+  #drawer .dx{background:rgba(255,255,255,.18);border:0;color:#fff;width:32px;height:32px;border-radius:8px;font-size:18px;cursor:pointer}
+  #drawer .dbody{overflow-y:auto;padding:14px 16px 30px}
+  #drawer h5{margin:16px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);border-bottom:1px solid var(--line2);padding-bottom:4px}
+  #drawer h5:first-child{margin-top:2px}
+  #scrim{position:fixed;inset:0;background:rgba(13,17,23,.42);z-index:85;opacity:0;pointer-events:none;transition:.26s}
+  #scrim.open{opacity:1;pointer-events:auto}
+
+  /* ---- toast ---- */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,40px);z-index:120;
+       background:#0f1729;color:#fff;padding:11px 20px;border-radius:30px;font-size:13.5px;font-weight:600;
+       box-shadow:0 8px 28px rgba(0,0,0,.3);opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  #toast.bad{background:#7c1812}
+
+  footer{padding:30px 0 70px;color:var(--muted);font-size:13px;text-align:center}
+  .toplink{font-size:11.5px}
+
+  @media (max-width:540px){
+    .sec-card{padding:15px}
+    h2 .num{width:30px;height:30px;font-size:15px}
+    .steps>li{padding:11px 12px 11px 44px}
+    .steps>li::before{width:23px;height:23px;left:11px}
+    .flow .arr{display:none}
+    .flow .node{flex:1 1 100%}
+    .dcard th{width:42%}
+  }
+  @media print{
+    nav.toc,#fab,#drawer,#scrim,#toast,.copybtn,td.cp::after{display:none!important}
+    header.top{box-shadow:none}
+    .sec-card{break-inside:avoid;box-shadow:none;border-color:#ccc}
+    details.acc{break-inside:avoid}details.acc[open]>summary::before{content:""}
+    a{color:#1b2330;text-decoration:none}
+    body{font-size:11.5pt}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Panduan Demo Sidang &mdash; Dashboard SHI</h1>
+    <p>Dashboard Manajemen Proyek Berbasis Laporan Harian &middot; PT Smart Home Inovasi</p>
+    <p>Dian Putri Iswandi (5220311118) &middot; Universitas Teknologi Yogyakarta</p>
+    <div class="pill-row">
+      <span class="pill">Responsif (HP &amp; laptop)</span>
+      <span class="pill">Klik untuk menyalin</span>
+      <span class="pill">Untuk latihan / gladi bersih</span>
+      <span class="pill">Data sesuai naskah &amp; kode</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#cara">Cara Pakai</a>
+    <a href="#nyalakan">0. Nyalakan</a>
+    <a href="#data-isi">1. Data Form</a>
+    <a href="#info">Info Proyek</a>
+    <a href="#db">2. Cek Database</a>
+    <a href="#teknisi">3. Teknisi</a>
+    <a href="#rag">4. Perubahan RAG</a>
+    <a href="#ews">5. Cara Kerja EWS</a>
+    <a href="#code">6. Titik Code</a>
+    <a href="#techstack">Tech Stack</a>
+    <a href="#kenapa">7. Kenapa Begitu</a>
+    <a href="#tanya">8. Antisipasi</a>
+    <a href="#naskah">Naskah &amp; Uji</a>
+    <a href="#glosarium">Glosarium</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ CARA PAKAI ============ -->
+<section id="cara">
+  <div class="sec-card">
+    <h2><span class="num">i</span> Cara pakai panduan ini</h2>
+    <p>Halaman ini untuk <b>kamu yang tidak perlu paham coding</b>. Tugasmu: <b>baca dari atas ke bawah</b>,
+       <b>ikuti langkah satu per satu</b>. File ini <b>hanya untuk latihan / gladi bersih</b> &mdash; saat sidang
+       kamu bawa lembar <b>TXT</b> ringkas (cuma data isian form).</p>
+    <ul>
+      <li>Cukup <b>dobel-klik</b> file ini &rarr; kebuka di browser (Chrome / Edge). Tidak perlu install apa pun. Bisa dibuka di HP juga (tampilan ikut lebar layar).</li>
+      <li><b>Klik untuk menyalin:</b> tiap kotak yang ada tombol <span class="copybtn" style="position:static;display:inline-block">Salin</span> atau sel data ber-<span style="color:var(--accent);font-weight:700">tanda salin</span> &rarr; sekali klik, isinya langsung masuk clipboard. Tinggal <span class="kbd">Ctrl</span>+<span class="kbd">V</span> di form.</li>
+      <li>Tombol mengambang <b>biru "Data Cepat"</b> di pojok kanan bawah &rarr; semua data penting (akun, klien, proyek) dalam satu panel, siap salin saat latihan.</li>
+      <li>Kotak <span style="color:var(--you);font-weight:700">oranye "OMONGIN KE PENGUJI"</span> = kalimat yang bisa kamu ucapkan langsung.</li>
+      <li>Tanda <span class="rag r">MERAH</span> <span class="rag a">KUNING</span> <span class="rag g">HIJAU</span> = warna indikator kesehatan proyek (RAG).</li>
+    </ul>
+    <div class="box note">
+      <span class="lbl">Urutan demo yang disarankan saat sidang</span>
+      Bagian 0 (nyalakan) &rarr; Bagian 4 (dashboard + perubahan warna RAG, ini paling "wow") &rarr;
+      Bagian 3 (sisi teknisi) &rarr; Bagian 2 (buka database kalau diminta lihat data asli) &rarr;
+      Bagian 1 (kalau diminta buat data baru live). Bagian 5&ndash;8 + "Naskah &amp; Uji" untuk <b>menjawab pertanyaan</b>, bukan diklik.
+    </div>
+
+    <h3>Checklist gladi bersih (klik untuk centang &mdash; tersimpan otomatis)</h3>
+    <ul class="chk" id="gladi">
+      <li data-k="g1"><span class="bx">&#10003;</span><span class="tx">Docker Desktop nyala (status "Engine running" hijau)</span></li>
+      <li data-k="g2"><span class="bx">&#10003;</span><span class="tx">Jalankan <b>python run.py --new --reset-db</b> sampai muncul localhost:3000</span></li>
+      <li data-k="g3"><span class="bx">&#10003;</span><span class="tx">Buka <b>localhost:3000</b> di browser, halaman login muncul</span></li>
+      <li data-k="g4"><span class="bx">&#10003;</span><span class="tx">Login <b>Manajer</b> (admin@shi.co.id) di jendela biasa</span></li>
+      <li data-k="g5"><span class="bx">&#10003;</span><span class="tx">Login <b>Teknisi</b> (rizky@shi.co.id) di jendela Incognito</span></li>
+      <li data-k="g6"><span class="bx">&#10003;</span><span class="tx">Dashboard tampil: Villa Kaliurang <span class="rag r">MERAH</span> ada di urutan teratas</span></li>
+      <li data-k="g7"><span class="bx">&#10003;</span><span class="tx">Latihan: tandai 1 tugas "Selesai" &rarr; refresh &rarr; warna proyek berubah</span></li>
+      <li data-k="g8"><span class="bx">&#10003;</span><span class="tx">Latihan teknisi: geser tugas, upload bukti, tulis catatan kendala</span></li>
+      <li data-k="g9"><span class="bx">&#10003;</span><span class="tx">(Opsional) HeidiSQL connect ke port 5433, query jalan</span></li>
+      <li data-k="g10"><span class="bx">&#10003;</span><span class="tx">Baca rencana darurat (Bagian 8) sekali</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 0. NYALAKAN ============ -->
+<section id="nyalakan">
+  <div class="sec-card">
+    <h2><span class="num">0</span> Menyalakan aplikasi (WAJIB, pagi sidang) <span class="sub">paling penting</span></h2>
+
+    <div class="box warn">
+      <span class="lbl">Baca dulu - kondisi database</span>
+      Database <b>hidup &amp; bisa diakses</b>, tapi <b>perlu diisi ulang data demo</b> sebelum sidang (kondisi terakhir
+      sempat dikosongkan saat uji coba). Satu perintah di bawah memperbaiki ini sekaligus menyalakan aplikasi. 1&ndash;2 menit.
+    </div>
+
+    <h3>Langkah 0.1 &mdash; Nyalakan Docker Desktop</h3>
+    <ol class="steps">
+      <li>Buka <b>Docker Desktop</b> (ikon paus di Start). Tunggu status <b>"Engine running"</b> (lampu hijau pojok kiri bawah). Ini wadah tempat database hidup.</li>
+    </ol>
+
+    <h3>Langkah 0.2 &mdash; Buka terminal di folder proyek</h3>
+    <ol class="steps">
+      <li>Buka folder proyek di File Explorer, klik kanan di area kosong &rarr; <b>"Open in Terminal"</b> (atau buka terminal fish, masuk ke folder itu).</li>
+    </ol>
+    <div class="dcard"><table><tr><th>Folder proyek</th>
+      <td class="cp" data-copy="D:\__CODING\personal\_gf\irene\shi-crm">D:\__CODING\personal\_gf\irene\shi-crm</td></tr></table></div>
+
+    <h3>Langkah 0.3 &mdash; Jalankan aplikasi + isi ulang data demo</h3>
+    <p>Ketik / salin perintah ini lalu <span class="kbd">Enter</span>. Inilah <b>satu-satunya perintah yang kamu butuh</b>:</p>
+    <div class="cmd" data-cmd="python run.py --new --reset-db">
+      <b class="tag">KETIK INI DI TERMINAL</b><br>
+      python run.py <span class="y">--new</span> <span class="y">--reset-db</span>
+    </div>
+    <p>Arti tiap bagian (biar kalau ditanya kamu paham):</p>
+    <div class="tw"><table>
+      <tr><th style="width:32%">Bagian</th><th>Artinya</th></tr>
+      <tr><td class="mono">python run.py</td><td>Menyalakan aplikasi (database + website sekaligus).</td></tr>
+      <tr><td class="mono">--new</td><td>Pakai versi <b>sesuai naskah TA</b> (tabel Bahasa Indonesia, 2 peran). WAJIB ada.</td></tr>
+      <tr><td class="mono">--reset-db</td><td>Hapus data lama lalu <b>muat ulang data demo lengkap</b> dari skema (8 klien, 10 proyek, tugas, warna RAG, eskalasi). Ini yang mengisi database.</td></tr>
+    </table></div>
+    <div class="box note">
+      <span class="lbl">Yang akan kamu lihat di layar</span>
+      Tulisan berjalan: <code class="inl">[OK] PostgreSQL siap</code> &rarr; <code class="inl">Skema dimuat</code> &rarr;
+      <code class="inl">Backfill SPI</code> &rarr; <code class="inl">Next.js Dev Server</code> &rarr;
+      <code class="inl">localhost:3000</code>. <b>Jangan tutup terminalnya</b> selama sidang &mdash; itu "mesin"-nya.
+    </div>
+    <div class="box tip">
+      <span class="lbl">Kalau cuma mau menyalakan tanpa hapus data (sudah pernah isi)</span>
+      Pakai <code class="inl">python run.py --new</code> saja (tanpa <code class="inl">--reset-db</code>). Data tetap utuh.
+    </div>
+
+    <h3>Langkah 0.4 &mdash; Buka websitenya</h3>
+    <ol class="steps">
+      <li>Browser, ketik <code class="inl">localhost:3000</code> &rarr; <span class="kbd">Enter</span>.</li>
+      <li>Muncul <b>halaman login</b> (kolom Email + Password). Isi pakai akun di bawah, klik <b>Masuk</b>.</li>
+    </ol>
+
+    <h3>Langkah 0.5 &mdash; Akun untuk login</h3>
+    <p>Semua password sama: <code class="inl cp" data-copy="password123">password123</code> (klik untuk salin). Daftar lengkap 8 akun ada di <a href="#info">Info Proyek</a>.</p>
+    <div class="tw"><table>
+      <tr><th>Peran</th><th>Email (klik = salin)</th><th>Password</th><th>Dipakai untuk</th></tr>
+      <tr><td><b>Manajer</b></td><td class="cp mono" data-copy="admin@shi.co.id">admin@shi.co.id</td><td class="mono">password123</td><td>Dashboard, EWS, kelola proyek, tandai tugas "Selesai"</td></tr>
+      <tr><td><b>Manajer</b> (cadangan)</td><td class="cp mono" data-copy="budi@shi.co.id">budi@shi.co.id</td><td class="mono">password123</td><td>Sama seperti di atas</td></tr>
+      <tr><td><b>Teknisi</b></td><td class="cp mono" data-copy="rizky@shi.co.id">rizky@shi.co.id</td><td class="mono">password123</td><td>Sisi lapangan: kerjakan tugas, unggah bukti, catatan kendala</td></tr>
+      <tr><td><b>Teknisi</b> (cadangan)</td><td class="cp mono" data-copy="andi@shi.co.id">andi@shi.co.id</td><td class="mono">password123</td><td>Sama seperti di atas</td></tr>
+    </table></div>
+    <div class="box tip">
+      <span class="lbl">Tips sidang - dua jendela</span>
+      Buka <b>dua jendela browser</b>: satu login <b>Manajer</b> (admin@shi.co.id), satu <b>Incognito/Penyamaran</b>
+      login <b>Teknisi</b> (rizky@shi.co.id). Pindah peran cepat tanpa logout-login berulang.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 1. DATA FORM ============ -->
+<section id="data-isi">
+  <div class="sec-card">
+    <h2><span class="num">1</span> Data siap-isi untuk form <span class="sub">klik sel = salin</span></h2>
+    <p>Kalau penguji minta kamu <b>membuat data baru di depan mereka</b>, pakai data ini. Semua bernuansa Yogyakarta,
+       konsisten dengan data seed. Urutan logis: <b>Klien &rarr; Proyek &rarr; Tugas &rarr; Teknisi kerjakan</b>.
+       <b>Sel kuning bertanda "salin" tinggal diklik.</b></p>
+
+    <h3>1a. Form Klien baru</h3>
+    <p style="font-size:13.5px;color:var(--muted)">Jalur: login <b>Manajer</b> &rarr; menu <b>Klien</b> &rarr; tombol <b>"+ Tambah Klien"</b> &rarr; jendela form. Field persis ini (urut atas ke bawah):</p>
+    <div class="tw"><table>
+      <tr><th style="width:24%">Field (label di layar)</th><th style="width:12%">Wajib?</th><th>Isi dengan ini (klik = salin)</th></tr>
+      <tr><td><b>Nama</b></td><td><span class="rag r">WAJIB</span></td><td class="cp" data-copy="CV Sinar Abadi Teknik">CV Sinar Abadi Teknik</td></tr>
+      <tr><td><b>Email</b></td><td>opsional</td><td class="cp" data-copy="kontak@sinarabaditeknik.co.id">kontak@sinarabaditeknik.co.id</td></tr>
+      <tr><td><b>Telepon (WhatsApp)</b></td><td><span class="rag r">WAJIB</span></td><td class="cp" data-copy="081328845120">081328845120</td></tr>
+      <tr><td><b>Alamat</b></td><td>opsional</td><td class="cp" data-copy="Jl. Kaliurang Km 9, Sardonoharjo, Ngaglik, Sleman, Yogyakarta 55581">Jl. Kaliurang Km 9, Sardonoharjo, Ngaglik, Sleman, Yogyakarta 55581</td></tr>
+      <tr><td><b>Link Google Maps</b></td><td>opsional</td><td>tempel link di bawah &rarr; koordinat &amp; peta muncul otomatis</td></tr>
+      <tr><td><b>Catatan</b></td><td>opsional</td><td class="cp" data-copy="Klien baru bidang ritel. Pemasangan CCTV + smart lock untuk 2 toko.">Klien baru bidang ritel. Pemasangan CCTV + smart lock untuk 2 toko.</td></tr>
+    </table></div>
+    <div class="box warn">
+      <span class="lbl">2 field WAJIB - tombol Simpan mati kalau belum diisi</span>
+      <b>Nama</b> dan <b>Telepon (WhatsApp)</b> dua-duanya harus diisi. Kalau salah satu kosong, tombol
+      <b>"Simpan"</b> tetap abu-abu. (Telepon dipakai juga untuk tombol chat WhatsApp di sebelah kolomnya.)
+    </div>
+    <h4>Link Google Maps untuk field "Link Google Maps"</h4>
+    <p>Tempel link ini. Begitu ditempel, di bawah kolom muncul tulisan hijau <b>"Koordinat terdeteksi: -7.72603, 110.40060"</b> + <b>peta kecil</b>:</p>
+    <div class="cmd" data-cmd="https://www.google.com/maps/place/@-7.7260288,110.4006013,17z"><b class="tag">SALIN - TEMPEL KE FIELD "LINK GOOGLE MAPS"</b><br>
+https://www.google.com/maps/place/@-7.7260288,110.4006013,17z</div>
+    <div class="box tip">
+      <span class="lbl">Kenapa peta bisa muncul (kalau ditanya)</span>
+      Sistem membaca angka koordinat (<code class="inl">-7.72..,110.40..</code>) dari link Google Maps, lalu menampilkan
+      peta lokasi klien. Kalau linknya versi pendek (<code class="inl">maps.app.goo.gl/...</code>), sistem "membuka"
+      link itu dulu untuk ambil koordinatnya.
+    </div>
+
+    <h3>1b. Form Proyek baru</h3>
+    <p style="font-size:13.5px;color:var(--muted)">Jalur: menu <b>Proyek</b> &rarr; tombol <b>"+ Proyek Baru"</b> &rarr; jendela <b>"Buat Proyek Baru"</b>.</p>
+    <div class="box warn">
+      <span class="lbl">Perhatikan - label form ini Bahasa Inggris</span>
+      Beda dengan form lain, label form proyek <b>masih Bahasa Inggris</b> ("Project Name", "Start Date", dst). Tabel di bawah menulis label asli + artinya.
+    </div>
+    <div class="tw"><table>
+      <tr><th style="width:30%">Field (label di layar)</th><th style="width:12%">Wajib?</th><th>Isi dengan ini (klik = salin)</th></tr>
+      <tr><td><b>Project Name</b> <span style="color:var(--muted)">(Nama Proyek)</span></td><td><span class="rag r">WAJIB</span></td><td class="cp" data-copy="Pemasangan CCTV & Smart Lock - Toko Sinar Abadi">Pemasangan CCTV &amp; Smart Lock - Toko Sinar Abadi</td></tr>
+      <tr><td><b>Client</b> <span style="color:var(--muted)">(Klien)</span></td><td><span class="rag r">WAJIB</span></td><td>pilih <b>CV Sinar Abadi Teknik</b> dari dropdown (buat kliennya dulu di 1a)</td></tr>
+      <tr><td><b>Category</b> <span style="color:var(--muted)">(Kategori)</span></td><td>opsional</td><td>pilih <b>Security</b> (default: Instalasi)</td></tr>
+      <tr><td><b>Description</b> <span style="color:var(--muted)">(Deskripsi)</span></td><td>opsional</td><td class="cp" data-copy="Instalasi 12 kamera CCTV + 4 smart lock di 2 cabang toko.">Instalasi 12 kamera CCTV + 4 smart lock di 2 cabang toko.</td></tr>
+      <tr><td><b>Start Date</b> <span style="color:var(--muted)">(Tgl Mulai)</span></td><td><span class="rag r">WAJIB</span></td><td>pilih tanggal <b>hari ini</b></td></tr>
+      <tr><td><b>End Date</b> <span style="color:var(--muted)">(Tgl Selesai)</span></td><td><span class="rag r">WAJIB</span></td><td>pilih tanggal <b>30 hari dari hari ini</b> (harus setelah Tgl Mulai)</td></tr>
+      <tr><td><b>Project Value (Rp)</b> <span style="color:var(--muted)">(Nilai)</span></td><td>opsional</td><td class="cp" data-copy="42000000">42000000</td></tr>
+      <tr><td><b>Target / Goal Description</b></td><td>opsional</td><td class="cp" data-copy="Sistem keamanan terpasang & terhubung aplikasi mobile, serah terima 1 bulan.">Sistem keamanan terpasang &amp; terhubung aplikasi mobile, serah terima 1 bulan.</td></tr>
+    </table></div>
+    <div class="box warn">
+      <span class="lbl">Koreksi penting - Client itu WAJIB</span>
+      Di form proyek, <b>Client (Klien) WAJIB dipilih</b>. Kalau dikosongkan, muncul pesan merah
+      <b>"Klien wajib dipilih."</b> dan proyek tidak tersimpan. Jadi buat kliennya dulu (1a), baru buat proyek.
+      Urutan cek tombol Create: Nama &rarr; Tgl Mulai/Selesai &rarr; Tgl Selesai harus setelah Mulai &rarr; Klien.
+    </div>
+    <p style="font-size:13.5px;color:var(--muted)">Tombol bawah: <b>"Cancel"</b> / <b>"Create Project"</b>. Field <b>kode proyek</b> &amp; <b>fase</b> tidak ada di form &mdash; dibuat otomatis.</p>
+    <div class="box note">
+      <span class="lbl">Yang terjadi setelah proyek dibuat</span>
+      Proyek baru otomatis masuk <b>fase "Survei"</b> (sesuai naskah). Teknisi hanya bisa kerjakan <b>tugas survei</b> dulu.
+      Setelah tugas survei selesai, manajer tekan <b>"Setujui Survei"</b> &rarr; proyek pindah ke fase <b>eksekusi</b>.
+      <b>Tips:</b> kalau tak mau ribet fase survei saat sidang, demo tugas pakai proyek seed yang sudah eksekusi (mis. Villa Kaliurang).
+    </div>
+
+    <h3>1c. Form Tugas + Penjadwalan (sisi Manajer)</h3>
+    <p>Di aplikasi ini <b>"penjadwalan" = mengisi tanggal &amp; teknisi pada form Tugas</b>. Tidak ada form jadwal terpisah.
+       Jalur: buka proyek &rarr; tab <b>"Tugas"</b> &rarr; <b>"+ Tugas Baru"</b> (hanya Manajer) &rarr; jendela <b>"Tugas Baru"</b>.</p>
+    <div class="tw"><table>
+      <tr><th style="width:24%">Field (label di layar)</th><th style="width:12%">Wajib?</th><th>Penjelasan / isi</th></tr>
+      <tr><td><b>Nama Tugas</b></td><td><span class="rag r">WAJIB</span></td><td>cth: "Survey lokasi 2 toko"</td></tr>
+      <tr><td><b>Deskripsi</b></td><td>opsional</td><td>Penjelasan singkat tugas</td></tr>
+      <tr><td><b>Penugasan</b></td><td>opsional</td><td>pilih teknisi (ada label <b>Bebas/Sibuk</b> + jumlah tugas aktif)</td></tr>
+      <tr><td><b>Mulai Jadwal</b></td><td>opsional</td><td>tanggal mulai dikerjakan &rarr; <b>bagian "penjadwalan"</b></td></tr>
+      <tr><td><b>Tenggat Waktu</b></td><td>opsional</td><td>batas akhir / deadline &rarr; <b>bagian "penjadwalan"</b></td></tr>
+      <tr><td><b>Bergantung Pada</b></td><td>opsional</td><td>pilih tugas lain yang harus selesai dulu (muncul kalau sudah ada tugas)</td></tr>
+      <tr><td><b>Catatan</b></td><td>opsional</td><td>Catatan tambahan</td></tr>
+    </table></div>
+    <p>Tombol: <b>"Batal"</b> / <b>"Buat Tugas"</b>. Buat 3 tugas contoh ini berurutan:</p>
+    <div class="tw"><table>
+      <tr><th>Nama Tugas (klik = salin)</th><th>Penugasan</th><th>Mulai Jadwal</th><th>Tenggat</th></tr>
+      <tr><td class="cp" data-copy="Survey lokasi 2 toko">Survey lokasi 2 toko</td><td>Rizky Ramadhan</td><td>hari ini</td><td>+3 hari</td></tr>
+      <tr><td class="cp" data-copy="Penarikan kabel & pemasangan kamera">Penarikan kabel &amp; pemasangan kamera</td><td>Rizky Ramadhan</td><td>+4 hari</td><td>+12 hari</td></tr>
+      <tr><td class="cp" data-copy="Setup NVR + smart lock + testing">Setup NVR + smart lock + testing</td><td>Andi Wijaya</td><td>+13 hari</td><td>+25 hari</td></tr>
+    </table></div>
+    <div class="box tip">
+      <span class="lbl">Fitur penjadwalan yang bisa dipamerkan</span>
+      1) Saat pilih teknisi muncul label <b>"Bebas"/"Sibuk"</b> + jumlah tugas aktif. &nbsp; 2) Kalau menjadwalkan 1 teknisi
+      di waktu <b>bentrok</b>, muncul peringatan kuning <b>"Teknisi sudah memiliki tugas di rentang waktu ini"</b> (anti dobel-booking).
+      &nbsp; 3) Hasil jadwal terlihat di menu <b>"Jadwal"</b> &mdash; ada <b>Gantt</b> (timeline + garis "hari ini") dan <b>Kalender</b>.
+    </div>
+    <div class="box note">
+      <span class="lbl">Catatan fase Survei</span>
+      Kalau proyek masih fase <b>Survei</b>, tiap tugas otomatis ditandai <b>"Tugas Survei"</b> (kotak ungu di form). Normal, sesuai naskah.
+    </div>
+
+    <h3>1d. Sisi Teknisi mengerjakan tugas</h3>
+    <p>Dibahas lengkap di <a href="#teknisi"><b>Bagian 3</b></a>. Singkatnya: teknisi <b>tidak membuat tugas</b>; ia menerima
+       tugas dari manajer, menggesernya ke "Sedang Dikerjakan", mengunggah bukti foto, dan menulis catatan kendala harian.</p>
+  </div>
+</section>
+
+<!-- ============ INFO PROYEK (data seed) ============ -->
+<section id="info">
+  <div class="sec-card">
+    <h2><span class="num">D</span> Info data di sistem <span class="sub">isi seed yang tampil saat demo</span></h2>
+    <p>Ini <b>data yang sudah ada di sistem</b> setelah perintah Bagian 0 dijalankan. Hafalkan garis besarnya supaya
+       kamu tahu apa yang muncul di layar dan proyek mana yang dipakai untuk demo.</p>
+
+    <h3>Daftar lengkap 8 akun login</h3>
+    <p>Semua password: <code class="inl cp" data-copy="password123">password123</code>. Klik email untuk salin.</p>
+    <div class="tw"><table>
+      <tr><th>Nama</th><th>Email</th><th>Peran</th></tr>
+      <tr><td>Administrator SHI</td><td class="cp mono" data-copy="admin@shi.co.id">admin@shi.co.id</td><td><span class="rag g">Manajer</span></td></tr>
+      <tr><td>Budi Santoso</td><td class="cp mono" data-copy="budi@shi.co.id">budi@shi.co.id</td><td><span class="rag g">Manajer</span></td></tr>
+      <tr><td>Diana Kusuma</td><td class="cp mono" data-copy="diana@shi.co.id">diana@shi.co.id</td><td><span class="rag g">Manajer</span></td></tr>
+      <tr><td>Rizky Ramadhan</td><td class="cp mono" data-copy="rizky@shi.co.id">rizky@shi.co.id</td><td><span class="rag a">Teknisi</span></td></tr>
+      <tr><td>Andi Wijaya</td><td class="cp mono" data-copy="andi@shi.co.id">andi@shi.co.id</td><td><span class="rag a">Teknisi</span></td></tr>
+      <tr><td>Reza Pratama</td><td class="cp mono" data-copy="reza@shi.co.id">reza@shi.co.id</td><td><span class="rag a">Teknisi</span></td></tr>
+      <tr><td>Fajar Nugroho</td><td class="cp mono" data-copy="fajar@shi.co.id">fajar@shi.co.id</td><td><span class="rag a">Teknisi</span></td></tr>
+      <tr><td>Hendra Saputra</td><td class="cp mono" data-copy="hendra@shi.co.id">hendra@shi.co.id</td><td><span class="rag a">Teknisi</span></td></tr>
+    </table></div>
+    <p style="font-size:13px;color:var(--muted)">3 manajer, 5 teknisi. Untuk sidang cukup pakai <b>admin</b> (manajer) + <b>rizky</b> (teknisi).</p>
+
+    <h3>Daftar 10 proyek seed + warna kesehatannya</h3>
+    <p>Dashboard mengurutkan <b>yang paling kritis (merah) di atas</b>. Kolom warna = yang muncul di dashboard.
+       Angka SPI perkiraan (sistem hitung ulang live; <b>yang penting warnanya</b>).</p>
+    <div class="tw"><table>
+      <tr><th>Proyek</th><th>Klien</th><th>Status / Fase</th><th>Tugas</th><th>Warna (~SPI)</th></tr>
+      <tr><td><b>Smart Home Automation - Villa Kaliurang</b> &nbsp;<span class="rag r">DEMO</span></td><td>Bp. Haryanto</td><td>Aktif / Eksekusi</td><td>1 dari 6 selesai</td><td><span class="rag r">MERAH</span> ~0,22</td></tr>
+      <tr><td>Smart Home IoT - Perumahan Citra Raya</td><td>PT Citra Raya Development</td><td>Aktif / Eksekusi</td><td>3 dari 9 selesai</td><td><span class="rag r">MERAH</span> ~0,50</td></tr>
+      <tr><td>IoT Sensor Network - Gudang Logistik</td><td>PT Logistik Nusantara</td><td>Aktif / Eksekusi</td><td>1 dari 5 selesai</td><td><span class="rag r">MERAH</span> ~0,60</td></tr>
+      <tr><td>CCTV Gudang Farmasi RS PKU</td><td>RS PKU Muhammadiyah</td><td>Aktif / Eksekusi</td><td>1 dari 4 selesai</td><td><span class="rag r">MERAH</span> ~0,30</td></tr>
+      <tr><td>CCTV &amp; Security System - Kantor BPD DIY</td><td>Bank BPD DIY</td><td>Aktif / Eksekusi</td><td>4 dari 8 selesai</td><td><span class="rag g">HIJAU</span> ~1,50</td></tr>
+      <tr><td>Smart Building - Kantor Dishub Yogyakarta</td><td>Pemkot Yogyakarta - Dishub</td><td>Aktif / Eksekusi</td><td>7 dari 12 selesai</td><td><span class="rag g">HIJAU</span> ~1,31</td></tr>
+      <tr><td>Smart Lighting - Hotel Melia</td><td>Hotel Melia Yogyakarta</td><td>Aktif / Survei</td><td>0 dari 3 selesai</td><td><span class="rag s">SURVEI</span> belum disetujui</td></tr>
+      <tr><td>Monitoring Suhu Ruang RS PKU</td><td>RS PKU Muhammadiyah</td><td>Aktif / Survei</td><td>2 dari 4 selesai</td><td><span class="rag s">SURVEI</span> sudah disetujui</td></tr>
+      <tr><td>Smart Traffic Light - Simpang Tiga Janti</td><td>Pemkot Yogyakarta - Dishub</td><td>Selesai / Eksekusi</td><td>6 dari 6 selesai</td><td><span class="rag g">HIJAU</span> rampung</td></tr>
+      <tr><td>Smart Home - Rumah Ibu Ratna</td><td>Ibu Ratna Dewi</td><td>Ditunda / Eksekusi</td><td>1 dari 4 selesai</td><td><span class="rag n">DITUNDA</span></td></tr>
+    </table></div>
+    <div class="box tip">
+      <span class="lbl">Proyek andalan untuk demo</span>
+      <b>Villa Kaliurang</b> (MERAH, 1/6 selesai) = proyek paling kritis &amp; di urutan teratas dashboard. Inilah yang dipakai
+      untuk demo "MERAH jadi HIJAU" di <a href="#rag">Bagian 4</a>. Proyek HIJAU (BPD DIY, Dishub) untuk menunjukkan kontras
+      "yang sehat". Ditugaskan ke <b>Rizky</b>: Villa Kaliurang &amp; Citra Raya &rarr; pas untuk demo sisi teknisi.
+    </div>
+    <div class="box note">
+      <span class="lbl">Kalau ditanya "ada berapa proyek / klien?"</span>
+      <b>10 proyek</b>, <b>8 klien</b>, <b>8 pengguna</b> (3 manajer + 5 teknisi). Status proyek campur: aktif, selesai, ditunda,
+      dan ada yang masih fase survei &mdash; sengaja dibuat lengkap supaya dashboard menampilkan semua kondisi.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. CEK DATABASE ============ -->
+<section id="db">
+  <div class="sec-card">
+    <h2><span class="num">2</span> Cek database &amp; lihat data mentah <span class="sub">HeidiSQL</span></h2>
+    <p>Penguji sering minta bukti data <b>benar-benar tersimpan di database</b>, bukan cuma tampilan.
+       Database proyek ini <b>PostgreSQL</b> (bukan MySQL). HeidiSQL bisa connect ke PostgreSQL.</p>
+
+    <div class="box tip">
+      <span class="lbl">Sudah dipastikan</span>
+      Database <b>hidup &amp; bisa dikoneksi</b>: container <code class="inl">shi_db</code> status <b>healthy</b>, port <b>5433</b> terbuka
+      (asal Docker Desktop menyala &mdash; lihat Bagian 0).
+    </div>
+
+    <h3>Langkah 2.1 &mdash; Pengaturan koneksi HeidiSQL</h3>
+    <p>Buka HeidiSQL &rarr; <b>New</b> &rarr; isi persis ini (klik nilai = salin):</p>
+    <div class="dcard"><table>
+      <tr><th>Network type</th><td>PostgreSQL (TCP/IP)</td></tr>
+      <tr><th>Hostname / IP</th><td class="cp" data-copy="127.0.0.1">127.0.0.1</td></tr>
+      <tr><th>User</th><td class="cp" data-copy="postgres">postgres</td></tr>
+      <tr><th>Password</th><td class="cp" data-copy="postgres">postgres</td></tr>
+      <tr><th>Port</th><td class="cp" data-copy="5433">5433</td></tr>
+      <tr><th>Database</th><td class="cp" data-copy="shi">shi</td></tr>
+    </table></div>
+    <p>Klik <b>Open</b>. Di panel kiri muncul database <code class="inl">shi</code> &rarr; folder <code class="inl">public</code> &rarr; daftar tabel
+       (<code class="inl">tb_user</code>, <code class="inl">tb_klien</code>, <code class="inl">tb_proyek</code>, <code class="inl">tb_tugas</code>, dst).
+       Klik 2x tabel &rarr; tab <b>"Data"</b> untuk lihat isinya.</p>
+
+    <div class="box warn">
+      <span class="lbl">Kalau HeidiSQL gagal / tak ada pilihan PostgreSQL</span>
+      Pakai cara cadangan (tanpa install apa pun). Ketik di terminal:
+      <div class="cmd" data-cmd="docker exec -it shi_db psql -U postgres -d shi" style="margin-top:10px">
+        <b class="tag">CADANGAN - LIHAT DATA VIA TERMINAL</b><br>
+        docker exec -it shi_db psql -U postgres -d shi
+      </div>
+      Setelah masuk (prompt jadi <code class="inl">shi=#</code>), ketik query di bawah. Keluar: <code class="inl">\q</code>.
+    </div>
+
+    <h3>Langkah 2.2 &mdash; Query untuk "pamer" data ke penguji</h3>
+    <p>Salin (tombol Salin di pojok kotak), tempel di kotak SQL HeidiSQL, jalankan (<span class="kbd">F9</span>):</p>
+
+    <h4>Semua proyek + warna kesehatan + nilai SPI</h4>
+    <pre class="code"><span class="kw">SELECT</span> p.nama_proyek, p.status, ph.spi_value, ph.status <span class="kw">AS</span> warna_rag,
+       ph.completed_tasks, ph.total_tasks
+<span class="kw">FROM</span> tb_proyek p
+<span class="kw">LEFT JOIN</span> project_health ph <span class="kw">ON</span> ph.project_id = p.id_proyek
+<span class="kw">ORDER BY</span> ph.spi_value <span class="kw">ASC</span>;</pre>
+
+    <h4>Tugas suatu proyek (ganti angka 1 dengan id proyek)</h4>
+    <pre class="code"><span class="kw">SELECT</span> nama_tugas, status, due_date, assigned_to
+<span class="kw">FROM</span> tb_tugas
+<span class="kw">WHERE</span> id_proyek = 1
+<span class="kw">ORDER BY</span> sort_order;</pre>
+
+    <h4>Hitung berapa proyek tiap warna (ringkasan EWS)</h4>
+    <pre class="code"><span class="kw">SELECT</span> status <span class="kw">AS</span> warna, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> jumlah
+<span class="kw">FROM</span> project_health
+<span class="kw">GROUP BY</span> status;</pre>
+
+    <h3>Peta nama tabel (biar tidak bingung saat ditanya)</h3>
+    <p>Nama tabel sengaja <b>Bahasa Indonesia sesuai naskah</b> (alasannya di <a href="#kenapa">Bagian 7</a>):</p>
+    <div class="tw"><table>
+      <tr><th>Nama di database</th><th>Isinya</th><th>Tabel di naskah</th></tr>
+      <tr><td class="mono">tb_user</td><td>Akun pengguna (manajer &amp; teknisi)</td><td>Tabel 4.9</td></tr>
+      <tr><td class="mono">tb_klien</td><td>Data klien / pelanggan</td><td>Tabel 4.10</td></tr>
+      <tr><td class="mono">tb_proyek</td><td>Data proyek</td><td>Tabel 4.11</td></tr>
+      <tr><td class="mono">tb_penugasan_proyek</td><td>Siapa teknisi di proyek mana</td><td>Tabel 4.12</td></tr>
+      <tr><td class="mono">tb_tugas</td><td>Tugas/pekerjaan dalam proyek</td><td>Tabel 4.13</td></tr>
+      <tr><td class="mono">tb_bukti</td><td>Bukti (foto/dokumen) per tugas</td><td>Tabel 4.14</td></tr>
+      <tr><td class="mono">tb_eskalasi</td><td>Eskalasi masalah dari lapangan</td><td>Tabel 4.15</td></tr>
+      <tr><td class="mono">project_health</td><td>Hasil hitung SPI + warna RAG (penopang EWS)</td><td>kelas Kesehatan Proyek</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ 3. SKENARIO TEKNISI ============ -->
+<section id="teknisi">
+  <div class="sec-card">
+    <h2><span class="num">3</span> Skenario teknisi "sudah mengerjakan tugas" <span class="sub">untuk screenshot</span></h2>
+    <p>Tujuan: menampilkan layar seolah teknisi <b>sudah bekerja di lapangan</b> &mdash; tugas dikerjakan, ada bukti foto,
+       ada catatan kendala. Login <b>Teknisi</b> (<code class="inl cp" data-copy="rizky@shi.co.id">rizky@shi.co.id</code> / <code class="inl cp" data-copy="password123">password123</code>).</p>
+
+    <h3>Alur lengkap (ikuti urut)</h3>
+    <ol class="steps">
+      <li>Login teknisi &rarr; otomatis masuk <b>"Dashboard Saya"</b>. Ada ringkasan: jumlah tugas, sedang dikerjakan, lewat tenggat. <b>Screenshot.</b></li>
+      <li>Buka <b>"Proyek Saya"</b> &rarr; pilih <b>"Smart Home Automation - Villa Kaliurang"</b> (atau "Citra Raya"). Ini proyek yang ditugaskan ke Rizky.</li>
+      <li>Tab <b>"Tugas"</b> tampil papan <b>Kanban</b> (Belum Dikerjakan / Sedang Dikerjakan / Selesai). <b>Klik kartu</b> yang masih "Belum Dikerjakan" &rarr; detail &rarr; ubah status ke <b>"Sedang Dikerjakan"</b>. Sistem mencatat <b>waktu mulai</b>.</li>
+      <li>Tab <b>"Bukti"</b> (deretan tab: Tugas / Bukti / Grafik / Laporan Harian). Di kotak tugasmu: klik <b>pilih file</b> (foto apa saja, maks 10MB), jenis <b>"Photo"</b>, isi <b>Deskripsi</b>, klik <b>Upload</b>. Muncul "Evidence uploaded successfully". <b>Screenshot.</b></li>
+      <li>Tab <b>"Laporan Harian"</b> &rarr; tulis <b>catatan kendala</b> di kotak teks &rarr; <b>"Simpan Catatan"</b>. Catatan muncul di daftar dengan nama &amp; tanggal. <b>Screenshot.</b></li>
+      <li>(Opsional) Tab <b>"Grafik"</b> &rarr; kurva <b>Earned Value</b>: garis PV, EV, dan SPI dari waktu ke waktu. Bukti visual SPI. <b>Screenshot.</b></li>
+    </ol>
+
+    <div class="box note">
+      <span class="lbl">Aturan penting (sering ditanya penguji)</span>
+      Teknisi <b>TIDAK BISA</b> menandai tugas "Selesai" sendiri. Ia cuma: Belum Dikerjakan &harr; Sedang Dikerjakan.
+      Yang menandai <b>"Selesai" hanya Manajer</b> (gerbang review/persetujuan). Sengaja &mdash; lihat <a href="#kenapa">Bagian 7</a>.
+    </div>
+
+    <h4>Contoh teks bukti (jenis: Photo) &mdash; klik = salin</h4>
+    <div class="dcard"><table>
+      <tr><th>Deskripsi bukti</th><td class="cp" data-copy="Pemasangan panel kontrol utama selesai, kabel sudah dirapikan.">Pemasangan panel kontrol utama selesai, kabel sudah dirapikan.</td></tr>
+    </table></div>
+
+    <h4>Contoh catatan kendala harian (pilih salah satu, klik = salin)</h4>
+    <div class="dcard"><table>
+      <tr><td class="cp" data-copy="Material smart curtain datang terlambat dari supplier, pemasangan tirai mundur 1 hari.">Material smart curtain datang terlambat dari supplier, pemasangan tirai mundur 1 hari.</td></tr>
+      <tr><td class="cp" data-copy="Akses ke ruang panel terbatas karena pemilik villa sedang ada acara, lanjut besok pagi.">Akses ke ruang panel terbatas karena pemilik villa sedang ada acara, lanjut besok pagi.</td></tr>
+      <tr><td class="cp" data-copy="Modul controller perlu update firmware dulu, sudah dikoordinasikan dengan tim kantor.">Modul controller perlu update firmware dulu, sudah dikoordinasikan dengan tim kantor.</td></tr>
+    </table></div>
+
+    <div class="box say">
+      <span class="lbl">Omongin ke penguji</span>
+      <p>"Di sini teknisi melapor dari lapangan: menggeser status tugas, mengunggah bukti foto, dan mencatat kendala harian.
+      Yang penting, teknisi tidak mengisi angka persentase progres &mdash; sistem menghitung sendiri dari status tugas.
+      Jadi laporan harian fokus pada <b>kendala</b>, bukan angka yang bisa dikarang."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. PERUBAHAN RAG ============ -->
+<section id="rag">
+  <div class="sec-card">
+    <h2><span class="num">4</span> Demo perubahan indikator RAG secara langsung <span class="sub">paling menarik</span></h2>
+    <p>Ini bagian yang paling membuktikan sistem "hidup": <b>warna kesehatan proyek berubah otomatis</b> begitu tugas
+       diselesaikan. Login <b>Manajer</b> (<code class="inl cp" data-copy="admin@shi.co.id">admin@shi.co.id</code>).</p>
+
+    <h3>Arti 3 warna (ambang batas)</h3>
+    <div class="tw"><table>
+      <tr><th>Warna</th><th>Syarat nilai SPI</th><th>Arti</th></tr>
+      <tr><td><span class="rag g">HIJAU</span></td><td>SPI &ge; 0,95</td><td>Sesuai jadwal (on track)</td></tr>
+      <tr><td><span class="rag a">KUNING</span></td><td>0,85 &le; SPI &lt; 0,95</td><td>Perlu perhatian (warning)</td></tr>
+      <tr><td><span class="rag r">MERAH</span></td><td>SPI &lt; 0,85</td><td>Kritis - tertinggal jadwal</td></tr>
+    </table></div>
+
+    <h3>Skenario demo: ubah proyek dari MERAH jadi HIJAU</h3>
+    <p>Pakai proyek <b>"Smart Home Automation - Villa Kaliurang"</b>. Saat ini paling kritis
+       (<span class="rag r">MERAH</span>, SPI ~0,22). Punya <b>6 tugas</b>, baru <b>1 selesai</b>.</p>
+
+    <ol class="steps">
+      <li>Sebagai Manajer, buka <b>Dashboard</b>. Villa Kaliurang ada di <b>urutan paling atas</b> dengan label <span class="rag r">MERAH</span> (dashboard menaruh yang paling kritis di atas).</li>
+      <li>Klik proyek itu &rarr; tab <b>"Tugas"</b>. Pilih tugas berstatus "Sedang Dikerjakan", ubah jadi <b>"Selesai"</b> (manajer boleh). Satu per satu.</li>
+      <li>Tiap kali menandai "Selesai", <b>SPI dihitung ulang otomatis</b>. Angka SPI di atas naik.</li>
+      <li>Kembali ke <b>Dashboard</b>, tekan <span class="kbd">F5</span> (refresh). Warna proyek sudah berubah.</li>
+    </ol>
+
+    <p>Inilah yang terjadi tiap kali kamu tandai 1 tugas "Selesai" (PV / target waktu tetap ~75%):</p>
+    <div class="tw"><table>
+      <tr><th>Total tugas selesai</th><th>EV (% pekerjaan)</th><th>SPI = EV / PV</th><th>Warna</th></tr>
+      <tr><td>1 (kondisi awal)</td><td>16,7%</td><td>0,22</td><td><span class="rag r">MERAH</span></td></tr>
+      <tr><td>2</td><td>33,3%</td><td>0,44</td><td><span class="rag r">MERAH</span></td></tr>
+      <tr><td>3</td><td>50,0%</td><td>0,67</td><td><span class="rag r">MERAH</span></td></tr>
+      <tr><td>4</td><td>66,7%</td><td>0,89</td><td><span class="rag a">KUNING</span></td></tr>
+      <tr><td>5</td><td>83,3%</td><td>1,11</td><td><span class="rag g">HIJAU</span></td></tr>
+      <tr><td>6</td><td>100%</td><td>1,33</td><td><span class="rag g">HIJAU</span></td></tr>
+    </table></div>
+    <div class="box tip">
+      <span class="lbl">Inti demo</span>
+      Mulai dari 1 selesai. Tandai <b>3 tugas lagi</b> (jadi total 4 selesai) &rarr; loncat ke <span class="rag a">KUNING</span>.
+      Tandai <b>1 lagi</b> (total 5 selesai) &rarr; jadi <span class="rag g">HIJAU</span>. Cerita kuat: "Begitu pekerjaan
+      benar-benar selesai, kesehatan proyek membaik otomatis, tanpa input manual."
+    </div>
+    <div class="box note">
+      <span class="lbl">Kalau warna belum berubah di Dashboard</span>
+      Tekan <span class="kbd">F5</span>. Nilainya sudah benar tersimpan begitu kamu klik "Selesai"; dashboard kadang perlu
+      dimuat ulang untuk menampilkan warna terbaru. (Tercatat di naskah sebagai temuan pengujian TC-MN-04 &mdash; lihat <a href="#naskah">Naskah &amp; Uji</a>.)
+    </div>
+    <div class="box say">
+      <span class="lbl">Omongin ke penguji</span>
+      <p>"Perubahan warna ini bukan saya ubah manual. Saya hanya menandai tugas selesai. Sistem otomatis menghitung ulang
+      Earned Value, membaginya dengan Planned Value untuk dapat SPI, lalu mengubah SPI menjadi warna. Inilah inti Early Warning System-nya."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. EWS ============ -->
+<section id="ews">
+  <div class="sec-card">
+    <h2><span class="num">5</span> Bagaimana EWS (Early Warning System) bekerja <span class="sub">untuk dijelaskan</span></h2>
+    <p>EWS = fitur yang <b>otomatis memberi peringatan</b> kalau proyek mulai tertinggal jadwal, supaya manajer bisa
+       bertindak cepat. Pemicunya: nilai <b>SPI di bawah 1</b> (progres lebih lambat dari rencana).</p>
+
+    <h3>Rumus dasarnya (dari naskah BAB II)</h3>
+    <pre class="code">SPI = EV / PV
+
+EV (Earned Value / Nilai Hasil)  = % pekerjaan yang BENAR-BENAR selesai
+PV (Planned Value / Nilai Rencana) = % pekerjaan yang SEHARUSNYA selesai sampai hari ini
+                                   = (Hari Berjalan / Total Durasi Proyek) x 100%</pre>
+    <ul>
+      <li><b>SPI = 1</b> &rarr; tepat jadwal &rarr; <span class="rag g">HIJAU</span></li>
+      <li><b>SPI &gt; 1</b> &rarr; lebih cepat dari rencana</li>
+      <li><b>SPI &lt; 1</b> &rarr; terlambat &rarr; pemicu peringatan &rarr; <span class="rag a">KUNING</span> / <span class="rag r">MERAH</span></li>
+    </ul>
+
+    <h3>Alur kerja di dalam sistem</h3>
+    <div class="flow">
+      <div class="node">1. Status tugas berubah<small>teknisi geser / manajer "Selesai"</small></div>
+      <div class="arr">&rarr;</div>
+      <div class="node">2. Hitung ulang otomatis<small>recalculateSPI()</small></div>
+      <div class="arr">&rarr;</div>
+      <div class="node">3. Hitung EV &amp; PV<small>EV = tugas selesai / total</small></div>
+      <div class="arr">&rarr;</div>
+      <div class="node">4. SPI = EV / PV</div>
+    </div>
+    <div class="flow">
+      <div class="node">5. SPI jadi warna<small>categorizeHealth()</small></div>
+      <div class="arr">&rarr;</div>
+      <div class="node">6. Simpan ke project_health<small>warna RAG tersimpan</small></div>
+      <div class="arr">&rarr;</div>
+      <div class="node">7. Dashboard tampil<small>MERAH di urutan teratas</small></div>
+      <div class="arr">&rarr;</div>
+      <div class="node">8. Manajer bertindak<small>peringatan dini</small></div>
+    </div>
+
+    <h3>3 cara sistem memberi peringatan</h3>
+    <ol>
+      <li><b>Warna RAG</b> per proyek (merah/kuning/hijau) &mdash; lihat sekejap proyek mana yang bermasalah.</li>
+      <li><b>Pengurutan kekritisan</b> &mdash; dashboard menaruh proyek <span class="rag r">MERAH</span> paling atas, lalu kuning, lalu hijau. Manajer tidak perlu mencari.</li>
+      <li><b>Ringkasan angka</b> di atas dashboard: berapa proyek merah, kuning, hijau, dan berapa lewat tenggat.</li>
+    </ol>
+    <p>Selain itu ada fitur <b>Eskalasi</b> (tb_eskalasi): kalau teknisi menemukan masalah serius (mis. perangkat rusak),
+       ia bisa <b>mengeskalasi</b> ke manajer dengan prioritas (rendah/sedang/tinggi). Peringatan yang dipicu manusia, melengkapi peringatan otomatis dari SPI.</p>
+    <div class="box say">
+      <span class="lbl">Omongin ke penguji (ringkas)</span>
+      <p>"EWS bekerja tiga lapis: indikator warna per proyek, pengurutan otomatis yang menaruh proyek kritis paling atas,
+      dan ringkasan jumlah. Semua digerakkan satu angka objektif, SPI, yang dihitung ulang otomatis setiap ada perubahan
+      status tugas. Manajer dapat peringatan dini berbasis data, bukan menunggu laporan terlambat."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. TITIK CODE ============ -->
+<section id="code">
+  <div class="sec-card">
+    <h2><span class="num">6</span> Titik code untuk menjelaskan rumus <span class="sub">kalau diminta tunjuk</span></h2>
+    <p>Kalau penguji minta "tunjukkan di mana rumusnya", buka file di bawah. <span class="fileref">file : nomor baris</span>
+       = nama file dan baris ke berapa. Tidak perlu hafal isinya &mdash; cukup tahu <b>file mana</b> dan <b>bisa jelaskan fungsinya dengan bahasa biasa</b>.</p>
+
+    <div class="tw"><table>
+      <tr><th>Yang dicari penguji</th><th>Ada di file &amp; baris</th><th>Fungsinya (bahasa biasa)</th></tr>
+      <tr><td><b>Rumus PV</b></td><td><span class="fileref">spiCalculator.ts : 24-39</span></td><td>Hitung % target dari (hari berjalan / total durasi).</td></tr>
+      <tr><td><b>Ambang warna RAG</b></td><td><span class="fileref">spiCalculator.ts : 47-51</span></td><td>Ubah angka SPI jadi hijau / kuning / merah.</td></tr>
+      <tr><td><b>Rumus EV &amp; SPI</b> (inti)</td><td><span class="fileref">spiCalculator.ts : 111-179</span></td><td>Hitung EV dari tugas selesai, lalu SPI = EV/PV, lalu simpan.</td></tr>
+      <tr><td><b>Pemicu hitung ulang</b></td><td><span class="fileref">tasks.ts : 553</span></td><td>Saat status tugas diubah, panggil recalculateSPI.</td></tr>
+      <tr><td><b>Pengurutan kekritisan</b></td><td><span class="fileref">dashboard.ts : 42-44</span></td><td>Urutkan proyek: merah dulu, lalu kuning, lalu hijau.</td></tr>
+      <tr><td><b>Ringkasan jumlah RAG</b></td><td><span class="fileref">dashboard.ts : 60-65</span></td><td>Hitung berapa proyek merah / kuning / hijau / lewat tenggat.</td></tr>
+      <tr><td><b>Gerbang review</b></td><td><span class="fileref">tasks.ts : 15-19</span></td><td>Aturan: teknisi hanya boleh ke "Sedang Dikerjakan".</td></tr>
+    </table></div>
+
+    <p>Jalur folder: semua di <code class="inl">frontend/src/lib/</code> dan <code class="inl">frontend/src/lib/handlers/</code>.</p>
+
+    <h3>Cuplikan 1 &mdash; Rumus SPI (spiCalculator.ts)</h3>
+    <pre class="code"><span class="cm">// EV = persen tugas yang selesai</span>
+actualProgress = (taskCounts.completed / taskCounts.total) * 100;
+
+<span class="cm">// PV = persen waktu yang sudah berjalan</span>
+plannedValue = calculatePlannedValue(start_date, end_date, today);
+
+<span class="cm">// SPI = EV dibagi PV  (inilah rumus utamanya)</span>
+rawSpi = (actualProgress / plannedValue);
+status = categorizeHealth(spiValue);   <span class="cm">// jadi merah/kuning/hijau</span></pre>
+
+    <h3>Cuplikan 2 &mdash; Ambang warna (spiCalculator.ts:47)</h3>
+    <pre class="code"><span class="kw">function</span> <span class="fn">categorizeHealth</span>(spiValue) {
+  <span class="kw">if</span> (spiValue &gt;= 0.95) <span class="kw">return</span> <span class="fn">'green'</span>;   <span class="cm">// HIJAU</span>
+  <span class="kw">if</span> (spiValue &gt;= 0.85) <span class="kw">return</span> <span class="fn">'amber'</span>;   <span class="cm">// KUNING</span>
+  <span class="kw">return</span> <span class="fn">'red'</span>;                        <span class="cm">// MERAH</span>
+}</pre>
+
+    <h3>Cuplikan 3 &mdash; Pengurutan EWS (dashboard.ts:42)</h3>
+    <pre class="code"><span class="kw">ORDER BY</span>
+  <span class="kw">CASE</span> ph.status <span class="kw">WHEN</span> 'red' <span class="kw">THEN</span> 1
+                  <span class="kw">WHEN</span> 'amber' <span class="kw">THEN</span> 2
+                  <span class="kw">WHEN</span> 'green' <span class="kw">THEN</span> 3 <span class="kw">END</span>,
+  ph.spi_value <span class="kw">ASC</span>   <span class="cm">-- proyek paling kritis tampil paling atas</span></pre>
+
+    <div class="box say">
+      <span class="lbl">Omongin ke penguji</span>
+      <p>"Rumus inti ada di satu file khusus, <b>spiCalculator.ts</b>. Saya pisahkan rumus matematisnya dari kode tampilan
+      supaya mudah diuji dan tidak tercampur. Setiap kali status tugas berubah, file tugas memanggil fungsi hitung ulang ini."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH STACK ============ -->
+<section id="techstack">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap');
+    .ts-card{background:#3d4b80;border-radius:16px;padding:clamp(24px,4vw,40px) clamp(18px,3vw,30px) 34px;margin:6px 0 16px;
+         box-shadow:0 6px 26px rgba(28,40,90,.22);text-align:center}
+    .ts-title{font-family:"Playfair Display",Georgia,"Times New Roman",serif;
+         color:#f4edda;font-weight:800;letter-spacing:1px;line-height:1.04;
+         font-size:clamp(30px,6.5vw,60px);margin:4px 0 26px;text-transform:uppercase}
+    .ts-panel{background:#f4eee1;border-radius:10px;padding:clamp(20px,3vw,30px) clamp(16px,2.6vw,26px);display:grid;
+         grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.6vw,26px);text-align:left}
+    .ts-col h3{font-family:var(--sans);color:#3a4a86;font-weight:800;font-size:15px;
+         letter-spacing:1.5px;text-transform:uppercase;margin:0 0 14px;text-align:center}
+    .ts-col ul{list-style:none;margin:0;padding:0}
+    .ts-col li{position:relative;padding:5px 0 5px 18px;color:#2a3340;font-size:14.5px;line-height:1.45}
+    .ts-col li::before{content:"";position:absolute;left:2px;top:11px;width:7px;height:7px;border-radius:50%;background:#3d4b80}
+    .ts-col li b{color:#1f2733;font-weight:700}
+    .ts-col li small{color:#6a7283;font-size:12px}
+    .ts-foot{color:#cdd4ea;font-size:12.5px;margin:18px 2px 0;letter-spacing:.3px}
+    @media (max-width:680px){.ts-panel{grid-template-columns:1fr;gap:18px}}
+  </style>
+
+  <div class="ts-card">
+    <div class="ts-title">Implementasi<br>Sistem</div>
+    <div class="ts-panel">
+      <div class="ts-col">
+        <h3>Database</h3>
+        <ul>
+          <li><b>PostgreSQL</b> v17</li>
+          <li><b>node-postgres (pg)</b> v8.20 <small>(SQL mentah, tanpa ORM)</small></li>
+        </ul>
+      </div>
+      <div class="ts-col">
+        <h3>Backend</h3>
+        <ul>
+          <li><b>Next.js</b> v15.3 <small>(Route Handler API)</small></li>
+          <li><b>Node.js</b> v22 <small>(bun v1.3 saat dev)</small></li>
+          <li><b>TypeScript</b> v5.9</li>
+          <li><b>JWT</b> &mdash; jsonwebtoken v9</li>
+          <li><b>bcryptjs</b> v3 <small>(hash password)</small></li>
+        </ul>
+      </div>
+      <div class="ts-col">
+        <h3>Frontend</h3>
+        <ul>
+          <li><b>Next.js</b> v15.3 <small>(App Router)</small></li>
+          <li><b>React</b> v19.2</li>
+          <li><b>TypeScript</b> v5.9</li>
+          <li><b>Tailwind CSS</b> v4.2</li>
+          <li><b>TanStack Query</b> v5.90</li>
+          <li><b>Recharts</b> v3.8 <small>&middot;</small> <b>Leaflet</b> v1.9 <small>(peta)</small></li>
+        </ul>
+      </div>
+    </div>
+    <p class="ts-foot">Satu basis kode Next.js (full-stack) &middot; dijalankan via bun &middot; PostgreSQL di Docker (postgres:17-alpine)</p>
+  </div>
+
+  <div class="sec-card" style="margin-top:0">
+    <div class="box warn">
+      <span class="lbl">Penting - ini stack ASLI proyekmu (beda dari gambar contoh)</span>
+      Gambar contoh pakai <b>Nuxt, Vue, Express, Prisma, Redis</b> &mdash; itu <b>BUKAN</b> proyekmu. Proyekmu pakai
+      <b>Next.js</b> (bukan Nuxt/Vue), <b>tanpa Express</b> (API lewat Route Handler Next.js), <b>tanpa Prisma</b>
+      (akses DB pakai SQL mentah lewat <code class="inl">pg</code>), <b>tanpa Redis</b>. Kartu di atas versi yang benar (dari <code class="inl">package.json</code>).
+    </div>
+    <div class="box say">
+      <span class="lbl">Omongin ke penguji</span>
+      <p>"Sistem ini satu basis kode Next.js yang menangani frontend sekaligus backend. Database PostgreSQL diakses
+      langsung dengan SQL berparameter melalui driver node-postgres, tanpa ORM, agar query dashboard yang berat
+      (perhitungan SPI dan agregat) tetap efisien dan terkontrol penuh."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. KENAPA STRUKTUR ============ -->
+<section id="kenapa">
+  <div class="sec-card">
+    <h2><span class="num">7</span> Kenapa bentuk &amp; struktur code seperti itu <span class="sub">alasan desain</span></h2>
+    <p>Penguji suka bertanya "kenapa dibuat begini?". Tiap keputusan ada <b>alasannya</b>. Hafalkan alasannya saja, bukan code-nya.</p>
+
+    <h3>1. Memakai Next.js (bukan dua aplikasi terpisah)</h3>
+    <p>Tampilan (frontend) dan logika server (backend) jadi <b>satu proyek</b>. Lebih sederhana dijalankan, sesuai naskah
+       (BAB II 2.2.6 menyebut Next.js + SSR). Semua permintaan lewat satu pintu: <code class="inl">api/[...route]/route.ts</code>.</p>
+
+    <h3>2. Nama tabel Bahasa Indonesia, tapi tampilan tetap normal</h3>
+    <p>Database memakai nama sesuai naskah (<code class="inl">tb_proyek</code>, <code class="inl">id_proyek</code>). Saat data diambil,
+       namanya "diterjemahkan balik" ke nama umum (<code class="inl">id</code>, <code class="inl">name</code>) lewat <code class="inl">AS</code> di SQL.
+       Alasannya: <b>database setia ke naskah</b>, <b>kode tampilan tidak perlu diubah</b>.</p>
+
+    <h3>3. Rumus dipisah di file sendiri (spiCalculator.ts)</h3>
+    <p>Rumus SPI/EV/PV terpisah dari tampilan dan database. Alasannya: <b>satu sumber kebenaran</b> &mdash; perbaikan cukup di satu tempat; dan <b>mudah diuji</b>.</p>
+
+    <h3>4. Ada tabel khusus project_health</h3>
+    <p>Daripada menghitung SPI tiap dashboard dibuka (lambat kalau proyek banyak), hasilnya <b>disimpan</b> di
+       <code class="inl">project_health</code> dan diperbarui hanya saat ada perubahan tugas. Dashboard tinggal membaca &mdash; <b>cepat walau ratusan proyek</b>.</p>
+
+    <h3>5. "Lewat tenggat" tidak disimpan, tapi dihitung</h3>
+    <p>Status seperti <b>Overtime</b> dihitung langsung dari <code class="inl">tanggal tenggat &lt; hari ini</code>, bukan ditandai manual.
+       Alasannya: <b>selalu akurat otomatis</b>, tidak bisa lupa di-update.</p>
+
+    <h3>6. Teknisi tidak bisa menandai "Selesai" sendiri</h3>
+    <p>Aturan transisi status membatasi teknisi hanya ke "Sedang Dikerjakan". Yang menandai "Selesai" hanya manajer.
+       Alasannya: meniru <b>alur kerja nyata</b> &mdash; yang mengerjakan dan yang menyetujui orang berbeda (gerbang review). Menjaga EV tetap jujur.</p>
+
+    <h3>7. Laporan harian = catatan kendala, BUKAN angka persen</h3>
+    <p>Teknisi tidak mengisi "progres 40%". Sistem menghitung sendiri dari tugas selesai. Laporan harian hanya untuk
+       <b>mencatat kendala</b>. Alasannya: kalau teknisi mengisi angka sendiri, datanya bisa dikarang. Angka yang dihitung sistem lebih <b>objektif</b>.</p>
+
+    <h3>8. Keamanan</h3>
+    <p>Login pakai <b>token (JWT)</b>; tiap permintaan dicek tokennya. Akses dibatasi peran. Semua query ke database memakai
+       <b>parameter</b> (<code class="inl">$1, $2</code>), bukan menempel teks &mdash; mencegah <b>SQL injection</b>.</p>
+
+    <div class="box say">
+      <span class="lbl">Omongin ke penguji (kalimat pamungkas)</span>
+      <p>"Prinsip desain saya: <b>angka kinerja harus objektif</b>. Karena itu SPI dihitung sistem dari status tugas,
+      bukan diketik manual; hasilnya disimpan agar dashboard cepat; dan ada pemisahan peran supaya data tetap jujur.
+      Struktur kodenya berlapis &mdash; tampilan, logika, dan rumus terpisah &mdash; agar mudah dirawat dan diuji."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. ANTISIPASI ============ -->
+<section id="tanya">
+  <div class="sec-card">
+    <h2><span class="num">8</span> Antisipasi pertanyaan penguji <span class="sub">+ jawaban singkat</span></h2>
+
+    <h4>"Kenapa SPI tidak diisi manual oleh teknisi?"</h4>
+    <p>Karena angka manual bisa subjektif/dikarang. Sistem menghitung SPI dari jumlah tugas yang benar-benar selesai &mdash; lebih objektif, tidak bisa dimanipulasi.</p>
+
+    <h4>"Kalau proyek belum punya tugas sama sekali, SPI-nya bagaimana?"</h4>
+    <p>Ada cadangan: kalau tidak ada tugas, sistem memakai progres dari catatan laporan harian terakhir; kalau itu pun tidak ada, dianggap 0. (spiCalculator.ts baris 127-136.)</p>
+
+    <h4>"Apa beda Overtime dan Over Deadline?"</h4>
+    <p><b>Overtime</b> = tugas <b>sedang dikerjakan</b> tapi sudah lewat tenggat. <b>Over Deadline</b> = tugas <b>belum dikerjakan</b> padahal sudah lewat tenggat. Keduanya dihitung otomatis dari tanggal.</p>
+
+    <h4>"Kenapa pakai PostgreSQL, bukan MySQL?"</h4>
+    <p>PostgreSQL kuat untuk perhitungan agregat (COUNT berkondisi) yang dipakai dashboard, mendukung tipe data &amp; constraint ketat, andal untuk data proyek relasional.</p>
+
+    <h4>"Indikator EWS update real-time?"</h4>
+    <p>Nilainya dihitung &amp; disimpan <b>seketika</b> saat status tugas berubah. Tampilan dashboard kadang perlu di-refresh (F5) untuk menampilkan warna terbaru &mdash; sudah dicatat sebagai temuan pengujian (TC-MN-04).</p>
+
+    <h4>"Berapa peran pengguna?"</h4>
+    <p>Dua: <b>Manajer</b> dan <b>Teknisi</b>, sesuai naskah (Tabel 4.9). Manajer kelola &amp; setujui; teknisi kerjakan &amp; lapor.</p>
+
+    <h4>"Tunjukkan datanya benar ada di database."</h4>
+    <p>Buka HeidiSQL (Bagian 2), jalankan <code class="inl">SELECT * FROM tb_proyek;</code> &mdash; tampil data mentahnya.</p>
+
+    <div class="box warn">
+      <span class="lbl">Kalau aplikasi error / blank saat sidang (rencana darurat)</span>
+      1) Cek terminal masih jalan &amp; Docker Desktop hijau. &nbsp; 2) Refresh browser (<span class="kbd">F5</span>).
+      &nbsp; 3) Kalau masih kacau, di terminal tekan <span class="kbd">Ctrl</span>+<span class="kbd">C</span>, lalu jalankan lagi
+      <code class="inl">python run.py --new</code> (tanpa <code class="inl">--reset-db</code> supaya data tidak terhapus).
+      &nbsp; 4) Tunggu <code class="inl">localhost:3000</code>, buka ulang browser.
+    </div>
+  </div>
+</section>
+
+<!-- ============ NASKAH & UJI ============ -->
+<section id="naskah">
+  <div class="sec-card">
+    <h2><span class="num">N</span> Naskah, pengujian &amp; referensi <span class="sub">buka kalau ditanya bagian teori</span></h2>
+    <p>Bagian ini bukan untuk diklik di aplikasi &mdash; ini bekal kalau penguji menanyakan <b>isi naskah</b>: beda implementasi
+       vs naskah, hasil pengujian, dan penelitian acuan. Klik tiap baris untuk membuka.</p>
+
+    <details class="acc">
+      <summary>Kalau ditanya "kok ada yang beda dari naskah?" (jawaban aman)</summary>
+      <div class="body">
+        <p>Aplikasi yang dipakai (folder <code class="inl">frontend/</code>) sengaja dibuat <b>setia ke naskah</b>. Beberapa
+           penyesuaian sadar yang sebaiknya kamu tahu:</p>
+        <div class="tw"><table>
+          <tr><th>Hal</th><th>Di naskah</th><th>Di aplikasi (alasan)</th></tr>
+          <tr><td>Framework</td><td>Next.js (SSR)</td><td>Next.js 15 &mdash; <b>sama</b>.</td></tr>
+          <tr><td>Sumber SPI</td><td>EV / PV</td><td>EV / PV, EV = % tugas selesai &mdash; <b>sama</b>.</td></tr>
+          <tr><td>Laporan harian</td><td>isi % progres + catatan kendala</td><td>hanya <b>catatan kendala (tanpa %)</b>. Alasan: angka % manual subjektif; EV dihitung sistem dari status tugas. Lebih objektif.</td></tr>
+          <tr><td>Material &amp; anggaran</td><td>di luar lingkup (batasan masalah)</td><td>tidak dibuat &mdash; <b>sesuai batasan</b>.</td></tr>
+          <tr><td>Eskalasi</td><td>fitur penuh</td><td>ada (<code class="inl">tb_eskalasi</code>, prioritas rendah/sedang/tinggi) &mdash; <b>sesuai</b>.</td></tr>
+          <tr><td>Peran pengguna</td><td>Teknisi &amp; Manajer (Admin disebut di narasi)</td><td><b>2 peran</b>: Teknisi &amp; Manajer (tugas admin masuk ke Manajer).</td></tr>
+        </table></div>
+        <div class="box say">
+          <span class="lbl">Omongin ke penguji</span>
+          <p>"Implementasi saya setia pada naskah. Satu penyesuaian sadar: laporan harian saya buat sebagai catatan kendala
+          tanpa input persentase manual, karena nilai Earned Value lebih objektif kalau dihitung sistem dari status tugas yang
+          benar-benar selesai, bukan diketik sendiri oleh teknisi."</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>Hasil pengujian Black Box (BAB V) &mdash; 18 skenario, 83,33% valid</summary>
+      <div class="body">
+        <p>Tabel 5.1: <b>18 skenario &rarr; 15 valid, 3 tidak valid = 83,33%</b>. Kategori: TC-AUTH (3), TC-MN manajer (5),
+           TC-TK teknisi (6), TC-SYS sistem (4). Tiga yang "tidak valid" adalah <b>bug terdokumentasi</b> &mdash; jujur ditulis di naskah, bukan disembunyikan.</p>
+        <div class="tw"><table>
+          <tr><th>ID</th><th>Skenario</th><th>Hasil</th></tr>
+          <tr><td class="mono">TC-AUTH-01..03</td><td>Login manajer/teknisi + blokir akses lewat URL (RBAC)</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-MN-01</td><td>Manajer input proyek baru</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-MN-02</td><td>Tugaskan teknisi + validasi jadwal anti-bentrok</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-MN-03</td><td>Review gate: tinjau bukti &rarr; status Done</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-MN-04</td><td>Approve done &rarr; SPI/EWS update tanpa refresh</td><td><span class="rag r">Tidak Valid</span></td></tr>
+          <tr><td class="mono">TC-MN-05</td><td>Manajer balas instruksi eskalasi ke teknisi</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-TK-01</td><td>Teknisi geser kanban to_do &rarr; working_on_it</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-TK-02</td><td>Unggah bukti format valid</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-TK-03</td><td>Tolak upload .exe/.zip</td><td><span class="rag r">Tidak Valid</span></td></tr>
+          <tr><td class="mono">TC-TK-04</td><td>Kirim laporan eskalasi &rarr; notifikasi manajer</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-TK-05</td><td>Teknisi akses dashboard SPI pribadi</td><td><span class="rag g">Valid</span></td></tr>
+          <tr><td class="mono">TC-TK-06</td><td>Cegah double-submit klik cepat "Kirim Laporan"</td><td><span class="rag r">Tidak Valid</span></td></tr>
+          <tr><td class="mono">TC-SYS-01..04</td><td>Hitung EV, SPI&rarr;warna RAG, urut kritis, anti-bentrok jadwal</td><td><span class="rag g">Valid</span></td></tr>
+        </table></div>
+        <h4>3 temuan "tidak valid" + cara menjelaskan</h4>
+        <ul>
+          <li><b>TC-MN-04 (EWS tidak real-time):</b> setelah approve, nilai SPI &amp; warna baru berubah setelah halaman di-<b>refresh (F5)</b>, belum otomatis. <i>"Nilainya sudah benar tersimpan; yang belum, dashboard memuat ulang otomatis. Perbaikannya tinggal tambah auto-refresh."</i></li>
+          <li><b>TC-TK-03 (validasi upload lemah):</b> sistem masih menerima file <code class="inl">.exe</code>, belum membatasi ke gambar/dokumen saja. <i>"Ini soal keamanan upload; perbaikannya whitelist tipe file."</i></li>
+          <li><b>TC-TK-06 (double-submit):</b> klik cepat "Kirim" dua kali bisa membuat catatan ganda. <i>"Perbaikannya nonaktifkan tombol setelah klik pertama (debounce)."</i></li>
+        </ul>
+        <div class="box tip">
+          <span class="lbl">Kenapa ini justru bagus</span>
+          Menulis 3 kegagalan dengan jujur menunjukkan pengujian <b>benar dilakukan</b> dan kamu <b>tahu batas sistemmu</b> + cara memperbaikinya. Penguji menghargai itu.
+        </div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>Penelitian acuan (kajian terdahulu, Tabel 2.1) &mdash; 7 penelitian</summary>
+      <div class="body">
+        <div class="tw"><table>
+          <tr><th>Penulis (tahun)</th><th>Inti yang dipakai</th></tr>
+          <tr><td>Azkia, Yekti, Caesaron (2024)</td><td>Dashboard monitoring kinerja proyek pakai <b>EVM</b> + Looker Studio. UAT 86%.</td></tr>
+          <tr><td>Ernawan (2024)</td><td>Management dashboard &rarr; KPI real-time mempercepat keputusan. <b>Dikutip di Latar Belakang.</b></td></tr>
+          <tr><td>Gledson dkk. (2024)</td><td>Dashboard berbasis web untuk manajer desain konstruksi (metode DSRM).</td></tr>
+          <tr><td>Hakim &amp; Pradibta (2025)</td><td>Fitur dashboard + report, Agile Kanban, evaluasi SUS "sangat sesuai".</td></tr>
+          <tr><td>Auliansyah dkk. (2023)</td><td>Monitoring konstruksi pakai <b>Kurva-S</b> + hitung deviasi, multi-user 4 hak akses.</td></tr>
+          <tr><td>Iqbal dkk. (2024)</td><td>Sistem manajemen proyek: tugas + Gantt + dashboard ringkasan.</td></tr>
+          <tr><td>Luthan dkk. (2023)</td><td>Rumus <b>MDI/PDI</b> (indeks keterlambatan manajemen vs produksi) &mdash; inspirasi fitur <b>eskalasi</b>.</td></tr>
+        </table></div>
+        <p style="font-size:13px;color:var(--muted)">Acuan lain yang sering disebut: Fonseca dkk. (2025) &amp; Reddy dkk. (2025) untuk konsep RAG/health; Genne (2025) untuk Next.js SSR; Umana dkk. (2022) &amp; RealCONs (2025) untuk EWS/deteksi keterlambatan dini.</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>Ringkas: kalimat pembuka kalau diminta "jelaskan sistem Anda"</summary>
+      <div class="body">
+        <div class="box say">
+          <span class="lbl">Omongin ke penguji (pembuka)</span>
+          <p>"Sistem ini dashboard manajemen proyek untuk PT Smart Home Inovasi. Masalahnya: teknisi tidak bisa lapor langsung,
+          tidak ada dashboard pemantauan, dan keterlambatan baru ketahuan setelah terlambat. Solusi saya: teknisi input langsung
+          dari lapangan lewat tugas Kanban, lalu sistem menghitung <b>SPI</b> (Schedule Performance Index = Earned Value dibagi
+          Planned Value) secara otomatis dari status tugas, mengubahnya jadi indikator warna merah-kuning-hijau, dan menaruh
+          proyek paling kritis di urutan teratas. Inilah <b>Early Warning System</b>-nya &mdash; peringatan dini berbasis data,
+          bukan menunggu laporan terlambat."</p>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ GLOSARIUM ============ -->
+<section id="glosarium">
+  <div class="sec-card">
+    <h2><span class="num">G</span> Glosarium istilah <span class="sub">bahasa sederhana</span></h2>
+    <div class="tw"><table>
+      <tr><th>Istilah</th><th>Arti sederhana</th></tr>
+      <tr><td><b>SPI</b> (Schedule Performance Index)</td><td>Angka penilai apakah proyek sesuai jadwal. 1 = pas, di bawah 1 = terlambat.</td></tr>
+      <tr><td><b>EV</b> (Earned Value / Nilai Hasil)</td><td>Persen pekerjaan yang benar-benar selesai.</td></tr>
+      <tr><td><b>PV</b> (Planned Value / Nilai Rencana)</td><td>Persen pekerjaan yang seharusnya selesai sampai hari ini.</td></tr>
+      <tr><td><b>RAG</b></td><td>Red-Amber-Green. Tiga warna status: merah/kuning/hijau.</td></tr>
+      <tr><td><b>EWS</b> (Early Warning System)</td><td>Sistem peringatan dini: otomatis menandai proyek yang mulai bermasalah.</td></tr>
+      <tr><td><b>Eskalasi</b></td><td>Melaporkan masalah serius dari lapangan ke manajer dengan prioritas.</td></tr>
+      <tr><td><b>Kanban</b></td><td>Papan tugas berkolom: Belum Dikerjakan / Sedang Dikerjakan / Selesai.</td></tr>
+      <tr><td><b>Database / PostgreSQL</b></td><td>Tempat semua data disimpan secara permanen.</td></tr>
+      <tr><td><b>Docker</b></td><td>"Wadah" yang menjalankan database tanpa ribet install.</td></tr>
+      <tr><td><b>localhost:3000</b></td><td>Alamat website aplikasi saat dijalankan di komputermu sendiri.</td></tr>
+      <tr><td><b>JWT / Token</b></td><td>Tanda pengenal digital saat login, supaya server tahu kamu siapa.</td></tr>
+    </table></div>
+    <p class="toplink"><a href="#cara">&uarr; Kembali ke atas</a></p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    Panduan Demo Sidang &mdash; Dashboard SHI &middot; untuk latihan / gladi bersih &middot;
+    dobel-klik untuk buka (browser) &middot; responsif &middot; klik data untuk menyalin &middot; ramah cetak (Ctrl+P).
+  </div>
+</footer>
+
+<!-- ============ FLOATING DATA CEPAT ============ -->
+<button id="fab" aria-label="Buka Data Cepat"><span class="ic">&#9889;</span> Data Cepat</button>
+<div id="scrim"></div>
+<aside id="drawer" aria-label="Panel Data Cepat">
+  <div class="dh">
+    <div><b>Data Cepat</b><small>klik mana saja untuk menyalin</small></div>
+    <button class="dx" id="drawerClose" aria-label="Tutup">&times;</button>
+  </div>
+  <div class="dbody">
+    <h5>Akun (password: password123)</h5>
+    <span class="chip" data-copy="admin@shi.co.id"><span class="k">Manajer</span><span class="v">admin@shi.co.id</span></span>
+    <span class="chip" data-copy="rizky@shi.co.id"><span class="k">Teknisi</span><span class="v">rizky@shi.co.id</span></span>
+    <span class="chip" data-copy="password123"><span class="k">Pass</span><span class="v">password123</span></span>
+
+    <h5>Perintah terminal</h5>
+    <span class="chip" data-copy="python run.py --new --reset-db"><span class="v">python run.py --new --reset-db</span></span>
+    <span class="chip" data-copy="python run.py --new"><span class="k">tanpa reset</span><span class="v">python run.py --new</span></span>
+
+    <h5>Form Klien</h5>
+    <span class="chip" data-copy="CV Sinar Abadi Teknik"><span class="k">Nama</span><span class="v">CV Sinar Abadi Teknik</span></span>
+    <span class="chip" data-copy="081328845120"><span class="k">Telp</span><span class="v">081328845120</span></span>
+    <span class="chip" data-copy="kontak@sinarabaditeknik.co.id"><span class="k">Email</span><span class="v">kontak@sinarabaditeknik.co.id</span></span>
+    <span class="chip" data-copy="Jl. Kaliurang Km 9, Sardonoharjo, Ngaglik, Sleman, Yogyakarta 55581"><span class="k">Alamat</span><span class="v">Jl. Kaliurang Km 9, Sleman</span></span>
+    <span class="chip" data-copy="https://www.google.com/maps/place/@-7.7260288,110.4006013,17z"><span class="k">Maps</span><span class="v">link Google Maps</span></span>
+    <span class="chip" data-copy="Klien baru bidang ritel. Pemasangan CCTV + smart lock untuk 2 toko."><span class="k">Catatan</span><span class="v">catatan klien</span></span>
+
+    <h5>Form Proyek</h5>
+    <span class="chip" data-copy="Pemasangan CCTV & Smart Lock - Toko Sinar Abadi"><span class="k">Nama</span><span class="v">Pemasangan CCTV &amp; Smart Lock</span></span>
+    <span class="chip" data-copy="Instalasi 12 kamera CCTV + 4 smart lock di 2 cabang toko."><span class="k">Deskripsi</span><span class="v">deskripsi proyek</span></span>
+    <span class="chip" data-copy="42000000"><span class="k">Nilai</span><span class="v">42000000</span></span>
+    <span class="chip" data-copy="Sistem keamanan terpasang & terhubung aplikasi mobile, serah terima 1 bulan."><span class="k">Target</span><span class="v">target proyek</span></span>
+
+    <h5>Form Tugas (3)</h5>
+    <span class="chip" data-copy="Survey lokasi 2 toko"><span class="v">Survey lokasi 2 toko</span></span>
+    <span class="chip" data-copy="Penarikan kabel & pemasangan kamera"><span class="v">Penarikan kabel &amp; pemasangan kamera</span></span>
+    <span class="chip" data-copy="Setup NVR + smart lock + testing"><span class="v">Setup NVR + smart lock + testing</span></span>
+
+    <h5>Bukti &amp; catatan kendala</h5>
+    <span class="chip" data-copy="Pemasangan panel kontrol utama selesai, kabel sudah dirapikan."><span class="k">Bukti</span><span class="v">deskripsi bukti</span></span>
+    <span class="chip" data-copy="Material smart curtain datang terlambat dari supplier, pemasangan tirai mundur 1 hari."><span class="k">Kendala</span><span class="v">catatan kendala</span></span>
+
+    <h5>Database (HeidiSQL)</h5>
+    <span class="chip" data-copy="127.0.0.1"><span class="k">Host</span><span class="v">127.0.0.1</span></span>
+    <span class="chip" data-copy="5433"><span class="k">Port</span><span class="v">5433</span></span>
+    <span class="chip" data-copy="postgres"><span class="k">User</span><span class="v">postgres</span></span>
+    <span class="chip" data-copy="postgres"><span class="k">Pass</span><span class="v">postgres</span></span>
+    <span class="chip" data-copy="shi"><span class="k">DB</span><span class="v">shi</span></span>
+  </div>
+</aside>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- clipboard with file:// fallback ---- */
+  function copyText(text){
+    if(navigator.clipboard && window.isSecureContext){
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function(res,rej){
+      try{
+        var ta=document.createElement("textarea");
+        ta.value=text; ta.setAttribute("readonly","");
+        ta.style.position="fixed"; ta.style.top="-1000px"; ta.style.opacity="0";
+        document.body.appendChild(ta); ta.select();
+        var ok=document.execCommand("copy"); document.body.removeChild(ta);
+        ok?res():rej(new Error("execCommand failed"));
+      }catch(e){ rej(e); }
+    });
+  }
+
+  var toastEl=document.getElementById("toast"), toastT=null;
+  function toast(msg,bad){
+    toastEl.textContent=msg; toastEl.classList.toggle("bad",!!bad);
+    toastEl.classList.add("show");
+    if(toastT) clearTimeout(toastT);
+    toastT=setTimeout(function(){ toastEl.classList.remove("show"); },1500);
+  }
+
+  function flash(el){
+    el.classList.add("ok");
+    setTimeout(function(){ el.classList.remove("ok"); },1300);
+  }
+
+  /* ---- inject Salin buttons on command + code blocks ---- */
+  function addBtn(block, text){
+    var b=document.createElement("button");
+    b.className="copybtn"; b.type="button"; b.textContent="Salin";
+    b.addEventListener("click",function(ev){
+      ev.stopPropagation();
+      copyText(text).then(function(){
+        b.classList.add("ok"); b.textContent="Tersalin";
+        toast("Tersalin ke clipboard");
+        setTimeout(function(){ b.classList.remove("ok"); b.textContent="Salin"; },1300);
+      },function(){ toast("Gagal menyalin - salin manual",true); });
+    });
+    block.appendChild(b);
+  }
+  document.querySelectorAll(".cmd").forEach(function(c){
+    var txt=c.getAttribute("data-cmd");
+    if(!txt){ txt=(c.innerText||"").replace(/^\s*KETIK INI DI TERMINAL\s*/,"").replace(/^\s*[A-Z\- ]{6,}\n?/,"").trim(); }
+    addBtn(c, txt);
+  });
+  document.querySelectorAll("pre.code").forEach(function(p){ addBtn(p, (p.innerText||"").trim()); });
+
+  /* ---- delegated copy for [data-copy] (cells, chips, inline) ---- */
+  document.addEventListener("click",function(e){
+    var t=e.target.closest("[data-copy]");
+    if(!t || t.classList.contains("copybtn")) return;
+    var text=t.getAttribute("data-copy");
+    copyText(text).then(function(){ flash(t); toast("Tersalin: "+(text.length>42?text.slice(0,42)+"…":text)); },
+                        function(){ toast("Gagal menyalin - salin manual",true); });
+  });
+
+  /* ---- Data Cepat drawer ---- */
+  var fab=document.getElementById("fab"), drawer=document.getElementById("drawer"),
+      scrim=document.getElementById("scrim"), dClose=document.getElementById("drawerClose");
+  function openD(){ drawer.classList.add("open"); scrim.classList.add("open"); }
+  function closeD(){ drawer.classList.remove("open"); scrim.classList.remove("open"); }
+  fab.addEventListener("click",openD);
+  dClose.addEventListener("click",closeD);
+  scrim.addEventListener("click",closeD);
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeD(); });
+
+  /* ---- gladi bersih checklist (localStorage) ---- */
+  var KEY="shi-gladi-v1", saved={};
+  try{ saved=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ saved={}; }
+  document.querySelectorAll("#gladi li").forEach(function(li){
+    var k=li.getAttribute("data-k");
+    if(saved[k]) li.classList.add("done");
+    li.addEventListener("click",function(){
+      li.classList.toggle("done");
+      saved[k]=li.classList.contains("done");
+      try{ localStorage.setItem(KEY,JSON.stringify(saved)); }catch(e){}
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
