@@ -251,4 +251,48 @@ describe('recalculateSPI', () => {
     const result = await recalculateSPI(projectId);
     expect(result?.status).toBe('red');
   });
+
+  // PROYEK SELESAI: SPI = durasi_rencana / durasi_aktual (efisiensi jadwal akhir),
+  // BUKAN EV/PV-di-hari-ini yang selalu jatuh ke 1.0. Regresi "SPI 1 semua di riwayat".
+  describe('completed projects use schedule efficiency (planned/actual duration)', () => {
+    async function seedCompleted(startDaysAgo: number, plannedEndDaysAgo: number, actualEndDaysAgo: number) {
+      const start = new Date(Date.now() - startDaysAgo * 86400000).toISOString().slice(0, 10);
+      const end = new Date(Date.now() - plannedEndDaysAgo * 86400000).toISOString().slice(0, 10);
+      const doneAt = new Date(Date.now() - actualEndDaysAgo * 86400000).toISOString();
+      await testPool.query(
+        "UPDATE tb_proyek SET start_date=$1, end_date=$2, status='completed' WHERE id_proyek=$3",
+        [start, end, projectId]
+      );
+      for (let i = 0; i < 4; i++) {
+        await testPool.query(
+          `INSERT INTO tb_tugas (id_proyek, nama_tugas, status, due_date, sort_order, is_survey_task, status_changed_at, created_by)
+           VALUES ($1,$2,'done',$3,$4,FALSE,$5,$6)`,
+          [projectId, `Task ${i + 1}`, end, i, doneAt, managerId]
+        );
+      }
+    }
+
+    it('SPI > 1 (green) when finished EARLIER than planned', async () => {
+      // rencana 60 hari, aktual 50 hari -> SPI = 60/50 = 1.2
+      await seedCompleted(100, 40, 50);
+      const result = await recalculateSPI(projectId);
+      expect(Number(result?.spi_value)).toBeGreaterThan(1);
+      expect(result?.status).toBe('green');
+    });
+
+    it('SPI < 0.85 (red) when finished LATER than planned', async () => {
+      // rencana 60 hari, aktual 80 hari -> SPI = 60/80 = 0.75
+      await seedCompleted(100, 40, 20);
+      const result = await recalculateSPI(projectId);
+      expect(Number(result?.spi_value)).toBeLessThan(0.85);
+      expect(result?.status).toBe('red');
+    });
+
+    it('does NOT collapse every completed project to SPI 1.0', async () => {
+      // Inti keluhan "SPI 1 semua": proyek selesai lebih cepat HARUS != 1.
+      await seedCompleted(100, 40, 50);
+      const result = await recalculateSPI(projectId);
+      expect(Number(result?.spi_value)).not.toBe(1);
+    });
+  });
 });

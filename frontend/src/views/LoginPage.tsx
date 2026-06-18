@@ -74,7 +74,11 @@ export default function LoginPage() {
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 blur-3xl bg-white/20 rounded-full scale-150" />
-              <SHILogo size={160} />
+              {/* Wordmark biru `logo.png` butuh alas terang -- kalau langsung di
+                  atas panel biru jadi biru-di-biru (tak terbaca). Kartu putih. */}
+              <div className="relative rounded-3xl bg-white px-8 py-6 shadow-2xl shadow-black/25">
+                <SHILogo size={120} />
+              </div>
             </div>
           </div>
 
@@ -121,7 +125,9 @@ export default function LoginPage() {
         <div className="w-full max-w-sm relative z-10">
           {/* Mobile logo (hidden on desktop) */}
           <div className="lg:hidden flex flex-col items-center mb-8">
-            <SHILogo size={96} />
+            <div className="rounded-2xl bg-white px-5 py-3.5 shadow-lg shadow-blue-500/10">
+              <SHILogo size={72} />
+            </div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-3">SHI Dashboard</h2>
             <p className="text-xs text-gray-500 dark:text-gray-400">PT Smart Home Inovasi</p>
           </div>

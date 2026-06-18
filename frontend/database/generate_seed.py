@@ -30,8 +30,8 @@ from pathlib import Path
 
 # ============================ KONFIGURASI ============================
 SEED = 20260619
-NUM_PROJECTS = 900                 # ~1 tahun riwayat (3 proyek masuk/hari)
-CAPACITY = 4                       # maks proyek berjalan bersamaan / teknisi
+NUM_PROJECTS = 450                 # riwayat operasi (intake 2-3/hari sibuk, banyak hari kosong)
+CAPACITY = 1                       # 1 teknisi = 1 job pada satu waktu (realistis lapangan)
 NOMINAL_TODAY = datetime.date(2026, 6, 19)   # anchor kode proyek (kosmetik)
 OUT = Path(__file__).parent / "seed.sql"
 PW_HASH = "$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6"  # password123
@@ -85,9 +85,15 @@ def _coords(lat, lon, maps_url):
     return float(m.group(1)), float(m.group(2))
 
 
-def _load_names():
+def _load_tech_names():
+    """Daftar nama teknisi rekrutan terkurasi (urut, dipakai saat _hire)."""
+    return _lines("tech_names.csv")
+
+
+def _load_person_pools():
+    """Pool nama klien perorangan (first_m/first_f/last) dari client_persons.csv."""
     fm, ff, ln = [], [], []
-    for kind, val in _rows("tech_names.csv"):
+    for kind, val in _rows("client_persons.csv"):
         (fm if kind == "first_m" else ff if kind == "first_f" else ln).append(val)
     return fm, ff, ln
 
@@ -119,7 +125,8 @@ def _load_project_names():
     return d
 
 
-FIRST_M, FIRST_F, LAST = _load_names()
+TECH_NAMES = _load_tech_names()                 # nama teknisi rekrutan terkurasi <- tech_names.csv
+FIRST_M, FIRST_F, LAST = _load_person_pools()   # nama klien perorangan <- client_persons.csv
 
 ENTERPRISE = _load_clients_pool()      # klien enterprise + koordinat <- clients.csv
 INDIV_AREAS = _load_areas()            # area perumahan klien perorangan <- residential_areas.csv
@@ -134,9 +141,10 @@ VALUE = {
     "maintenance": (4, 15, 18, 50, 55, 150), "perbaikan": (3, 12, 15, 40, 45, 120),
     "upgrade": (10, 30, 35, 90, 100, 250), "lainnya": (5, 20, 25, 70, 80, 200),
 }
-# durasi (hari kalender) per skala -- proyek CCTV/smart-home: hari s.d. minggu,
-# besar paling lama ~2.5 bulan (bukan konstruksi). Menjaga konkurensi realistis.
-DUR = {"small": (3, 12), "medium": (14, 35), "large": (40, 75)}
+# durasi (hari kalender) per skala -- instalasi CCTV/smart-home realistis: rumah
+# 1-3 hari, komersil 4-12 hari, besar (hotel/RS/mall) 2-5 minggu. Sengaja pendek
+# supaya "1 teknisi = 1 job" (CAPACITY=1) tetap muat <=25 teknisi pada konkurensi.
+DUR = {"small": (1, 3), "medium": (4, 12), "large": (14, 35)}
 # distribusi skala per tipe klien
 SCALE_DIST = {
     "developer": ["small", "small", "medium", "medium", "large"],
@@ -157,6 +165,13 @@ SCALE_DIST = {
 TARGET_DESC = {cat: desc for cat, desc in _rows("target_desc.csv")}   # <- target_desc.csv
 CONSTRAINTS_POOL = _lines("constraints.txt")                          # catatan kendala <- constraints.txt
 ESC_POOL = [(t, d, p) for t, d, p in _rows("escalations.csv")]        # eskalasi <- escalations.csv
+
+# Faktor jadwal proyek SELESAI = durasi_aktual / durasi_rencana. SPI akhir = 1/faktor:
+# faktor <1 -> selesai lebih cepat (SPI>1); >1 -> telat (SPI<1). Sebaran realistis:
+# mayoritas tepat waktu/sedikit cepat, sebagian telat -> riwayat SPI BERVARIASI
+# (bukan "1 semua"). Dipakai build_tasks utk menggeser waktu penyelesaian tugas.
+SCHED_FACTORS = [0.70, 0.75, 0.80, 0.82, 0.88, 0.92, 0.96, 1.0, 1.0,
+                 1.04, 1.08, 1.15, 1.22, 1.30, 1.45]
 
 
 def pick(seq):
@@ -186,13 +201,21 @@ def build_clients():
         clients.append(dict(id=cid, nama=nama, short=short, tipe=tipe, alamat=alamat, telp=telp,
                             email=email, notes=notes, lat=lat, lon=lon, weight=w, favs=favs,
                             created_by=pick(MANAGERS)))
-    # perorangan
+    # perorangan -- nama depan UNIK antar klien (tak ada duplikasi depan); gelar
+    # mengikuti gender nama depan (Bp. utk pria, Ibu utk wanita).
     n_indiv = 34
+    persons = [("Bp.", f) for f in FIRST_M] + [("Ibu", f) for f in FIRST_F]
+    rng.shuffle(persons)
+    used_first = set()
+    pi = 0
     for _ in range(n_indiv):
         cid += 1
-        fn = pick(FIRST_M + FIRST_F)
+        while pi < len(persons) and persons[pi][1] in used_first:
+            pi += 1
+        title, fn = persons[pi]
+        pi += 1
+        used_first.add(fn)
         ln = pick(LAST)
-        title = pick(["Bp.", "Bp.", "Ibu", "Ibu"])
         area, blat, blon = pick(INDIV_AREAS)
         blok = f"{pick('ABCDEF')}-{rng.randint(1, 28)}"
         nama = f"{title} {fn} {ln}"
@@ -214,7 +237,7 @@ def build_start_offsets(n):
     offs = []
     day = -2  # proyek terbaru mulai 2 hari lalu
     while len(offs) < n:
-        intake = pick([1, 2, 2, 3, 3, 3, 4, 4, 5, 0])  # rata-rata ~3/hari, kadang 0
+        intake = pick([0, 0, 0, 0, 0, 2, 2, 3, 3, 0])  # 2-3 proyek/hari sibuk, banyak hari kosong (rata ~1/hari)
         for _ in range(intake):
             if len(offs) >= n:
                 break
@@ -259,16 +282,19 @@ class Roster:
     def _hire(self, start_off):
         tid = self.next_id
         self.next_id += 1
-        # nama unik + email unik
-        while True:
-            fn = pick(FIRST_M + FIRST_F)
-            ln = pick(LAST)
-            email = f"{fn.lower()}.{ln.lower()}@shi.co.id"
-            if email not in USED_EMAILS:
-                USED_EMAILS.add(email)
-                break
+        # nama teknisi terkurasi, dipakai BERURUTAN (pria, nama depan unik).
+        # Fallback bernomor hanya kalau daftar habis (tak diharapkan pada CAPACITY ini).
+        idx = len(self.hires)
+        nama = TECH_NAMES[idx] if idx < len(TECH_NAMES) else f"Teknisi {tid}"
+        parts = nama.split()
+        base = f"{parts[0].lower()}.{parts[-1].lower()}"
+        email, n = f"{base}@shi.co.id", 2
+        while email in USED_EMAILS:
+            email = f"{base}{n}@shi.co.id"
+            n += 1
+        USED_EMAILS.add(email)
         self.tech[tid] = []
-        self.hires.append(dict(id=tid, nama=f"{fn} {ln}", email=email, hire_off=start_off))
+        self.hires.append(dict(id=tid, nama=nama, email=email, hire_off=start_off))
         return tid
 
 
@@ -307,13 +333,10 @@ def build_projects(clients):
         dur = rng.randint(dlo, dhi)
         end_off = start_off + dur
 
-        # tentukan status dari posisi interval vs hari ini (0)
-        if end_off < 0:
-            status = "completed" if rng.random() > 0.04 else "on-hold"
-        elif start_off <= 0 <= end_off:
-            status = "active" if rng.random() > 0.06 else "on-hold"
-        else:
-            status = "active"
+        # tentukan status dari posisi interval vs hari ini (0).
+        # TANPA 'on-hold': PT SHI menjaga citra -> tidak menunda pekerjaan. Proyek
+        # yang jadwalnya sudah lewat = selesai; yang sedang berjalan = aktif.
+        status = "completed" if end_off < 0 else "active"
 
         # fase + survey approval
         survey_len = max(2, min(dur // 4, 10))
@@ -332,7 +355,7 @@ def build_projects(clients):
 
         manager = rng.choices(MANAGERS, weights=MANAGER_W)[0]
         name = pick(NAME_TEMPLATES[category]).format(c=client["short"])
-        team_size = {"small": 1, "medium": rng.choice([1, 2]), "large": rng.choice([2, 3])}[scale]
+        team_size = {"small": 1, "medium": rng.choice([1, 1, 2]), "large": rng.choice([2, 2, 3])}[scale]
         team = roster.assign(start_off, end_off, team_size)
 
         # target kesehatan utk aktif
@@ -364,6 +387,16 @@ def build_tasks(projects):
         total = len(chosen)
         s, e, dur = p["start_off"], p["end_off"], p["dur"]
 
+        # durasi AKTUAL proyek selesai = durasi_rencana x faktor jadwal (acak realistis).
+        # actual_end = saat tugas terakhir di-'done' (harus di masa lalu, <= -1) -> jadi
+        # dasar SPI akhir (durasi_rencana / durasi_aktual) yang dihitung recalculateSPI.
+        if p["status"] == "completed":
+            actual_dur = max(1, round(dur * pick(SCHED_FACTORS)))
+            actual_end = clamp(s + actual_dur, s + 1, -1)
+            actual_dur = actual_end - s
+        else:
+            actual_end, actual_dur = e, dur
+
         # tentukan jumlah 'done' sesuai status/kesehatan
         if p["status"] == "completed":
             done = total
@@ -387,9 +420,12 @@ def build_tasks(projects):
             assignee = p["team"][idx % len(p["team"])]
             if idx < done:
                 st = "done"
-                upd_off = clamp(due_off + rng.randint(-2, 1), s + 1, min(e, -1) if e < 0 else min(e, 0))
-                if e >= 0:
-                    upd_off = clamp(due_off + rng.randint(-2, 1), s + 1, -1)
+                if p["status"] == "completed":
+                    # penyelesaian aktual mengikuti durasi aktual; tugas terakhir
+                    # mendarat di actual_end -> MAX(status_changed_at) = actual_end.
+                    upd_off = clamp(s + round((idx + 1) / total * actual_dur), s + 1, actual_end)
+                else:
+                    upd_off = clamp(due_off + rng.randint(-2, 1), s + 1, min(e, -1))
             elif idx == working_idx and p["status"] != "on-hold":
                 st = "working_on_it"
                 upd_off = clamp(-rng.randint(0, 3), s + 1, 0)

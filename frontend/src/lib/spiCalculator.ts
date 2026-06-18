@@ -113,6 +113,20 @@ async function getLatestReportProgress(projectId: number): Promise<number | null
 }
 
 /**
+ * Tanggal penyelesaian AKTUAL proyek = waktu tugas terakhir ditandai 'done'
+ * (MAX status_changed_at). Dipakai SPI proyek selesai (durasi rencana vs aktual).
+ */
+async function getActualCompletionDate(projectId: number): Promise<Date | null> {
+  const result = await query<{ done_at: Date | null }>(
+    `SELECT MAX(status_changed_at) AS done_at
+     FROM tb_tugas
+     WHERE id_proyek = $1 AND status = 'done'`,
+    [projectId]
+  );
+  return result.rows[0]?.done_at ?? null;
+}
+
+/**
  * Recalculate SPI and health status for a given project.
  */
 export async function recalculateSPI(projectId: number): Promise<ProjectHealth | null> {
@@ -150,7 +164,27 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
 
   let spiValue: number | null;
   let status: HealthStatus | null;
-  if (!measurable) {
+
+  if (project.status === 'completed' && taskCounts.total > 0 && taskCounts.completed > 0) {
+    // PROYEK SELESAI: SPI = efisiensi jadwal akhir = durasi_rencana / durasi_aktual.
+    // EVM klasik memaksa SPI->1 saat selesai (EV=PV=100% di tanggal akhir) -> tak
+    // informatif & bikin "SPI 1 semua" di riwayat. Untuk proyek selesai yang
+    // bermakna (tepat waktu / lebih cepat / telat), pakai rasio durasi:
+    //   selesai lebih cepat dari rencana -> SPI > 1; lebih lambat -> SPI < 1.
+    // Durasi aktual diukur dari tugas terakhir di-'done' (MAX status_changed_at).
+    const DAY_MS = 86400000;
+    const startMs = new Date(project.start_date).getTime();
+    const plannedEndMs = new Date(project.end_date).getTime();
+    const plannedDur = Math.max(1, Math.round((plannedEndMs - startMs) / DAY_MS));
+    const actualEnd = await getActualCompletionDate(projectId);
+    const actualDur = actualEnd
+      ? Math.max(1, Math.round((new Date(actualEnd).getTime() - startMs) / DAY_MS))
+      : plannedDur;
+    const raw = Math.round((plannedDur / actualDur) * 10000) / 10000;
+    spiValue = Math.min(raw, SPI_CAP);
+    status = categorizeHealth(spiValue);
+    actualProgress = 100; // selesai => seluruh tugas done
+  } else if (!measurable) {
     spiValue = null;
     status = null;
   } else {

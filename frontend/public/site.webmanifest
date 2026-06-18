@@ -1,7 +1,6 @@
 {
-  "name": "PT Smart Home Inovasi Dashboard",
-  "short_name": "SHI Dashboard",
-  "description": "Dashboard manajemen proyek PT Smart Home Inovasi - monitoring SPI & Early Warning System",
+  "name": "MyWebSite",
+  "short_name": "MySite",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -16,8 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#2563eb",
-  "background_color": "#0f172a",
-  "display": "standalone",
-  "start_url": "/"
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
 }

@@ -1,84 +1,36 @@
-# Pool nama teknisi untuk rekrutmen (saat kapasitas terlampaui).
-# Delimiter '|'. Kolom: kind|value   (kind: first_m | first_f | last)
-# Generator memilih first_m/first_f + last secara acak deterministik, email unik @shi.co.id.
-first_m|Agus
-first_m|Bayu
-first_m|Cahyo
-first_m|Dimas
-first_m|Eko
-first_m|Galih
-first_m|Hadi
-first_m|Irfan
-first_m|Joko
-first_m|Krisna
-first_m|Lukman
-first_m|Made
-first_m|Nanda
-first_m|Oki
-first_m|Putra
-first_m|Rian
-first_m|Surya
-first_m|Teguh
-first_m|Umar
-first_m|Vino
-first_m|Wahyu
-first_m|Yoga
-first_m|Zaki
-first_m|Bagas
-first_m|Candra
-first_m|Doni
-first_m|Ferdi
-first_m|Gilang
-first_m|Heru
-first_m|Ilham
-first_m|Jefri
-first_m|Kevin
-first_m|Leo
-first_m|Naufal
-first_m|Panji
-first_m|Rangga
-first_f|Ayu
-first_f|Bela
-first_f|Citra
-first_f|Dewi
-first_f|Eka
-first_f|Fitri
-first_f|Gita
-first_f|Hana
-first_f|Indah
-first_f|Kirana
-first_f|Laras
-first_f|Mega
-first_f|Nadia
-first_f|Okta
-first_f|Putri
-first_f|Rahma
-first_f|Sinta
-first_f|Tika
-last|Pratama
-last|Santoso
-last|Wibowo
-last|Nugroho
-last|Saputra
-last|Hidayat
-last|Kurniawan
-last|Setiawan
-last|Permana
-last|Ramadhan
-last|Firmansyah
-last|Maulana
-last|Suryanto
-last|Gunawan
-last|Prasetyo
-last|Hartono
-last|Wijaya
-last|Susanto
-last|Anggara
-last|Pradana
-last|Cahyono
-last|Mahendra
-last|Putranto
-last|Aditya
-last|Nurcahyo
-last|Iskandar
-last|Yulianto
+# Daftar nama teknisi lapangan PT SHI yang DIREKRUT seiring volume tumbuh.
+# Dikurasi tangan: semua PRIA (teknisi instalasi/CCTV lapangan), nama depan UNIK
+# (tidak ada duplikasi depan antar-staf) + nama lengkap distinctive khas Indonesia.
+# Generator memakai baris ini BERURUTAN saat merekrut (deterministik), email unik
+# diturunkan dari nama. Base 5 teknisi (Rizky/Andi/Reza/Fajar/Hendra) ada di init.sql.
+# 1 nama lengkap per baris. Cukup utk batas atas headcount; sisanya tak terpakai.
+Aditya Nugraha
+Bagas Prakoso
+Cahyo Wibowo
+Damar Saputra
+Edwin Hartanto
+Galih Pratomo
+Hafiz Maulana
+Irfan Kurniawan
+Joko Purnomo
+Krisna Wijaya
+Lukman Hakim
+Naufal Akbar
+Oka Mahendra
+Panji Kusuma
+Rangga Saputro
+Surya Atmaja
+Teguh Iriawan
+Wisnu Pamungkas
+Yoga Permana
+Zaki Firdaus
+Bayu Aditama
+Dion Prasetyo
+Ferry Gunawan
+Gilang Mahesa
+Hendro Susilo
+Indra Maulida
+Bima Anggara
+Satria Wibisono
+Rendra Pranata
+Yusuf Habibie
