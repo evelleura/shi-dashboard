@@ -27,3 +27,6 @@ __pycache__/
 *.pyc
 
 frontend_backup/.next/
+
+# rename-aside husk untuk node_modules/.next terkunci editor (run.py move_aside)
+.trash/

@@ -1,0 +1,18 @@
+# Area perumahan untuk klien perorangan (residensial) yang digenerate prosedural.
+# Delimiter '|'. Kolom: area|lat|lon|maps_url
+# Generator membuat nama Bp./Ibu + alamat blok acak di area ini (koordinat di-jitter sedikit).
+Perum Griya Sleman Asri|-7.7300|110.3550|https://www.google.com/maps?q=-7.7300,110.3550
+Perum Casa Bella Maguwo|-7.7700|110.4200|https://www.google.com/maps?q=-7.7700,110.4200
+Villa Pakem Hijau|-7.6800|110.4000|https://www.google.com/maps?q=-7.6800,110.4000
+Perum Banteng Baru|-7.7450|110.3950|https://www.google.com/maps?q=-7.7450,110.3950
+Perum Grand Ambarukmo|-7.7820|110.4050|https://www.google.com/maps?q=-7.7820,110.4050
+Perumahan Jakal Asri|-7.7200|110.3900|https://www.google.com/maps?q=-7.7200,110.3900
+Perum Sawitsari Condongcatur|-7.7550|110.4000|https://www.google.com/maps?q=-7.7550,110.4000
+Komplek Minomartani|-7.7350|110.4050|https://www.google.com/maps?q=-7.7350,110.4050
+Perum Bumi Sentosa Kalasan|-7.7700|110.4500|https://www.google.com/maps?q=-7.7700,110.4500
+Villa Cangkringan|-7.6600|110.4300|https://www.google.com/maps?q=-7.6600,110.4300
+Perum Taman Cemara Wedomartani|-7.7400|110.4300|https://www.google.com/maps?q=-7.7400,110.4300
+Perum Pesona Merapi|-7.7000|110.4100|https://www.google.com/maps?q=-7.7000,110.4100
+Perum Pandega Sleman|-7.7600|110.3780|https://www.google.com/maps?q=-7.7600,110.3780
+Perum Kadisoka Permai|-7.7650|110.4350|https://www.google.com/maps?q=-7.7650,110.4350
+Perum Sidoarum Godean|-7.7780|110.3200|https://www.google.com/maps?q=-7.7780,110.3200

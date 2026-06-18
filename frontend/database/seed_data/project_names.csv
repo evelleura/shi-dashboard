@@ -1,0 +1,30 @@
+# Template nama proyek per kategori. Delimiter '|'. Kolom: category|template
+# {c} diganti nama pendek klien oleh generator.
+instalasi|Instalasi Smart Home {c}
+instalasi|Smart Building Automation {c}
+instalasi|Pemasangan Smart Lighting {c}
+instalasi|Home Automation {c}
+security|CCTV & Access Control {c}
+security|Sistem Keamanan Terintegrasi {c}
+security|Pemasangan CCTV {c}
+security|Upgrade Pengamanan {c}
+monitoring|IoT Monitoring {c}
+monitoring|Sensor Suhu & Kelembaban {c}
+monitoring|Smart Monitoring {c}
+monitoring|Monitoring Gudang {c}
+networking|Instalasi Jaringan {c}
+networking|Upgrade Infrastruktur Jaringan {c}
+networking|Pemasangan Fiber Optik {c}
+networking|Jaringan Terstruktur {c}
+maintenance|Maintenance Berkala Sistem {c}
+maintenance|Perawatan CCTV & Sensor {c}
+maintenance|Maintenance Tahunan {c}
+perbaikan|Perbaikan Sistem {c}
+perbaikan|Troubleshooting Jaringan {c}
+perbaikan|Perbaikan CCTV {c}
+upgrade|Upgrade Sistem Keamanan {c}
+upgrade|Migrasi NVR & Storage {c}
+upgrade|Upgrade Jaringan {c}
+lainnya|Konsultasi Smart System {c}
+lainnya|Audit Keamanan {c}
+lainnya|Desain Sistem Terintegrasi {c}

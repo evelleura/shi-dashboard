@@ -1,0 +1,12 @@
+# Pool eskalasi (kendala lapangan). Delimiter '|'. Kolom: title|desc|priority
+# priority: low | medium | high
+Perangkat tidak kompatibel dengan instalasi existing|Unit yang dikirim tidak cocok dengan kondisi lapangan, butuh penggantian/adapter.|high
+Keterlambatan material kritikal|Material utama belum tiba dari supplier, menghambat progres tugas.|high
+Akses lokasi dibatasi klien|Tim tidak bisa masuk area tertentu pada jam operasional, jadwal mundur.|medium
+Perlu pekerjaan sipil tambahan|Ditemukan kebutuhan bobok dinding/jalur tambahan di luar lingkup awal.|medium
+Gangguan jaringan existing klien|Infrastruktur existing bermasalah, perlu perbaikan sebelum integrasi.|low
+Revisi titik pemasangan dari klien|Klien meminta perubahan tata letak setelah survey disetujui.|low
+Tegangan listrik lokasi tidak stabil|Perlu penambahan stabilizer/UPS sebelum perangkat dinyalakan.|medium
+Cuaca ekstrem menghambat kerja ketinggian|Pemasangan kamera/kabel luar tertunda karena hujan dan angin.|low
+Spesifikasi perangkat dari klien berubah|Klien meminta upgrade spesifikasi di tengah pengerjaan.|medium
+Kerusakan unit saat pengiriman|Satu unit perangkat rusak saat tiba, menunggu penggantian dari distributor.|high

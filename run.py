@@ -223,6 +223,37 @@ def load_schema(db_name: str):
     print(f"  [OK] Skema dimuat ke {db_name}")
 
 
+def load_seed_frontend(db_name: str):
+    """Muat seed.sql (data operasional realistis ~200 proyek, digenerate
+    generate_seed.py) ke db frontend lewat docker psql.
+
+    Idempotent: seed.sql punya guard 'IF NOT EXISTS (SELECT 1 FROM tb_proyek)'
+    -> aman dimuat ulang run.py. Hanya untuk app dir 'frontend' (frontend_backup
+    pakai db:seed sendiri). Regenerasi data: python frontend/database/generate_seed.py
+    """
+    if APP_DIR.name != "frontend":
+        return
+    seed = APP_DIR / "database" / "seed.sql"
+    if not seed.exists():
+        print("  [skip] seed.sql belum ada (jalankan: python frontend/database/generate_seed.py)")
+        return
+    print(f"  Memuat data realistis '{seed.name}' -> db '{db_name}'...")
+    subprocess.run(
+        ["docker", "cp", str(seed), f"{DB_CONTAINER}:/tmp/{seed.name}"],
+        check=True, capture_output=True,
+    )
+    r = subprocess.run(
+        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", db_name,
+         "-v", "ON_ERROR_STOP=1", "-f", f"/tmp/{seed.name}"],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        print("[ERROR] Gagal memuat seed.sql:")
+        print(r.stderr.strip())
+        sys.exit(1)
+    print("  [OK] Data realistis dimuat (klien/proyek/tugas/laporan/eskalasi).")
+
+
 def wipe_non_users(db_name: str):
     """Kosongkan SEMUA tabel kecuali tabel staff/user (tb_user / users).
 
@@ -250,6 +281,15 @@ def wipe_non_users(db_name: str):
         print("[ERROR] Gagal mengosongkan data:")
         print(r.stderr.strip())
         sys.exit(1)
+    # frontend: buang teknisi rekrutan dari seed (id>8); sisakan 8 staf dasar
+    # init.sql. Tanpa ini, --empty menyisakan puluhan teknisi seed (tb_user tak
+    # ikut TRUNCATE) -> bukan "sistem baru". 8 dasar = manajer 1-3 + teknisi 4-8.
+    if APP_DIR.name == "frontend":
+        subprocess.run(
+            ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", db_name,
+             "-c", "DELETE FROM tb_user WHERE id_user > 8;"],
+            capture_output=True,
+        )
     user_tbl = "tb_user" if APP_DIR.name == "frontend" else "users"
     cnt = subprocess.run(
         ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", db_name,
@@ -457,6 +497,22 @@ def iso_load_schema(empty: bool):
             check=True, capture_output=True,
         )
         print("  [OK] Data dikosongkan (EMPTY) — sisakan staff/user (8 akun)")
+    else:
+        # --seed: muat data realistis (seed.sql) ke stack iso. Idempotent (guard).
+        seed = ROOT / "frontend" / "database" / "seed.sql"
+        if seed.exists():
+            subprocess.run(["docker", "cp", str(seed), f"{ISO_DB_CONTAINER}:/tmp/{seed.name}"],
+                           check=True, capture_output=True)
+            r = subprocess.run(
+                ["docker", "exec", ISO_DB_CONTAINER, "psql", "-U", DB_USER, "-d", DB_NAME,
+                 "-v", "ON_ERROR_STOP=1", "-f", f"/tmp/{seed.name}"],
+                capture_output=True, text=True,
+            )
+            if r.returncode != 0:
+                print("[ERROR] Gagal memuat seed.sql (iso):")
+                print(r.stderr.strip())
+                sys.exit(1)
+            print("  [OK] Data realistis (seed.sql) dimuat ke iso db")
 
 
 def iso_start_dev():
@@ -557,43 +613,118 @@ def install_deps():
 
 
 def kill_procs_under(dir_path: Path):
-    """Windows: hentikan proses yang mengunci file di bawah dir_path. Dua kelas:
+    """Windows: hentikan proses yang mengunci file di bawah dir_path. Tiga kelas:
       1) exe-nya ADA di bawah dir_path (mis. next.exe di node_modules/.bin), DAN
-      2) exe global (node.exe/bun) tapi CommandLine-nya merujuk dir_path -> ini yang
-         me-load *.node SWC (next-swc...node) sehingga mengunci file walau exe-nya
-         di luar node_modules. Tanpa keduanya, rmtree kena PermissionError WinError 5.
+      2) exe global (node.exe/bun) tapi CommandLine-nya merujuk dir_path, DAN
+      3) node/bun/next/esbuild yang ME-LOAD modul native (*.node, mis.
+         tailwindcss-oxide...node / next-swc...node) dari dir_path. File .node
+         di-map sebagai IMAGE -> menghapusnya kena 'Access is denied' (WinError 5),
+         BUKAN sharing violation. Proses ini sering lolos dari query CIM karena
+         exe + CommandLine-nya tak menyebut dir_path sama sekali (mis. dijalankan
+         lewat `bun run dev` yang CommandLine-nya cuma "bun run dev"). Dideteksi
+         lewat Process.Modules: modul yang ter-load punya FileName di bawah dir_path.
     pgrep/pkill (Unix) tak membunuh proses native Windows ini."""
     if sys.platform != "win32":
         return
     target = str(dir_path).replace("/", "\\")
     ps = (
         "$t='" + target + "';"
+        # (1)+(2): exe di bawah target ATAU CommandLine menyebut target.
         "Get-CimInstance Win32_Process | Where-Object { "
         "($_.ExecutablePath -and $_.ExecutablePath.StartsWith($t)) -or "
         "($_.CommandLine -and $_.CommandLine -like ('*'+$t+'*')) "
-        "} | ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop } catch {} }"
+        "} | ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop } catch {} };"
+        # (3): node/bun/next/esbuild yang me-load modul native dari target. Dibatasi
+        # nama proses ini supaya tidak ikut membunuh editor (VS Code dll) yang
+        # kebetulan me-load modul yang sama.
+        "Get-Process -Name node,bun,next-server,esbuild -ErrorAction SilentlyContinue | "
+        "ForEach-Object { $p=$_; try { if ($p.Modules | Where-Object "
+        "{ $_.FileName -and $_.FileName.StartsWith($t) }) "
+        "{ Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue } } catch {} }"
     )
     subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True)
     time.sleep(2)
 
 
+def purge_trash():
+    """Buang husk node_modules/.next lama di ROOT/.trash (sisa rename-aside run
+    sebelumnya). Sebagian mungkin masih dikunci editor -> ignore_errors; yang sudah
+    dilepas akan terhapus, sisanya dicoba lagi run berikutnya."""
+    trash = ROOT / ".trash"
+    if not trash.is_dir():
+        return
+    for h in trash.glob("locked-*"):
+        shutil.rmtree(h, ignore_errors=True)
+    try:
+        trash.rmdir()  # hanya sukses bila .trash sudah kosong
+    except OSError:
+        pass
+
+
+def move_aside(d: Path):
+    """Pindahkan dir terkunci ke ROOT/.trash/locked-<n>. Rename direktori = operasi
+    METADATA: berhasil walau ada file ter-map sebagai image (*.node) di dalamnya,
+    selama satu volume -- inilah jalan keluar saat lock-holder TAK boleh dibunuh
+    (mis. VS Code memegang tailwindcss-oxide...node lewat ekstensi Tailwind). Setelah
+    pindah, path asli bebas -> install ulang jalan; husk dibersihkan purge_trash()
+    run berikutnya saat editor sudah melepas. Return Path baru, atau None bila rename
+    gagal (mis. beda volume / handle ke dir-nya sendiri terbuka)."""
+    trash = ROOT / ".trash"
+    trash.mkdir(exist_ok=True)
+    for i in range(1, 1000):
+        cand = trash / f"locked-{i}"
+        if cand.exists():
+            continue
+        try:
+            os.rename(d, cand)
+        except OSError:
+            return None
+        shutil.rmtree(cand, ignore_errors=True)  # buang yg bisa; sisakan file terkunci
+        return cand
+    return None
+
+
 def rmtree_robust(d: Path):
-    """rmtree tahan-banting: reset atribut read-only + retry beberapa kali untuk
-    melawan lock sementara (umum di Windows). Kalau benar-benar gagal -> raise."""
+    """rmtree tahan-banting untuk Windows. Tiga lapis penanganan lock:
+      1) retry + reset read-only + backoff menaik -- lock transien dari proses yang
+         baru saja di-kill (OS butuh ratusan ms meng-unmap image *.node);
+      2) kill ulang proses pe-lock (bun/next/esbuild) lalu rmtree pamungkas;
+      3) kalau MASIH terkunci -- lock-holder yang sengaja TIDAK kita bunuh, mis. VS
+         Code yang me-load *.node lewat ekstensi Tailwind -- pindahkan dir ke
+         ROOT/.trash supaya path bebas; husk dibersihkan run berikutnya.
+    Hanya raise bila ketiga lapis gagal (mis. rename beda-volume)."""
     def _onexc(func, path, _exc):
+        # File read-only (umum di node_modules/.bin & cache) -> buka write-bit, ulang.
         try:
             os.chmod(path, stat.S_IWRITE)
             func(path)
         except OSError:
-            pass
-    for _ in range(3):
+            pass  # masih dipegang proses hidup; serahkan ke lapis berikut
+    # Lapis 1: retry dengan backoff.
+    for attempt in range(6):
         try:
             shutil.rmtree(d, onexc=_onexc)
         except OSError:
-            time.sleep(1)
+            pass
         if not d.exists():
             return
-    shutil.rmtree(d)  # percobaan terakhir tanpa peredam -> munculkan error asli bila tetap gagal
+        time.sleep(0.5 * (attempt + 1))  # 0.5, 1.0, 1.5, 2.0, 2.5s -> beri OS waktu unmap
+    # Lapis 2: kill ulang proses pe-lock, rmtree sekali lagi.
+    kill_procs_under(d)
+    shutil.rmtree(d, onexc=_onexc)
+    if not d.exists():
+        return
+    # Lapis 3: lock-holder tak-bisa/tak-boleh dibunuh (editor) -> pindahkan dir.
+    aside = move_aside(d)
+    if aside is not None:
+        print(f"  [!] {d.name} dikunci editor (VS Code) -> dipindah ke .trash/{aside.name} "
+              f"(install ulang tetap jalan; husk dibersihkan run berikutnya)")
+        return
+    raise RuntimeError(
+        f"Gagal menghapus {d}: terkunci proses yang tak bisa dihentikan dan tak bisa\n"
+        f"  dipindah (beda volume?). Tutup dev server + editor yang membuka folder ini,\n"
+        f"  lalu ulangi --clean."
+    )
 
 
 def clean():
@@ -605,6 +736,9 @@ def clean():
     masih pakai kolom 'name') tetap nyangkut dan menyebabkan login gagal.
     """
     print("\n=== Bersihkan (kode + database) ===")
+    # Sapu husk node_modules/.next lama (rename-aside run sebelumnya) yang kini
+    # mungkin sudah dilepas editor.
+    purge_trash()
     # WINDOWS: proses next/bun yang masih jalan mengunci node_modules/.bin/next.exe
     # -> rmtree kena PermissionError WinError 5. Hentikan proses + container dulu.
     kill_stale_next_processes()
@@ -773,6 +907,12 @@ def main():
     # DB adalah Postgres polos -> muat skema app dir aktif (idempotent).
     ensure_database(DB_NAME)
     load_schema(DB_NAME)
+
+    # frontend: muat data operasional realistis (seed.sql, ~200 proyek) kecuali
+    # --empty. Idempotent (guard IF NOT EXISTS tb_proyek). Pengganti demo inline
+    # lama init.sql; no-op utk frontend_backup (pakai db:seed sendiri).
+    if "--empty" not in args:
+        load_seed_frontend(DB_NAME)
 
     # --empty: kosongkan semua data kecuali staff (simulasi sistem baru dipakai).
     # Jalan setelah load_schema (yang sudah seed staff) -> sisakan staff, buang demo.

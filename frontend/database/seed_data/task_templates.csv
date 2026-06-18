@@ -1,0 +1,55 @@
+# Template tugas per kategori proyek (urut sesuai alur kerja lapangan).
+# Delimiter '|'. Kolom: category|sort|nama_tugas|deskripsi|is_survey|est_jam
+#   is_survey: true = tugas fase survey (tugas pertama biasanya survey).
+# Proyek 'small' bisa memakai subset (generator memangkas 0-2 tugas terakhir).
+instalasi|1|Survey lokasi & pengukuran|Survey awal lokasi dan kebutuhan perangkat|true|6
+instalasi|2|Desain sistem & RAB|Desain skema smart home dan rencana anggaran|true|8
+instalasi|3|Penarikan kabel jaringan & power|Kabel UTP, power untuk controller dan perangkat|false|16
+instalasi|4|Instalasi panel kontrol utama|Pemasangan panel automasi pusat|false|10
+instalasi|5|Instalasi smart lock & switch|Smart lock, smart switch, dan dimmer|false|12
+instalasi|6|Instalasi lighting & curtain control|Kontrol pencahayaan dan tirai otomatis|false|10
+instalasi|7|Instalasi CCTV & sensor|Kamera dan sensor keamanan|false|12
+instalasi|8|Setup gateway IoT & cloud|Konfigurasi gateway dan koneksi cloud|false|8
+instalasi|9|Konfigurasi & uji mobile app|Setup aplikasi dan pengujian kontrol|false|6
+instalasi|10|Testing menyeluruh & QC|Pengujian seluruh fungsi sistem|false|8
+instalasi|11|Serah terima & training klien|Serah terima dan pelatihan penggunaan|false|4
+security|1|Survey titik kamera & akses|Survey lokasi kamera dan titik akses|true|6
+security|2|Desain topologi & RAB|Desain jalur kabel dan anggaran|true|6
+security|3|Penarikan kabel kamera|Kabel data dan power seluruh kamera|false|16
+security|4|Instalasi kamera CCTV|Pemasangan dan pengarahan kamera|false|14
+security|5|Setup NVR & storage|Konfigurasi NVR dan media penyimpanan|false|8
+security|6|Instalasi access control|Card reader dan controller pintu|false|10
+security|7|Konfigurasi recording & remote|Setup jadwal rekaman dan akses jarak jauh|false|6
+security|8|Testing & commissioning|Uji rekaman 24 jam dan serah terima|false|8
+monitoring|1|Survey titik sensor|Survey lokasi pemasangan sensor|true|6
+monitoring|2|Desain sistem monitoring & RAB|Desain arsitektur sensor dan anggaran|true|6
+monitoring|3|Instalasi sensor lapangan|Pemasangan sensor suhu/kelembaban/keamanan|false|14
+monitoring|4|Setup gateway & konektivitas|Gateway dan jaringan pengumpul data|false|8
+monitoring|5|Konfigurasi dashboard & alarm|Dashboard terpusat dan ambang alarm|false|10
+monitoring|6|Kalibrasi sensor|Kalibrasi akurasi dan threshold|false|8
+monitoring|7|Testing & serah terima|Pengujian end-to-end dan handover|false|6
+networking|1|Survey jaringan & denah|Survey kebutuhan jaringan dan denah|true|6
+networking|2|Desain topologi jaringan|Desain VLAN, IP plan, dan perangkat|true|8
+networking|3|Penarikan kabel/fiber|Instalasi kabel data dan fiber optik|false|18
+networking|4|Instalasi switch & router|Pemasangan dan konfigurasi perangkat inti|false|10
+networking|5|Instalasi access point|Pemasangan AP dan survey coverage|false|8
+networking|6|Konfigurasi & hardening|Setup konfigurasi dan keamanan jaringan|false|8
+networking|7|Testing throughput & serah terima|Uji kecepatan, stabilitas, dan handover|false|6
+maintenance|1|Inspeksi & assessment awal|Pemeriksaan kondisi sistem terpasang|true|4
+maintenance|2|Pembersihan perangkat|Pembersihan kamera, sensor, dan panel|false|6
+maintenance|3|Penggantian komponen aus|Ganti part yang rusak/aus|false|8
+maintenance|4|Kalibrasi & update firmware|Kalibrasi ulang dan pembaruan firmware|false|6
+maintenance|5|Uji fungsi & laporan|Pengujian fungsi dan laporan berkala|false|4
+perbaikan|1|Diagnosa kerusakan|Identifikasi sumber masalah sistem|true|4
+perbaikan|2|Pengadaan suku cadang|Sourcing dan pengadaan part pengganti|false|6
+perbaikan|3|Perbaikan & penggantian|Eksekusi perbaikan perangkat|false|8
+perbaikan|4|Testing & verifikasi|Pengujian hasil perbaikan|false|4
+upgrade|1|Assessment sistem existing|Evaluasi sistem lama dan kebutuhan upgrade|true|6
+upgrade|2|Desain & pengadaan perangkat|Desain upgrade dan procurement|true|8
+upgrade|3|Migrasi & instalasi perangkat baru|Pemasangan perangkat upgrade|false|14
+upgrade|4|Konfigurasi & integrasi|Integrasi dengan sistem existing|false|10
+upgrade|5|Testing & serah terima|Pengujian dan handover sistem upgrade|false|6
+lainnya|1|Konsultasi & analisa kebutuhan|Konsultasi awal dan analisa kebutuhan|true|6
+lainnya|2|Penyusunan dokumen/desain|Penyusunan dokumen teknis atau desain|false|10
+lainnya|3|Implementasi/pendampingan|Eksekusi atau pendampingan implementasi|false|12
+lainnya|4|Evaluasi & laporan akhir|Evaluasi hasil dan laporan akhir|false|6
