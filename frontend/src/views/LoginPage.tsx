@@ -77,7 +77,7 @@ export default function LoginPage() {
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 blur-3xl bg-white/20 rounded-full scale-150" />
-              <SHILogo size={100} />
+              <SHILogo size={160} />
             </div>
           </div>
 
@@ -124,7 +124,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm relative z-10">
           {/* Mobile logo (hidden on desktop) */}
           <div className="lg:hidden flex flex-col items-center mb-8">
-            <SHILogo size={72} />
+            <SHILogo size={96} />
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-3">SHI Dashboard</h2>
             <p className="text-xs text-gray-500 dark:text-gray-400">PT Smart Home Inovasi</p>
           </div>

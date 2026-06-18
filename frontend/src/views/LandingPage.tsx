@@ -206,8 +206,8 @@ function HeroSection() {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto">
         {/* Logo mark */}
-        <div className="rounded-2xl bg-white flex items-center justify-center mb-4 px-5 py-4 shadow-xl shadow-black/20">
-          <SHILogo size={56} />
+        <div className="rounded-3xl bg-white flex items-center justify-center mb-6 px-7 py-6 shadow-2xl shadow-black/30">
+          <SHILogo size={100} />
         </div>
 
         <p className="text-gray-400 text-sm tracking-widest uppercase mb-6 font-medium">
