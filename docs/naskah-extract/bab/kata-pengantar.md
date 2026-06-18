@@ -1,6 +1,6 @@
 # KATA PENGANTAR
 
-_Pages 5-7 of Naskah TA Final 4.pdf_
+_Pages 5-7 of Naskah TA Final.pdf_
 
 
 <!-- page 5 -->

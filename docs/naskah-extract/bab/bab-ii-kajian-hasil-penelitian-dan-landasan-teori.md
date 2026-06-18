@@ -1,6 +1,6 @@
 # BAB II KAJIAN HASIL PENELITIAN DAN LANDASAN TEORI
 
-_Pages 18-32 of Naskah TA Final 4.pdf_
+_Pages 18-32 of Naskah TA Final.pdf_
 
 
 <!-- page 18 -->

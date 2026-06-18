@@ -7,7 +7,7 @@ metadata:
 
 # Divergences: Naskah vs Kode
 
-The thesis `Naskah TA Final 4.pdf` is the academic spec. The repo now has **two** codebases, so "the code" is ambiguous - always say which:
+The thesis `Naskah TA Final.pdf` is the academic spec. The repo now has **two** codebases, so "the code" is ambiguous - always say which:
 
 - **`frontend/`** = Next.js, skema **Bahasa Indonesia** (`tb_user`, `tb_proyek`), enum persis naskah. **Ini target setia-naskah** (mode aman TA). `init.sql` header menyatakannya eksplisit.
 - **`frontend_backup/`** = Next.js, skema **Bahasa Inggris** (`users`, `projects`), lebih kaya fitur. Bukan acuan akademik.
@@ -25,10 +25,10 @@ Keputusan proyek: **naskah = acuan**. `frontend/` sudah dibangun untuk itu. Ring
 | materials-budget | **RESOLVED** - tak ada tabel materials/budget. (`project_value` ringan masih ada.) |
 | spi-formula | **ALIGNED** - `spiCalculator`: EV=% tugas done, PV=hari/durasi, SPI=EV/PV. |
 | kesehatan-table | **RESOLVED** - tabel `project_health` ada, ditandai pendukung di luar 7 tabel inti. |
-| roles | **PARTIAL** - DB 2 peran (sesuai naskah) TAPI TS/UI masih bawa `admin` (UserRole type, UserManagementPage, nav Layout, `authorizeRoles(['manager','admin'])`). Perlu pangkas. |
-| daily-report | **OPEN** - tetap tanpa input % manual; `daily_reports` cuma fallback EV. Naskah minta input manual. **Satu-satunya keputusan tersisa.** |
+| roles | **RESOLVED** - 2 peran Indonesia (`teknisi`/`manajer`) selaras DB+types+handler+UI; `tsc` bersih; UI tanpa menu admin (user-mgmt = manajer). Sisa admin kosmetik. |
+| daily-report | **RESOLVED** - fitur "Laporan Harian (Catatan Kendala)" TANPA %; EV tetap task-derived. Diverifikasi UI. |
 
-Dua sisa pekerjaan agar `frontend/` 100% setia-naskah: (1) buang scaffolding `admin`, (2) putuskan nasib laporan harian (lihat `#daily-report`).
+Status (2026-06-17): `frontend/` kini selaras-naskah. Peran admin dipangkas (2 peran, sisa kosmetik), laporan harian diimplementasi sebagai **catatan kendala tanpa %** (EV tetap task-derived). Sumber kebenaran nilai role = **Bahasa Indonesia** (`teknisi`/`manajer`) di DB+token+kode (catatan: enum literal naskah Tabel 4.9 English; nilai Indonesia adalah keputusan proyek).
 
 ## spi-formula
 `[[div:spi-formula]]` **SPI formula has three framings.**
@@ -54,7 +54,7 @@ The naskah's SSR/Next.js claim is not what the OLD code did. If the naskah text 
 
 So the naskah still describes a feature the code intentionally dropped. EV in code is derived from task status (review-gate done), not typed %. Touches `[[concept:daily-report]]`, `[[concept:review-gate]]`. Internal naskah tension: class `computeEarnedValue` says EV "berdasarkan tugas yang telah selesai" (task-based), contradicting the typed-% functional req in the same chapter.
 
-> **frontend/:** tetap task-derived; `daily_reports` hanya fallback EV saat proyek 0 tugas, TANPA endpoint/UI input -> **tetap OPEN**. Naskah read-only + user benci input % manual (memory FIX 19) = perlu keputusan, bukan auto-implement.
+> **frontend/ (RESOLVED 2026-06-17):** fitur "Laporan Harian (Catatan Kendala)" dibuat - tab di ProjectDetailPage + `DailyReportPanel` + `dailyReports.ts` + route `daily-reports`. Teknisi/manajer catat kendala harian **TANPA %**; `progress_percentage` jadi nullable; EV tetap task-derived (spiCalculator fallback skip baris NULL). Selaras naskah 4.2.2 (laporan harian + catatan kendala) tanpa self-report % yang ditolak user (memory FIX 19).
 
 ## materials-budget
 `[[div:materials-budget]]` **Materials & budget entities.**
@@ -82,7 +82,7 @@ Escalation is NEW in the naskah (replaces the materials/budget scope). Inspired 
 
 Admin is half-present in the naskah (narrative yes, enum + use case no). Decide whether admin is in scope per the authoritative side. Touches `[[concept:rbac]]`, `[[actor:admin]]`.
 
-> **frontend/:** DB `role_check IN ('technician','manager')` sesuai naskah, seed `admin@shi.co.id` jadi `manager`. TAPI TS/UI masih bawa `admin`: `UserRole` type, `UserManagementPage`, nav `Layout.tsx`, `authorizeRoles(['manager','admin'])`, tab history admin-only. -> **PARTIAL**: pangkas scaffolding admin agar penuh setia-naskah.
+> **frontend/ (RESOLVED 2026-06-17):** 2 peran **Bahasa Indonesia** (`teknisi`/`manajer`) selaras di DB (`role_check IN ('teknisi','manajer')`) + seed + `UserRole` + handler authz + UI. `tsc --noEmit` 0 error, tak ada perbandingan `admin` fungsional, UI tak menampilkan menu admin (user-mgmt jadi hak manajer). Sisa `admin` kosmetik: komentar, label i18n `role.admin`, var `isAdmin`, factory test `makeAdmin`.
 
 ## kesehatan-table
 `[[div:kesehatan-table]]` **Project health: class without physical table.**

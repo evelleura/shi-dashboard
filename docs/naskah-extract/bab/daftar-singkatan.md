@@ -1,6 +1,6 @@
 # DAFTAR SINGKATAN
 
-_Pages 13-13 of Naskah TA Final 4.pdf_
+_Pages 13-13 of Naskah TA Final.pdf_
 
 
 <!-- page 13 -->

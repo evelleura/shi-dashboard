@@ -1,6 +1,6 @@
 # DAFTAR GAMBAR
 
-_Pages 11-12 of Naskah TA Final 4.pdf_
+_Pages 11-12 of Naskah TA Final.pdf_
 
 
 <!-- page 11 -->

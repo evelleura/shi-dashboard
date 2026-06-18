@@ -7,7 +7,7 @@ metadata:
 
 # Thesis Root
 
-Node `[[thesis]]` in `graph.json`. Source: `Naskah TA Final 4.pdf` (114 pages). Per-chapter text under `../bab/`, raw page text under `../text/`, image inventory in `../_manifest.json`.
+Node `[[thesis]]` in `graph.json`. Source: `Naskah TA Final.pdf` (113 pages). Per-chapter text under `../bab/`, raw page text under `../text/`, image inventory in `../_manifest.json`.
 
 **Judul:** Pengembangan Fitur Dashboard pada Sistem Manajemen Proyek Berdasarkan Data Laporan Harian
 **Studi Kasus:** PT Smart Home Inovasi Yogyakarta (PT SHI)

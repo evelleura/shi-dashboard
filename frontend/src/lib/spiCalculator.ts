@@ -95,7 +95,7 @@ async function getLatestReportProgress(projectId: number): Promise<number | null
   const result = await query<{ progress_percentage: string }>(
     `SELECT progress_percentage
      FROM daily_reports
-     WHERE project_id = $1
+     WHERE project_id = $1 AND progress_percentage IS NOT NULL
      ORDER BY report_date DESC, created_at DESC
      LIMIT 1`,
     [projectId]

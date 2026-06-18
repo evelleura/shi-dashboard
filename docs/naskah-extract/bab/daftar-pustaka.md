@@ -1,6 +1,6 @@
 # DAFTAR PUSTAKA
 
-_Pages 110-114 of Naskah TA Final 4.pdf_
+_Pages 110-113 of Naskah TA Final.pdf_
 
 
 <!-- page 110 -->
@@ -142,7 +142,7 @@ Implementation Projects. Journal of Frontiers in Multidisciplinary Research,
  
  
  
-99 
+ 
  
  
  
@@ -156,18 +156,8 @@ LAMPIRAN
  
  
  
-100 
+ 
  
  
  
 LOGBOOK TUGAS AKHIR
-
-<!-- page 114 -->
-
- 
- 
- 
- 
- 
- 
-101

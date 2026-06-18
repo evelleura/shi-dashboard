@@ -1,6 +1,6 @@
 # BAB V IMPLEMENTASI DAN PEMBAHASAN SISTEM
 
-_Pages 77-108 of Naskah TA Final 4.pdf_
+_Pages 77-108 of Naskah TA Final.pdf_
 
 
 <!-- page 77 -->
@@ -1362,16 +1362,6 @@ disajikan pada Gambar 5.33.
  
  
 3) Dashboard Performa Teknisi Berbasis Beban Kerja Aktual 
-Aplikasi manajemen proyek konvensional umumnya sebatas visualisasi makro 
-tanpa evaluasi performa individu, sehingga manajer sulit mengukur kapasitas dan 
-distribusi beban kerja teknisi secara objektif. Mengatasi hal tersebut, sistem ini 
-menghadirkan dashboard terintegrasi dengan empat dimensi visualisasi simultan: 
-komposisi proyek per kategori, distribusi beban kerja teknisi, sebaran status 
-penugasan, dan agregasi tenggat waktu bulanan. Pendekatan multidimensional ini 
-menjadi keunggulan sistem karena memungkinkan manajer melakukan analisis 
-korelasi silang antarvariabel—seperti mengidentifikasi tingkat keterlambatan 
-teknisi pada kategori proyek tertentu—yang tidak diakomodasi oleh aplikasi 
-konvensional. Seluruh metrik tersebut dikomputasi secara otomatis dari basis data 
 Gambar 5.33 Halaman Review Gate
 
 <!-- page 108 -->
@@ -1386,6 +1376,16 @@ Gambar 5.33 Halaman Review Gate
  
  
  
-guna memberikan visibilitas manajerial utuh dalam satu antarmuka terpusat, 
-sebagaimana diilustrasikan pada Gambar 5.34. 
+Aplikasi manajemen proyek konvensional umumnya sebatas visualisasi makro 
+tanpa evaluasi performa individu, sehingga manajer sulit mengukur kapasitas dan 
+distribusi beban kerja teknisi secara objektif. Mengatasi hal tersebut, sistem ini 
+menghadirkan dashboard terintegrasi dengan empat dimensi visualisasi simultan: 
+komposisi proyek per kategori, distribusi beban kerja teknisi, sebaran status penugasan, 
+dan agregasi tenggat waktu bulanan. Pendekatan multidimensional ini menjadi 
+keunggulan sistem karena memungkinkan manajer melakukan analisis korelasi silang 
+antarvariabel—seperti mengidentifikasi tingkat keterlambatan teknisi pada kategori 
+proyek tertentu—yang tidak diakomodasi oleh aplikasi konvensional. Seluruh metrik 
+tersebut dikomputasi secara otomatis dari basis data guna memberikan visibilitas 
+manajerial utuh dalam satu antarmuka terpusat, sebagaimana diilustrasikan pada 
+Gambar 5.34. 
 Gambar 5.34 Halaman Dashboard Performa Teknisi

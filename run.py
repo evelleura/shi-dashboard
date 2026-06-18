@@ -15,6 +15,7 @@ Penggunaan:
   python run.py              # DB + skema + install deps + dev server (frontend_backup)
   python run.py --new        # Sama, tapi pakai frontend/ bukan frontend_backup/
   python run.py --seed       # Sama + seed data contoh (frontend_backup saja)
+  python run.py --empty      # Data KOSONG kecuali staff/user (simulasi sistem baru)
   python run.py --test       # DB + skema (db uji) + jalankan vitest
   python run.py --build      # Build image Next.js produksi (app dir aktif)
   python run.py --pg-only    # Hanya jalankan PostgreSQL + muat skema
@@ -201,6 +202,42 @@ def load_schema(db_name: str):
         print(r.stderr.strip())
         sys.exit(1)
     print(f"  [OK] Skema dimuat ke {db_name}")
+
+
+def wipe_non_users(db_name: str):
+    """Kosongkan SEMUA tabel kecuali tabel staff/user (tb_user / users).
+
+    Dipakai oleh --empty: simulasi sistem baru dipakai. Staff TETAP ada (bisa
+    login), tapi tak ada data klien/proyek/tugas/eskalasi/laporan/dll. RESTART
+    IDENTITY -> sequence balik ke 1 supaya data baru mulai dari id 1.
+
+    Dinamis (exclude 'tb_user' DAN 'users') -> aman untuk frontend (skema
+    Indonesia) maupun frontend_backup (skema Inggris) tanpa hardcode daftar tabel.
+    """
+    print("\n=== Kosongkan Data (sisakan staff) ===")
+    sql = (
+        "DO $$ DECLARE r RECORD; BEGIN "
+        "FOR r IN SELECT tablename FROM pg_tables WHERE schemaname='public' "
+        "AND tablename NOT IN ('tb_user','users') LOOP "
+        "EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) || ' RESTART IDENTITY CASCADE'; "
+        "END LOOP; END $$;"
+    )
+    r = subprocess.run(
+        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", db_name,
+         "-v", "ON_ERROR_STOP=1", "-c", sql],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        print("[ERROR] Gagal mengosongkan data:")
+        print(r.stderr.strip())
+        sys.exit(1)
+    user_tbl = "tb_user" if APP_DIR.name == "frontend" else "users"
+    cnt = subprocess.run(
+        ["docker", "exec", DB_CONTAINER, "psql", "-U", DB_USER, "-d", db_name,
+         "-tAc", f"SELECT count(*) FROM {user_tbl};"],
+        capture_output=True, text=True,
+    )
+    print(f"[OK] Semua data dikosongkan kecuali staff. Staff tersisa: {cnt.stdout.strip()}")
 
 
 def seed_db():
@@ -437,6 +474,11 @@ def main():
     ensure_database(DB_NAME)
     load_schema(DB_NAME)
 
+    # --empty: kosongkan semua data kecuali staff (simulasi sistem baru dipakai).
+    # Jalan setelah load_schema (yang sudah seed staff) -> sisakan staff, buang demo.
+    if "--empty" in args:
+        wipe_non_users(DB_NAME)
+
     if "--pg-only" in args:
         print("\n[OK] PostgreSQL berjalan + skema dimuat. Container aktif sampai 'python run.py --stop'.")
         return
@@ -447,7 +489,9 @@ def main():
         return
 
     # Lengkapi SPI semua proyek (frontend) setelah deps siap -> tak ada SPI kosong.
-    backfill_spi_frontend()
+    # Dilewati saat --empty: tak ada proyek untuk dihitung.
+    if "--empty" not in args:
+        backfill_spi_frontend()
 
     if "--build" in args:
         run_build()
@@ -462,7 +506,8 @@ def main():
 
     # --clean = mulai dari nol: volume DB sudah dihapus (lihat clean()), skema
     # baru saja dimuat ulang -> sekalian seed supaya langsung bisa login.
-    if "--seed" in args or "--clean" in args:
+    # --empty menang atas auto-seed --clean: biarkan kosong (kecuali staff).
+    if ("--seed" in args or "--clean" in args) and "--empty" not in args:
         seed_db()
 
     start_dev_server()

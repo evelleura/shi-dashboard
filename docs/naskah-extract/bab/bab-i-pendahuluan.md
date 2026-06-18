@@ -1,6 +1,6 @@
 # BAB I PENDAHULUAN
 
-_Pages 14-17 of Naskah TA Final 4.pdf_
+_Pages 14-17 of Naskah TA Final.pdf_
 
 
 <!-- page 14 -->

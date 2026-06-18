@@ -1,6 +1,6 @@
 # DAFTAR TABEL
 
-_Pages 10-10 of Naskah TA Final 4.pdf_
+_Pages 10-10 of Naskah TA Final.pdf_
 
 
 <!-- page 10 -->

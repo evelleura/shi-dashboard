@@ -15,12 +15,13 @@ import EarnedValueChart from '../components/charts/EarnedValueChart';
 import EvidenceGallery from '../components/evidence/EvidenceGallery';
 import EvidenceUploader from '../components/evidence/EvidenceUploader';
 import EntityActivityTimeline from '../components/ui/EntityActivityTimeline';
+import DailyReportPanel from '../components/reports/DailyReportPanel';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import type { Task, TaskStatus, CreateTaskData } from '../types';
 import { useAuth } from '../hooks/useAuth';
 
-type TabId = 'tasks' | 'evidence' | 'charts' | 'history';
+type TabId = 'tasks' | 'evidence' | 'charts' | 'laporan' | 'history';
 
 function formatDate(d: string, locale: string) {
   return new Date(d).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
@@ -88,6 +89,7 @@ export default function ProjectDetailPage() {
     { id: 'tasks', label: t('project.tab_tasks', language), count: project.tasks?.length ?? 0 },
     { id: 'evidence', label: t('project.tab_evidence', language) },
     { id: 'charts', label: t('project.tab_charts', language) },
+    { id: 'laporan' as TabId, label: 'Laporan Harian' },
     ...(isManager ? [{ id: 'history' as TabId, label: t('project.tab_history', language) }] : []),
   ];
 
@@ -467,6 +469,12 @@ export default function ProjectDetailPage() {
         {activeTab === 'charts' && (
           <div className="space-y-4">
             <EarnedValueChart projectId={projectId} />
+          </div>
+        )}
+
+        {activeTab === 'laporan' && (
+          <div className="space-y-4">
+            <DailyReportPanel projectId={projectId} canSubmit={isTechnician || isManager} />
           </div>
         )}
 

@@ -37,6 +37,8 @@ import type {
   TechProductivityData,
   TechTimeSpentData,
   AuditLogResponse,
+  DailyReport,
+  CreateDailyReportData,
 } from '../types';
 
 export const api = axios.create({
@@ -326,6 +328,18 @@ export const createActivity = async (data: FormData): Promise<TaskActivity> => {
   const res = await api.post<ApiResponse<TaskActivity>>('/activities', data, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+  return res.data.data!;
+};
+
+// ==================== Laporan Harian (Catatan Kendala) ====================
+
+export const getDailyReports = async (projectId: number): Promise<DailyReport[]> => {
+  const res = await api.get<ApiResponse<DailyReport[]>>(`/daily-reports/project/${projectId}`);
+  return res.data.data!;
+};
+
+export const createDailyReport = async (data: CreateDailyReportData): Promise<DailyReport> => {
+  const res = await api.post<ApiResponse<DailyReport>>('/daily-reports', data);
   return res.data.data!;
 };
 

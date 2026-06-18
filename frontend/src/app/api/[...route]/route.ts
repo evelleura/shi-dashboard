@@ -52,6 +52,7 @@ import * as escalations from '@/lib/handlers/escalations';
 import * as activities from '@/lib/handlers/activities';
 import * as audit from '@/lib/handlers/audit';
 import * as notifications from '@/lib/handlers/notifications';
+import * as dailyReports from '@/lib/handlers/dailyReports';
 
 type Context = { params: Promise<{ route: string[] }> };
 
@@ -286,6 +287,19 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     }
     if (r1 === 'task' && r2 && !r3) {
       if (method === 'GET') return activities.getActivitiesByTask(request, r2);
+      return methodNotAllowed();
+    }
+    return notFound();
+  }
+
+  // ── Laporan Harian (Catatan Kendala) ──────────────────────────────────────
+  if (r0 === 'daily-reports') {
+    if (!r1) {
+      if (method === 'POST') return dailyReports.createDailyReport(request);
+      return methodNotAllowed();
+    }
+    if (r1 === 'project' && r2 && !r3) {
+      if (method === 'GET') return dailyReports.listByProject(request, r2);
       return methodNotAllowed();
     }
     return notFound();

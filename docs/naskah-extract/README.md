@@ -1,14 +1,14 @@
 # naskah-extract
 
-LLM-friendly extraction + memory graph of `../Naskah TA Final 4.pdf` (Dian's Tugas Akhir, 114 pages).
+LLM-friendly extraction + memory graph of `../Naskah TA Final.pdf` (Dian's Tugas Akhir, 113 pages).
 
 ## Layout
 
 ```
 naskah-extract/
-  extract.py          generator (PyMuPDF + pdfplumber). Re-run: python extract.py
-  _manifest.json      raw inventory: TOC, page->chapter map, 72 images, 162 figure refs, 46 table refs
-  text/page-NNN.txt   raw text per physical page (1-based), 114 files
+  extract.py          generator (PyMuPDF). Re-run: uv run --with pymupdf python extract.py
+  _manifest.json      raw inventory: TOC, page->chapter map, 71 images, 162 figure refs, 46 table refs
+  text/page-NNN.txt   raw text per physical page (1-based), 113 files
   bab/<slug>.md       per-chapter concatenated text, 12 files (incl. front matter sections)
   images/             every raster image, page-NNN-imgKK.<ext>, 72 files
   wireframes/         (pre-existing) UI mockups 4.17-4.26

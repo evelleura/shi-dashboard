@@ -209,6 +209,10 @@ CREATE TABLE IF NOT EXISTS daily_reports (
 );
 CREATE INDEX IF NOT EXISTS idx_daily_reports_project_date ON daily_reports(project_id, report_date);
 CREATE INDEX IF NOT EXISTS idx_daily_reports_task ON daily_reports(task_id);
+-- Catatan kendala harian boleh TANPA persentase (keputusan proyek: EV diturunkan
+-- dari status tugas, bukan input manual). progress_percentage jadi nullable;
+-- CHECK progress_range tetap lolos saat NULL. Idempotent: DROP NOT NULL aman diulang.
+ALTER TABLE daily_reports ALTER COLUMN progress_percentage DROP NOT NULL;
 
 -- ---------------------------------------------------------------------
 -- project_health  (denormalisasi EWS untuk performa dashboard - pendukung;

@@ -7,13 +7,13 @@ metadata:
 
 # Memory Graph - PT SHI Dashboard EWS Thesis
 
-Knowledge graph extracted from `../Naskah TA Final 4.pdf` (114 pages). This is the **navigation hub**.
+Knowledge graph extracted from `../Naskah TA Final.pdf` (113 pages). This is the **navigation hub**.
 
 ## How to use
 
 - **`graph.json`** - machine-readable source of truth: 78 nodes + 89 edges. Query it for entities/relations. Each node has `id`, `type`, `label`, `doc` (the markdown that explains it), `props`.
 - **`nodes/*.md`** - human/LLM-readable narrative, grouped by theme. Cross-linked with `[[node-id]]` wikilinks (the `id` matches `graph.json`).
-- **`../bab/*.md`** - full text per chapter. **`../text/page-NNN.txt`** - raw text per page. **`../images/`** - 72 extracted images. **`../_manifest.json`** - raw inventory (every figure/table/image with page + caption).
+- **`../bab/*.md`** - full text per chapter. **`../text/page-NNN.txt`** - raw text per page. **`../images/`** - 71 extracted images. **`../_manifest.json`** - raw inventory (every figure/table/image with page + caption).
 
 Wikilink convention: `[[concept:spi]]` = the node with that `id` in `graph.json`; open its `doc` to read it. `[[file.md]]` = sibling doc.
 

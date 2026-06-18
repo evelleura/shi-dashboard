@@ -3,7 +3,7 @@
 # dependencies = ["pymupdf", "pdfplumber"]
 # ///
 """
-Extract `Naskah TA Final 4.pdf` into LLM-friendly form.
+Extract the naskah TA PDF (lihat _PDF_CANDIDATES) into LLM-friendly form.
 
 Outputs (all under docs/naskah-extract/):
   _manifest.json     structure tree, page->chapter map, image + figure + table inventory
@@ -20,11 +20,16 @@ import shutil
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PDF = HERE.parent / "Naskah TA Final 4.pdf"
+# Auto-deteksi PDF naskah. Filename direvisi dari "Naskah TA Final 4.pdf" (114 hlm)
+# ke "Naskah TA Final.pdf" (113 hlm). Ambil yang ada, prioritas nama terbaru.
+_PDF_CANDIDATES = ["Naskah TA Final.pdf", "Naskah TA Final 4.pdf"]
+PDF = next((HERE.parent / n for n in _PDF_CANDIDATES if (HERE.parent / n).exists()),
+           HERE.parent / _PDF_CANDIDATES[0])
 
 TEXT_DIR = HERE / "text"
 BAB_DIR = HERE / "bab"
 IMG_DIR = HERE / "images"
+MANIFEST = HERE / "_manifest.json"
 
 FIG_RE = re.compile(r"Gambar\s+(\d+\.\d+)\s+(.+)")
 TBL_RE = re.compile(r"Tabel\s+(\d+\.\d+)\s+(.+)")
@@ -37,6 +42,15 @@ def slugify(s: str) -> str:
 
 
 def reset_dirs():
+    """Hapus SEMUA output lama DULU (manifest + text/bab/images) sebelum extract.
+
+    Penting: kalau run gagal di tengah, tak ada sisa stale yang menyesatkan
+    (mis. _manifest.json versi PDF lama yang nyangkut + page-NNN.txt sisa revisi
+    sebelumnya). Manifest baru ditulis di akhir, jadi run gagal = manifest hilang
+    (kelihatan jelas rusak) bukan diam-diam pakai data lama.
+    """
+    if MANIFEST.exists():
+        MANIFEST.unlink()
     for d in (TEXT_DIR, BAB_DIR, IMG_DIR):
         if d.exists():
             shutil.rmtree(d)
@@ -137,7 +151,7 @@ def main():
             im["figure"] = figs[0]["id"]
             im["caption"] = figs[0]["title"]
 
-    (HERE / "_manifest.json").write_text(
+    MANIFEST.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 

@@ -498,3 +498,21 @@ export interface AuditLogResponse {
   logs: AuditLogEntry[];
   total: number;
 }
+
+// === Laporan Harian (Catatan Kendala) ===
+// Naskah 4.2.2. TANPA persentase progres (keputusan proyek); hanya catatan kendala.
+export interface DailyReport {
+  id: number;
+  project_id: number;
+  report_date: string;
+  constraints: string;
+  created_by: number;
+  created_by_name?: string;
+  created_at: string;
+}
+
+export interface CreateDailyReportData {
+  project_id: number;
+  report_date?: string;
+  constraints: string;
+}

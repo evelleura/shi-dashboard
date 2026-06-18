@@ -1,6 +1,6 @@
 # BAB VI PENUTUP
 
-_Pages 109-109 of Naskah TA Final 4.pdf_
+_Pages 109-109 of Naskah TA Final.pdf_
 
 
 <!-- page 109 -->

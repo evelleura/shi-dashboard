@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traceability Tabel 5.1 (Black Box) -> Pengujian Otomatis</title>
+<style>
+  :root{
+    --paper:#faf8f3; --card:#fff; --ink:#1f2329; --muted:#6b7280; --line:#e7e2d8; --line2:#efeae0;
+    --anchor:#1d4ed8; --anchor-soft:#eef2ff;
+    --yes:#1f8a4c; --yes-bg:#e9f6ee; --part:#b7791f; --part-bg:#fcf3e3; --no:#c0392b; --no-bg:#fdecea;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fffdf9,var(--paper))}
+  .hd{padding:46px 0 32px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--anchor);margin:0 0 12px}
+  h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.14;margin:0 0 10px;letter-spacing:-.01em}
+  .lead{font-size:16px;color:var(--muted);max-width:74ch;margin:0}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .pill{font-family:var(--mono);font-size:12px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .pill b{color:var(--anchor)}
+  main{padding:36px 0 80px}
+  h2{font-family:var(--serif);font-size:23px;font-weight:600;margin:34px 0 6px}
+  h2 .num{color:var(--anchor);font-family:var(--mono);font-size:14px;margin-right:9px}
+  .sub{color:var(--muted);margin:0 0 18px;max-width:78ch}
+  .badge{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;white-space:nowrap;border:1px solid}
+  .b-yes{color:var(--yes);background:var(--yes-bg);border-color:#bfe4cc}
+  .b-part{color:var(--part);background:var(--part-bg);border-color:#ecd9ad}
+  .b-no{color:var(--no);background:var(--no-bg);border-color:#f2c9c2}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:22px;font-size:13px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+  thead th{background:#f6f2ea;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fbf9f4}
+  td.id{font-family:var(--mono);font-weight:600;white-space:nowrap;font-size:12.5px}
+  code,.m{font-family:var(--mono);font-size:.85em;background:#f3efe7;border:1px solid var(--line2);border-radius:4px;padding:1px 5px;color:#33373d}
+  .naskah-no{color:var(--no);font-weight:600}
+  .note{display:flex;gap:14px;padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin:18px 0}
+  .note .bar{width:4px;border-radius:4px;flex:0 0 4px;background:var(--anchor)}
+  .note.warn .bar{background:var(--part)}
+  .note h4{margin:0 0 4px;font-size:14.5px}
+  .note p{margin:0;color:var(--muted);font-size:13.5px}
+  ul.tight{margin:6px 0 0;padding-left:18px}
+  ul.tight li{margin:4px 0}
+  footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<header><div class="wrap hd">
+  <p class="eyebrow">Traceability Pengujian &middot; Tabel 5.1 -> Vitest</p>
+  <h1>Pemetaan Pengujian Black Box (Tabel 5.1) ke Pengujian Otomatis</h1>
+  <p class="lead">Naskah mendokumentasikan 18 skenario Black Box manual (Tabel 5.1). Tabel ini memetakan tiap skenario ke pengujian otomatis (vitest) di <code>frontend/</code> beserta status cakupannya. Tujuan: bukti keterlacakan bahwa skenario naskah benar-benar diuji.</p>
+  <div class="pills">
+    <span class="pill">Suite: <b>263 lulus</b> / 2 skip / 12 file</span>
+    <span class="pill">Tercakup: <b>9</b></span>
+    <span class="pill">Sebagian: <b>5</b></span>
+    <span class="pill">Belum: <b>4</b></span>
+    <span class="pill">Sumber: docs/naskah-extract/text/page-100..104</span>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <div class="legend">
+    <div><span class="badge b-yes">Tercakup</span> ada pengujian otomatis + assert yang sepadan</div>
+    <div><span class="badge b-part">Sebagian</span> perilaku diuji parsial / lewat beberapa test terpisah / jalur valid di-skip</div>
+    <div><span class="badge b-no">Belum</span> tidak ada pengujian otomatis spesifik</div>
+  </div>
+
+  <section>
+    <h2><span class="num">A</span>Matriks keterlacakan (18 TC)</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Skenario (naskah)</th><th>Hasil naskah</th><th>Pengujian otomatis (file : fungsi)</th><th>Cakupan</th></tr></thead>
+      <tbody>
+        <tr><td class="id">TC-AUTH-01</td><td>Manajer login -> dashboard</td><td>Valid</td><td><code>handlers/auth.test.ts</code> (login) + <code>dashboard.test.ts</code> "returns dashboard data for manager"</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-AUTH-02</td><td>Teknisi login -> kanban</td><td>Valid</td><td><code>handlers/auth.test.ts</code> (login teknisi) + <code>dashboard.test.ts</code> getTechnicianDashboard</td><td><span class="badge b-part">Sebagian</span> <span style="color:var(--muted)">(login+data; render kanban tak diuji unit)</span></td></tr>
+        <tr><td class="id">TC-AUTH-03</td><td>Teknisi diblokir akses dashboard manajer via URL (RBAC)</td><td>Valid</td><td><code>dashboard.test.ts</code> "returns 403 for technician" + <code>lib/auth.test.ts</code> authorizeRoles 403</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-MN-01</td><td>Manajer input proyek baru</td><td>Valid</td><td><code>projects.test.ts</code> "creates project for manager"</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-MN-02</td><td>Tugaskan teknisi + validasi jadwal anti-bentrok</td><td>Valid</td><td><code>projects.test.ts</code> assignTechnician + <code>tasks.test.ts</code> checkConflicts</td><td><span class="badge b-part">Sebagian</span> <span style="color:var(--muted)">(dua test terpisah; belum satu alur)</span></td></tr>
+        <tr><td class="id">TC-MN-03</td><td>Review gate: tinjau bukti -> status Done</td><td>Valid</td><td><code>tasks.test.ts</code> "manager can change to any valid status" + "technician cannot ... to done"</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-MN-04</td><td>Approve done -> SPI/EWS update real-time tanpa refresh</td><td class="naskah-no">Tidak Valid</td><td>&mdash; (reaktivitas UI; <code>recalculateSPI</code> dipanggil saat ubah status, refresh via invalidasi query)</td><td><span class="badge b-no">Belum</span></td></tr>
+        <tr><td class="id">TC-MN-05</td><td>Manajer kirim instruksi balasan eskalasi -> teruskan ke teknisi</td><td>Valid</td><td><code>escalations.test.ts</code> reviewEscalation + addUpdate + resolveEscalation</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-TK-01</td><td>Teknisi geser kanban to_do -> working_on_it</td><td>Valid</td><td><code>tasks.test.ts</code> changeTaskStatus (teknisi tugas sendiri)</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-TK-02</td><td>Teknisi unggah bukti (format valid)</td><td>Valid</td><td><code>evidence.test.ts</code> uploadEvidence (jalur valid termasuk <b>2 test di-skip</b>; hanya 400/401 yang di-assert)</td><td><span class="badge b-part">Sebagian</span></td></tr>
+        <tr><td class="id">TC-TK-03</td><td>Tolak upload ekstensi tak didukung (.exe/.zip)</td><td class="naskah-no">Tidak Valid</td><td>&mdash; tak ada test khusus. Kode <code>evidence.ts</code> kini <b>menolak</b> via whitelist <code>ALLOWED_MIMES</code> (400)</td><td><span class="badge b-no">Belum</span></td></tr>
+        <tr><td class="id">TC-TK-04</td><td>Teknisi kirim laporan eskalasi -> notifikasi manajer</td><td>Valid</td><td><code>escalations.test.ts</code> createEscalation / listEscalations</td><td><span class="badge b-part">Sebagian</span> <span style="color:var(--muted)">(pembuatan diuji; pengiriman notifikasi tidak di-assert)</span></td></tr>
+        <tr><td class="id">TC-TK-05</td><td>Teknisi akses Self-Performance Dashboard (SPI pribadi)</td><td>Valid</td><td><code>dashboard.test.ts</code> getTechnicianDashboard</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-TK-06</td><td>Cegah double-submit klik cepat "Kirim Laporan"</td><td class="naskah-no">Tidak Valid</td><td>&mdash; tak ada test. Fitur laporan-harian baru pakai <b>upsert</b> (<code>ON CONFLICT project_id,report_date,created_by</code>) -> tak ganda</td><td><span class="badge b-no">Belum</span></td></tr>
+        <tr><td class="id">TC-SYS-01</td><td>Hitung EV otomatis dari bobot penugasan disetujui</td><td>Valid</td><td><code>spiCalculator.test.ts</code> "calculates correct SPI with tasks" (EV = % tugas selesai)</td><td><span class="badge b-part">Sebagian</span> <span style="color:var(--muted)">("bobot disetujui" ~ rasio tugas selesai)</span></td></tr>
+        <tr><td class="id">TC-SYS-02</td><td>Hitung SPI (EV vs PV) -> render warna RAG</td><td>Valid</td><td><code>spiCalculator.test.ts</code> categorizeHealth + calculatePlannedValue + recalculateSPI</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+        <tr><td class="id">TC-SYS-03</td><td>Agregasi + urutkan proyek kritis ke atas</td><td>Valid</td><td>&mdash; getDashboard mengembalikan proyek; urutan merah-di-atas tidak di-assert</td><td><span class="badge b-no">Belum</span></td></tr>
+        <tr><td class="id">TC-SYS-04</td><td>Validasi jadwal anti-bentrok saat alokasi teknisi</td><td>Valid</td><td><code>tasks.test.ts</code> checkConflicts ("returns empty conflicts for non-overlapping dates")</td><td><span class="badge b-yes">Tercakup</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="num">B</span>Catatan penting</h2>
+    <div class="note warn"><div class="bar"></div><div>
+      <h4>3 kasus "Tidak Valid" naskah kini sudah DIPERBAIKI di kode (hasil aktual != naskah)</h4>
+      <p>Naskah mencatat TC-MN-04, TC-TK-03, TC-TK-06 sebagai bug. Kode <code>frontend/</code> sekarang: TK-03 menolak <code>.exe</code> (whitelist mime), TK-06 dicegah ganda (upsert laporan harian), MN-04 rekalkulasi SPI dipicu saat status berubah. Saat sidang: jelaskan bahwa implementasi melampaui hasil yang terdokumentasi, atau selaraskan tabel naskah.</p>
+    </div></div>
+    <div class="note"><div class="bar"></div><div>
+      <h4>Sifat pengujian</h4>
+      <p>Suite ini white-box (unit/integrasi di lapisan handler/lib), bukan replikasi black-box manual naskah. Cakupan fungsional sepadan untuk 9 TC penuh + 5 sebagian. 4 "Belum" = MN-04 (reaktivitas UI), TK-03 &amp; TK-06 (jalur bug yang kini fix - belum ada test regresi), SYS-03 (urutan kritis).</p>
+    </div></div>
+  </section>
+
+  <section>
+    <h2><span class="num">C</span>Saran melengkapi (opsional)</h2>
+    <ul class="tight">
+      <li><b>TC-TK-03 regresi:</b> tambah test <code>evidence.test.ts</code> yang assert upload <code>.exe</code> -> 400 (mengunci perbaikan).</li>
+      <li><b>TC-TK-06 regresi:</b> test laporan-harian: dua POST identik -> 1 baris (upsert).</li>
+      <li><b>TC-SYS-03:</b> test getDashboard meng-assert proyek <code>red</code> berada sebelum <code>amber</code>/<code>green</code>.</li>
+      <li><b>TC-TK-02:</b> aktifkan 2 test upload yang di-skip (mock file) agar jalur valid teruji.</li>
+      <li><b>TC-MN-04:</b> uji E2E (Playwright) reaktivitas dashboard setelah approve (di luar vitest).</li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">Traceability Tabel 5.1 &middot; PT SHI Dashboard EWS &middot; frontend/ vitest (263 lulus) &middot; 2026-06-18</div></footer>
+</body>
+</html>

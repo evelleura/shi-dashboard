@@ -6,6 +6,7 @@
     Usage:
         .\run.ps1              # auto-install PG + deps + schema + run all (frontend_backup)
         .\run.ps1 --new        # use frontend/ instead of frontend_backup/
+        .\run.ps1 --empty      # empty data except staff/user (fresh-system simulation)
         .\run.ps1 --seed       # also seed test data
         .\run.ps1 --clean      # clean reinstall node_modules
         .\run.ps1 --db-only    # only start postgres + run schema

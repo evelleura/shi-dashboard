@@ -1,6 +1,6 @@
 # BAB IV  ANALISIS DAN PERANCANGAN
 
-_Pages 36-76 of Naskah TA Final 4.pdf_
+_Pages 36-76 of Naskah TA Final.pdf_
 
 
 <!-- page 36 -->
@@ -890,8 +890,7 @@ DATE
 6 
 status 
 ENUM 
-'active','completed','on
--hold' 
+'active','completed','on-hold' 
 Default: 
 active 
 7 
@@ -971,7 +970,14 @@ VARCHAR
  
 5 
 due_date 
-DATE
+DATE 
+ 
+ 
+6 
+status 
+ENUM 
+'to_do','working_on_it','done' 
+Default: to_do
 
 <!-- page 63 -->
 
@@ -985,13 +991,6 @@ Nama Field
 Tipe Data 
 Panjang Karakter 
 Constraint 
-6 
-status 
-ENUM 
-'to_do','working_on_it'
-,'done' 
-Default: 
-to_do 
 7 
 assigned_to 
 BIGINT 
@@ -1041,8 +1040,7 @@ No
 Nama Field 
 Tipe Data 
 Panjang Karakter 
-Constrain
-t 
+Constraint 
 1 
 id_eskalasi 
 BIGINT 
@@ -1061,7 +1059,18 @@ FK
 4 
 title 
 VARCHAR 
-255
+255 
+ 
+5 
+priority 
+ENUM 
+'low','medium','high' 
+Default: medium 
+6 
+status 
+ENUM 
+'open','handled','closed' 
+Default: open
 
 <!-- page 64 -->
 
@@ -1069,19 +1078,6 @@ VARCHAR
  
  
 51 
- 
-5 
-priority 
-ENUM 
-'low','medium','high' 
-Default: 
-medium 
-6 
-status 
-ENUM 
-'open','handled','closed' 
-Default: 
-open 
  
 4.3.4 Perancangan Relasi Antar Tabel  
 Pada bagian perancangan relasi antar tabel, gambar 4.16 menggambarkan 
@@ -1105,6 +1101,11 @@ dan mengerjakan beberapa tugas, sedangkan setiap tugas hanya diberikan kepada
 satu Teknisi. 
 7) Tabel tb_tugas berelasi dengan tb_bukti, di mana satu tugas dapat memiliki 
 beberapa bukti pekerjaan yang diunggah sebagai dokumentasi pelaksanaan 
+pekerjaan. 
+8) Tabel tb_user berelasi dengan tb_bukti, di mana seorang Teknisi dapat 
+mengunggah beberapa bukti pekerjaan pada tugas yang dikerjakannya. 
+9) Tabel tb_tugas berelasi dengan tb_eskalasi, di mana satu tugas dapat memiliki 
+beberapa data eskalasi yang berkaitan dengan kendala selama pelaksanaan 
 pekerjaan.
 
 <!-- page 65 -->
@@ -1114,11 +1115,6 @@ pekerjaan.
  
 52 
  
-8) Tabel tb_user berelasi dengan tb_bukti, di mana seorang Teknisi dapat 
-mengunggah beberapa bukti pekerjaan pada tugas yang dikerjakannya. 
-9) Tabel tb_tugas berelasi dengan tb_eskalasi, di mana satu tugas dapat memiliki 
-beberapa data eskalasi yang berkaitan dengan kendala selama pelaksanaan 
-pekerjaan. 
 10) Tabel tb_user berelasi dengan tb_eskalasi, di mana seorang Teknisi dapat 
 membuat laporan eskalasi apabila ditemukan kendala pada tugas yang sedang 
 dikerjakan. 
@@ -1126,6 +1122,11 @@ dikerjakan.
 banding satu (1:1), di mana setiap proyek memiliki satu data kesehatan proyek yang 
 digunakan sebagai dasar penyajian informasi pada dashboard. 
  
+4.3.5 Perancangan Antarmuka 
+4.3.5.1 Antarmuka Data Input 
+1) Halaman Login 
+Gambar 4.17 merepresentasikan rancangan antarmuka halaman masuk sebagai 
+gerbang autentikasi dan lapis keamanan utama sistem. Desain antarmuka dirancang 
 Gambar 4.16 Perancangan Relasi Antar Tabel
 
 <!-- page 66 -->
@@ -1135,24 +1136,21 @@ Gambar 4.16 Perancangan Relasi Antar Tabel
  
 53 
  
-4.3.5 Perancangan Antarmuka 
-4.3.5.1 Antarmuka Data Input 
-1) Halaman Login 
-Gambar 4.17 merepresentasikan rancangan antarmuka halaman masuk sebagai 
-gerbang autentikasi dan lapis keamanan utama sistem. Desain antarmuka memuat 
-elemen formulir esensial berupa kolom input surel, kata sandi, dan tombol "Masuk". 
-Halaman ini terintegrasi langsung dengan basis data untuk menjalankan sistem RBAC. 
-Pascavalidasi, sistem otomatis mengidentifikasi peran pengguna lalu mengarahkan 
-mereka ke tampilan dashboard spesifik sesuai otoritas dan kebutuhan operasional 
-masing-masing. 
+dengan estetika minimalis dan profesional, hanya memuat elemen formulir esensial 
+berupa kolom input surel, kata sandi, dan tombol "Masuk". Halaman ini terintegrasi 
+langsung dengan basis data untuk menjalankan sistem RBAC. Pascavalidasi, sistem 
+otomatis mengidentifikasi peran pengguna lalu mengarahkan mereka ke tampilan 
+dashboard spesifik sesuai otoritas dan kebutuhan operasional masing-masing. 
+ 
 Gambar 4.17 Halaman Login 
 2) Halaman Tambah Proyek 
 Gambar 4.18 merepresentasikan rancangan antarmuka penambahan proyek 
-yang diakses khusus oleh manajer. Berfungsi sebagai modul entri data utama untuk 
-menginisiasi proyek ke dalam basis data. Antarmuka ini membagi proses pengisian 
-menjadi tiga bagian operasional: atribut dasar, panel penugasan teknisi yang dilengkapi 
-rekomendasi jadwal dinamis guna mencegah benturan, serta daftar rincian tugas untuk 
-mendekomposisi beban kerja lapangan.
+yang khusus diakses oleh pengguna berotoritas manajerial. Halaman ini berfungsi 
+sebagai modul entri data utama untuk menginisiasi proyek ke dalam basis data. 
+Antarmuka ini membagi proses pengisian menjadi tiga bagian operasional: atribut 
+dasar, panel penugasan teknisi yang dilengkapi rekomendasi jadwal dinamis guna 
+mencegah benturan, serta daftar rincian tugas untuk mendekomposisi beban kerja 
+lapangan.
 
 <!-- page 67 -->
 

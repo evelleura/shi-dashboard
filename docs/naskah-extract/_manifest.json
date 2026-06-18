@@ -1,6 +1,6 @@
 {
-  "source": "Naskah TA Final 4.pdf",
-  "pages": 114,
+  "source": "Naskah TA Final.pdf",
+  "pages": 113,
   "metadata": {
     "title": "",
     "author": "user",
@@ -230,12 +230,12 @@
     {
       "level": 3,
       "title": "4.3.5 Perancangan Antarmuka",
-      "page": 66
+      "page": 65
     },
     {
       "level": 3,
       "title": "4.3.5.1 Antarmuka Data Input",
-      "page": 66
+      "page": 65
     },
     {
       "level": 3,
@@ -394,7 +394,7 @@
       "title": "DAFTAR PUSTAKA",
       "slug": "daftar-pustaka",
       "start": 110,
-      "end": 114
+      "end": 113
     }
   ],
   "images": [
@@ -407,17 +407,9 @@
       "h": 466
     },
     {
-      "file": "page-003-img00.jpeg",
+      "file": "page-003-img00.png",
       "page": 3,
       "xref": 22,
-      "ext": "jpeg",
-      "w": 242,
-      "h": 181
-    },
-    {
-      "file": "page-003-img01.png",
-      "page": 3,
-      "xref": 23,
       "ext": "png",
       "w": 254,
       "h": 227
@@ -425,13 +417,21 @@
     {
       "file": "page-004-img00.png",
       "page": 4,
-      "xref": 27,
+      "xref": 26,
       "ext": "png",
       "w": 1095,
       "h": 1326
     },
     {
       "file": "page-005-img00.jpeg",
+      "page": 5,
+      "xref": 29,
+      "ext": "jpeg",
+      "w": 242,
+      "h": 181
+    },
+    {
+      "file": "page-005-img01.jpeg",
       "page": 5,
       "xref": 32,
       "ext": "jpeg",
@@ -628,17 +628,15 @@
       "xref": 412,
       "ext": "jpeg",
       "w": 1130,
-      "h": 823,
-      "figure": "4.16",
-      "caption": "Perancangan Relasi Antar Tabel"
+      "h": 823
     },
     {
       "file": "page-066-img00.png",
       "page": 66,
       "xref": 414,
       "ext": "png",
-      "w": 1042,
-      "h": 493
+      "w": 1102,
+      "h": 677
     },
     {
       "file": "page-067-img00.png",
@@ -1005,14 +1003,6 @@
       "h": 749,
       "figure": "5.34",
       "caption": "Halaman Dashboard Performa Teknisi"
-    },
-    {
-      "file": "page-113-img00.jpeg",
-      "page": 113,
-      "xref": 509,
-      "ext": "jpeg",
-      "w": 1030,
-      "h": 1371
     }
   ],
   "figures": [
@@ -1452,14 +1442,14 @@
       "page": 59
     },
     {
-      "id": "4.16",
-      "title": "Perancangan Relasi Antar Tabel",
+      "id": "4.17",
+      "title": "merepresentasikan rancangan antarmuka halaman masuk sebagai",
       "page": 65
     },
     {
-      "id": "4.17",
-      "title": "merepresentasikan rancangan antarmuka halaman masuk sebagai",
-      "page": 66
+      "id": "4.16",
+      "title": "Perancangan Relasi Antar Tabel",
+      "page": 65
     },
     {
       "id": "4.17",
