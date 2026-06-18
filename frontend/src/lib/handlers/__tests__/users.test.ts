@@ -61,7 +61,7 @@ beforeEach(async () => {
 
   const adm = await testPool.query(
     `INSERT INTO tb_user (nama, email, role, password, is_active) VALUES ($1,$2,$3,$4,TRUE) RETURNING id_user AS id`,
-    ['Admin', 'admin@t.com', 'manajer', hash]
+    ['Admin', 'admin@t.com', 'admin', hash]
   );
   adminId = adm.rows[0].id;
 });
@@ -72,14 +72,21 @@ afterAll(async () => {
 
 describe('Users Handler', () => {
   describe('listUsers', () => {
-    it('returns user list for manager', async () => {
-      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+    it('returns user list for admin', async () => {
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('GET', '/api/users', undefined, token);
       const res = await usersHandler.listUsers(req);
       const body = await res.json();
       expect(res.status).toBe(200);
       expect(Array.isArray(body.data)).toBe(true);
       expect(body.data.length).toBeGreaterThanOrEqual(3);
+    });
+
+    it('returns 403 for manager (kelola pengguna eksklusif admin)', async () => {
+      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+      const req = makeRequest('GET', '/api/users', undefined, token);
+      const res = await usersHandler.listUsers(req);
+      expect(res.status).toBe(403);
     });
 
     it('returns 403 for technician', async () => {
@@ -205,7 +212,7 @@ describe('Users Handler', () => {
 
   describe('createUser', () => {
     it('creates user for admin', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', '/api/users', {
         name: 'New User',
         email: 'newuser@t.com',
@@ -224,11 +231,11 @@ describe('Users Handler', () => {
         name: 'X', email: 'x@t.com', password: 'pw', role: 'teknisi',
       }, token);
       const res = await usersHandler.createUser(req);
-      expect(res.status).not.toBe(403); // 2 peran: manajer mewarisi wewenang admin
+      expect(res.status).toBe(403); // kelola pengguna eksklusif admin
     });
 
     it('returns 400 for invalid role', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', '/api/users', {
         name: 'X', email: 'x@t.com', password: 'Password123!', role: 'superuser',
       }, token);
@@ -237,7 +244,7 @@ describe('Users Handler', () => {
     });
 
     it('returns 400 when password too short', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', '/api/users', {
         name: 'X', email: 'x2@t.com', password: 'abc', role: 'teknisi',
       }, token);
@@ -246,7 +253,7 @@ describe('Users Handler', () => {
     });
 
     it('returns 409 on duplicate email', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', '/api/users', {
         name: 'Dup', email: 'mgr@t.com', password: 'Password123!', role: 'manajer',
       }, token);
@@ -257,7 +264,7 @@ describe('Users Handler', () => {
 
   describe('updateUser', () => {
     it('updates user for admin', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('PUT', `/api/users/${technicianId}`, { name: 'Updated Tech' }, token);
       const res = await usersHandler.updateUser(req, String(technicianId));
       const body = await res.json();
@@ -269,11 +276,11 @@ describe('Users Handler', () => {
       const token = makeToken(managerId, 'manajer', 'mgr@t.com');
       const req = makeRequest('PUT', `/api/users/${technicianId}`, { name: 'X' }, token);
       const res = await usersHandler.updateUser(req, String(technicianId));
-      expect(res.status).not.toBe(403); // 2 peran: manajer mewarisi wewenang admin
+      expect(res.status).toBe(403); // kelola pengguna eksklusif admin
     });
 
     it('returns 404 for non-existent user', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('PUT', '/api/users/99999', { name: 'X' }, token);
       const res = await usersHandler.updateUser(req, '99999');
       expect(res.status).toBe(404);
@@ -282,21 +289,21 @@ describe('Users Handler', () => {
 
   describe('deleteUser', () => {
     it('deletes user for admin', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('DELETE', `/api/users/${technicianId}`, undefined, token);
       const res = await usersHandler.deleteUser(req, String(technicianId));
       expect(res.status).toBe(200);
     });
 
     it('returns 400 when trying to delete self', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('DELETE', `/api/users/${adminId}`, undefined, token);
       const res = await usersHandler.deleteUser(req, String(adminId));
       expect(res.status).toBe(400);
     });
 
     it('returns 404 for non-existent user', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('DELETE', '/api/users/99999', undefined, token);
       const res = await usersHandler.deleteUser(req, '99999');
       expect(res.status).toBe(404);
@@ -305,14 +312,14 @@ describe('Users Handler', () => {
 
   describe('deactivateUser / activateUser', () => {
     it('deactivates user for admin', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', `/api/users/${technicianId}/deactivate`, undefined, token);
       const res = await usersHandler.deactivateUser(req, String(technicianId));
       expect(res.status).toBe(200);
     });
 
     it('returns 400 when trying to deactivate self', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', `/api/users/${adminId}/deactivate`, undefined, token);
       const res = await usersHandler.deactivateUser(req, String(adminId));
       expect(res.status).toBe(400);
@@ -321,37 +328,36 @@ describe('Users Handler', () => {
     it('activates user for admin', async () => {
       // First deactivate
       await testPool.query(`UPDATE tb_user SET is_active=FALSE WHERE id_user=$1`, [technicianId]);
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', `/api/users/${technicianId}/activate`, undefined, token);
       const res = await usersHandler.activateUser(req, String(technicianId));
       expect(res.status).toBe(200);
     });
 
-    it('returns 400 when deactivating last active admin', async () => {
-      // Deactivate the other admins (only adminId remains)
-      await testPool.query(`UPDATE tb_user SET is_active=FALSE WHERE role='manajer' AND id_user!=$1`, [adminId]);
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
-      // Try to deactivate the last admin through a different admin (but we only have one admin)
-      // Create a second admin to perform the operation
+    it('allows deactivating an admin when another active admin remains', async () => {
       const hash = await bcrypt.hash('pw', 10);
       const admin2 = await testPool.query(
         `INSERT INTO tb_user (nama, email, role, password, is_active) VALUES ($1,$2,$3,$4,TRUE) RETURNING id_user AS id`,
-        ['Admin2', 'admin2@t.com', 'manajer', hash]
+        ['Admin2', 'admin2@t.com', 'admin', hash]
       );
-      const token2 = makeToken(admin2.rows[0].id, 'manajer', 'admin2@t.com');
-      const req2 = makeRequest('POST', `/api/users/${adminId}/deactivate`, undefined, token2);
-      // Now adminId is the last active admin
-      const res = await usersHandler.deactivateUser(req2, String(adminId));
-      // admin2 is active, so adminId should be deactivatable only if admin2 is the last one
-      // Actually, the check is: are there other active admins besides the one being deactivated?
-      // Since admin2 exists and is active, deactivation should succeed
-      expect([200, 400]).toContain(res.status);
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
+      const req = makeRequest('POST', `/api/users/${admin2.rows[0].id}/deactivate`, undefined, token);
+      const res = await usersHandler.deactivateUser(req, String(admin2.rows[0].id));
+      expect(res.status).toBe(200);
+    });
+
+    it('returns 400 when demoting the last active admin', async () => {
+      // adminId satu-satunya admin; menurunkan perannya menyisakan 0 admin -> ditolak.
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
+      const req = makeRequest('PUT', `/api/users/${adminId}`, { role: 'manajer' }, token);
+      const res = await usersHandler.updateUser(req, String(adminId));
+      expect(res.status).toBe(400);
     });
   });
 
   describe('resetUserPassword', () => {
     it('resets password for admin', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', `/api/users/${technicianId}/reset-password`, {
         password: 'NewPassword123!',
       }, token);
@@ -360,7 +366,7 @@ describe('Users Handler', () => {
     });
 
     it('returns 400 when password too short', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('POST', `/api/users/${technicianId}/reset-password`, {
         password: 'abc',
       }, token);
@@ -374,13 +380,13 @@ describe('Users Handler', () => {
         password: 'NewPassword123!',
       }, token);
       const res = await usersHandler.resetUserPassword(req, String(technicianId));
-      expect(res.status).not.toBe(403); // 2 peran: manajer mewarisi wewenang admin
+      expect(res.status).toBe(403); // kelola pengguna eksklusif admin
     });
   });
 
   describe('getTechnicianDetail', () => {
     it('returns technician detail for admin', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('GET', `/api/users/technicians/${technicianId}`, undefined, token);
       const res = await usersHandler.getTechnicianDetail(req, String(technicianId));
       const body = await res.json();
@@ -389,15 +395,15 @@ describe('Users Handler', () => {
       expect(body.data).toHaveProperty('projects');
     });
 
-    it('returns 403 for manager', async () => {
+    it('allows manager (manajemen teknisi operasional, bukan eksklusif admin)', async () => {
       const token = makeToken(managerId, 'manajer', 'mgr@t.com');
       const req = makeRequest('GET', `/api/users/technicians/${technicianId}`, undefined, token);
       const res = await usersHandler.getTechnicianDetail(req, String(technicianId));
-      expect(res.status).not.toBe(403); // 2 peran: manajer mewarisi wewenang admin
+      expect(res.status).not.toBe(403); // TECHNICIAN_VIEW: manajer + admin
     });
 
     it('returns 404 for non-existent or non-technician user', async () => {
-      const token = makeToken(adminId, 'manajer', 'admin@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       // managerId is a manager, not a technician
       const req = makeRequest('GET', `/api/users/technicians/${managerId}`, undefined, token);
       const res = await usersHandler.getTechnicianDetail(req, String(managerId));

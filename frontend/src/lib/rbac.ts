@@ -16,6 +16,8 @@
  *              (kelola pengguna, log audit). "Kontrol penuh."
  */
 
+import type { TranslationKey } from './i18n';
+
 // ── Peran ────────────────────────────────────────────────────────────────────
 export const ROLES = {
   TEKNISI: 'teknisi',
@@ -134,7 +136,7 @@ export type NavSection = 'technician' | 'operational' | 'admin';
 
 export interface NavItemDef {
   to: string;
-  labelKey: string;
+  labelKey: TranslationKey;
   icon: NavIconKey;
   permission: Permission;
   section: NavSection;

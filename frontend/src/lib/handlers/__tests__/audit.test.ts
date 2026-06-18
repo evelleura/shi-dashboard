@@ -37,6 +37,7 @@ function makeRequest(method: string, url: string, body?: object, token?: string)
 
 let managerId: number;
 let technicianId: number;
+let adminId: number;
 
 beforeAll(async () => {
   await testPool.query('SELECT 1');
@@ -58,6 +59,12 @@ beforeEach(async () => {
   );
   technicianId = tech.rows[0].id;
 
+  const adm = await testPool.query(
+    `INSERT INTO tb_user (nama, email, role, password) VALUES ($1,$2,$3,$4) RETURNING id_user AS id`,
+    ['Admin', 'admin@t.com', 'admin', hash]
+  );
+  adminId = adm.rows[0].id;
+
   // Seed some audit log entries
   await testPool.query(`
     INSERT INTO audit_log (entity_type, entity_id, entity_name, action, field_name, old_value, new_value, changed_by, changed_by_name)
@@ -74,8 +81,9 @@ afterAll(async () => {
 
 describe('Audit Handler', () => {
   describe('listAuditLogs', () => {
-    it('returns audit logs for authenticated manager', async () => {
-      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+    // Log audit GLOBAL (tanpa entity_id) = eksklusif admin (AUDIT_VIEW).
+    it('returns global audit logs for admin', async () => {
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = makeRequest('GET', '/api/audit', undefined, token);
       const res = await auditHandler.listAuditLogs(req);
       const body = await res.json();
@@ -85,15 +93,32 @@ describe('Audit Handler', () => {
       expect(body.data.logs.length).toBeGreaterThanOrEqual(3);
     });
 
-    it('returns audit logs for technician (no role restriction)', async () => {
+    it('returns 403 on global audit log for manager', async () => {
+      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+      const req = makeRequest('GET', '/api/audit', undefined, token);
+      const res = await auditHandler.listAuditLogs(req);
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 403 on global audit log for technician', async () => {
       const token = makeToken(technicianId, 'teknisi', 'tech@t.com');
       const req = makeRequest('GET', '/api/audit', undefined, token);
+      const res = await auditHandler.listAuditLogs(req);
+      expect(res.status).toBe(403);
+    });
+
+    // Riwayat ENTITAS spesifik (ada entity_id) = operasional -> manajer + admin.
+    it('returns scoped entity history for manager', async () => {
+      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+      const req = new NextRequest('http://localhost:3000/api/audit?entity_type=task&entity_id=1', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
       const res = await auditHandler.listAuditLogs(req);
       expect(res.status).toBe(200);
     });
 
-    it('filters by entity_type', async () => {
-      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+    it('filters by entity_type (global -> admin)', async () => {
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = new NextRequest('http://localhost:3000/api/audit?entity_type=project', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -119,7 +144,7 @@ describe('Audit Handler', () => {
     });
 
     it('respects limit parameter', async () => {
-      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = new NextRequest('http://localhost:3000/api/audit?limit=2', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -130,7 +155,7 @@ describe('Audit Handler', () => {
     });
 
     it('caps limit at 200', async () => {
-      const token = makeToken(managerId, 'manajer', 'mgr@t.com');
+      const token = makeToken(adminId, 'admin', 'admin@t.com');
       const req = new NextRequest('http://localhost:3000/api/audit?limit=999', {
         headers: { 'Authorization': `Bearer ${token}` },
       });

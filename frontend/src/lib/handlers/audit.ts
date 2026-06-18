@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateRequest, requirePermission } from '@/lib/auth';
+import { authenticateRequest, authorizeRoles, requirePermission } from '@/lib/auth';
 import { PERMISSIONS } from '@/lib/rbac';
 import { query } from '@/lib/db';
 
@@ -22,16 +22,27 @@ export async function logChange(opts: {
   }
 }
 
-// GET /api/audit - list audit logs (eksklusif admin: jejak perubahan sistem)
+// GET /api/audit - list audit logs.
+//   Dua tingkat akses (lihat src/lib/rbac.ts):
+//   - Riwayat ENTITAS spesifik (ada entity_id) = operasional -> manajer + admin.
+//     Dipakai tab "Riwayat" proyek/klien (EntityActivityTimeline).
+//   - Log audit GLOBAL (tanpa entity_id) = jejak se-sistem, termasuk perubahan
+//     akun/peran -> sensitif, EKSKLUSIF admin (AUDIT_VIEW).
 export async function listAuditLogs(request: NextRequest) {
   const auth = authenticateRequest(request);
   if (!auth.user) return auth.errorResponse;
-  const permCheck = requirePermission(auth.user, PERMISSIONS.AUDIT_VIEW);
-  if (permCheck) return permCheck;
 
   const params = request.nextUrl.searchParams;
   const entityType = params.get('entity_type');
   const entityId = params.get('entity_id');
+
+  if (entityId) {
+    const roleCheck = authorizeRoles(auth.user, ['manajer']); // admin lolos via hierarki
+    if (roleCheck) return roleCheck;
+  } else {
+    const permCheck = requirePermission(auth.user, PERMISSIONS.AUDIT_VIEW);
+    if (permCheck) return permCheck;
+  }
   const limit = Math.min(parseInt(params.get('limit') || '50'), 200);
   const offset = parseInt(params.get('offset') || '0');
 

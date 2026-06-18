@@ -4,7 +4,8 @@ process.env.JWT_SECRET = 'SecretDian';
 import { describe, it, expect } from 'vitest';
 import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { authenticateRequest, authorizeRoles } from '../auth';
+import { authenticateRequest, authorizeRoles, requirePermission } from '../auth';
+import { PERMISSIONS, type Role } from '../rbac';
 
 const JWT_SECRET = 'SecretDian';
 
@@ -86,7 +87,7 @@ describe('auth.ts', () => {
   });
 
   describe('authorizeRoles', () => {
-    const makeUser = (role: 'teknisi' | 'manajer') => ({
+    const makeUser = (role: Role) => ({
       userId: 1,
       email: 'x@t.com',
       role,
@@ -123,6 +124,30 @@ describe('auth.ts', () => {
     it('returns null when all roles are allowed', () => {
       const result = authorizeRoles(makeUser('teknisi'), ['teknisi', 'manajer']);
       expect(result).toBeNull();
+    });
+
+    it('admin satisfies a manajer-gated endpoint via hierarchy', () => {
+      expect(authorizeRoles(makeUser('admin'), ['manajer'])).toBeNull();
+    });
+  });
+
+  describe('requirePermission', () => {
+    const makeUser = (role: Role) => ({ userId: 1, email: 'x@t.com', role });
+
+    it('admin passes admin-exclusive capabilities', () => {
+      expect(requirePermission(makeUser('admin'), PERMISSIONS.USER_MANAGE)).toBeNull();
+      expect(requirePermission(makeUser('admin'), PERMISSIONS.AUDIT_VIEW)).toBeNull();
+    });
+
+    it('manager is denied admin-exclusive capabilities (403)', async () => {
+      const result = requirePermission(makeUser('manajer'), PERMISSIONS.USER_MANAGE);
+      expect(result?.status).toBe(403);
+      const body = await result?.json();
+      expect(body.error).toBe('Access denied');
+    });
+
+    it('manager keeps operational capabilities', () => {
+      expect(requirePermission(makeUser('manajer'), PERMISSIONS.PROJECT_MANAGE)).toBeNull();
     });
   });
 });

@@ -1,6 +1,7 @@
 // === Enums / Union Types ===
 // UserRole bersumber tunggal dari kebijakan RBAC (src/lib/rbac.ts) -> 'teknisi' | 'manajer' | 'admin'.
-export type { Role as UserRole } from '@/lib/rbac';
+import type { Role } from '@/lib/rbac';
+export type UserRole = Role;
 export type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'cancelled';
 export type ProjectPhase = 'survey' | 'execution';
 export type ProjectCategory = 'instalasi' | 'maintenance' | 'perbaikan' | 'upgrade' | 'monitoring' | 'security' | 'networking' | 'lainnya';
