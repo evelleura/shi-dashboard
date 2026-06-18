@@ -1,41 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
-
-function SHILogo({ size = 64 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Outer ring */}
-      <circle cx="60" cy="60" r="56" stroke="url(#logo-gradient)" strokeWidth="3" fill="none" opacity="0.3" />
-      {/* Inner hexagon shape */}
-      <path
-        d="M60 12L102 36V84L60 108L18 84V36L60 12Z"
-        fill="url(#logo-gradient)"
-        opacity="0.1"
-      />
-      <path
-        d="M60 12L102 36V84L60 108L18 84V36L60 12Z"
-        stroke="url(#logo-gradient)"
-        strokeWidth="2"
-        fill="none"
-      />
-      {/* House/home icon inside */}
-      <path
-        d="M60 35L82 52V78C82 79.1 81.1 80 80 80H68V66C68 64.9 67.1 64 66 64H54C52.9 64 52 64.9 52 66V80H40C38.9 80 38 79.1 38 78V52L60 35Z"
-        fill="url(#logo-gradient)"
-      />
-      {/* Signal waves (IoT/smart) */}
-      <path d="M72 42C76 45 78 50 78 55" stroke="url(#logo-gradient)" strokeWidth="2" strokeLinecap="round" fill="none" />
-      <path d="M76 38C82 42 85 49 85 57" stroke="url(#logo-gradient)" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.6" />
-      <defs>
-        <linearGradient id="logo-gradient" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#3b82f6" />
-          <stop offset="1" stopColor="#6366f1" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
+import SHILogo from "../components/ui/SHILogo";
 
 function FloatingParticle({ delay, x, y, size }: { delay: number; x: number; y: number; size: number }) {
   return (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import SHILogo from '../components/ui/SHILogo';
 
 // ---------- SVG Icon Components ----------
 
@@ -205,13 +206,8 @@ function HeroSection() {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto">
         {/* Logo mark */}
-        <div
-          className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4"
-          style={{ background: 'linear-gradient(135deg, #6366f1, #ec4899)' }}
-          role="img"
-          aria-label="SHI Logo"
-        >
-          <span className="text-white font-black text-2xl tracking-tight select-none">SHI</span>
+        <div className="rounded-2xl bg-white flex items-center justify-center mb-4 px-5 py-4 shadow-xl shadow-black/20">
+          <SHILogo size={56} />
         </div>
 
         <p className="text-gray-400 text-sm tracking-widest uppercase mb-6 font-medium">

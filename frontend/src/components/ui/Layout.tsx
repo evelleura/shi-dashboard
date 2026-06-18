@@ -7,6 +7,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { useEscalationSummary } from '../../hooks/useEscalations';
 import GlobalSearchBar from './GlobalSearchBar';
 import NotificationBell from './NotificationBell';
+import SHILogo from './SHILogo';
 import { t } from '../../lib/i18n';
 import type { ReactNode } from 'react';
 
@@ -182,11 +183,11 @@ export default function Layout({ children }: Props) {
           {/* Brand */}
           <div className="px-4 py-4 border-b border-slate-800 dark:border-gray-800">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <span className="text-white font-bold text-xs">SHI</span>
+              <div className="h-9 rounded-lg bg-white px-2 flex items-center justify-center shrink-0">
+                <SHILogo size={24} />
               </div>
               <div>
-                <p className="text-white font-bold text-sm">SHI Dashboard</p>
+                <p className="text-white font-bold text-sm leading-tight">SHI Dashboard</p>
                 <p className="text-slate-400 text-[10px]">Smart Home Inovasi</p>
               </div>
             </div>
