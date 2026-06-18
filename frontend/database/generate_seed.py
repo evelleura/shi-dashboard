@@ -30,7 +30,7 @@ from pathlib import Path
 
 # ============================ KONFIGURASI ============================
 SEED = 20260619
-NUM_PROJECTS = 200
+NUM_PROJECTS = 900                 # ~1 tahun riwayat (3 proyek masuk/hari)
 CAPACITY = 4                       # maks proyek berjalan bersamaan / teknisi
 NOMINAL_TODAY = datetime.date(2026, 6, 19)   # anchor kode proyek (kosmetik)
 OUT = Path(__file__).parent / "seed.sql"
