@@ -16,6 +16,12 @@ Penggunaan:
   python run.py --new        # Sama, tapi pakai frontend/ bukan frontend_backup/
   python run.py --seed       # Sama + seed data contoh (frontend_backup saja)
   python run.py --empty      # Data KOSONG kecuali staff/user (simulasi sistem baru)
+  python run.py --new --iso  # STACK TERISOLASI: DB sendiri (shi_db_iso :5544) +
+                             #   web sendiri (:3100) + build .next-iso. Default EMPTY
+                             #   (8 staff, tanpa data). TIDAK menyentuh stack utama
+                             #   (:3000 / shi_db :5433). Untuk uji guide tanpa ganggu
+                             #   data kerja. Tambah --seed untuk data demo penuh.
+  python run.py --iso --stop # Hentikan + hapus stack terisolasi (container + .next-iso)
   python run.py --test       # DB + skema (db uji) + jalankan vitest
   python run.py --build      # Build image Next.js produksi (app dir aktif)
   python run.py --pg-only    # Hanya jalankan PostgreSQL + muat skema
@@ -26,12 +32,15 @@ Penggunaan:
                              #   reset volume DB + muat skema + SEED + dev server
 """
 
+import datetime
 import os
 import shutil
+import stat
 import signal
 import socket
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -46,6 +55,16 @@ DB_PASSWORD = "postgres"
 DB_NAME = "shi"
 DB_NAME_TEST = "shi_test"
 JWT_DEV_SECRET = "dev-secret-shi"  # hanya untuk dev lokal
+
+# -- Stack TERISOLASI (--iso) -------------------------------------------------
+# Container + port + folder build terpisah supaya bisa jalan BERSAMAAN dengan
+# stack utama tanpa bentrok. Dipakai untuk uji guide/UI tanpa menyentuh data kerja.
+ISO_DB_CONTAINER = "shi_db_iso"
+ISO_DB_PORT = 5544          # vs 5433 (utama)
+ISO_WEB_PORT = 3100         # vs 3000 (utama)
+ISO_DIST_DIR = ".next-iso"  # vs .next (utama); diaktifkan via NEXT_DIST_DIR
+ISO_LOG_DIR = ROOT / "iso-logs"  # SEMUA log stack iso (server+API, DB, frontend) disimpan di sini
+_iso_followers: list = []        # proses follower log yang harus dimatikan saat shutdown
 
 
 def db_env(db_name: str) -> dict:
@@ -295,6 +314,222 @@ def compose_down():
     print("[OK] Semua container dihentikan")
 
 
+# -- Stack TERISOLASI (--iso) -------------------------------------------------
+
+def _ts() -> str:
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def _banner(fh, title: str):
+    """Tulis garis pemisah sesi yang jelas ke file log."""
+    fh.write("\n" + "=" * 78 + "\n")
+    fh.write(f"=== SESI ISO MULAI {_ts()} | {title}\n")
+    fh.write("=" * 78 + "\n")
+    fh.flush()
+
+
+def iso_logs_init():
+    """Siapkan folder iso-logs + tulis README + banner sesi ke log server/DB.
+    SEMUA log (server+API, DB, frontend) berkumpul di sini untuk diserahkan ke
+    sesi berikutnya."""
+    ISO_LOG_DIR.mkdir(exist_ok=True)
+    # Truncate log stream per sesi --iso (fresh), lalu tulis banner.
+    for name, title in (("next-dev.log", "Next.js dev server (frontend + API handler + request log)"),
+                        ("postgres.log", "PostgreSQL (semua query SQL, log_statement=all)")):
+        with open(ISO_LOG_DIR / name, "w", encoding="utf-8") as fh:
+            _banner(fh, title)
+    (ISO_LOG_DIR / "README.md").write_text(
+        "# iso-logs — log lengkap stack terisolasi (run.py --iso)\n\n"
+        f"Dibuat: {_ts()}. Folder ini berisi SELURUH log sistem untuk diserahkan ke sesi berikutnya.\n\n"
+        "| File | Isi | Sumber |\n"
+        "|---|---|---|\n"
+        "| `next-dev.log` | Log server Next.js: kompilasi, **request API** (GET/POST /api/...), "
+        "`console.*` di handler, error server | run.py tee stdout `next dev` |\n"
+        "| `postgres.log` | **Setiap query SQL** + koneksi (log_statement=all) | follower `docker logs` DB iso |\n"
+        "| `browser-console.log` | **Console frontend** (semua level) + page error, per langkah | walkthrough.py |\n"
+        "| `api-calls.log` | **Setiap panggilan /api/** dari browser: method, URL, status, ms | walkthrough.py |\n"
+        "| `actions-timeline.log` | **TIMELINE aksi** — tiap langkah diberi garis pemisah jelas, "
+        "lalu API/console yang terjadi di langkah itu | walkthrough.py |\n"
+        "| `_console-errors.json` | error/warning ringkas (mesin-baca) | walkthrough.py |\n\n"
+        "## Cara baca\n"
+        "Mulai dari `actions-timeline.log` (ada garis `==== STEP NN ====` per aksi). "
+        "Tiap baris ber-**timestamp**, jadi bisa dikorelasikan ke `next-dev.log` & `postgres.log` "
+        "(samakan jam:menit:detik) untuk lihat API + query DB yang dipicu aksi itu.\n\n"
+        "## Regenerasi\n"
+        "```\npython run.py --new --iso          # nyalakan (tulis next-dev.log + postgres.log)\n"
+        "cd docs/hasil-uji && python walkthrough.py   # tulis browser/api/timeline\n"
+        "python run.py --iso --stop          # hentikan\n```\n",
+        encoding="utf-8")
+    print(f"[OK] Log iso -> {ISO_LOG_DIR}")
+
+
+def iso_env() -> dict:
+    """Env untuk dev server iso: DB ke port 5544, web ke 3100, build ke .next-iso."""
+    return {
+        **os.environ,
+        "DB_HOST": DB_HOST,
+        "DB_PORT": str(ISO_DB_PORT),
+        "DB_USER": DB_USER,
+        "DB_PASSWORD": DB_PASSWORD,
+        "DB_NAME": DB_NAME,
+        "JWT_SECRET": os.environ.get("JWT_SECRET", JWT_DEV_SECRET),
+        "PORT": str(ISO_WEB_PORT),          # next dev menghormati env PORT
+        "NEXT_DIST_DIR": ISO_DIST_DIR,      # dibaca next.config.ts -> build terpisah
+    }
+
+
+def iso_db_up():
+    """DB Postgres TERISOLASI (container shi_db_iso, port 5544), terpisah dari
+    stack utama (shi_db:5433). Dibuat FRESH tiap start (tanpa volume) supaya
+    state pengujian selalu bersih. log_statement=all -> SEMUA query SQL tercatat."""
+    print(f"\n=== [ISO] PostgreSQL terisolasi (port {ISO_DB_PORT}) ===")
+    subprocess.run(["docker", "rm", "-f", ISO_DB_CONTAINER], capture_output=True)
+    run([
+        "docker", "run", "-d", "--name", ISO_DB_CONTAINER,
+        "-e", f"POSTGRES_USER={DB_USER}",
+        "-e", f"POSTGRES_PASSWORD={DB_PASSWORD}",
+        "-e", f"POSTGRES_DB={DB_NAME}",
+        "-e", "TZ=Asia/Jakarta", "-e", "PGTZ=Asia/Jakarta",
+        "-p", f"{ISO_DB_PORT}:5432", "postgres:17-alpine",
+        # Logging penuh: tiap statement + koneksi + durasi -> ke stderr container -> docker logs.
+        "-c", "log_statement=all",
+        "-c", "log_min_duration_statement=0",
+        "-c", "log_connections=on",
+        "-c", "log_disconnections=on",
+        "-c", "log_line_prefix=%m [%p] %u@%d ",
+    ])
+    print("  Menunggu PostgreSQL (iso) siap...")
+    for _ in range(30):
+        r = subprocess.run(
+            ["docker", "exec", ISO_DB_CONTAINER, "pg_isready", "-U", DB_USER],
+            capture_output=True,
+        )
+        if r.returncode == 0:
+            print(f"[OK] PostgreSQL (iso) siap di port {ISO_DB_PORT}")
+            return
+        time.sleep(1)
+    print(f"[ERROR] PostgreSQL (iso) tidak siap. Cek: docker logs {ISO_DB_CONTAINER}")
+    sys.exit(1)
+
+
+def iso_db_logs_follow():
+    """Alirkan log DB iso (semua query) ke iso-logs/postgres.log secara live."""
+    fh = open(ISO_LOG_DIR / "postgres.log", "a", encoding="utf-8")
+    proc = subprocess.Popen(
+        ["docker", "logs", "-f", "--tail", "0", ISO_DB_CONTAINER],
+        stdout=fh, stderr=subprocess.STDOUT,
+    )
+    _iso_followers.append((proc, fh))
+    print("  [OK] Follower log DB -> iso-logs/postgres.log")
+
+
+def iso_load_schema(empty: bool):
+    """Muat skema frontend (init.sql) ke DB iso; bila empty=True kosongkan semua
+    tabel kecuali staff/user (login tetap bisa)."""
+    sql = ROOT / "frontend" / "database" / "init.sql"
+    if not sql.exists():
+        print(f"[ERROR] File skema tidak ditemukan: {sql}")
+        sys.exit(1)
+    print(f"  Memuat skema '{sql.name}' -> iso db '{DB_NAME}'...")
+    subprocess.run(["docker", "cp", str(sql), f"{ISO_DB_CONTAINER}:/tmp/{sql.name}"],
+                   check=True, capture_output=True)
+    r = subprocess.run(
+        ["docker", "exec", ISO_DB_CONTAINER, "psql", "-U", DB_USER, "-d", DB_NAME,
+         "-v", "ON_ERROR_STOP=1", "-f", f"/tmp/{sql.name}"],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        print("[ERROR] Gagal memuat skema iso:")
+        print(r.stderr.strip())
+        sys.exit(1)
+    print("  [OK] Skema dimuat ke iso db")
+    if empty:
+        wipe = (
+            "DO $$ DECLARE r RECORD; BEGIN "
+            "FOR r IN SELECT tablename FROM pg_tables WHERE schemaname='public' "
+            "AND tablename NOT IN ('tb_user','users') LOOP "
+            "EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) || ' RESTART IDENTITY CASCADE'; "
+            "END LOOP; END $$;"
+        )
+        subprocess.run(
+            ["docker", "exec", ISO_DB_CONTAINER, "psql", "-U", DB_USER, "-d", DB_NAME,
+             "-v", "ON_ERROR_STOP=1", "-c", wipe],
+            check=True, capture_output=True,
+        )
+        print("  [OK] Data dikosongkan (EMPTY) — sisakan staff/user (8 akun)")
+
+
+def iso_start_dev():
+    """Dev server TERISOLASI di port 3100, build di .next-iso. TIDAK membunuh proses
+    next lain (server utama :3000 tetap aman) dan TIDAK menyentuh .next utama."""
+    print(f"\n=== [ISO] Next.js Dev Server (port {ISO_WEB_PORT}) ===")
+    dist = (ROOT / "frontend" / ISO_DIST_DIR)
+    if dist.exists():
+        shutil.rmtree(dist, ignore_errors=True)
+    (ROOT / "frontend" / "uploads").mkdir(exist_ok=True)
+    print(f"  App (iso): http://localhost:{ISO_WEB_PORT}  (dir: frontend, build: {ISO_DIST_DIR})")
+    print(f"  DB  (iso): localhost:{ISO_DB_PORT} (user={DB_USER}, db={DB_NAME})")
+    print(f"  Log (iso): {ISO_LOG_DIR}")
+    print("  Ctrl+C untuk berhenti\n")
+    pkg, _ = find_pkg_mgr()
+    # Tee stdout/stderr dev server -> console + iso-logs/next-dev.log (request API + console handler + error).
+    logf = open(ISO_LOG_DIR / "next-dev.log", "a", encoding="utf-8", buffering=1)
+    app = subprocess.Popen(
+        [pkg, "run", "dev"], cwd=str(ROOT / "frontend"), env=iso_env(),
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
+    )
+
+    def _tee():
+        assert app.stdout is not None
+        for line in app.stdout:
+            sys.stdout.write(line)
+            try:
+                logf.write(line)
+                logf.flush()
+            except Exception:
+                pass
+    threading.Thread(target=_tee, daemon=True).start()
+
+    def shutdown(*_):
+        print("\n\nMenghentikan (iso)...")
+        for proc, fh in _iso_followers:
+            try:
+                proc.terminate()
+            except Exception:
+                pass
+            try:
+                fh.close()
+            except Exception:
+                pass
+        if app.poll() is None:
+            app.terminate()
+            try:
+                app.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                app.kill()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)
+    while True:
+        if app.poll() is not None:
+            print(f"[WARN] Next.js (iso) berhenti (exit {app.returncode})")
+            sys.exit(app.returncode or 0)
+        time.sleep(1)
+
+
+def iso_down():
+    """Hentikan + bersihkan stack terisolasi (container DB iso + folder .next-iso).
+    Tidak menyentuh stack utama. Dev server iso (kalau jalan) berhenti dengan Ctrl+C
+    di terminalnya sendiri."""
+    print("\n=== [ISO] Hentikan stack terisolasi ===")
+    subprocess.run(["docker", "rm", "-f", ISO_DB_CONTAINER], capture_output=True)
+    dist = (ROOT / "frontend" / ISO_DIST_DIR)
+    if dist.exists():
+        shutil.rmtree(dist, ignore_errors=True)
+    print(f"[OK] Container {ISO_DB_CONTAINER} dihapus + {ISO_DIST_DIR} dibersihkan.")
+
+
 # -- Node / bun ---------------------------------------------------------------
 
 def find_pkg_mgr() -> tuple[str, str]:
@@ -321,6 +556,46 @@ def install_deps():
     print(f"[OK] Dependencies terinstal via {name}")
 
 
+def kill_procs_under(dir_path: Path):
+    """Windows: hentikan proses yang mengunci file di bawah dir_path. Dua kelas:
+      1) exe-nya ADA di bawah dir_path (mis. next.exe di node_modules/.bin), DAN
+      2) exe global (node.exe/bun) tapi CommandLine-nya merujuk dir_path -> ini yang
+         me-load *.node SWC (next-swc...node) sehingga mengunci file walau exe-nya
+         di luar node_modules. Tanpa keduanya, rmtree kena PermissionError WinError 5.
+    pgrep/pkill (Unix) tak membunuh proses native Windows ini."""
+    if sys.platform != "win32":
+        return
+    target = str(dir_path).replace("/", "\\")
+    ps = (
+        "$t='" + target + "';"
+        "Get-CimInstance Win32_Process | Where-Object { "
+        "($_.ExecutablePath -and $_.ExecutablePath.StartsWith($t)) -or "
+        "($_.CommandLine -and $_.CommandLine -like ('*'+$t+'*')) "
+        "} | ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop } catch {} }"
+    )
+    subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True)
+    time.sleep(2)
+
+
+def rmtree_robust(d: Path):
+    """rmtree tahan-banting: reset atribut read-only + retry beberapa kali untuk
+    melawan lock sementara (umum di Windows). Kalau benar-benar gagal -> raise."""
+    def _onexc(func, path, _exc):
+        try:
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        except OSError:
+            pass
+    for _ in range(3):
+        try:
+            shutil.rmtree(d, onexc=_onexc)
+        except OSError:
+            time.sleep(1)
+        if not d.exists():
+            return
+    shutil.rmtree(d)  # percobaan terakhir tanpa peredam -> munculkan error asli bila tetap gagal
+
+
 def clean():
     """Hapus artefak build (node_modules, .next) DAN reset DB.
 
@@ -330,9 +605,14 @@ def clean():
     masih pakai kolom 'name') tetap nyangkut dan menyebabkan login gagal.
     """
     print("\n=== Bersihkan (kode + database) ===")
+    # WINDOWS: proses next/bun yang masih jalan mengunci node_modules/.bin/next.exe
+    # -> rmtree kena PermissionError WinError 5. Hentikan proses + container dulu.
+    kill_stale_next_processes()
+    kill_stale_app_container()
+    kill_procs_under(APP_DIR / "node_modules")
     for d in [APP_DIR / "node_modules", APP_DIR / ".next"]:
         if d.exists():
-            shutil.rmtree(d)
+            rmtree_robust(d)
             print(f"  Hapus {d.name}")
     # Stale .env.local dari setup lama (PG portable, DB name lama) bikin
     # Next.js connect ke instance yang salah. Wajib dihapus.
@@ -412,7 +692,7 @@ def start_dev_server():
     # Bersihkan .next agar tidak ada sisa build/cache yang rusak dari run sebelumnya.
     next_dir = APP_DIR / ".next"
     if next_dir.exists():
-        shutil.rmtree(next_dir)
+        rmtree_robust(next_dir)
         print("  [OK] .next/ dibersihkan")
 
     print(f"  App:  http://localhost:3000  (dir: {APP_DIR.name})")
@@ -449,12 +729,32 @@ def start_dev_server():
 def main():
     global APP_DIR
     args = sys.argv[1:]
-    if "--new" in args:
-        APP_DIR = ROOT / "frontend"
+    iso = "--iso" in args
+    if "--new" in args or iso:
+        APP_DIR = ROOT / "frontend"  # iso selalu pakai frontend (app naskah)
     print("=" * 50)
     print(f"  SHI Dashboard  ({sys.platform})")
-    print(f"  App dir: {APP_DIR.name}")
+    print(f"  App dir: {APP_DIR.name}{'  [STACK TERISOLASI]' if iso else ''}")
     print("=" * 50)
+
+    # --- Stack TERISOLASI: DB+web sendiri, terpisah dari stack utama ---
+    if iso:
+        ensure_docker()
+        if "--stop" in args:
+            iso_down()
+            return
+        iso_logs_init()
+        iso_db_up()
+        iso_db_logs_follow()   # mulai rekam query DB SEBELUM load schema -> seed ikut tercatat
+        empty = "--seed" not in args  # default EMPTY; --seed = data demo penuh
+        iso_load_schema(empty)
+        install_deps()
+        if not empty:
+            pkg, _ = find_pkg_mgr()
+            print("  Backfill SPI semua proyek (iso)...")
+            run([pkg, "run", "db:backfill-spi"], cwd=(ROOT / "frontend"), env=iso_env())
+        iso_start_dev()
+        return
 
     if "--stop" in args:
         compose_down()

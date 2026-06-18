@@ -164,8 +164,8 @@ export interface EscalationSummary {
 
 export interface ProjectHealth {
   project_id: number;
-  spi_value: number;
-  status: HealthStatus;
+  spi_value: number | null;   // null = Belum Dinilai (proyek baru / belum cukup berjalan)
+  status: HealthStatus | null;
   actual_progress: number;
   planned_progress: number;
   total_tasks: number;

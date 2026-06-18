@@ -180,6 +180,7 @@ describe('Projects Handler', () => {
         name: 'Cat Project',
         start_date: '2031-01-01',
         end_date: '2031-06-30',
+        client_id: clientId,
         category: 'invalid_cat',
       }, token);
       const res = await projectsHandler.createProject(req);

@@ -16,7 +16,7 @@ export default function StatusBadge({ status, showLabel = true }: Props) {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
         <span className="w-2 h-2 rounded-full bg-gray-400" />
-        {showLabel && 'No Report'}
+        {showLabel && 'Belum Dinilai'}
       </span>
     );
   }

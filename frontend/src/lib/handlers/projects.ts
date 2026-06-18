@@ -78,14 +78,16 @@ export async function createProject(request: NextRequest) {
   if (!name || !start_date || !end_date) {
     return NextResponse.json({ success: false, error: 'Name, start_date, and end_date are required' }, { status: 400 });
   }
+  // Klien WAJIB: setiap proyek harus punya klien pemilik (sesuai relasi naskah tb_klien 1:M tb_proyek).
+  if (!client_id) {
+    return NextResponse.json({ success: false, error: 'Klien wajib dipilih' }, { status: 400 });
+  }
   if (new Date(start_date) >= new Date(end_date)) {
     return NextResponse.json({ success: false, error: 'start_date must be before end_date' }, { status: 400 });
   }
-  if (client_id) {
-    const clientCheck = await query('SELECT id_klien FROM tb_klien WHERE id_klien = $1', [client_id]);
-    if (clientCheck.rowCount === 0) {
-      return NextResponse.json({ success: false, error: 'Client not found' }, { status: 400 });
-    }
+  const clientCheck = await query('SELECT id_klien FROM tb_klien WHERE id_klien = $1', [client_id]);
+  if (clientCheck.rowCount === 0) {
+    return NextResponse.json({ success: false, error: 'Client not found' }, { status: 400 });
   }
 
   try {

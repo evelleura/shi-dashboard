@@ -44,6 +44,10 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
       setError('End date must be after start date.');
       return;
     }
+    if (!form.client_id) {
+      setError('Klien wajib dipilih.');
+      return;
+    }
 
     try {
       await onSubmit({
@@ -84,15 +88,16 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
       </div>
 
       <div>
-        <label htmlFor="proj-client" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client</label>
+        <label htmlFor="proj-client" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client *</label>
         <select
           id="proj-client"
           name="client_id"
           value={form.client_id}
           onChange={handleChange}
+          required
           className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">-- Select Client --</option>
+          <option value="">-- Pilih Klien --</option>
           {clients.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}

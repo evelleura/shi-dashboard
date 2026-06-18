@@ -180,8 +180,8 @@ export const getProject = async (id: number): Promise<ProjectWithDetail> => {
   const health: ProjectHealth | undefined = hasHealth
     ? {
         project_id: id,
-        spi_value: Number(raw.spi_value) || 0,
-        status: (raw.health_status ?? 'green') as HealthStatus,
+        spi_value: raw.spi_value != null ? Number(raw.spi_value) : null,
+        status: (raw.health_status ?? null) as HealthStatus | null,
         actual_progress: Number(raw.actual_progress) || 0,
         planned_progress: Number(raw.planned_progress) || 0,
         total_tasks: Number(raw.total_tasks) || 0,

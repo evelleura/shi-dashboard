@@ -2,10 +2,17 @@ import { query } from './db';
 
 export type HealthStatus = 'green' | 'amber' | 'red';
 
+// SPI baru bermakna kalau proyek sudah berjalan minimal sekian persen durasi (PV).
+// Di bawah itu -> "Belum Dinilai" (null), supaya proyek baru tak menampilkan SPI
+// prematur/absurd (mis. SPI 1 utk proyek kosong, atau SPI 10 utk yang baru mulai
+// tapi sudah ada tugas selesai -> EV/PV meledak saat PV kecil).
+const MIN_PV_FOR_SPI = 5;   // persen durasi berjalan
+const SPI_CAP = 2;          // selaras domain chart [0,2]; SPI > 1 = di depan jadwal
+
 export interface ProjectHealth {
   project_id: number;
-  spi_value: number;
-  status: HealthStatus;
+  spi_value: number | null;
+  status: HealthStatus | null;
   actual_progress: number;
   planned_progress: number;
   total_tasks: number;
@@ -122,27 +129,36 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
   const today = new Date();
   const plannedValue = calculatePlannedValue(project.start_date, project.end_date, today);
 
-  let actualProgress: number;
+  let actualProgress = 0;
+  let hasBasis = true;  // ada dasar EV (tugas atau laporan harian)?
 
   if (taskCounts.total === 0) {
     const reportProgress = await getLatestReportProgress(projectId);
     if (reportProgress !== null) {
       actualProgress = reportProgress;
     } else {
-      actualProgress = 0;
+      hasBasis = false;  // 0 tugas & 0 laporan -> tak ada dasar EV
     }
   } else {
     actualProgress = (taskCounts.completed / taskCounts.total) * 100;
   }
 
-  const rawSpi = plannedValue > 0
-    ? Math.round((actualProgress / plannedValue) * 10000) / 10000
-    : 1;
-  // Cap agar muat di project_health.spi_value NUMERIC(6,4) (maks 9.9999). SPI sebesar
-  // ini (mis. proyek baru mulai tapi tugas sudah selesai) tetap jauh di atas target -> hijau.
-  const spiValue = Math.min(rawSpi, 9.9999);
+  // SPI hanya bermakna kalau ADA dasar EV DAN proyek sudah berjalan >= MIN_PV_FOR_SPI.
+  // Kalau belum -> "Belum Dinilai" (spi_value/status NULL) -> UI tampil '--', tak ikut
+  // rata-rata SPI, masuk hitungan "Belum Dinilai". Bukan angka prematur (1) atau absurd (10).
+  const measurable = hasBasis && plannedValue >= MIN_PV_FOR_SPI;
 
-  const status = categorizeHealth(spiValue);
+  let spiValue: number | null;
+  let status: HealthStatus | null;
+  if (!measurable) {
+    spiValue = null;
+    status = null;
+  } else {
+    // Cap di SPI_CAP supaya tak ada angka absurd saat PV masih kecil; >1 = di depan jadwal.
+    const raw = Math.round((actualProgress / plannedValue) * 10000) / 10000;
+    spiValue = Math.min(raw, SPI_CAP);
+    status = categorizeHealth(spiValue);
+  }
 
   const upsertResult = await query<ProjectHealth>(
     `INSERT INTO project_health

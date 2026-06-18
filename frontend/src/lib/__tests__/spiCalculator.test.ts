@@ -141,16 +141,30 @@ describe('recalculateSPI', () => {
     expect(result).toBeNull();
   });
 
-  it('calculates SPI=1 when no tasks exist and project is on schedule', async () => {
-    // Project is in the past (start: 2020-01-01, end: 2020-12-31)
-    // so planned value = 100, actual = 0 (no tasks, no reports) => SPI = 0/100 = 0
+  it('treats a project with no tasks as Belum Dinilai (null SPI/status) - not 0, not fake-1', async () => {
+    // Proyek tanpa tugas & tanpa laporan -> tak ada dasar EV -> Belum Dinilai (null).
+    // Bukan kritis (SPI 0) maupun angka palsu (SPI 1). Regresi bug "SPI proyek baru".
     const result = await recalculateSPI(projectId);
     expect(result).not.toBeNull();
-    expect(result?.spi_value).toBeDefined(); // pg NUMERIC dikembalikan sbg string
-    // With no tasks and no reports, actual progress = 0
-    expect(Number(result?.actual_progress)).toBe(0);
+    expect(result?.spi_value).toBeNull();
+    expect(result?.status).toBeNull();
     expect(result?.total_tasks).toBe(0);
-    expect(result?.completed_tasks).toBe(0);
+  });
+
+  it('caps SPI at 2.0 for a barely-started project (no absurd values like 10)', async () => {
+    // Proyek baru mulai (~10% durasi) tapi tugas selesai -> EV/PV ~10 -> harus di-cap 2.0.
+    const start = new Date(Date.now() - 10 * 86400000).toISOString().slice(0, 10);
+    const end = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
+    await testPool.query('UPDATE tb_proyek SET start_date=$1, end_date=$2 WHERE id_proyek=$3', [start, end, projectId]);
+    await testPool.query(
+      `INSERT INTO tb_tugas (id_proyek, nama_tugas, status, due_date, sort_order, is_survey_task, created_by)
+       VALUES ($1,'T done','done',CURRENT_DATE,0,FALSE,$2)`,
+      [projectId, managerId]
+    );
+    const result = await recalculateSPI(projectId);
+    expect(result?.spi_value).not.toBeNull();
+    expect(Number(result?.spi_value)).toBeLessThanOrEqual(2);
+    expect(result?.status).toBe('green');
   });
 
   it('calculates correct SPI with tasks', async () => {

@@ -16,7 +16,7 @@ export default function ProjectHealthPieChart({ summary }: Props) {
     onTrack:  id ? 'Tepat Waktu' : 'On Track',
     warning:  id ? 'Waspada'     : 'Warning',
     critical: id ? 'Kritis'      : 'Critical',
-    noData:   id ? 'Tanpa Data'  : 'No Data',
+    noData:   id ? 'Belum Dinilai' : 'Not Assessed',
     title:    id ? 'Distribusi Kesehatan Proyek' : 'Project Health Distribution',
     empty:    id ? 'Belum ada data proyek' : 'No project data available',
     projects: id ? 'Proyek' : 'Projects',
