@@ -1,7 +1,7 @@
-# fly.toml -- shi-naskah (app naskah TA: Next.js 15 + Postgres, tabel Indonesia tb_*)
+# fly.toml -- shi-dashboard (app naskah TA: Next.js 15 + Postgres, tabel Indonesia tb_*)
 # Region: sin (Singapore), region-match dengan Fly Postgres utk latensi rendah.
 
-app             = "shi-naskah"
+app             = "shi-dashboard"
 primary_region  = "sin"
 
 [build]
@@ -10,7 +10,7 @@ primary_region  = "sin"
 # Tiap deploy: init.sql (skema + 8 user dasar, idempotent) + seed.sql (data
 # operasional, self-guard IF NOT EXISTS tb_proyek) + backfill SPI (project_health).
 # Re-seed PAKSA (ganti data dummy):
-#   fly ssh console -a shi-naskah -C "bash -lc 'cd /app && bun database/setup.ts --force-seed && bun database/backfill-spi.ts'"
+#   fly ssh console -a shi-dashboard -C "bash -lc 'cd /app && bun database/setup.ts --force-seed && bun database/backfill-spi.ts'"
 [deploy]
   release_command = "bun database/setup.ts --seed && bun database/backfill-spi.ts"
 
@@ -36,3 +36,10 @@ primary_region  = "sin"
   cpu_kind = "shared"
   cpus     = 1
   memory   = "512mb"
+
+# Volume shi_data (sudah ada di mesin shi-dashboard) -- di-mount supaya deploy konsisten
+# dgn mesin yang punya volume. App tak menulis ke /data (upload ephemeral), tapi mount
+# dibiarkan agar rolling-deploy tidak menolak mesin yang punya volume terpasang.
+[mounts]
+  source      = "shi_data"
+  destination = "/data"

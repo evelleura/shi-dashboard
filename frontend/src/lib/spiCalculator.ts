@@ -172,13 +172,17 @@ export async function recalculateSPI(projectId: number): Promise<ProjectHealth |
     // bermakna (tepat waktu / lebih cepat / telat), pakai rasio durasi:
     //   selesai lebih cepat dari rencana -> SPI > 1; lebih lambat -> SPI < 1.
     // Durasi aktual diukur dari tugas terakhir di-'done' (MAX status_changed_at).
+    // Hitung durasi dalam HARI PENUH dari awal proyek. start_date & end_date =
+    // tanggal (tengah malam); status_changed_at = timestamp (mis. 14:00). Pakai
+    // Math.floor supaya komponen jam (mis. +0.58 hari) TIDAK membulat ke atas dan
+    // menggelembungkan durasi aktual -> bias "telat/merah" palsu utk proyek tepat waktu.
     const DAY_MS = 86400000;
     const startMs = new Date(project.start_date).getTime();
     const plannedEndMs = new Date(project.end_date).getTime();
-    const plannedDur = Math.max(1, Math.round((plannedEndMs - startMs) / DAY_MS));
+    const plannedDur = Math.max(1, Math.floor((plannedEndMs - startMs) / DAY_MS));
     const actualEnd = await getActualCompletionDate(projectId);
     const actualDur = actualEnd
-      ? Math.max(1, Math.round((new Date(actualEnd).getTime() - startMs) / DAY_MS))
+      ? Math.max(1, Math.floor((new Date(actualEnd).getTime() - startMs) / DAY_MS))
       : plannedDur;
     const raw = Math.round((plannedDur / actualDur) * 10000) / 10000;
     spiValue = Math.min(raw, SPI_CAP);

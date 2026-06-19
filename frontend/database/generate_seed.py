@@ -39,7 +39,7 @@ SEED = 20260619
 # total proyek banyak TANPA menambah headcount (konkurensi tetap ~N_TECHS).
 YEARS_HISTORY = 2.5                # rentang riwayat ke belakang (multi-tahun)
 N_TECHS = 25                       # ukuran tim TETAP (5 base + 20 rekrut); diturunkan dari throughput 3-4/hari
-BENCH_GAP = (1, 2)                 # jeda hari antar proyek per teknisi; >=1 jaga ketat 1-job
+BENCH_GAP = (2, 3)                 # jeda hari antar proyek per teknisi; >=2 jaga ketat 1-job (tanpa sentuh batas)
 MAX_PROJECTS = 3000                # pengaman ukuran seed.sql
 NOMINAL_TODAY = datetime.date(2026, 6, 19)   # anchor kode proyek (kosmetik)
 OUT = Path(__file__).parent / "seed.sql"
@@ -291,32 +291,47 @@ def build_projects(clients):
                       + ["ahead"] * 12 + ["unrated"] * 8)
     projects = []
     pid = 0
-    # heap (free_off, tid): proses teknisi yang bebas paling awal -> rantai kronologis.
-    # tiap teknisi mengerjakan proyek beruntun sampai satu menembus hari ini (aktif).
-    heap = [(jo, tid) for tid, jo in roster.members]
+    # heap (free_off, tid, prev_end): proses teknisi yang bebas paling awal -> rantai
+    # kronologis. Tiap teknisi mengerjakan proyek SELESAI beruntun (jeda BENCH_GAP),
+    # lalu SATU proyek "berjalan" (aktif) yang sedang dikerjakan hari ini.
+    heap = [(jo, tid, jo - 1) for tid, jo in roster.members]
     heapq.heapify(heap)
     while heap and pid < MAX_PROJECTS:
-        free_off, tid = heapq.heappop(heap)
+        free_off, tid, prev_end = heapq.heappop(heap)
         if free_off > 0:
-            continue  # teknisi ini sudah punya proyek aktif yang menembus hari ini -> stop
-        start_off = min(free_off + rng.randint(*BENCH_GAP), 0)  # proyek terakhir mulai <= hari ini
+            continue  # teknisi sudah punya proyek aktif menembus hari ini -> stop rantai
         client = next_client()
         category = pick(client["favs"])
         scale = weighted_scale(client["tipe"])
         dlo, dhi = DUR[scale]
         dur = rng.randint(dlo, dhi)
-        end_off = start_off + dur                       # tanggal akhir RENCANA (= end_date)
         actual_dur = max(1, round(dur * pick(SCHED_FACTORS)))
-        # hindari SPI menumpuk tepat di 1.0: geser +-1 hari utk sebagian proyek >=3 hari
+        # hindari SPI menumpuk tepat 1.0: geser +-1 hari utk sebagian proyek >=3 hari
         # (job sangat pendek <3 hari realistis memang sering tepat waktu -> SPI 1).
         if actual_dur == dur and dur >= 3 and rng.random() < 0.6:
             actual_dur = max(1, dur + rng.choice([-1, 1, 1]))
-        actual_end = start_off + actual_dur             # penyelesaian AKTUAL (dasar SPI akhir)
-        status = "completed" if actual_end < 0 else "active"
+
+        start_off = free_off + rng.randint(*BENCH_GAP)   # mulai setelah jeda dari proyek lalu
+        if start_off + actual_dur >= 0:
+            # PROYEK BERJALAN (aktif), MID-FLIGHT: hari ini sudah di tengah durasi -> PV>0
+            # -> SPI dinilai (EWS tampil merah/kuning/hijau, bukan "Belum Dinilai" semua).
+            # Mundur 'elapsed' hari, dibatasi ruang sebelum proyek selesai terakhir (anti-tabrakan).
+            room = -1 - prev_end
+            if room < 1:
+                start_off = 0                            # tak ada ruang -> baru mulai hari ini
+            else:
+                start_off = -rng.randint(1, min(max(1, dur - 1), room))
+            if start_off + dur < 1:
+                dur = 1 - start_off + rng.randint(0, 4)  # pastikan end menembus hari ini
+            end_off = start_off + dur
+            actual_end, eff_dur, status = end_off, dur, "active"
+        else:
+            end_off = start_off + dur                    # tanggal akhir RENCANA (= end_date)
+            actual_end, eff_dur, status = start_off + actual_dur, actual_dur, "completed"
 
         # fase + survey approval
         survey_len = max(2, min(dur // 4, 10))
-        if status == "active" and rng.random() < 0.30 and start_off > -survey_len:
+        if status == "active" and rng.random() < 0.25 and start_off > -survey_len:
             phase, survey_approved, sap_off = "survey", False, None
         else:
             phase, survey_approved = "execution", True
@@ -329,13 +344,14 @@ def build_projects(clients):
         pid += 1
         projects.append(dict(
             id=pid, code=None, name=name, client=client, category=category, scale=scale,
-            start_off=start_off, end_off=end_off, dur=dur, actual_dur=actual_dur, actual_end=actual_end,
+            start_off=start_off, end_off=end_off, dur=dur, actual_dur=eff_dur, actual_end=actual_end,
             status=status, phase=phase, survey_approved=survey_approved, sap_off=sap_off,
             manager=manager, team=[tid], value=make_value(category, scale), bucket=bucket,
             target=TARGET_DESC[category],
         ))
-        # teknisi bebas lagi setelah penyelesaian AKTUAL + jeda -> proyek berikutnya
-        heapq.heappush(heap, (actual_end + rng.randint(*BENCH_GAP), tid))
+        if status == "completed":
+            # bebas lagi pada actual_end; jeda BENCH_GAP ditambah saat pop berikutnya
+            heapq.heappush(heap, (actual_end, tid, actual_end))
 
     # id + kode proyek mengikuti urutan KRONOLOGIS (start_off) -> rapi & stabil
     projects.sort(key=lambda p: (p["start_off"], p["id"]))
