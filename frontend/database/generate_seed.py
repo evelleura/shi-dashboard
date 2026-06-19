@@ -400,7 +400,9 @@ def build_tasks(projects):
             # survey (bucket None) diperlakukan on-track (hijau): survei berjalan wajar.
             bucket = p["bucket"] or "green"
             tgt = {"amber": 0.90, "green": 1.05, "ahead": 1.35}[bucket]
-            floor = {"amber": 0.85, "green": 0.95, "ahead": 1.0}[bucket]
+            # floor diberi margin di atas ambang kategori (0.85/0.95) supaya pembulatan
+            # PV 2-desimal di recalculateSPI tak menjatuhkan bucket ke bawah ambang.
+            floor = {"amber": 0.87, "green": 0.96, "ahead": 1.0}[bucket]
             # done >= 1 -> EV>0 -> TAK PERNAH SPI 0.000. Naikkan done bila pembulatan
             # menjatuhkan SPI di bawah floor bucket -> tak ada proyek aktif MERAH (<0.85).
             done = clamp(round(tgt * pv_frac * total), 1, total)

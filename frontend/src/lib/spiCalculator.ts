@@ -29,6 +29,7 @@ export interface ProjectHealth {
  * Clamped to [0, 100].
  */
 export function calculatePlannedValue(startDate: Date, endDate: Date, referenceDate: Date = new Date()): number {
+  const DAY_MS = 86400000;
   const start = new Date(startDate).getTime();
   const end = new Date(endDate).getTime();
   const ref = new Date(referenceDate).getTime();
@@ -39,8 +40,14 @@ export function calculatePlannedValue(startDate: Date, endDate: Date, referenceD
 
   if (totalDuration <= 0) return 100;
 
-  const elapsed = clamped - start;
-  const pv = (elapsed / totalDuration) * 100;
+  // PV pakai HARI PENUH (Math.floor): start_date/end_date = tengah malam, tapi "hari
+  // ini" (referenceDate) punya komponen jam. Tanpa floor, pecahan jam menggelembungkan
+  // elapsed -> PV naik -> SPI proyek aktif turun -> proyek baru-jalan tampil MERAH
+  // PALSU (mis. SPI 0.80 utk yang seharusnya ~1.0). Floor menyetarakan PV dengan EV
+  // tugas yang diskret per hari, selaras cabang proyek-selesai (durasi pakai floor).
+  const elapsedDays = Math.floor((clamped - start) / DAY_MS);
+  const totalDays = totalDuration / DAY_MS;
+  const pv = (elapsedDays / totalDays) * 100;
 
   return Math.min(100, Math.max(0, Math.round(pv * 100) / 100));
 }
