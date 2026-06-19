@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useProject, useProjectTechnicians, useApproveSurvey, useRejectSurvey, useDeleteProject } from '../hooks/useProjects';
+import { useProject, useProjectTechnicians, useApproveSurvey, useRejectSurvey, useDeleteProject, useAssignTechnician, useUnassignTechnician } from '../hooks/useProjects';
 import { useChangeTaskStatus, useCreateTask, useSwapTaskOrder } from '../hooks/useTasks';
 import { useTechnicianList } from '../hooks/useUsers';
 import StatusBadge from '../components/ui/StatusBadge';
@@ -50,6 +50,8 @@ export default function ProjectDetailPage() {
   const approveSurveyMutation = useApproveSurvey();
   const rejectSurveyMutation = useRejectSurvey();
   const deleteProjectMutation = useDeleteProject();
+  const assignTech = useAssignTechnician();
+  const unassignTech = useUnassignTechnician();
 
   const [activeTab, setActiveTab] = useState<TabId>('tasks');
   const [taskView, setTaskView] = useState<'kanban' | 'table'>('kanban');
@@ -58,6 +60,7 @@ export default function ProjectDetailPage() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [showDelete, setShowDelete] = useState(false);
+  const [assignUserId, setAssignUserId] = useState<number | ''>('');
 
 
   const { can } = usePermissions();
@@ -115,6 +118,9 @@ export default function ProjectDetailPage() {
   const techMeta = Object.fromEntries(
     projectTechnicians.map((pt) => [pt.id, { busy_today: pt.busy_today, active_tasks: pt.active_tasks }])
   );
+
+  const assignedIds = new Set(projectTechnicians.map((pt) => pt.id));
+  const availableTechnicians = technicians.filter((tch) => !assignedIds.has(tch.id));
 
   return (
     <div className="space-y-6">
@@ -340,6 +346,31 @@ export default function ProjectDetailPage() {
       {/* Assigned technicians — derived from tasks */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">{t('project.assigned_technicians', language)}</h3>
+        {isManager && (
+          <div className="flex items-center gap-2 mb-3">
+            <select
+              value={assignUserId}
+              onChange={(e) => setAssignUserId(e.target.value === '' ? '' : Number(e.target.value))}
+              className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{language === 'id' ? 'Pilih teknisi...' : 'Select technician...'}</option>
+              {availableTechnicians.map((tch) => (
+                <option key={tch.id} value={tch.id}>{tch.name}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={assignUserId === '' || assignTech.isPending}
+              onClick={() => {
+                if (assignUserId === '') return;
+                assignTech.mutate({ projectId, userId: Number(assignUserId) }, { onSuccess: () => setAssignUserId('') });
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors"
+            >
+              {language === 'id' ? 'Tugaskan' : 'Assign'}
+            </button>
+          </div>
+        )}
         {projectTechnicians.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-500">{t('project.no_technicians', language)}</p>
         ) : (
@@ -354,6 +385,7 @@ export default function ProjectDetailPage() {
                   <th className="text-center pb-2 font-medium px-2">Terlambat</th>
                   <th className="text-center pb-2 font-medium px-2">Hari Ini</th>
                   <th className="text-left pb-2 font-medium pl-2">Deadline Terdekat</th>
+                  {isManager && <th className="pb-2 pl-2 w-8" aria-label={language === 'id' ? 'Aksi' : 'Actions'}></th>}
                 </tr>
               </thead>
               <tbody>
@@ -396,6 +428,24 @@ export default function ProjectDetailPage() {
                         ? new Date(tech.earliest_due_date).toLocaleDateString(locale, { day: '2-digit', month: 'short' })
                         : '--'}
                     </td>
+                    {isManager && (
+                      <td className="py-2.5 pl-2 text-center">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            unassignTech.mutate({ projectId, userId: tech.id });
+                          }}
+                          disabled={unassignTech.isPending}
+                          title={language === 'id' ? 'Copot dari proyek' : 'Remove from project'}
+                          className="text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useDashboard } from '../hooks/useDashboard';
-import { useProjects, useUpdateProject } from '../hooks/useProjects';
+import { useProjects, useUpdateProject, useDeleteProject } from '../hooks/useProjects';
 import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import * as XLSX from 'xlsx';
@@ -64,7 +64,7 @@ function PhaseSelect({ value, onChange }: { value: string; onChange: (v: string)
   );
 }
 
-function ActionButtons({ project, onView, onEdit }: { project: DashboardProject; onView: () => void; onEdit: () => void }) {
+function ActionButtons({ project, onView, onEdit, onDelete }: { project: DashboardProject; onView: () => void; onEdit: () => void; onDelete: () => void }) {
   return (
     <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
       <button onClick={onView} title="View Detail" className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
@@ -76,6 +76,11 @@ function ActionButtons({ project, onView, onEdit }: { project: DashboardProject;
       <button onClick={onEdit} title="Quick Edit" className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+      </button>
+      <button onClick={onDelete} title="Hapus" className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
       </button>
     </div>
@@ -480,8 +485,10 @@ export default function ReportsPage() {
   const { data: dashData, isLoading: dashLoading } = useDashboard();
   const { data: projects = [], isLoading: projLoading } = useProjects();
   const updateMutation = useUpdateProject();
+  const deleteMutation = useDeleteProject();
   const router = useRouter();
   const [tab, setTab] = useState<ReportType>('summary');
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState<string>(() => ymd(new Date(new Date().getFullYear(), new Date().getMonth(), 1)));
   const [endDate, setEndDate] = useState<string>(() => ymd(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)));
@@ -554,6 +561,12 @@ export default function ReportsPage() {
 
   const handleInlinePhaseChange = (p: DashboardProject, newPhase: string) => {
     updateMutation.mutate({ id: p.id, data: { phase: newPhase as UpdateProjectData['phase'] } });
+  };
+
+  const handleDelete = async () => {
+    if (deleteId == null) return;
+    await deleteMutation.mutateAsync(deleteId);
+    setDeleteId(null);
   };
 
   const handleExcelExport = useCallback(() => {
@@ -721,7 +734,7 @@ export default function ReportsPage() {
                       <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '-'}</td>
                       <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{formatDate(p.start_date)} — {formatDate(p.end_date)}</td>
                       <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400 text-right font-mono">{Number(p.project_value) > 0 ? formatRupiah(Number(p.project_value)) : '-'}</td>
-                      <td className="px-3 py-2.5"><ActionButtons project={p} onView={() => router.push(`/projects/${p.id}`)} onEdit={() => openEdit(p)} /></td>
+                      <td className="px-3 py-2.5"><ActionButtons project={p} onView={() => router.push(`/projects/${p.id}`)} onEdit={() => openEdit(p)} onDelete={() => setDeleteId(p.id)} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -776,7 +789,7 @@ export default function ReportsPage() {
                           <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.actual_progress != null ? `${Number(p.actual_progress).toFixed(1)}%` : '-'}</td>
                           <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.planned_progress != null ? `${Number(p.planned_progress).toFixed(1)}%` : '-'}</td>
                           <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '-'}</td>
-                          <td className="px-3 py-2.5"><ActionButtons project={p} onView={() => router.push(`/projects/${p.id}`)} onEdit={() => openEdit(p)} /></td>
+                          <td className="px-3 py-2.5"><ActionButtons project={p} onView={() => router.push(`/projects/${p.id}`)} onEdit={() => openEdit(p)} onDelete={() => setDeleteId(p.id)} /></td>
                         </tr>
                       ))}
                   </tbody>
@@ -918,6 +931,18 @@ export default function ReportsPage() {
           </div>
         )}
       </Modal>
+
+      {/* ── DELETE CONFIRM ───────────────────────────────────────────── */}
+      <ConfirmDialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Hapus Proyek"
+        message="Apakah Anda yakin ingin menghapus proyek ini? Semua tugas, bukti, laporan, dan eskalasi terkait akan ikut terhapus permanen. Tindakan ini tidak dapat dibatalkan."
+        confirmLabel="Hapus"
+        variant="danger"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

@@ -309,11 +309,18 @@ def build_projects(clients):
         scale = weighted_scale(client["tipe"])
         dlo, dhi = DUR[scale]
         dur = rng.randint(dlo, dhi)
-        actual_dur = max(1, round(dur * pick(SCHED_FACTORS)))
+        _sf = pick(SCHED_FACTORS)
+        _dur_float = dur * _sf
+        actual_dur = max(1, round(_dur_float))
         # hindari SPI menumpuk tepat 1.0: geser +-1 hari utk sebagian proyek >=3 hari
         # (job sangat pendek <3 hari realistis memang sering tepat waktu -> SPI 1).
         if actual_dur == dur and dur >= 3 and rng.random() < 0.6:
             actual_dur = max(1, dur + rng.choice([-1, 1, 1]))
+        # jam penyelesaian dikodekan dari fraksi float -> sub-hari precision di
+        # status_changed_at tugas terakhir -> spiCalculator membaca tanpa floor
+        # -> SPI tidak selalu rasional bulat (1.500, 1.200).
+        _frac = _dur_float - int(_dur_float)
+        completion_hour = min(23, max(1, int(_frac * 24)))
 
         start_off = free_off + rng.randint(*BENCH_GAP)   # mulai setelah jeda dari proyek lalu
         if start_off + actual_dur >= 0:
@@ -351,7 +358,7 @@ def build_projects(clients):
             start_off=start_off, end_off=end_off, dur=dur, actual_dur=eff_dur, actual_end=actual_end,
             status=status, phase=phase, survey_approved=survey_approved, sap_off=sap_off,
             manager=manager, team=[tid], value=make_value(category, scale), bucket=bucket,
-            target=TARGET_DESC[category],
+            target=TARGET_DESC[category], completion_hour=completion_hour,
         ))
         if status == "completed":
             # bebas lagi pada actual_end; jeda BENCH_GAP ditambah saat pop berikutnya
@@ -434,6 +441,7 @@ def build_tasks(projects):
                 id=tid, proyek=p["id"], nama=nm, desc=ds, assigned=assignee, status=st,
                 due_off=due_off, is_survey=is_sv, est=est, created_by=p["manager"],
                 created_off=s, upd_off=upd_off,
+                comp_hour=p["completion_hour"] if (idx == done - 1 and p["status"] == "completed") else 14,
             ))
         p["_task_ids"] = list(range(tid - total + 1, tid + 1))
         p["_total_tasks"] = total
@@ -592,7 +600,7 @@ def emit(clients, projects, tasks, roster, acts, reports, escs):
         rows.append(
             f"  ({t['id']}, {t['proyek']}, {q(t['nama'])}, {q(t['desc'])}, {t['assigned']}, {q(t['status'])}, "
             f"{dexpr(t['due_off'])}, {str(t['is_survey']).upper()}, {t['est']}, NULL, "
-            f"{tsexpr(scoff, 14, 0)}, {t['created_by']}, {tsexpr(t['created_off'], 8, 0)}, {tsexpr(t['upd_off'], 15, 0)})")
+            f"{tsexpr(scoff, t.get('comp_hour', 14), 0)}, {t['created_by']}, {tsexpr(t['created_off'], 8, 0)}, {tsexpr(t['upd_off'], 15, 0)})")
     chunked_insert(out, "  INSERT INTO tb_tugas (id_tugas, id_proyek, nama_tugas, description, assigned_to, status, due_date, is_survey_task, estimated_hours, depends_on, status_changed_at, created_by, created_at, updated_at) VALUES", rows)
     out.append("")
 
