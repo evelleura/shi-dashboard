@@ -6,13 +6,16 @@
 Generator seed realistis PT Smart Home Inovasi (SHI) -> frontend/database/seed.sql
 
 Tujuan: rombak seed demo menjadi RIWAYAT OPERASI yang realistis dan konsisten:
-  - ~3 proyek masuk per hari (skala 900 proyek/tahun); chunk ini NUM_PROJECTS proyek
-    "kebelakang" (mayoritas selesai + sebagian aktif untuk dashboard EWS).
+  - Model TIM TETAP: PT SHI punya N_TECHS teknisi; tiap orang mengerjakan 1 job pada
+    satu waktu (CAPACITY=1) secara BERURUTAN. Throughput perusahaan = N_TECHS / siklus
+    (~3-4 proyek/hari). Riwayat MULTI-TAHUN (YEARS_HISTORY) -> total proyek banyak
+    (mayoritas selesai + ~N_TECHS aktif utk dashboard EWS) TANPA menambah headcount.
   - Klien retensi: sebagian klien (developer/hotel/RS/pemerintah/mall/pabrik) punya
-    BANYAK proyek; perorangan 1 proyek.
-  - Penjadwalan teknisi berbasis KAPASITAS: tiap teknisi maksimum CAPACITY proyek
-    berjalan bersamaan. Kalau permintaan > kapasitas -> REKRUT teknisi baru
-    (created_at = tanggal proyek). Tidak pernah ada tabrakan jadwal.
+    BANYAK proyek; perorangan sedikit.
+  - Penjadwal (`FixedRoster` + heap di build_projects): teknisi bebas paling awal
+    mengambil proyek berikutnya -> konkurensi selalu <= N_TECHS, tak ada tabrakan.
+    Rekrut masuk bertahap di awal riwayat (kisah pertumbuhan tim 5 -> N_TECHS).
+  - TANPA status 'on-hold' (perusahaan tidak menunda pekerjaan).
 
 Determinisme: random.Random(SEED) tetap -> output identik tiap run. Tanggal ditulis
 relatif `CURRENT_DATE + N` supaya data selalu "segar" saat seed dimuat run.py.
@@ -30,8 +33,14 @@ from pathlib import Path
 
 # ============================ KONFIGURASI ============================
 SEED = 20260619
-NUM_PROJECTS = 450                 # riwayat operasi (intake 2-3/hari sibuk, banyak hari kosong)
-CAPACITY = 1                       # 1 teknisi = 1 job pada satu waktu (realistis lapangan)
+# Model TIM TETAP: PT SHI punya N_TECHS teknisi; tiap orang 1 job pada satu waktu
+# (CAPACITY=1) dan mengerjakan proyek BERURUTAN. Throughput perusahaan = N_TECHS /
+# siklus-rata2 (target ~3-4 proyek/hari masuk & selesai). Riwayat MULTI-TAHUN ->
+# total proyek banyak TANPA menambah headcount (konkurensi tetap ~N_TECHS).
+YEARS_HISTORY = 2.5                # rentang riwayat ke belakang (multi-tahun)
+N_TECHS = 25                       # ukuran tim TETAP (5 base + 20 rekrut); diturunkan dari throughput 3-4/hari
+BENCH_GAP = (1, 2)                 # jeda hari antar proyek per teknisi; >=1 jaga ketat 1-job
+MAX_PROJECTS = 3000                # pengaman ukuran seed.sql
 NOMINAL_TODAY = datetime.date(2026, 6, 19)   # anchor kode proyek (kosmetik)
 OUT = Path(__file__).parent / "seed.sql"
 PW_HASH = "$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6"  # password123
@@ -142,9 +151,9 @@ VALUE = {
     "upgrade": (10, 30, 35, 90, 100, 250), "lainnya": (5, 20, 25, 70, 80, 200),
 }
 # durasi (hari kalender) per skala -- instalasi CCTV/smart-home realistis: rumah
-# 1-3 hari, komersil 4-12 hari, besar (hotel/RS/mall) 2-5 minggu. Sengaja pendek
-# supaya "1 teknisi = 1 job" (CAPACITY=1) tetap muat <=25 teknisi pada konkurensi.
-DUR = {"small": (1, 3), "medium": (4, 12), "large": (14, 35)}
+# 1-3 hari, komersil 3-8 hari, besar (hotel/RS/mall) ~2-3 minggu. Pendek -> siklus
+# per teknisi pendek -> throughput perusahaan ~3-4 proyek/hari dengan ~N_TECHS orang.
+DUR = {"small": (1, 3), "medium": (2, 6), "large": (7, 14)}
 # distribusi skala per tipe klien
 SCALE_DIST = {
     "developer": ["small", "small", "medium", "medium", "large"],
@@ -232,142 +241,111 @@ def build_clients():
     return clients
 
 
-# ============================ TIMELINE INTAKE (mundur ~3/hari) ============================
-def build_start_offsets(n):
-    offs = []
-    day = -2  # proyek terbaru mulai 2 hari lalu
-    while len(offs) < n:
-        intake = pick([0, 0, 0, 0, 0, 2, 2, 3, 3, 0])  # 2-3 proyek/hari sibuk, banyak hari kosong (rata ~1/hari)
-        for _ in range(intake):
-            if len(offs) >= n:
-                break
-            offs.append(day)
-        day -= 1
-    offs.sort()  # paling lama dulu (untuk scheduler kronologis)
-    return offs
-
-
-# ============================ PENJADWAL KAPASITAS (rekrut bila penuh) ============================
-class Roster:
-    def __init__(self):
-        # tiap teknisi: list interval (s,e) proyek yang diemban
-        self.tech = {tid: [] for tid in BASE_TECHS}
-        self.hires = []  # dict user baru yang direkrut
-        self.next_id = 9
-
-    def _overlap_count(self, tid, s, e):
-        return sum(1 for (a, b) in self.tech[tid] if not (b < s or a > e))
-
-    def assign(self, s, e, team_size):
-        chosen = []
-        # best-fit packing: isi teknisi yg sudah hampir penuh (tapi <CAPACITY) dulu,
-        # supaya headcount minimum (rekrut hanya saat semua benar2 penuh). Tie-break:
-        # veteran (assignment terbanyak) didahulukan -> base teknisi dipakai maksimal.
-        elig = sorted(
-            [tid for tid in self.tech if self._overlap_count(tid, s, e) < CAPACITY],
-            key=lambda t: (-self._overlap_count(t, s, e), -len(self.tech[t])),
-        )
-        for tid in elig:
-            if len(chosen) >= team_size:
-                break
-            chosen.append(tid)
-        # kurang teknisi -> REKRUT
-        while len(chosen) < team_size:
-            tid = self._hire(s)
-            chosen.append(tid)
-        for tid in chosen:
-            self.tech[tid].append((s, e))
-        return chosen
-
-    def _hire(self, start_off):
-        tid = self.next_id
-        self.next_id += 1
-        # nama teknisi terkurasi, dipakai BERURUTAN (pria, nama depan unik).
-        # Fallback bernomor hanya kalau daftar habis (tak diharapkan pada CAPACITY ini).
-        idx = len(self.hires)
-        nama = TECH_NAMES[idx] if idx < len(TECH_NAMES) else f"Teknisi {tid}"
-        parts = nama.split()
-        base = f"{parts[0].lower()}.{parts[-1].lower()}"
-        email, n = f"{base}@shi.co.id", 2
-        while email in USED_EMAILS:
-            email = f"{base}{n}@shi.co.id"
-            n += 1
-        USED_EMAILS.add(email)
-        self.tech[tid] = []
-        self.hires.append(dict(id=tid, nama=nama, email=email, hire_off=start_off))
-        return tid
+# ============================ PENJADWAL TIM TETAP (1 teknisi = 1 job) ============================
+# PT SHI punya N_TECHS teknisi TETAP. Tiap teknisi mengerjakan proyek BERURUTAN
+# (back-to-back) sepanjang riwayat -> konkurensi selalu ~N_TECHS (tiap orang 1 job),
+# throughput perusahaan = N_TECHS / siklus-rata2. Rekrutan masuk bertahap di ~60%
+# awal riwayat (kisah pertumbuhan tim 5 -> N_TECHS). Tidak ada lembur/tabrakan.
+class FixedRoster:
+    def __init__(self, span_days):
+        self.members = []   # (tid, join_off): teknisi + tanggal gabung (offset)
+        self.hires = []
+        for tid in BASE_TECHS:                  # 5 base tersedia sejak awal riwayat
+            self.members.append((tid, -span_days))
+        n_hire = max(0, N_TECHS - len(BASE_TECHS))
+        ramp = max(1, int(span_days * 0.6))     # rekrut tersebar di ~60% awal riwayat
+        for k in range(n_hire):
+            tid = 9 + k
+            join = -span_days + int((k + 1) / (n_hire + 1) * ramp)
+            self.members.append((tid, join))
+            # nama teknisi terkurasi BERURUTAN (pria, nama depan unik); fallback bernomor.
+            nama = TECH_NAMES[k] if k < len(TECH_NAMES) else f"Teknisi {tid}"
+            parts = nama.split()
+            base = f"{parts[0].lower()}.{parts[-1].lower()}"
+            email, nn = f"{base}@shi.co.id", 2
+            while email in USED_EMAILS:
+                email = f"{base}{nn}@shi.co.id"
+                nn += 1
+            USED_EMAILS.add(email)
+            self.hires.append(dict(id=tid, nama=nama, email=email, hire_off=join))
 
 
 # ============================ SINTESIS PROYEK ============================
-def assign_clients(clients, n):
-    """Round-robin 1 proyek/klien dulu (cakupan), sisanya berbobot (retensi)."""
-    order = []
-    pool = [c for c in clients]
-    rng.shuffle(pool)
-    order.extend(pool)  # putaran cakupan
-    # sisanya berbobot
-    weighted = []
-    for c in clients:
-        weighted += [c] * c["weight"]
-    while len(order) < n:
-        order.append(pick(weighted))
-    rng.shuffle(order)  # campur supaya timeline tidak berurut per klien
-    return order[:n]
+def _client_picker(clients):
+    """Pemilih klien: jamin tiap klien >=1 proyek (cakupan) dulu, lalu berbobot (retensi)."""
+    queue = list(clients)
+    rng.shuffle(queue)
+    weighted = [c for c in clients for _ in range(c["weight"])]
+    def nxt():
+        return queue.pop() if queue else pick(weighted)
+    return nxt
 
 
 def build_projects(clients):
-    starts = build_start_offsets(NUM_PROJECTS)
-    client_seq = assign_clients(clients, NUM_PROJECTS)
-    roster = Roster()
-    projects = []
-    seq_per_month = {}
-    # bucket kesehatan utk proyek AKTIF (manufaktur sebaran dashboard)
+    import heapq
+    span = int(YEARS_HISTORY * 365)
+    roster = FixedRoster(span)
+    next_client = _client_picker(clients)
+    # bucket kesehatan utk proyek AKTIF (manufaktur sebaran dashboard EWS)
     health_buckets = (["red"] * 15 + ["amber"] * 20 + ["green"] * 40
                       + ["ahead"] * 12 + ["unrated"] * 8)
-    for i in range(NUM_PROJECTS):
-        start_off = starts[i]
-        client = client_seq[i]
+    projects = []
+    pid = 0
+    # heap (free_off, tid): proses teknisi yang bebas paling awal -> rantai kronologis.
+    # tiap teknisi mengerjakan proyek beruntun sampai satu menembus hari ini (aktif).
+    heap = [(jo, tid) for tid, jo in roster.members]
+    heapq.heapify(heap)
+    while heap and pid < MAX_PROJECTS:
+        free_off, tid = heapq.heappop(heap)
+        if free_off > 0:
+            continue  # teknisi ini sudah punya proyek aktif yang menembus hari ini -> stop
+        start_off = min(free_off + rng.randint(*BENCH_GAP), 0)  # proyek terakhir mulai <= hari ini
+        client = next_client()
         category = pick(client["favs"])
         scale = weighted_scale(client["tipe"])
         dlo, dhi = DUR[scale]
         dur = rng.randint(dlo, dhi)
-        end_off = start_off + dur
-
-        # tentukan status dari posisi interval vs hari ini (0).
-        # TANPA 'on-hold': PT SHI menjaga citra -> tidak menunda pekerjaan. Proyek
-        # yang jadwalnya sudah lewat = selesai; yang sedang berjalan = aktif.
-        status = "completed" if end_off < 0 else "active"
+        end_off = start_off + dur                       # tanggal akhir RENCANA (= end_date)
+        actual_dur = max(1, round(dur * pick(SCHED_FACTORS)))
+        # hindari SPI menumpuk tepat di 1.0: geser +-1 hari utk sebagian proyek >=3 hari
+        # (job sangat pendek <3 hari realistis memang sering tepat waktu -> SPI 1).
+        if actual_dur == dur and dur >= 3 and rng.random() < 0.6:
+            actual_dur = max(1, dur + rng.choice([-1, 1, 1]))
+        actual_end = start_off + actual_dur             # penyelesaian AKTUAL (dasar SPI akhir)
+        status = "completed" if actual_end < 0 else "active"
 
         # fase + survey approval
         survey_len = max(2, min(dur // 4, 10))
         if status == "active" and rng.random() < 0.30 and start_off > -survey_len:
             phase, survey_approved, sap_off = "survey", False, None
         else:
-            phase = "execution"
-            survey_approved = True
+            phase, survey_approved = "execution", True
             sap_off = start_off + survey_len
-
-        # kode proyek (anchor nominal)
-        nom = NOMINAL_TODAY + datetime.timedelta(days=start_off)
-        ym = f"{str(nom.year)[2:]}{nom.month:02d}"
-        seq_per_month[ym] = seq_per_month.get(ym, 0) + 1
-        code = f"SHI-{ym}{seq_per_month[ym]:03d}"
 
         manager = rng.choices(MANAGERS, weights=MANAGER_W)[0]
         name = pick(NAME_TEMPLATES[category]).format(c=client["short"])
-        team_size = {"small": 1, "medium": rng.choice([1, 1, 2]), "large": rng.choice([2, 2, 3])}[scale]
-        team = roster.assign(start_off, end_off, team_size)
-
-        # target kesehatan utk aktif
         bucket = pick(health_buckets) if status == "active" and phase == "execution" else None
 
+        pid += 1
         projects.append(dict(
-            id=i + 1, code=code, name=name, client=client, category=category, scale=scale,
-            start_off=start_off, end_off=end_off, dur=dur, status=status, phase=phase,
-            survey_approved=survey_approved, sap_off=sap_off, manager=manager, team=team,
-            value=make_value(category, scale), bucket=bucket,
+            id=pid, code=None, name=name, client=client, category=category, scale=scale,
+            start_off=start_off, end_off=end_off, dur=dur, actual_dur=actual_dur, actual_end=actual_end,
+            status=status, phase=phase, survey_approved=survey_approved, sap_off=sap_off,
+            manager=manager, team=[tid], value=make_value(category, scale), bucket=bucket,
             target=TARGET_DESC[category],
         ))
+        # teknisi bebas lagi setelah penyelesaian AKTUAL + jeda -> proyek berikutnya
+        heapq.heappush(heap, (actual_end + rng.randint(*BENCH_GAP), tid))
+
+    # id + kode proyek mengikuti urutan KRONOLOGIS (start_off) -> rapi & stabil
+    projects.sort(key=lambda p: (p["start_off"], p["id"]))
+    seq_per_month = {}
+    for newid, p in enumerate(projects, 1):
+        p["id"] = newid
+        nom = NOMINAL_TODAY + datetime.timedelta(days=p["start_off"])
+        ym = f"{str(nom.year)[2:]}{nom.month:02d}"
+        seq_per_month[ym] = seq_per_month.get(ym, 0) + 1
+        p["code"] = f"SHI-{ym}{seq_per_month[ym]:03d}"
     return projects, roster
 
 
@@ -387,15 +365,11 @@ def build_tasks(projects):
         total = len(chosen)
         s, e, dur = p["start_off"], p["end_off"], p["dur"]
 
-        # durasi AKTUAL proyek selesai = durasi_rencana x faktor jadwal (acak realistis).
-        # actual_end = saat tugas terakhir di-'done' (harus di masa lalu, <= -1) -> jadi
-        # dasar SPI akhir (durasi_rencana / durasi_aktual) yang dihitung recalculateSPI.
-        if p["status"] == "completed":
-            actual_dur = max(1, round(dur * pick(SCHED_FACTORS)))
-            actual_end = clamp(s + actual_dur, s + 1, -1)
-            actual_dur = actual_end - s
-        else:
-            actual_end, actual_dur = e, dur
+        # durasi AKTUAL dari penjadwal (FixedRoster). Proyek selesai: actual_end < 0,
+        # tugas terakhir di-'done' mendarat di actual_end -> MAX(status_changed_at) =
+        # actual_end -> SPI akhir = durasi_rencana / durasi_aktual (recalculateSPI).
+        actual_end = p["actual_end"] if p["status"] == "completed" else e
+        actual_dur = p["actual_dur"] if p["status"] == "completed" else dur
 
         # tentukan jumlah 'done' sesuai status/kesehatan
         if p["status"] == "completed":
@@ -536,8 +510,8 @@ def emit(clients, projects, tasks, roster, acts, reports, escs):
     out = []
     out.append("-- =====================================================================")
     out.append("-- seed.sql -- DIGENERATE OTOMATIS oleh generate_seed.py. JANGAN EDIT TANGAN.")
-    out.append(f"-- {NUM_PROJECTS} proyek realistis | kapasitas {CAPACITY}/teknisi | "
-               f"{len(roster.hires)} teknisi direkrut | {len(clients)} klien | {len(tasks)} tugas")
+    out.append(f"-- {len(projects)} proyek realistis ({YEARS_HISTORY} thn) | tim TETAP "
+               f"{len(BASE_TECHS) + len(roster.hires)} teknisi (1 job/orang) | {len(clients)} klien | {len(tasks)} tugas")
     out.append("-- Guard: hanya jalan saat tb_proyek kosong (idempotent utk run.py).")
     out.append("-- project_health TIDAK di sini -- dihitung db:backfill-spi (recalculateSPI).")
     out.append("-- =====================================================================")
@@ -649,27 +623,37 @@ def main():
     OUT.write_text(sql, encoding="utf-8")
 
     # ringkasan distribusi (stdout, bukan ke file)
-    from collections import Counter
+    from collections import Counter, defaultdict
     st = Counter(p["status"] for p in projects)
     ph = Counter(p["phase"] for p in projects if p["status"] == "active")
     bk = Counter(p["bucket"] for p in projects if p["bucket"])
     cat = Counter(p["category"] for p in projects)
     cli = Counter(p["client"]["nama"] for p in projects)
+    span = int(YEARS_HISTORY * 365)
+    n_tech = len(BASE_TECHS) + len(roster.hires)
+    active_today = sum(1 for p in projects if p["start_off"] <= 0 <= p["end_off"])
+    rate = round(len(projects) / span, 2)
+    avg_dur = round(sum(p["dur"] for p in projects) / len(projects), 1)
+    recent = sum(1 for p in projects if -365 <= p["start_off"] <= 0)   # 1 thn terakhir (tim penuh)
+    rate_recent = round(recent / 365, 2)
+    # cek "1 teknisi = 1 job": konkurensi job per teknisi tak boleh > 1 di titik mana pun
+    peak = 0
+    busy = defaultdict(list)
+    for p in projects:
+        busy[p["team"][0]].append((p["start_off"], p["actual_end"]))
+    for tid, ivs in busy.items():
+        pts = sorted({x for iv in ivs for x in iv})
+        for pt in pts:
+            peak = max(peak, sum(1 for (a, b) in ivs if a <= pt <= b))
     print(f"[OK] tulis {OUT}  ({len(sql.splitlines())} baris)")
-    print(f"  proyek: {dict(st)}  total={len(projects)}")
+    print(f"  proyek: {dict(st)}  total={len(projects)}  (riwayat {YEARS_HISTORY} thn, avg durasi {avg_dur} hr)")
     print(f"  aktif-fase: {dict(ph)}  target-health: {dict(bk)}")
-    print(f"  teknisi: base {len(BASE_TECHS)} + rekrut {len(roster.hires)} = {len(BASE_TECHS)+len(roster.hires)}")
+    print(f"  teknisi TETAP: base {len(BASE_TECHS)} + rekrut {len(roster.hires)} = {n_tech}")
+    print(f"  throughput: ~{rate_recent} proyek/hari (1 thn terakhir, tim penuh) | lifetime ~{rate}/hari | aktif hari ini = {active_today}")
     print(f"  klien: {len(clients)} (top retensi: {cli.most_common(5)})")
     print(f"  kategori: {dict(cat)}")
     print(f"  tugas={len(tasks)} aktivitas={len(acts)} laporan={len(reports)} eskalasi={len(escs)}")
-    # cek tabrakan: tidak ada teknisi dgn > CAPACITY interval saling-tumpang di titik mana pun
-    worst = 0
-    for tid, ivs in roster.tech.items():
-        pts = sorted(set([x for iv in ivs for x in iv]))
-        for pt in pts:
-            c = sum(1 for (a, b) in ivs if a <= pt <= b)
-            worst = max(worst, c)
-    print(f"  cek kapasitas: konkurensi maksimum per teknisi = {worst} (batas {CAPACITY})")
+    print(f"  cek 1-job/teknisi: konkurensi maksimum per teknisi = {peak} (harus 1)")
 
 
 if __name__ == "__main__":
