@@ -41,7 +41,7 @@ SEED = 20260619
 # kecil -> tim kecil (25 teknisi utk 400 job = nganggur). Peak konkurensi/teknisi = 1.
 YEARS_HISTORY = 2.5                # rentang riwayat ke belakang (multi-tahun)
 N_TECHS = 6                        # tim TETAP kecil (5 base + 1 rekrut) -> ~400 proyek / 2.5 thn
-BENCH_GAP = (4, 10)                # jeda hari antar proyek/teknisi; >=2 jaga 1-job + atur kerapatan ke ~400
+BENCH_GAP = (5, 11)                # jeda hari antar proyek/teknisi; >=2 jaga 1-job + atur kerapatan ke ~400 (lebar dikit: faktor jadwal kini lebih pendek -> kompensasi biar ~400)
 MAX_PROJECTS = 3000                # pengaman ukuran seed.sql
 SPI_CAP_PY = 2                     # cermin SPI_CAP di spiCalculator.ts (utk estimasi SPI di ringkasan)
 NOMINAL_TODAY = datetime.date(2026, 6, 19)   # anchor kode proyek (kosmetik)
