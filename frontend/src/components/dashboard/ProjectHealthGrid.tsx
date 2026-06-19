@@ -1,6 +1,7 @@
 import type { DashboardProject } from '../../types';
 import ProjectCard from './ProjectCard';
 import EmptyState from '../ui/EmptyState';
+import { a } from 'vitest/dist/chunks/suite.B2jumIFP.js'
 
 interface Props {
   projects: DashboardProject[];
@@ -18,7 +19,7 @@ export default function ProjectHealthGrid({ projects, filter }: Props) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-      {filtered.map((project) => (
+      {filtered.sort((a,b)=>(b.spi_value??0)-(a.spi_value??0)).map((project) => (
         <ProjectCard key={project.id} project={project} />
       ))}
     </div>

@@ -19,7 +19,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
 
 function CardWrapper({ children, title }: { children: React.ReactNode; title: string }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6" style={{height:"fit-content"}}>
       <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{title}</h3>
       {children}
     </div>
@@ -31,7 +31,7 @@ export default function ProjectCategoryPieChart({ dateRange }: Props) {
 
   if (isLoading) {
     return (
-      <CardWrapper title="Projects by Category">
+      <CardWrapper title="Kategori Proyek">
         <div className="flex items-center justify-center h-56">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" aria-label="Loading chart..." />
         </div>
@@ -50,14 +50,14 @@ export default function ProjectCategoryPieChart({ dateRange }: Props) {
 
   if (chartData.length === 0) {
     return (
-      <CardWrapper title="Projects by Category">
+      <CardWrapper title="Kategori Proyek">
         <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No project data available</p>
       </CardWrapper>
     );
   }
 
   return (
-    <CardWrapper title="Projects by Category">
+    <CardWrapper title="Kategori Proyek">
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie

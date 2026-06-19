@@ -63,7 +63,10 @@ export async function getDashboard(request: NextRequest) {
           COUNT(*) FILTER (WHERE ph.status = 'amber' AND p.status = 'active')::int AS total_amber,
           COUNT(*) FILTER (WHERE ph.status = 'green' AND p.status = 'active')::int AS total_green,
           COUNT(*) FILTER (WHERE ph.status IS NULL AND p.status = 'active')::int AS total_no_health,
-          ROUND(AVG(ph.spi_value) FILTER (WHERE p.status = 'active'), 4) AS avg_spi,
+          -- Rata-rata SPI = indeks kinerja SELURUH portofolio (riwayat selesai + aktif);
+          -- NULL ("Belum Dinilai") otomatis di-skip AVG. BUKAN active-only: proyek baru
+          -- jalan ber-PV kecil akan menekan indeks secara semu (citra perusahaan turun).
+          ROUND(AVG(ph.spi_value), 4) AS avg_spi,
           COUNT(*) FILTER (WHERE p.end_date < CURRENT_DATE AND p.status = 'active')::int AS overdue_projects
          FROM tb_proyek p LEFT JOIN project_health ph ON ph.project_id = p.id_proyek
          WHERE 1=1${statsDateClause}`,

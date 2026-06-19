@@ -286,9 +286,11 @@ def build_projects(clients):
     span = int(YEARS_HISTORY * 365)
     roster = FixedRoster(span)
     next_client = _client_picker(clients)
-    # bucket kesehatan utk proyek AKTIF (manufaktur sebaran dashboard EWS)
-    health_buckets = (["red"] * 15 + ["amber"] * 20 + ["green"] * 40
-                      + ["ahead"] * 12 + ["unrated"] * 8)
+    # bucket kesehatan utk proyek AKTIF (manufaktur sebaran dashboard EWS).
+    # SEHAT-saja (tanpa 'red'/'unrated'): perusahaan jaga citra -> proyek baru-jalan
+    # TIDAK boleh tampil merah/0.000/Belum-Dinilai di tabel. Panjang TETAP 95 supaya
+    # stream rng.choice identik -> 2206 proyek SELESAI byte-identik (verifikasi lama valid).
+    health_buckets = (["amber"] * 15 + ["green"] * 50 + ["ahead"] * 30)
     projects = []
     pid = 0
     # heap (free_off, tid, prev_end): proses teknisi yang bebas paling awal -> rantai
@@ -392,16 +394,18 @@ def build_tasks(projects):
             done = total
         elif p["status"] == "on-hold":
             done = clamp(int(total * rng.uniform(0.2, 0.6)), 1, total - 1)
-        else:  # active
+        else:  # active -- bucket SEHAT saja (tanpa red/unrated). SPI dijamin >= floor.
             elapsed = clamp(-s, 1, dur)
             pv_frac = elapsed / dur
-            if p["phase"] == "survey":
-                done = clamp(int(total * pv_frac * 0.5), 0, max(1, total // 3))
-            elif p["bucket"] == "unrated":
-                done = 0
-            else:
-                tgt = {"red": 0.6, "amber": 0.90, "green": 1.02, "ahead": 1.3}[p["bucket"]]
-                done = clamp(round(tgt * pv_frac * total), 0, total)
+            # survey (bucket None) diperlakukan on-track (hijau): survei berjalan wajar.
+            bucket = p["bucket"] or "green"
+            tgt = {"amber": 0.90, "green": 1.05, "ahead": 1.35}[bucket]
+            floor = {"amber": 0.85, "green": 0.95, "ahead": 1.0}[bucket]
+            # done >= 1 -> EV>0 -> TAK PERNAH SPI 0.000. Naikkan done bila pembulatan
+            # menjatuhkan SPI di bawah floor bucket -> tak ada proyek aktif MERAH (<0.85).
+            done = clamp(round(tgt * pv_frac * total), 1, total)
+            while done < total and (done / total) / pv_frac < floor:
+                done += 1
 
         working_idx = done if done < total else None  # tugas berjalan berikutnya
         for idx, (nm, ds, is_sv, est) in enumerate(chosen):

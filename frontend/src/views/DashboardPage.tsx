@@ -7,10 +7,8 @@ import ProjectHealthPieChart from '../components/charts/ProjectHealthPieChart';
 import TasksByStatusChart from '../components/charts/TasksByStatusChart';
 import TasksByOwnerChart from '../components/charts/TasksByOwnerChart';
 import TasksByDueDateChart from '../components/charts/TasksByDueDateChart';
-import OverdueTasksChart from '../components/charts/OverdueTasksChart';
 import ProjectCategoryPieChart from '../components/charts/ProjectCategoryPieChart';
 import TechnicianWorkloadChart from '../components/charts/TechnicianWorkloadChart';
-import SPITrendChart from '../components/charts/SPITrendChart';
 import RecentActivityFeed from '../components/charts/RecentActivityFeed';
 import QuickActionsBar from '../components/dashboard/QuickActionsBar';
 import DateRangePicker from '../components/ui/DateRangePicker';
@@ -213,12 +211,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts Row 4: Overdue */}
-      <div className="grid grid-cols-1 gap-4">
+      {/* <div className="grid grid-cols-1 gap-4">
         <OverdueTasksChart dateRange={dateRange} />
-      </div>
+      </div> */}
 
       {/* SPI Trend (full width) */}
-      <SPITrendChart dateRange={dateRange} />
+      {/* <SPITrendChart dateRange={dateRange} /> */}
 
       {/* Recent Activity Feed (full width) */}
       <RecentActivityFeed dateRange={dateRange} />

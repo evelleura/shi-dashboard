@@ -32,3 +32,6 @@ frontend_backup/.next/
 .trash/
 
 *.tsbuildinfo
+
+
+frontend_backup/

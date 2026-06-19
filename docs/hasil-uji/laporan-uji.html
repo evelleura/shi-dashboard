@@ -1,221 +1,577 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laporan Uji Guide - Dashboard SHI</title>
-<style>
-  :root{
-    --bg:#f6f8fb;--card:#fff;--ink:#1b2330;--muted:#5c6675;--line:#e4e8ee;--line2:#eef1f5;
-    --accent:#2563eb;--accent-soft:#eaf1ff;--green:#15803d;--green-soft:#e8f6ec;
-    --amber:#b45309;--amber-soft:#fdf3e3;--red:#c0241c;--red-soft:#fdeceb;
-    --mono:ui-monospace,"Consolas",monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:15.5px}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
-  header.top{background:linear-gradient(135deg,#0f3d2e,#15803d);color:#fff;padding:30px 0 24px}
-  header.top h1{margin:0 0 6px;font-size:24px}
-  header.top p{margin:2px 0;opacity:.92;font-size:14px}
-  section{padding:26px 0 4px}
-  .sec{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 3px rgba(20,40,90,.04)}
-  h2{font-size:20px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
-  h2 .n{background:var(--accent);color:#fff;width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-  h3{font-size:16px;margin:18px 0 6px}
-  p{margin:8px 0}
-  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-  th{background:#f0f3f8;text-align:left;padding:9px 11px;font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:#3a4763;border-bottom:1px solid var(--line)}
-  td{padding:8px 11px;border-bottom:1px solid var(--line2);vertical-align:top}
-  tr:last-child td{border-bottom:0}
-  code{background:#f3f5f8;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:var(--mono);font-size:12.5px;color:#0f3d2e}
-  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:800;letter-spacing:.3px}
-  .ok{background:var(--green-soft);color:var(--green);border:1px solid #bfe3c9}
-  .med{background:var(--amber-soft);color:var(--amber);border:1px solid #f0d9af}
-  .low{background:var(--accent-soft);color:var(--accent);border:1px solid #cfe0fb}
-  .crit{background:var(--red-soft);color:var(--red);border:1px solid #f0c4c0}
-  .bug{border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:10px;padding:14px 16px;margin:14px 0;background:#fffdf8}
-  .bug.crit{border-left-color:var(--red);background:#fff8f7}
-  .bug.low{border-left-color:var(--accent);background:#f8fbff}
-  .bug h4{margin:0 0 6px;font-size:15.5px}
-  .bug .meta{font-size:13px;color:var(--muted);margin:6px 0}
-  .box{border-radius:10px;padding:12px 15px;margin:12px 0;border:1px solid;font-size:14px}
-  .box.note{background:var(--accent-soft);border-color:#cfe0fb;color:#1c3a73}
-  .box.win{background:var(--green-soft);border-color:#bfe3c9;color:#15532c}
-  .box .lbl{font-weight:800;font-size:11px;letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:4px}
-  figure{margin:14px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
-  figure img{display:block;width:100%;height:auto}
-  figcaption{font-size:12.5px;color:var(--muted);padding:7px 12px;background:#fafbfc;border-top:1px solid var(--line2)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
-  ul{margin:8px 0;padding-left:22px}li{margin:4px 0}
-</style>
-</head>
-<body>
-<header class="top">
-  <div class="wrap">
-    <h1>Laporan Uji Guide Sidang &mdash; otomatis via browser</h1>
-    <p>Aku jalankan sendiri panduan-demo-sidang.html dari awal sampai akhir, screenshot tiap langkah.</p>
-    <p>Tanggal uji: 18 Jun 2026 &middot; Metode: Playwright (browser asli, BUKAN curl) &middot; 16 langkah, 16 screenshot</p>
-  </div>
-</header>
-<div class="wrap">
 
-<section>
-  <div class="sec">
-    <h2><span class="n">i</span> Ringkasan</h2>
-    <p>Aku bikin <b>stack terisolasi sendiri</b> lewat code (<code>python run.py --new --iso</code>) supaya
-       <b>tidak menyentuh</b> data kerjamu: DB sendiri di port <b>5544</b>, web sendiri di <b>:3100</b>, build
-       <code>.next-iso</code> terpisah. Database <b>EMPTY</b> (8 akun login, 0 data) sesuai maumu, lalu aku
-       <b>buat semua data dari nol lewat form</b> seperti di guide.</p>
-    <div class="box win">
-      <span class="lbl">Hasil utama</span>
-      Alur inti guide <b>JALAN SEMUA</b>: login, buat klien (+ deteksi koordinat Google Maps), buat proyek, buat
-      tugas/penjadwalan, tandai Selesai, SPI/RAG berubah otomatis, dashboard ikut ter-update saat dibuka. Tidak ada
-      error JavaScript (crash) sama sekali. Bug yang ditemukan kecil-menengah (lihat bawah).
-    </div>
-    <table>
-      <tr><th>Hal</th><th>Status</th><th>Bukti</th></tr>
-      <tr><td>Login manajer &amp; teknisi</td><td><span class="badge ok">JALAN</span></td><td>01, 16</td></tr>
-      <tr><td>Buat klien + Link Google Maps (koordinat + peta)</td><td><span class="badge ok">JALAN</span></td><td>04, 05</td></tr>
-      <tr><td>Buat proyek</td><td><span class="badge ok">JALAN</span></td><td>07, 08</td></tr>
-      <tr><td>Buat tugas + penjadwalan (teknisi, tanggal)</td><td><span class="badge ok">JALAN</span></td><td>10, 11</td></tr>
-      <tr><td>Tandai Selesai &rarr; SPI &amp; RAG re-hitung</td><td><span class="badge ok">JALAN</span></td><td>11 vs 13</td></tr>
-      <tr><td>Dashboard update saat dibuka (tanpa F5)</td><td><span class="badge ok">JALAN</span></td><td>14 = 15</td></tr>
-      <tr><td>Teknisi lihat hasil kerja yang sama (konsisten antar peran)</td><td><span class="badge ok">JALAN</span></td><td>16</td></tr>
-    </table>
-  </div>
-</section>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Uji Guide - Dashboard SHI</title>
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --card: #fff;
+        --ink: #1b2330;
+        --muted: #5c6675;
+        --line: #e4e8ee;
+        --line2: #eef1f5;
+        --accent: #2563eb;
+        --accent-soft: #eaf1ff;
+        --green: #15803d;
+        --green-soft: #e8f6ec;
+        --amber: #b45309;
+        --amber-soft: #fdf3e3;
+        --red: #c0241c;
+        --red-soft: #fdeceb;
+        --mono: ui-monospace, "Consolas", monospace;
+        --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      }
 
-<section>
-  <div class="sec">
-    <h2><span class="n">1</span> Bukti alur jalan</h2>
+      * {
+        box-sizing: border-box
+      }
 
-    <h3>Klien + Google Maps (poin form yang kamu tekankan)</h3>
-    <figure><img src="04-klien-form-terisi-maps.png" alt="form klien">
-      <figcaption>04 &mdash; Link Google Maps ditempel &rarr; "Koordinat terdeteksi: -7.72603, 110.40060" (hijau) + peta Leaflet muncul. Telepon (WhatsApp) wajib, tombol Simpan aktif.</figcaption></figure>
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        line-height: 1.6;
+        font-size: 15.5px
+      }
 
-    <h3>Tugas / Kanban + SPI berubah</h3>
-    <div class="grid2">
-      <figure><img src="11-tugas-kanban.png" alt="sebelum">
-        <figcaption>11 &mdash; SEBELUM: proyek baru = <b>Critical</b> (merah), SPI 0.000, 0/2 selesai.</figcaption></figure>
-      <figure><img src="13-tugas-selesai-spi-update.png" alt="sesudah">
-        <figcaption>13 &mdash; SESUDAH 1 tugas Selesai: <b>On Track</b> (hijau), SPI 10.000, 1/2 selesai. Otomatis.</figcaption></figure>
-    </div>
+      .wrap {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px
+      }
 
-    <h3>Uji auto-refresh dashboard (keluhan utamamu)</h3>
-    <div class="grid2">
-      <figure><img src="14-dashboard-setelah-selesai-TANPA-reload.png" alt="tanpa reload">
-        <figcaption>14 &mdash; buka Dashboard lewat menu (navigasi SPA, <b>TANPA F5</b>).</figcaption></figure>
-      <figure><img src="15-dashboard-setelah-reload-F5.png" alt="dengan reload">
-        <figcaption>15 &mdash; setelah <b>F5</b>. Identik dengan 14.</figcaption></figure>
-    </div>
-    <div class="box note">
-      <span class="lbl">Temuan auto-refresh</span>
-      14 dan 15 <b>SAMA PERSIS</b> &mdash; jadi saat kamu <b>pindah halaman</b> ke Dashboard, data (ringkasan + grafik)
-      <b>sudah ter-update otomatis</b> tanpa perlu F5. Auto-refresh saat navigasi: <b>OK</b>. Yang TIDAK update lihat bug B4.
-    </div>
-  </div>
-</section>
+      header.top {
+        background: linear-gradient(135deg, #0f3d2e, #15803d);
+        color: #fff;
+        padding: 30px 0 24px
+      }
 
-<section>
-  <div class="sec">
-    <h2><span class="n">2</span> Bug / catatan yang ditemukan</h2>
+      header.top h1 {
+        margin: 0 0 6px;
+        font-size: 24px
+      }
 
-    <div class="bug low">
-      <h4>B1 &middot; Judul grafik "Projects by Category" masih Bahasa Inggris <span class="badge low">RINGAN</span></h4>
-      <p>Di Dashboard manajer, grafik lain Bahasa Indonesia (Distribusi Kesehatan Proyek, Tugas per Status, Beban Kerja
-         Teknisi), TAPI satu grafik tetap Inggris: <b>"Projects by Category"</b> + teks kosong <b>"No project data available"</b>.
-         Kelihatan saat sidang.</p>
-      <p class="meta">Lokasi: <code>frontend/src/components/charts/ProjectCategoryPieChart.tsx</code> baris 34/53/54/60 (hardcode, tidak pakai i18n seperti chart lain).</p>
-      <p class="meta">Fix: ganti judul jadi <code>id ? 'Proyek per Kategori' : 'Projects by Category'</code> &amp; teks kosong jadi <code>'Belum ada data proyek'</code>. (1-2 baris. Aku bisa kerjakan kalau kamu mau.)</p>
-    </div>
+      header.top p {
+        margin: 2px 0;
+        opacity: .92;
+        font-size: 14px
+      }
 
-    <div class="bug">
-      <h4>B2 &middot; Dockerfile rusak: COPY <code>next.config.mjs</code> padahal file <code>next.config.ts</code> <span class="badge med">MENENGAH</span></h4>
-      <p>Tahap akhir Dockerfile menyalin <code>next.config.mjs</code> yang <b>tidak ada</b> (project pakai <code>.ts</code>).
-         Artinya <code>python run.py --build</code> / build image produksi <b>akan GAGAL</b>. Dev (<code>--new</code>) tidak terpengaruh.</p>
-      <p class="meta">Lokasi: <code>frontend/Dockerfile</code> baris <code>COPY --from=builder /app/next.config.mjs ./</code>.</p>
-      <p class="meta">Fix: ganti <code>.mjs</code> &rarr; <code>.ts</code> (atau hapus baris itu kalau tak dibutuhkan saat runtime).</p>
-    </div>
+      section {
+        padding: 26px 0 4px
+      }
 
-    <div class="bug med">
-      <h4>B3 &middot; Peta klien butuh internet (OpenStreetMap) <span class="badge med">RISIKO DEMO</span></h4>
-      <p>Preview peta pakai tile OpenStreetMap online. Saat uji (headless tanpa internet) tile gagal &rarr; peta abu-abu kosong
-         (koordinat <b>tetap terdeteksi</b>). <b>Kalau ruang sidang tidak ada internet, peta akan kosong.</b></p>
-      <p class="meta">Antisipasi: pastikan ada internet saat demo klien, ATAU saat sidang cukup tunjukkan "Koordinat terdeteksi" (tanpa fokus ke peta). Bukan crash.</p>
-    </div>
+      .sec {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 22px 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 1px 3px rgba(20, 40, 90, .04)
+      }
 
-    <div class="bug med">
-      <h4>B4 &middot; Dashboard tidak update REAL-TIME kalau diam / lintas-sesi <span class="badge med">MENENGAH</span></h4>
-      <p>Ini kemungkinan "data ga auto refresh" yang kamu alami. Faktanya:</p>
-      <ul>
-        <li>Update OK saat kamu <b>pindah halaman</b> ke Dashboard (terbukti 14=15).</li>
-        <li>TAPI kalau kamu <b>diam menatap Dashboard</b> lalu data berubah di tempat lain, layar tidak ikut berubah sampai
-            <b>auto-poll 5 menit</b> atau kamu <b>F5</b>. (Tidak ada push real-time / websocket.)</li>
-        <li>Begitu juga <b>2 jendela browser</b> (manajer + teknisi): perubahan di satu jendela tidak langsung muncul di jendela
-            lain tanpa refresh.</li>
-      </ul>
-      <p class="meta">Sumber: <code>useDashboard</code> (<code>frontend/src/hooks/useDashboard.ts</code>) pakai <code>refetchInterval 5 menit</code>;
-         mutasi tugas (<code>useTasks.ts</code>) invalidate <code>['dashboard']</code> tapi hanya berlaku saat query di-mount ulang.
-         Grafik <code>['charts',...]</code> tidak di-invalidate mutasi &mdash; menyegar saat remount/stale-2-menit.</p>
-      <p class="meta">Sesuai catatan naskah <b>TC-MN-04</b> ("indikator EWS tidak update real-time setelah review gate; butuh refresh manual").
-         Guide sudah menyarankan F5. Kalau mau benar real-time: tambah polling pendek / invalidate <code>['charts']</code> juga / websocket (di luar scope sidang).</p>
-    </div>
+      h2 {
+        font-size: 20px;
+        margin: 0 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px
+      }
 
-    <div class="bug low">
-      <h4>B5 &middot; SPI "meledak" di proyek yang baru mulai <span class="badge low">CATATAN METRIK</span></h4>
-      <p>Proyek yang <b>baru dibuat</b> tampil <b>Critical/merah</b> seketika (SPI 0, karena 0 tugas selesai). Begitu 1 tugas
-         diselesaikan di hari pertama, SPI melonjak ke <b>10.000</b> (nilai maksimum/cap) &amp; jadi <b>On Track/hijau</b>.
-         Sebabnya: di awal proyek, "waktu berjalan" (PV) sangat kecil, jadi rasio EV/PV jadi besar sekali.</p>
-      <p class="meta">Bukan crash &mdash; perilaku rumus yang benar. Tapi penguji bisa bertanya "kenapa proyek 1 hari sudah 10.000 hijau?".
-         Siapkan jawaban (lihat guide Bagian 5/8), atau pakai proyek dengan rentang tanggal wajar saat demo RAG.</p>
-    </div>
+      h2 .n {
+        background: var(--accent);
+        color: #fff;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0
+      }
 
-    <div class="bug low">
-      <h4>B6 &middot; (Info) Mode <code>--iso</code> menambah baris di tsconfig.json <span class="badge low">INFO</span></h4>
-      <p>Saat <code>--iso</code> jalan, Next.js otomatis menambah <code>.next-iso/types/**/*.ts</code> ke
-         <code>frontend/tsconfig.json</code> include. Tidak berbahaya (cuma glob types). Bisa dirapikan manual kalau mengganggu.</p>
-    </div>
-  </div>
-</section>
+      h3 {
+        font-size: 16px;
+        margin: 18px 0 6px
+      }
 
-<section>
-  <div class="sec">
-    <h2><span class="n">3</span> Cara ulang uji ini (reusable)</h2>
-    <p>Semua sudah jadi code, tinggal jalankan:</p>
-    <table>
-      <tr><th>Langkah</th><th>Perintah</th></tr>
-      <tr><td>1. Nyalakan stack terisolasi (DB 5544 + web 3100, empty)</td><td><code>python run.py --new --iso</code></td></tr>
-      <tr><td>2. Jalankan walkthrough + screenshot</td><td><code>cd docs/hasil-uji &amp;&amp; python walkthrough.py</code></td></tr>
-      <tr><td>3. Hentikan + bersihkan stack iso</td><td><code>python run.py --iso --stop</code> (lalu Ctrl+C di terminal dev)</td></tr>
-    </table>
-    <div class="box note">
-      <span class="lbl">Catatan</span>
-      Stack iso <b>tidak menyentuh</b> stack utamamu (:3000 / DB 5433). Jadi kamu bisa lanjut kerja di :3000 sambil aku uji di :3100.
-      Screenshot tiap run ada di folder ini (<code>docs/hasil-uji/</code>): <code>01..16</code> + <code>_console-errors.json</code>.
-    </div>
-  </div>
-</section>
+      p {
+        margin: 8px 0
+      }
 
-<section>
-  <div class="sec">
-    <h2><span class="n">4</span> Logs LENGKAP sistem (untuk sesi berikutnya)</h2>
-    <p>Stack iso sekarang merekam <b>seluruh log sistem</b> ke satu folder, siap kamu serahkan ke sesi berikutnya:</p>
-    <div class="box win"><span class="lbl">Lokasi</span>
-      <code>D:\__CODING\personal\_gf\irene\shi-crm\iso-logs\</code> &nbsp;(folder <code>iso-logs/</code> di root proyek)</div>
-    <table>
-      <tr><th>File</th><th>Isi</th><th>Sumber</th></tr>
-      <tr><td><code>actions-timeline.log</code></td><td><b>TIMELINE aksi</b> &mdash; tiap langkah diberi <b>garis pemisah</b> <code>==== STEP NN ====</code>, lalu API call + console yang terjadi di langkah itu (ber-timestamp)</td><td>walkthrough.py</td></tr>
-      <tr><td><code>api-calls.log</code></td><td>Setiap panggilan <code>/api/</code> dari browser: method, URL, status, jam</td><td>walkthrough.py</td></tr>
-      <tr><td><code>browser-console.log</code></td><td>Semua <code>console.*</code> frontend + page error</td><td>walkthrough.py</td></tr>
-      <tr><td><code>next-dev.log</code></td><td>Log server Next.js: request API, <code>console</code> di handler, error server, kompilasi</td><td>run.py (tee dev server)</td></tr>
-      <tr><td><code>postgres.log</code></td><td><b>Setiap query SQL</b> + koneksi (<code>log_statement=all</code>) &mdash; ~280 KB/run</td><td>run.py (follower <code>docker logs</code>)</td></tr>
-      <tr><td><code>README.md</code></td><td>Penjelasan tiap file + cara baca/regen</td><td>run.py</td></tr>
-    </table>
-    <h3>Cara baca (korelasi antar log)</h3>
-    <p>Mulai dari <code>actions-timeline.log</code>. Tiap baris ber-<b>timestamp jam:menit:detik</b>, jadi bisa dicocokkan ke
-       <code>next-dev.log</code> (server+API) dan <code>postgres.log</code> (query DB) di jam yang sama. Contoh nyata satu aksi:</p>
-    <pre style="background:#0f1729;color:#e6edf7;border-radius:9px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.6">==============================================================================
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        font-size: 14px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        overflow: hidden
+      }
+
+      th {
+        background: #f0f3f8;
+        text-align: left;
+        padding: 9px 11px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        color: #3a4763;
+        border-bottom: 1px solid var(--line)
+      }
+
+      td {
+        padding: 8px 11px;
+        border-bottom: 1px solid var(--line2);
+        vertical-align: top
+      }
+
+      tr:last-child td {
+        border-bottom: 0
+      }
+
+      code {
+        background: #f3f5f8;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 1px 6px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: #0f3d2e
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 800;
+        letter-spacing: .3px
+      }
+
+      .ok {
+        background: var(--green-soft);
+        color: var(--green);
+        border: 1px solid #bfe3c9
+      }
+
+      .med {
+        background: var(--amber-soft);
+        color: var(--amber);
+        border: 1px solid #f0d9af
+      }
+
+      .low {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid #cfe0fb
+      }
+
+      .crit {
+        background: var(--red-soft);
+        color: var(--red);
+        border: 1px solid #f0c4c0
+      }
+
+      .bug {
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--amber);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 14px 0;
+        background: #fffdf8
+      }
+
+      .bug.crit {
+        border-left-color: var(--red);
+        background: #fff8f7
+      }
+
+      .bug.low {
+        border-left-color: var(--accent);
+        background: #f8fbff
+      }
+
+      .bug h4 {
+        margin: 0 0 6px;
+        font-size: 15.5px
+      }
+
+      .bug .meta {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 6px 0
+      }
+
+      .box {
+        border-radius: 10px;
+        padding: 12px 15px;
+        margin: 12px 0;
+        border: 1px solid;
+        font-size: 14px
+      }
+
+      .box.note {
+        background: var(--accent-soft);
+        border-color: #cfe0fb;
+        color: #1c3a73
+      }
+
+      .box.win {
+        background: var(--green-soft);
+        border-color: #bfe3c9;
+        color: #15532c
+      }
+
+      .box .lbl {
+        font-weight: 800;
+        font-size: 11px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 4px
+      }
+
+      figure {
+        margin: 14px 0;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff
+      }
+
+      figure img {
+        display: block;
+        width: 100%;
+        height: auto
+      }
+
+      figcaption {
+        font-size: 12.5px;
+        color: var(--muted);
+        padding: 7px 12px;
+        background: #fafbfc;
+        border-top: 1px solid var(--line2)
+      }
+
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px
+      }
+
+      @media(max-width:680px) {
+        .grid2 {
+          grid-template-columns: 1fr
+        }
+      }
+
+      ul {
+        margin: 8px 0;
+        padding-left: 22px
+      }
+
+      li {
+        margin: 4px 0
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="top">
+      <div class="wrap">
+        <h1>Laporan Uji Guide Sidang &mdash; otomatis via browser</h1>
+        <p>Aku jalankan sendiri panduan-demo-sidang.html dari awal sampai akhir, screenshot tiap langkah.</p>
+        <p>Tanggal uji: 18 Jun 2026 &middot; Metode: Playwright (browser asli, BUKAN curl) &middot; 16 langkah, 16
+          screenshot</p>
+      </div>
+    </header>
+    <div class="wrap">
+
+      <section>
+        <div class="sec">
+          <h2><span class="n">i</span> Ringkasan</h2>
+          <p>Aku bikin <b>stack terisolasi sendiri</b> lewat code (<code>python run.py --new --iso</code>) supaya
+            <b>tidak menyentuh</b> data kerjamu: DB sendiri di port <b>5544</b>, web sendiri di <b>:3100</b>, build
+            <code>.next-iso</code> terpisah. Database <b>EMPTY</b> (8 akun login, 0 data) sesuai maumu, lalu aku
+            <b>buat semua data dari nol lewat form</b> seperti di guide.
+          </p>
+          <div class="box win">
+            <span class="lbl">Hasil utama</span>
+            Alur inti guide <b>JALAN SEMUA</b>: login, buat klien (+ deteksi koordinat Google Maps), buat proyek, buat
+            tugas/penjadwalan, tandai Selesai, SPI/RAG berubah otomatis, dashboard ikut ter-update saat dibuka. Tidak
+            ada
+            error JavaScript (crash) sama sekali. Bug yang ditemukan kecil-menengah (lihat bawah).
+          </div>
+          <table>
+            <tr>
+              <th>Hal</th>
+              <th>Status</th>
+              <th>Bukti</th>
+            </tr>
+            <tr>
+              <td>Login manajer &amp; teknisi</td>
+              <td><span class="badge ok">JALAN</span></td>
+              <td>01, 16</td>
+            </tr>
+            <tr>
+              <td>Buat klien + Link Google Maps (koordinat + peta)</td>
+              <td><span class="badge ok">JALAN</span></td>
+              <td>04, 05</td>
+            </tr>
+            <tr>
+              <td>Buat proyek</td>
+              <td><span class="badge ok">JALAN</span></td>
+              <td>07, 08</td>
+            </tr>
+            <tr>
+              <td>Buat tugas + penjadwalan (teknisi, tanggal)</td>
+              <td><span class="badge ok">JALAN</span></td>
+              <td>10, 11</td>
+            </tr>
+            <tr>
+              <td>Tandai Selesai &rarr; SPI &amp; RAG re-hitung</td>
+              <td><span class="badge ok">JALAN</span></td>
+              <td>11 vs 13</td>
+            </tr>
+            <tr>
+              <td>Dashboard update saat dibuka (tanpa F5)</td>
+              <td><span class="badge ok">JALAN</span></td>
+              <td>14 = 15</td>
+            </tr>
+            <tr>
+              <td>Teknisi lihat hasil kerja yang sama (konsisten antar peran)</td>
+              <td><span class="badge ok">JALAN</span></td>
+              <td>16</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec">
+          <h2><span class="n">1</span> Bukti alur jalan</h2>
+
+          <h3>Klien + Google Maps (poin form yang kamu tekankan)</h3>
+          <figure><img src="04-klien-form-terisi-maps.png" alt="form klien">
+            <figcaption>04 &mdash; Link Google Maps ditempel &rarr; "Koordinat terdeteksi: -7.72603, 110.40060" (hijau)
+              + peta Leaflet muncul. Telepon (WhatsApp) wajib, tombol Simpan aktif.</figcaption>
+          </figure>
+
+          <h3>Tugas / Kanban + SPI berubah</h3>
+          <div class="grid2">
+            <figure><img src="11-tugas-kanban.png" alt="sebelum">
+              <figcaption>11 &mdash; SEBELUM: proyek baru = <b>Critical</b> (merah), SPI 0.000, 0/2 selesai.
+              </figcaption>
+            </figure>
+            <figure><img src="13-tugas-selesai-spi-update.png" alt="sesudah">
+              <figcaption>13 &mdash; SESUDAH 1 tugas Selesai: <b>On Track</b> (hijau), SPI 10.000, 1/2 selesai.
+                Otomatis.</figcaption>
+            </figure>
+          </div>
+
+          <h3>Uji auto-refresh dashboard (keluhan utamamu)</h3>
+          <div class="grid2">
+            <figure><img src="14-dashboard-setelah-selesai-TANPA-reload.png" alt="tanpa reload">
+              <figcaption>14 &mdash; buka Dashboard lewat menu (navigasi SPA, <b>TANPA F5</b>).</figcaption>
+            </figure>
+            <figure><img src="15-dashboard-setelah-reload-F5.png" alt="dengan reload">
+              <figcaption>15 &mdash; setelah <b>F5</b>. Identik dengan 14.</figcaption>
+            </figure>
+          </div>
+          <div class="box note">
+            <span class="lbl">Temuan auto-refresh</span>
+            14 dan 15 <b>SAMA PERSIS</b> &mdash; jadi saat kamu <b>pindah halaman</b> ke Dashboard, data (ringkasan +
+            grafik)
+            <b>sudah ter-update otomatis</b> tanpa perlu F5. Auto-refresh saat navigasi: <b>OK</b>. Yang TIDAK update
+            lihat bug B4.
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec">
+          <h2><span class="n">2</span> Bug / catatan yang ditemukan</h2>
+
+          <div class="bug low">
+            <h4>B1 &middot; Judul grafik "Projects by Category" masih Bahasa Inggris <span
+                class="badge low">RINGAN</span></h4>
+            <p>Di Dashboard manajer, grafik lain Bahasa Indonesia (Distribusi Kesehatan Proyek, Tugas per Status, Beban
+              Kerja
+              Teknisi), TAPI satu grafik tetap Inggris: <b>"Projects by Category"</b> + teks kosong <b>"No project data
+                available"</b>.
+              Kelihatan saat sidang.</p>
+            <p class="meta">Lokasi: <code>frontend/src/components/charts/ProjectCategoryPieChart.tsx</code> baris
+              34/53/54/60 (hardcode, tidak pakai i18n seperti chart lain).</p>
+            <p class="meta">Fix: ganti judul jadi <code>id ? 'Proyek per Kategori' : 'Projects by Category'</code> &amp;
+              teks kosong jadi <code>'Belum ada data proyek'</code>. (1-2 baris. Aku bisa kerjakan kalau kamu mau.)</p>
+          </div>
+
+          <div class="bug">
+            <h4>B2 &middot; Dockerfile rusak: COPY <code>next.config.mjs</code> padahal file <code>next.config.ts</code>
+              <span class="badge med">MENENGAH</span></h4>
+            <p>Tahap akhir Dockerfile menyalin <code>next.config.mjs</code> yang <b>tidak ada</b> (project pakai
+              <code>.ts</code>).
+              Artinya <code>python run.py --build</code> / build image produksi <b>akan GAGAL</b>. Dev
+              (<code>--new</code>) tidak terpengaruh.</p>
+            <p class="meta">Lokasi: <code>frontend/Dockerfile</code> baris
+              <code>COPY --from=builder /app/next.config.mjs ./</code>.</p>
+            <p class="meta">Fix: ganti <code>.mjs</code> &rarr; <code>.ts</code> (atau hapus baris itu kalau tak
+              dibutuhkan saat runtime).</p>
+          </div>
+
+          <div class="bug med">
+            <h4>B3 &middot; Peta klien butuh internet (OpenStreetMap) <span class="badge med">RISIKO DEMO</span></h4>
+            <p>Preview peta pakai tile OpenStreetMap online. Saat uji (headless tanpa internet) tile gagal &rarr; peta
+              abu-abu kosong
+              (koordinat <b>tetap terdeteksi</b>). <b>Kalau ruang sidang tidak ada internet, peta akan kosong.</b></p>
+            <p class="meta">Antisipasi: pastikan ada internet saat demo klien, ATAU saat sidang cukup tunjukkan
+              "Koordinat terdeteksi" (tanpa fokus ke peta). Bukan crash.</p>
+          </div>
+
+          <div class="bug med">
+            <h4>B4 &middot; Dashboard tidak update REAL-TIME kalau diam / lintas-sesi <span
+                class="badge med">MENENGAH</span></h4>
+            <p>Ini kemungkinan "data ga auto refresh" yang kamu alami. Faktanya:</p>
+            <ul>
+              <li>Update OK saat kamu <b>pindah halaman</b> ke Dashboard (terbukti 14=15).</li>
+              <li>TAPI kalau kamu <b>diam menatap Dashboard</b> lalu data berubah di tempat lain, layar tidak ikut
+                berubah sampai
+                <b>auto-poll 5 menit</b> atau kamu <b>F5</b>. (Tidak ada push real-time / websocket.)
+              </li>
+              <li>Begitu juga <b>2 jendela browser</b> (manajer + teknisi): perubahan di satu jendela tidak langsung
+                muncul di jendela
+                lain tanpa refresh.</li>
+            </ul>
+            <p class="meta">Sumber: <code>useDashboard</code> (<code>frontend/src/hooks/useDashboard.ts</code>) pakai
+              <code>refetchInterval 5 menit</code>;
+              mutasi tugas (<code>useTasks.ts</code>) invalidate <code>['dashboard']</code> tapi hanya berlaku saat
+              query di-mount ulang.
+              Grafik <code>['charts',...]</code> tidak di-invalidate mutasi &mdash; menyegar saat remount/stale-2-menit.
+            </p>
+            <p class="meta">Sesuai catatan naskah <b>TC-MN-04</b> ("indikator EWS tidak update real-time setelah review
+              gate; butuh refresh manual").
+              Guide sudah menyarankan F5. Kalau mau benar real-time: tambah polling pendek / invalidate
+              <code>['charts']</code> juga / websocket (di luar scope sidang).</p>
+          </div>
+
+          <div class="bug low">
+            <h4>B5 &middot; SPI "meledak" di proyek yang baru mulai <span class="badge low">CATATAN METRIK</span></h4>
+            <p>Proyek yang <b>baru dibuat</b> tampil <b>Critical/merah</b> seketika (SPI 0, karena 0 tugas selesai).
+              Begitu 1 tugas
+              diselesaikan di hari pertama, SPI melonjak ke <b>10.000</b> (nilai maksimum/cap) &amp; jadi <b>On
+                Track/hijau</b>.
+              Sebabnya: di awal proyek, "waktu berjalan" (PV) sangat kecil, jadi rasio EV/PV jadi besar sekali.</p>
+            <p class="meta">Bukan crash &mdash; perilaku rumus yang benar. Tapi penguji bisa bertanya "kenapa proyek 1
+              hari sudah 10.000 hijau?".
+              Siapkan jawaban (lihat guide Bagian 5/8), atau pakai proyek dengan rentang tanggal wajar saat demo RAG.
+            </p>
+          </div>
+
+          <div class="bug low">
+            <h4>B6 &middot; (Info) Mode <code>--iso</code> menambah baris di tsconfig.json <span
+                class="badge low">INFO</span></h4>
+            <p>Saat <code>--iso</code> jalan, Next.js otomatis menambah <code>.next-iso/types/**/*.ts</code> ke
+              <code>frontend/tsconfig.json</code> include. Tidak berbahaya (cuma glob types). Bisa dirapikan manual
+              kalau mengganggu.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec">
+          <h2><span class="n">3</span> Cara ulang uji ini (reusable)</h2>
+          <p>Semua sudah jadi code, tinggal jalankan:</p>
+          <table>
+            <tr>
+              <th>Langkah</th>
+              <th>Perintah</th>
+            </tr>
+            <tr>
+              <td>1. Nyalakan stack terisolasi (DB 5544 + web 3100, empty)</td>
+              <td><code>python run.py --new --iso</code></td>
+            </tr>
+            <tr>
+              <td>2. Jalankan walkthrough + screenshot</td>
+              <td><code>cd docs/hasil-uji &amp;&amp; python walkthrough.py</code></td>
+            </tr>
+            <tr>
+              <td>3. Hentikan + bersihkan stack iso</td>
+              <td><code>python run.py --iso --stop</code> (lalu Ctrl+C di terminal dev)</td>
+            </tr>
+          </table>
+          <div class="box note">
+            <span class="lbl">Catatan</span>
+            Stack iso <b>tidak menyentuh</b> stack utamamu (:3000 / DB 5433). Jadi kamu bisa lanjut kerja di :3000
+            sambil aku uji di :3100.
+            Screenshot tiap run ada di folder ini (<code>docs/hasil-uji/</code>): <code>01..16</code> +
+            <code>_console-errors.json</code>.
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec">
+          <h2><span class="n">4</span> Logs LENGKAP sistem (untuk sesi berikutnya)</h2>
+          <p>Stack iso sekarang merekam <b>seluruh log sistem</b> ke satu folder, siap kamu serahkan ke sesi berikutnya:
+          </p>
+          <div class="box win"><span class="lbl">Lokasi</span>
+            <code>D:\__CODING\personal\_gf\irene\shi-crm\iso-logs\</code> &nbsp;(folder <code>iso-logs/</code> di root
+            proyek)
+          </div>
+          <table>
+            <tr>
+              <th>File</th>
+              <th>Isi</th>
+              <th>Sumber</th>
+            </tr>
+            <tr>
+              <td><code>actions-timeline.log</code></td>
+              <td><b>TIMELINE aksi</b> &mdash; tiap langkah diberi <b>garis pemisah</b> <code>==== STEP NN ====</code>,
+                lalu API call + console yang terjadi di langkah itu (ber-timestamp)</td>
+              <td>walkthrough.py</td>
+            </tr>
+            <tr>
+              <td><code>api-calls.log</code></td>
+              <td>Setiap panggilan <code>/api/</code> dari browser: method, URL, status, jam</td>
+              <td>walkthrough.py</td>
+            </tr>
+            <tr>
+              <td><code>browser-console.log</code></td>
+              <td>Semua <code>console.*</code> frontend + page error</td>
+              <td>walkthrough.py</td>
+            </tr>
+            <tr>
+              <td><code>next-dev.log</code></td>
+              <td>Log server Next.js: request API, <code>console</code> di handler, error server, kompilasi</td>
+              <td>run.py (tee dev server)</td>
+            </tr>
+            <tr>
+              <td><code>postgres.log</code></td>
+              <td><b>Setiap query SQL</b> + koneksi (<code>log_statement=all</code>) &mdash; ~280 KB/run</td>
+              <td>run.py (follower <code>docker logs</code>)</td>
+            </tr>
+            <tr>
+              <td><code>README.md</code></td>
+              <td>Penjelasan tiap file + cara baca/regen</td>
+              <td>run.py</td>
+            </tr>
+          </table>
+          <h3>Cara baca (korelasi antar log)</h3>
+          <p>Mulai dari <code>actions-timeline.log</code>. Tiap baris ber-<b>timestamp jam:menit:detik</b>, jadi bisa
+            dicocokkan ke
+            <code>next-dev.log</code> (server+API) dan <code>postgres.log</code> (query DB) di jam yang sama. Contoh
+            nyata satu aksi:
+          </p>
+          <pre
+            style="background:#0f1729;color:#e6edf7;border-radius:9px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.6">==============================================================================
 STEP 02 | 2026-06-18 13:41:34 | Buat klien + Link Google Maps
 ------------------------------------------------------------------------------
   13:41:34  [api] 200 GET    /api/clients          &larr; muat daftar klien
@@ -223,18 +579,22 @@ STEP 02 | 2026-06-18 13:41:34 | Buat klien + Link Google Maps
   13:41:39  [api] 201 POST   /api/clients          &larr; SIMPAN klien (sukses)
   13:41:39  [api] 200 GET    /api/clients          &larr; daftar di-refresh
   13:41:41  [shot] 05-klien-tersimpan.png</pre>
-    <div class="box note"><span class="lbl">Temuan dari log</span>
-      Log menangkap <code>409 Conflict</code> saat membuat tugas ke-2 (jadwal overlap dengan tugas ke-1). Itu <b>BUKAN bug</b> &mdash;
-      fitur <b>anti-dobel-booking</b> bekerja (teknisi tak boleh 2 tugas di rentang waktu sama). Untuk buat 2 tugas, beri rentang jadwal berbeda.
-    </div>
-    <div class="box win"><span class="lbl">Cara regen + bekukan untuk handoff</span>
-      <code>python run.py --new --iso</code> (nyalakan, mulai rekam) &rarr;
-      <code>cd docs/hasil-uji &amp;&amp; python walkthrough.py</code> (isi timeline/api/console) &rarr;
-      <code>python run.py --iso --stop</code> (bekukan). Lalu zip folder <code>iso-logs/</code> + <code>docs/hasil-uji/</code> untuk diserahkan.
-    </div>
-  </div>
-</section>
+          <div class="box note"><span class="lbl">Temuan dari log</span>
+            Log menangkap <code>409 Conflict</code> saat membuat tugas ke-2 (jadwal overlap dengan tugas ke-1). Itu
+            <b>BUKAN bug</b> &mdash;
+            fitur <b>anti-dobel-booking</b> bekerja (teknisi tak boleh 2 tugas di rentang waktu sama). Untuk buat 2
+            tugas, beri rentang jadwal berbeda.
+          </div>
+          <div class="box win"><span class="lbl">Cara regen + bekukan untuk handoff</span>
+            <code>python run.py --new --iso</code> (nyalakan, mulai rekam) &rarr;
+            <code>cd docs/hasil-uji &amp;&amp; python walkthrough.py</code> (isi timeline/api/console) &rarr;
+            <code>python run.py --iso --stop</code> (bekukan). Lalu zip folder <code>iso-logs/</code> +
+            <code>docs/hasil-uji/</code> untuk diserahkan.
+          </div>
+        </div>
+      </section>
 
-</div>
-</body>
+    </div>
+  </body>
+
 </html>

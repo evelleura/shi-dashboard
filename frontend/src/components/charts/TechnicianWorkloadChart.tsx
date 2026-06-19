@@ -17,7 +17,7 @@ function truncate(name: string, max = 15): string {
 
 function CardWrapper({ children, title }: { children: React.ReactNode; title: string }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6" style={{height: "326px", overflowY: "scroll"}}>
       <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{title}</h3>
       {children}
     </div>
