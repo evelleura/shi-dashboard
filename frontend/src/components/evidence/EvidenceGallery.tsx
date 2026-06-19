@@ -52,7 +52,7 @@ export default function EvidenceGallery({ taskId, canDelete = false }: Props) {
 
   if (evidence.length === 0) {
     return (
-      <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No evidence files uploaded</p>
+      <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Belum ada file bukti yang diunggah</p>
     );
   }
 
@@ -77,7 +77,7 @@ export default function EvidenceGallery({ taskId, canDelete = false }: Props) {
                 {ev.file_name}
               </a>
               <p className="text-xs text-gray-400 dark:text-gray-500">
-                {formatFileSize(ev.file_size)} -- {ev.file_type} -- {ev.uploaded_by_name ?? 'Unknown'}
+                {formatFileSize(ev.file_size)} -- {ev.file_type} -- {ev.uploaded_by_name ?? 'Tidak diketahui'}
               </p>
               {ev.description && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{ev.description}</p>
@@ -90,7 +90,7 @@ export default function EvidenceGallery({ taskId, canDelete = false }: Props) {
               <button
                 onClick={() => deleteMutation.mutate(ev.id)}
                 className="text-red-400 hover:text-red-600 transition-colors shrink-0"
-                aria-label={`Delete ${ev.file_name}`}
+                aria-label={`Hapus ${ev.file_name}`}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

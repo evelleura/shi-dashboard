@@ -80,7 +80,7 @@ export default function TaskStatusSelect({ value, onChange, disabled = false, si
       onChange={(e) => onChange(e.target.value as TaskStatus)}
       disabled={disabled || isReadOnly}
       className={`rounded-lg font-medium border-0 ring-1 ${config.ring} ${config.bg} ${config.text} ${sizeClass} cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed appearance-none pr-6 w-full max-w-[140px]`}
-      aria-label="Change task status"
+      aria-label="Ubah status tugas"
       style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E")`,
         backgroundRepeat: 'no-repeat',

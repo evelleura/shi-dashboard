@@ -18,8 +18,8 @@ export default function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel = 'Konfirmasi',
+  cancelLabel = 'Batal',
   variant = 'danger',
   loading = false,
 }: Props) {
@@ -48,7 +48,7 @@ export default function ConfirmDialog({
           disabled={loading}
           className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${btnColor}`}
         >
-          {loading ? 'Processing...' : confirmLabel}
+          {loading ? 'Memproses...' : confirmLabel}
         </button>
       </div>
     </Modal>

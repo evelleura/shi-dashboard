@@ -62,15 +62,15 @@ function CountdownChip({ endDate, language }: { endDate?: string; language: Lang
   const days = daysUntil(endDate);
   const id = language === 'id';
   if (days === 0) {
-    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{id ? 'Hari ini!' : 'Today!'}</span>;
+    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{id ? 'Hari ini!' : 'Hari ini!'}</span>;
   }
   if (days < 0) {
-    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{Math.abs(days)} {id ? 'hr terlambat' : 'd overdue'}</span>;
+    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{Math.abs(days)} {id ? 'hari terlambat' : 'hari terlambat'}</span>;
   }
   if (days <= 7) {
-    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{days} {id ? 'hr lagi' : 'd left'}</span>;
+    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{days} {id ? 'hari lagi' : 'hari lagi'}</span>;
   }
-  return <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{days} {id ? 'hr lagi' : 'd left'}</span>;
+  return <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{days} {id ? 'hari lagi' : 'hari lagi'}</span>;
 }
 
 const ClipboardIcon = () => <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>;
@@ -96,10 +96,10 @@ function HealthBadge({ status }: { status?: HealthStatus | null }) {
 function ProjectStatusBadge({ status, language }: { status: ProjectStatus; language: Language }) {
   const id = language === 'id';
   const cfg: Record<ProjectStatus, { bg: string; text: string; labelId: string; labelEn: string }> = {
-    active:    { bg: 'bg-blue-100',  text: 'text-blue-700',  labelId: 'Aktif',     labelEn: 'Active' },
-    completed: { bg: 'bg-green-100', text: 'text-green-700', labelId: 'Selesai',   labelEn: 'Completed' },
-    'on-hold': { bg: 'bg-amber-100', text: 'text-amber-700', labelId: 'Ditunda',   labelEn: 'On Hold' },
-    cancelled: { bg: 'bg-red-100',   text: 'text-red-700',   labelId: 'Dibatalkan', labelEn: 'Cancelled' },
+    active:    { bg: 'bg-blue-100',  text: 'text-blue-700',  labelId: 'Aktif',     labelEn: 'Aktif' },
+    completed: { bg: 'bg-green-100', text: 'text-green-700', labelId: 'Selesai',   labelEn: 'Selesai' },
+    'on-hold': { bg: 'bg-amber-100', text: 'text-amber-700', labelId: 'Ditunda',   labelEn: 'Ditunda' },
+    cancelled: { bg: 'bg-red-100',   text: 'text-red-700',   labelId: 'Dibatalkan', labelEn: 'Dibatalkan' },
   };
   const c = cfg[status] ?? cfg.active;
   return <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.bg} ${c.text}`}>{id ? c.labelId : c.labelEn}</span>;
@@ -110,7 +110,7 @@ function StatusChip({ status }: { status: TaskStatus }) {
     to_do:        { bg: 'bg-gray-100',   text: 'text-gray-600',   label: 'Belum' },
     working_on_it:{ bg: 'bg-blue-100',  text: 'text-blue-700',  label: 'Dikerjakan' },
     in_progress:  { bg: 'bg-blue-100',  text: 'text-blue-700',  label: 'Dikerjakan' },
-    review:       { bg: 'bg-purple-100',text: 'text-purple-700',label: 'Review' },
+    review:       { bg: 'bg-purple-100',text: 'text-purple-700',label: 'Tinjauan' },
     done:         { bg: 'bg-green-100', text: 'text-green-700', label: 'Selesai' },
   };
   const c = cfg[status] ?? cfg.to_do;
@@ -136,7 +136,7 @@ function TaskPanel({ tasks, projId, language, onStatusChange, changingTaskId, ro
   if (tasks.length === 0) {
     return (
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400">
-        {id ? 'Belum ada tugas yang ditugaskan kepadamu di proyek ini.' : 'No tasks assigned to you in this project.'}
+        {id ? 'Belum ada tugas yang ditugaskan kepada Anda di proyek ini.' : 'Belum ada tugas yang ditugaskan kepada Anda di proyek ini.'}
       </div>
     );
   }
@@ -167,7 +167,7 @@ function TaskPanel({ tasks, projId, language, onStatusChange, changingTaskId, ro
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 ) : task.status === 'review' ? (
-                  <span className="text-gray-400 italic text-[10px]">{id ? 'Menunggu' : 'Waiting'}</span>
+                  <span className="text-gray-400 italic text-[10px]">{id ? 'Menunggu' : 'Menunggu'}</span>
                 ) : isBlocked ? (
                   <span title={task.depends_on_name ? `Menunggu: ${task.depends_on_name}` : 'Diblokir'}>
                     <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -180,7 +180,7 @@ function TaskPanel({ tasks, projId, language, onStatusChange, changingTaskId, ro
                     onClick={() => onStatusChange(task.id, 'working_on_it')}
                     className="text-[10px] font-medium px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {id ? 'Mulai' : 'Start'}
+                    {id ? 'Mulai' : 'Mulai'}
                   </button>
                 ) : (
                   <button
@@ -188,7 +188,7 @@ function TaskPanel({ tasks, projId, language, onStatusChange, changingTaskId, ro
                     onClick={() => onStatusChange(task.id, 'review')}
                     className="text-[10px] font-medium px-2 py-1 rounded bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50"
                   >
-                    {id ? 'Submit' : 'Submit'}
+                    {id ? 'Kirim' : 'Kirim'}
                   </button>
                 )}
               </div>
@@ -201,7 +201,7 @@ function TaskPanel({ tasks, projId, language, onStatusChange, changingTaskId, ro
           onClick={() => router.push(`/projects/${projId}`)}
           className="text-xs text-blue-600 hover:underline font-medium"
         >
-          {id ? 'Lihat Detail Proyek' : 'View Project Detail'} {'→'}
+          {id ? 'Lihat Detail Proyek' : 'Lihat Detail Proyek'} {'→'}
         </button>
       </div>
     </div>
@@ -307,9 +307,9 @@ export default function TechnicianProjectsPage() {
   }
 
   const tabs: { key: TabKey; label: string; count: number }[] = [
-    { key: 'survey',    label: id ? 'Survei'   : 'Survey',    count: surveyList.length },
-    { key: 'execution', label: id ? 'Proyek' : 'Projects', count: executionList.length },
-    { key: 'history',   label: id ? 'Riwayat'  : 'History',   count: historyList.length },
+    { key: 'survey',    label: id ? 'Survei'   : 'Survei',    count: surveyList.length },
+    { key: 'execution', label: id ? 'Proyek' : 'Proyek', count: executionList.length },
+    { key: 'history',   label: id ? 'Riwayat'  : 'Riwayat',   count: historyList.length },
   ];
 
   const currentList = activeTab === 'survey' ? surveyList : activeTab === 'execution' ? executionList : historyList;
@@ -336,7 +336,7 @@ export default function TechnicianProjectsPage() {
           </div>
           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 truncate">{hp.name}</p>
           <p className="text-xs text-gray-400 mb-3 truncate">{hp.client_name ?? '--'}</p>
-          {hp.end_date && <p className="text-xs text-gray-400 mb-2">{id ? 'Selesai:' : 'Ended:'} {formatDate(hp.end_date, locale)}</p>}
+          {hp.end_date && <p className="text-xs text-gray-400 mb-2">{id ? 'Selesai:' : 'Selesai:'} {formatDate(hp.end_date, locale)}</p>}
           <div className="flex justify-between text-xs text-gray-400 mb-1"><span>{hp.my_completed}/{hp.my_task_count}</span><span>{pct}%</span></div>
           <div className="h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden"><div className="h-full bg-gray-400 rounded-full" style={{ width: `${pct}%` }} /></div>
         </button>
@@ -351,8 +351,8 @@ export default function TechnicianProjectsPage() {
     const nextBox = ap.next_task_name
       ? <p className={`text-xs px-2 py-1 rounded truncate ${isSurvey ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>{ap.next_task_name}</p>
       : ap.my_task_count === 0
-        ? <p className="text-xs text-gray-400 italic">{id ? 'Belum ada tugas' : 'No tasks yet'}</p>
-        : <p className="text-xs text-gray-400 italic">{id ? 'Semua tugas selesai' : 'All tasks done'}</p>;
+        ? <p className="text-xs text-gray-400 italic">{id ? 'Belum ada tugas' : 'Belum ada tugas'}</p>
+        : <p className="text-xs text-gray-400 italic">{id ? 'Semua tugas selesai' : 'Semua tugas selesai'}</p>;
 
     return (
       <button
@@ -371,10 +371,10 @@ export default function TechnicianProjectsPage() {
         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-0.5 truncate">{ap.name}</p>
         <p className="text-xs text-gray-400 mb-3 truncate">{ap.client_name ?? '--'}</p>
         <div className="mb-3">
-          <p className="text-[10px] text-gray-400 mb-1">{id ? 'Tugas berikutnya:' : 'Next task:'}</p>
+          <p className="text-[10px] text-gray-400 mb-1">{id ? 'Tugas berikutnya:' : 'Tugas berikutnya:'}</p>
           {nextBox}
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mb-1"><span>{ap.my_completed}/{ap.my_task_count} {id ? 'selesai' : 'done'}</span><span>{pct}%</span></div>
+        <div className="flex justify-between text-xs text-gray-500 mb-1"><span>{ap.my_completed}/{ap.my_task_count} {id ? 'selesai' : 'selesai'}</span><span>{pct}%</span></div>
         <div className="h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden"><div className="h-full bg-green-500 rounded-full" style={{ width: `${pct}%` }} /></div>
       </button>
     );
@@ -399,7 +399,7 @@ export default function TechnicianProjectsPage() {
           </div>
           <ProjectStatusBadge status={hp.status} language={language} />
           <div className="text-right shrink-0 w-28 hidden sm:block">
-            <p className="text-[10px] text-gray-400 mb-0.5">{id ? 'Selesai' : 'Ended'}</p>
+            <p className="text-[10px] text-gray-400 mb-0.5">{id ? 'Selesai' : 'Selesai'}</p>
             <span className="text-xs text-gray-500">{hp.end_date ? formatDate(hp.end_date, locale) : '--'}</span>
           </div>
           <div className="w-24 shrink-0 hidden md:block">
@@ -469,10 +469,10 @@ export default function TechnicianProjectsPage() {
 
   const isEmpty = currentList.length === 0;
   const emptyMsg = activeTab === 'survey'
-    ? (id ? 'Belum ada proyek survei.' : 'No survey projects.')
+    ? (id ? 'Belum ada proyek survei.' : 'Belum ada proyek survei.')
     : activeTab === 'execution'
-      ? (id ? 'Belum ada proyek.' : 'No projects.')
-      : (id ? 'Belum ada riwayat proyek.' : 'No project history yet.');
+      ? (id ? 'Belum ada proyek.' : 'Belum ada proyek.')
+      : (id ? 'Belum ada riwayat proyek.' : 'Belum ada riwayat proyek.');
 
   return (
     <div className="space-y-6">
@@ -480,17 +480,17 @@ export default function TechnicianProjectsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('nav.my_projects', language)}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {id ? 'Proyek yang ditugaskan kepadamu beserta detail klien' : 'Projects assigned to you with client details'}
+            {id ? 'Proyek yang ditugaskan kepada Anda beserta detail klien' : 'Proyek yang ditugaskan kepada Anda beserta detail klien'}
           </p>
         </div>
         <div
           className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg shrink-0"
           role="group"
-          aria-label={id ? 'Tampilan' : 'View mode'}
+          aria-label={id ? 'Mode Tampilan' : 'Mode Tampilan'}
         >
           {(['grid', 'list'] as ViewMode[]).map(m => (
             <button key={m} onClick={() => setViewMode(m)} aria-pressed={viewMode === m}
-              title={m === 'grid' ? (id ? 'Tampilan grid' : 'Grid view') : (id ? 'Tampilan list' : 'List view')}
+              title={m === 'grid' ? (id ? 'Tampilan grid' : 'Tampilan grid') : (id ? 'Tampilan daftar' : 'Tampilan daftar')}
               className={`p-1.5 rounded-md transition-all ${viewMode === m ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
             >
               {m === 'grid'
@@ -529,8 +529,8 @@ export default function TechnicianProjectsPage() {
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-xs text-gray-500">
-            {currentList.length} {id ? 'proyek' : 'projects'}
-            {activeTab !== 'history' ? (id ? ' — diurutkan berdasarkan urgensi' : ' — sorted by urgency') : ''}
+            {currentList.length} {id ? 'proyek' : 'proyek'}
+            {activeTab !== 'history' ? (id ? ' — diurutkan berdasarkan urgensi' : ' — diurutkan berdasarkan urgensi') : ''}
           </div>
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
             {currentList.map((proj, idx) => ListRow(proj, idx))}
@@ -546,7 +546,7 @@ export default function TechnicianProjectsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
             </svg>
             <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {id ? 'Proyek Selesai Hari Ini' : 'Projects Completed Today'}
+              {id ? 'Proyek Selesai Hari Ini' : 'Proyek Selesai Hari Ini'}
             </h2>
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">
               {completedTodayProjects.length}

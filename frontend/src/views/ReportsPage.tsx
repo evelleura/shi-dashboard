@@ -604,8 +604,8 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Reports</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Click any row to view detail. Use dropdowns to change status/phase inline.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Laporan</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Klik data di bawah</p>
         </div>
         <div className="flex items-center gap-2">
           {updateMutation.isPending && (

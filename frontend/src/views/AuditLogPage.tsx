@@ -9,13 +9,13 @@ const LIMIT = 50;
 function relativeTime(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 60) return `${seconds} dtk lalu`;
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} min ago`;
+  if (minutes < 60) return `${minutes} mnt lalu`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hr ago`;
+  if (hours < 24) return `${hours} jam lalu`;
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return `${days} hr lalu`;
 }
 
 function actionBadge(action: string) {
@@ -25,15 +25,28 @@ function actionBadge(action: string) {
     delete: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
     status_change: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   };
+  const labels: Record<string, string> = {
+    create: 'Dibuat',
+    update: 'Diubah',
+    delete: 'Dihapus',
+    status_change: 'Ubah Status',
+  };
   const cls = map[action] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
   return (
     <span className={`inline-block text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${cls}`}>
-      {action.replace('_', ' ')}
+      {labels[action] ?? action.replace('_', ' ')}
     </span>
   );
 }
 
 const ENTITY_TYPES = ['All', 'project', 'task', 'client', 'user'];
+const ENTITY_LABELS: Record<string, string> = {
+  All: 'Semua Jenis',
+  project: 'Proyek',
+  task: 'Tugas',
+  client: 'Klien',
+  user: 'Pengguna',
+};
 
 export default function AuditLogPage() {
   const [filter, setFilter] = useState('');
@@ -56,7 +69,7 @@ export default function AuditLogPage() {
       setLogs((prev) => replace ? result.logs : [...prev, ...result.logs]);
       setTotal(result.total);
     } catch {
-      setError('Failed to load audit logs. The audit API may not be enabled yet.');
+      setError('Gagal memuat log aktivitas. API audit mungkin belum diaktifkan.');
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -74,23 +87,23 @@ export default function AuditLogPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Activity Log</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Log Aktivitas</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            Recent changes across projects, tasks, and clients
+            Perubahan terbaru pada proyek, tugas, dan klien
           </p>
         </div>
         <button
           onClick={() => fetchLogs(true)}
           disabled={loading}
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
-          aria-label="Refresh audit log"
+          aria-label="Muat ulang log aktivitas"
         >
-          Refresh
+          Muat Ulang
         </button>
       </div>
 
       {/* Filter */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by entity type">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter berdasarkan jenis entitas">
         {ENTITY_TYPES.map((type) => {
           const active = (type === 'All' ? '' : type) === filter;
           return (
@@ -104,7 +117,7 @@ export default function AuditLogPage() {
               }`}
               aria-pressed={active}
             >
-              {type === 'All' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)}
+              {ENTITY_LABELS[type] ?? type}
             </button>
           );
         })}
@@ -112,7 +125,7 @@ export default function AuditLogPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center h-48" role="status" aria-label="Loading">
+        <div className="flex items-center justify-center h-48" role="status" aria-label="Memuat">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         </div>
       ) : error ? (
@@ -121,22 +134,22 @@ export default function AuditLogPage() {
         </div>
       ) : logs.length === 0 ? (
         <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">No activity found.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Belum ada aktivitas.</p>
         </div>
       ) : (
         <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
           {/* Table header */}
           <div className="overflow-x-auto">
-            <table className="w-full text-sm" aria-label="Audit log entries">
+            <table className="w-full text-sm" aria-label="Entri log aktivitas">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Time</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">User</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Action</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Entity</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Field</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Old Value</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">New Value</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Waktu</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Pengguna</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Aksi</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Entitas</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Kolom</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Nilai Lama</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">Nilai Baru</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -205,7 +218,7 @@ export default function AuditLogPage() {
           {/* Footer: count + load more */}
           <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <span className="text-xs text-gray-400 dark:text-gray-500">
-              Showing {logs.length} of {total} entries
+              Menampilkan {logs.length} dari {total} entri
             </span>
             {hasMore && (
               <button
@@ -219,7 +232,7 @@ export default function AuditLogPage() {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
                 )}
-                {loadingMore ? 'Loading...' : 'Load more'}
+                {loadingMore ? 'Memuat...' : 'Muat lebih banyak'}
               </button>
             )}
           </div>

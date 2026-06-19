@@ -176,7 +176,7 @@ function ClientFormModal({
                   href={`https://wa.me/${form.phone.trim().replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Chat via WhatsApp"
+                  title="Hubungi via WhatsApp"
                   className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-green-500 hover:bg-green-600 transition-colors"
                 >
                   <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
@@ -480,7 +480,7 @@ export default function ClientDetailPage() {
                     href={`https://wa.me/${client.phone.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title="Chat via WhatsApp"
+                    title="Hubungi via WhatsApp"
                     className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
                   >
                     <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-green-600 dark:fill-green-400 shrink-0">
@@ -554,7 +554,7 @@ export default function ClientDetailPage() {
 
       {/* ── Tabs ───────────────────────────────────────────────────────────── */}
       <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="flex gap-1 -mb-px" role="tablist" aria-label="Client detail tabs">
+        <nav className="flex gap-1 -mb-px" role="tablist" aria-label="Tab detail klien">
           {tabs.map((tab) => (
             <button
               key={tab.id}

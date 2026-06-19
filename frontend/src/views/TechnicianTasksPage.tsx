@@ -58,9 +58,7 @@ export default function TechnicianTasksPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('nav.my_tasks', language)}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {id
-              ? `${taskCount} tugas aktif ditugaskan kepadamu`
-              : `${taskCount} active task${taskCount !== 1 ? 's' : ''} assigned to you`}
+            {`${taskCount} tugas aktif yang ditugaskan kepada Anda`}
           </p>
         </div>
         <ViewToggle view={taskView} onChange={setTaskView} />
@@ -72,10 +70,10 @@ export default function TechnicianTasksPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
           <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            {id ? 'Belum ada tugas aktif yang ditugaskan kepadamu.' : 'No active tasks assigned to you yet.'}
+            {'Belum ada tugas aktif yang ditugaskan kepada Anda.'}
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            {id ? 'Tugas akan muncul di sini setelah manager menugaskannya.' : 'Tasks will appear here once your manager assigns them.'}
+            {'Tugas akan muncul di sini setelah manajer menugaskannya.'}
           </p>
         </div>
       ) : taskView === 'kanban' ? (
@@ -105,7 +103,7 @@ export default function TechnicianTasksPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
             <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {id ? 'Tugas Selesai Hari Ini' : 'Tasks Completed Today'}
+              {'Tugas Selesai Hari Ini'}
             </h2>
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">
               {todayDoneTasks.length}

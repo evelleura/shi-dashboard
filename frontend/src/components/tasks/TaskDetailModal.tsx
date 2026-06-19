@@ -321,12 +321,12 @@ export default function TaskDetailModal({
               <button
                 onClick={() => setShowEscalationForm(true)}
                 className="ml-auto text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1"
-                aria-label="Escalate this task"
+                aria-label="Eskalasikan tugas ini"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
-                Escalate
+                Eskalasi
               </button>
             )}
           </div>
@@ -504,7 +504,7 @@ export default function TaskDetailModal({
                 disabled={updateTaskMutation.isPending}
                 className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
               >
-                Reset
+                Atur Ulang
               </button>
               <button
                 onClick={handleEditSave}

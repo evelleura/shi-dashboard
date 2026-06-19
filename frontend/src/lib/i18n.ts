@@ -9,7 +9,7 @@ export const translations = {
     'nav.projects': 'Proyek',
     'nav.clients': 'Klien',
     'nav.schedule': 'Jadwal',
-    'nav.timeline': 'Timeline',
+    'nav.timeline': 'Linimasa',
     'nav.reports': 'Laporan',
     'nav.escalations': 'Eskalasi',
     'nav.technicians': 'Teknisi',
@@ -58,7 +58,7 @@ export const translations = {
     'status.to_do': 'Belum Mulai',
     'status.in_progress': 'Dalam Proses',
     'status.working_on_it': 'Sedang Dikerjakan',
-    'status.review': 'Review',
+    'status.review': 'Tinjauan',
     'status.done': 'Selesai',
 
     // Status labels (project)
@@ -311,7 +311,7 @@ export const translations = {
     'tech.total_tasks': 'Total Tugas',
     'tech.to_do': 'Belum Mulai',
     'tech.in_progress': 'Dalam Proses',
-    'tech.review': 'Review',
+    'tech.review': 'Tinjauan',
     'tech.done': 'Selesai',
     'tech.overtime': 'Lembur',
     'tech.over_deadline': 'Melewati Tenggat',

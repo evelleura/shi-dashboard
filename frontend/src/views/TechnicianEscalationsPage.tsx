@@ -13,17 +13,17 @@ import Modal from '../components/ui/Modal';
 import type { Escalation, EscalationPriority, EscalationStatus, EscalationActionRequest } from '../types';
 
 const PRIORITY_CONFIG: Record<EscalationPriority, { bg: string; text: string; labelId: string; labelEn: string }> = {
-  critical: { bg: 'bg-red-50 dark:bg-red-900/30',    text: 'text-red-700 dark:text-red-400',    labelId: 'Kritis',  labelEn: 'Critical' },
-  high:     { bg: 'bg-orange-50 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400', labelId: 'Tinggi', labelEn: 'High' },
-  medium:   { bg: 'bg-yellow-50 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-400', labelId: 'Sedang', labelEn: 'Medium' },
-  low:      { bg: 'bg-gray-50 dark:bg-gray-800',    text: 'text-gray-600 dark:text-gray-400',   labelId: 'Rendah',  labelEn: 'Low' },
+  critical: { bg: 'bg-red-50 dark:bg-red-900/30',    text: 'text-red-700 dark:text-red-400',    labelId: 'Kritis',  labelEn: 'Kritis' },
+  high:     { bg: 'bg-orange-50 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400', labelId: 'Tinggi', labelEn: 'Tinggi' },
+  medium:   { bg: 'bg-yellow-50 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-400', labelId: 'Sedang', labelEn: 'Sedang' },
+  low:      { bg: 'bg-gray-50 dark:bg-gray-800',    text: 'text-gray-600 dark:text-gray-400',   labelId: 'Rendah',  labelEn: 'Rendah' },
 };
 
 const STATUS_CONFIG: Record<EscalationStatus, { bg: string; text: string; labelId: string; labelEn: string }> = {
-  open:      { bg: 'bg-red-100 dark:bg-red-900/40',   text: 'text-red-700 dark:text-red-400',    labelId: 'Terbuka',       labelEn: 'Open' },
-  in_review: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-400', labelId: 'Sedang Direview', labelEn: 'In Review' },
-  resolved:  { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-700 dark:text-green-400', labelId: 'Selesai',       labelEn: 'Resolved' },
-  cancelled: { bg: 'bg-gray-100 dark:bg-gray-700',    text: 'text-gray-500 dark:text-gray-400',  labelId: 'Dibatalkan',    labelEn: 'Cancelled' },
+  open:      { bg: 'bg-red-100 dark:bg-red-900/40',   text: 'text-red-700 dark:text-red-400',    labelId: 'Terbuka',       labelEn: 'Terbuka' },
+  in_review: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-400', labelId: 'Sedang Direview', labelEn: 'Sedang Direview' },
+  resolved:  { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-700 dark:text-green-400', labelId: 'Selesai',       labelEn: 'Selesai' },
+  cancelled: { bg: 'bg-gray-100 dark:bg-gray-700',    text: 'text-gray-500 dark:text-gray-400',  labelId: 'Dibatalkan',    labelEn: 'Dibatalkan' },
 };
 
 const PRIORITY_BORDER: Record<EscalationPriority, string> = {
@@ -42,17 +42,17 @@ const ACTION_REQUEST_LABELS_ID: Record<EscalationActionRequest, string> = {
 };
 
 const ACTION_REQUEST_LABELS_EN: Record<EscalationActionRequest, string> = {
-  ganti_teknisi:       'Change Technician',
-  ganti_alat:          'Change Equipment',
-  perpanjang_deadline: 'Extend Deadline',
-  mediasi_client:      'Client Mediation',
-  batalkan_eskalasi:   'Cancel Escalation',
+  ganti_teknisi:       'Ganti Teknisi',
+  ganti_alat:          'Ganti Alat',
+  perpanjang_deadline: 'Perpanjang Deadline',
+  mediasi_client:      'Mediasi ke Client',
+  batalkan_eskalasi:   'Batalkan Eskalasi',
 };
 
 const ACTION_STATUS_CONFIG = {
-  pending:  { bg: 'bg-amber-50 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400', labelId: 'Menunggu Persetujuan', labelEn: 'Awaiting Approval' },
-  approved: { bg: 'bg-green-50 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400', labelId: 'Disetujui', labelEn: 'Approved' },
-  rejected: { bg: 'bg-red-50 dark:bg-red-900/30',    text: 'text-red-700 dark:text-red-400',    labelId: 'Ditolak',   labelEn: 'Rejected' },
+  pending:  { bg: 'bg-amber-50 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400', labelId: 'Menunggu Persetujuan', labelEn: 'Menunggu Persetujuan' },
+  approved: { bg: 'bg-green-50 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400', labelId: 'Disetujui', labelEn: 'Disetujui' },
+  rejected: { bg: 'bg-red-50 dark:bg-red-900/30',    text: 'text-red-700 dark:text-red-400',    labelId: 'Ditolak',   labelEn: 'Ditolak' },
 };
 
 function formatDate(dateStr: string, lang: string): string {
@@ -111,7 +111,7 @@ export default function TechnicianEscalationsPage() {
 
   const filterLabels: Record<string, string> = id
     ? { all: 'Semua', open: 'Terbuka', in_review: 'Direview', resolved: 'Selesai', cancelled: 'Dibatalkan' }
-    : { all: 'All', open: 'Open', in_review: 'In Review', resolved: 'Resolved', cancelled: 'Cancelled' };
+    : { all: 'Semua', open: 'Terbuka', in_review: 'Direview', resolved: 'Selesai', cancelled: 'Dibatalkan' };
 
   if (isLoading) {
     return (
@@ -123,9 +123,9 @@ export default function TechnicianEscalationsPage() {
   if (isError) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500 text-sm">{id ? 'Gagal memuat eskalasi.' : 'Failed to load escalations.'}</p>
+        <p className="text-red-500 text-sm">{id ? 'Gagal memuat eskalasi.' : 'Gagal memuat eskalasi.'}</p>
         <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">
-          {id ? 'Coba lagi' : 'Retry'}
+          {id ? 'Coba Lagi' : 'Coba Lagi'}
         </button>
       </div>
     );
@@ -137,10 +137,10 @@ export default function TechnicianEscalationsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {id ? 'Eskalasi Saya' : 'My Escalations'}
+            {id ? 'Eskalasi Saya' : 'Eskalasi Saya'}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {id ? 'Masalah yang kamu laporkan dan statusnya saat ini' : 'Issues you reported and their current status'}
+            {id ? 'Masalah yang Anda laporkan beserta statusnya saat ini' : 'Masalah yang Anda laporkan beserta statusnya saat ini'}
           </p>
         </div>
         <button
@@ -150,7 +150,7 @@ export default function TechnicianEscalationsPage() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          {id ? 'Eskalasi Baru' : 'New Escalation'}
+          {id ? 'Eskalasi Baru' : 'Eskalasi Baru'}
         </button>
       </div>
 
@@ -158,9 +158,9 @@ export default function TechnicianEscalationsPage() {
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { labelId: 'Terbuka', labelEn: 'Open', value: summary.open, cls: 'red' },
-            { labelId: 'Direview', labelEn: 'In Review', value: summary.in_review, cls: 'amber' },
-            { labelId: 'Selesai', labelEn: 'Resolved', value: summary.resolved, cls: 'green' },
+            { labelId: 'Terbuka', labelEn: 'Terbuka', value: summary.open, cls: 'red' },
+            { labelId: 'Direview', labelEn: 'Direview', value: summary.in_review, cls: 'amber' },
+            { labelId: 'Selesai', labelEn: 'Selesai', value: summary.resolved, cls: 'green' },
             { labelId: 'Total', labelEn: 'Total', value: summary.total ?? 0, cls: 'blue' },
           ].map(({ labelId: lId, labelEn, value, cls }) => (
             <div key={lId} className={`bg-${cls}-50 dark:bg-${cls}-900/30 border border-${cls}-200 dark:border-${cls}-800 rounded-xl p-3 text-center`}>
@@ -192,7 +192,7 @@ export default function TechnicianEscalationsPage() {
       {filtered.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {id ? 'Tidak ada eskalasi ditemukan.' : 'No escalations found.'}
+            {id ? 'Tidak ada eskalasi yang ditemukan.' : 'Tidak ada eskalasi yang ditemukan.'}
           </p>
         </div>
       ) : (
@@ -210,11 +210,11 @@ export default function TechnicianEscalationsPage() {
       )}
 
       {/* New Escalation Modal */}
-      <Modal open={showForm} onClose={resetForm} title={id ? 'Eskalasi Baru' : 'New Escalation'} maxWidth="max-w-lg">
+      <Modal open={showForm} onClose={resetForm} title={id ? 'Eskalasi Baru' : 'Eskalasi Baru'} maxWidth="max-w-lg">
         <div className="space-y-4">
           <div>
             <label htmlFor="new-esc-project" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {id ? 'Proyek' : 'Project'} <span className="text-red-500">*</span>
+              {id ? 'Proyek' : 'Proyek'} <span className="text-red-500">*</span>
             </label>
             <select
               id="new-esc-project"
@@ -222,7 +222,7 @@ export default function TechnicianEscalationsPage() {
               onChange={(e) => setProjectId(Number(e.target.value))}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
-              <option value={0}>{id ? '-- Pilih proyek --' : '-- Select project --'}</option>
+              <option value={0}>{id ? '-- Pilih proyek --' : '-- Pilih proyek --'}</option>
               {activeProjects.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.project_code ? `[${p.project_code}] ` : ''}{p.name}
@@ -231,29 +231,29 @@ export default function TechnicianEscalationsPage() {
             </select>
             {activeProjects.length === 0 && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                {id ? 'Tidak ada proyek aktif yang ditugaskan.' : 'No active projects assigned to you.'}
+                {id ? 'Tidak ada proyek aktif yang ditugaskan kepada Anda.' : 'Tidak ada proyek aktif yang ditugaskan kepada Anda.'}
               </p>
             )}
           </div>
           <div>
             <label htmlFor="new-esc-title" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {id ? 'Judul' : 'Title'} <span className="text-red-500">*</span>
+              {id ? 'Judul' : 'Judul'} <span className="text-red-500">*</span>
             </label>
             <input
               id="new-esc-title" type="text" value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder={id ? 'Ringkasan masalah' : 'Brief issue summary'}
+              placeholder={id ? 'Ringkasan masalah' : 'Ringkasan masalah'}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>
           <div>
             <label htmlFor="new-esc-desc" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {id ? 'Deskripsi' : 'Description'} <span className="text-red-500">*</span>
+              {id ? 'Deskripsi' : 'Deskripsi'} <span className="text-red-500">*</span>
             </label>
             <textarea
               id="new-esc-desc" value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={id ? 'Jelaskan masalah secara detail...' : 'Describe the issue in detail...'}
+              placeholder={id ? 'Jelaskan masalah secara detail...' : 'Jelaskan masalah secara detail...'}
               rows={4}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
             />
@@ -261,22 +261,22 @@ export default function TechnicianEscalationsPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="new-esc-priority" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {id ? 'Prioritas' : 'Priority'}
+                {id ? 'Prioritas' : 'Prioritas'}
               </label>
               <select
                 id="new-esc-priority" value={priority}
                 onChange={(e) => setPriority(e.target.value as EscalationPriority)}
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
               >
-                <option value="low">{id ? 'Rendah' : 'Low'}</option>
-                <option value="medium">{id ? 'Sedang' : 'Medium'}</option>
-                <option value="high">{id ? 'Tinggi' : 'High'}</option>
-                <option value="critical">{id ? 'Kritis' : 'Critical'}</option>
+                <option value="low">{id ? 'Rendah' : 'Rendah'}</option>
+                <option value="medium">{id ? 'Sedang' : 'Sedang'}</option>
+                <option value="high">{id ? 'Tinggi' : 'Tinggi'}</option>
+                <option value="critical">{id ? 'Kritis' : 'Kritis'}</option>
               </select>
             </div>
             <div>
               <label htmlFor="new-esc-file" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {id ? 'Lampiran' : 'Attachment'}
+                {id ? 'Lampiran' : 'Lampiran'}
               </label>
               <input
                 id="new-esc-file" ref={fileRef} type="file"
@@ -287,7 +287,7 @@ export default function TechnicianEscalationsPage() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button onClick={resetForm} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600">
-              {id ? 'Batal' : 'Cancel'}
+              {id ? 'Batal' : 'Batal'}
             </button>
             <button
               onClick={handleSubmit}
@@ -295,13 +295,13 @@ export default function TechnicianEscalationsPage() {
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {createMutation.isPending
-                ? (id ? 'Mengirim...' : 'Submitting...')
-                : (id ? 'Kirim Eskalasi' : 'Submit Escalation')}
+                ? (id ? 'Mengirim...' : 'Mengirim...')
+                : (id ? 'Kirim Eskalasi' : 'Kirim Eskalasi')}
             </button>
           </div>
           {createMutation.isError && (
             <p className="text-xs text-red-600">
-              {id ? 'Gagal mengirim eskalasi. Coba lagi.' : 'Failed to submit escalation. Please try again.'}
+              {id ? 'Gagal mengirim eskalasi. Silakan coba lagi.' : 'Gagal mengirim eskalasi. Silakan coba lagi.'}
             </p>
           )}
         </div>
@@ -385,7 +385,7 @@ function EscalationCard({
           {/* Description */}
           <div>
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-              {id ? 'Deskripsi' : 'Description'}
+              {id ? 'Deskripsi' : 'Deskripsi'}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 whitespace-pre-wrap">{escalation.description}</p>
           </div>
@@ -394,7 +394,7 @@ function EscalationCard({
           {escalation.file_name && (
             <div>
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                {id ? 'Lampiran' : 'Attachment'}
+                {id ? 'Lampiran' : 'Lampiran'}
               </p>
               <p className="text-sm text-blue-600">{escalation.file_name}</p>
             </div>
@@ -404,7 +404,7 @@ function EscalationCard({
           {escalation.action_request && escalation.action_request_status && (
             <div className={`rounded-lg p-3 border ${ACTION_STATUS_CONFIG[escalation.action_request_status].bg} border-gray-200 dark:border-gray-700`}>
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                {id ? 'Permintaan Tindakan' : 'Action Request'}
+                {id ? 'Permintaan Tindakan' : 'Permintaan Tindakan'}
               </p>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -424,15 +424,15 @@ function EscalationCard({
           {escalation.status === 'resolved' && (
             <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-3">
               <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">
-                {id ? 'Resolusi' : 'Resolution'}
+                {id ? 'Resolusi' : 'Resolusi'}
               </p>
               <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                {escalation.resolution_notes ?? (id ? 'Tidak ada catatan' : 'No notes provided')}
+                {escalation.resolution_notes ?? (id ? 'Tidak ada catatan' : 'Tidak ada catatan')}
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                 {id
-                  ? `Diselesaikan oleh ${escalation.resolver_name ?? 'Unknown'} pada ${escalation.resolved_at ? formatDateTime(escalation.resolved_at, language) : '--'}`
-                  : `Resolved by ${escalation.resolver_name ?? 'Unknown'} on ${escalation.resolved_at ? formatDateTime(escalation.resolved_at, language) : '--'}`}
+                  ? `Diselesaikan oleh ${escalation.resolver_name ?? 'Tidak diketahui'} pada ${escalation.resolved_at ? formatDateTime(escalation.resolved_at, language) : '--'}`
+                  : `Diselesaikan oleh ${escalation.resolver_name ?? 'Tidak diketahui'} pada ${escalation.resolved_at ? formatDateTime(escalation.resolved_at, language) : '--'}`}
               </p>
             </div>
           )}
@@ -441,7 +441,7 @@ function EscalationCard({
           {(updates && updates.length > 0) && (
             <div>
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
-                {id ? 'Riwayat Catatan' : 'Update Thread'}
+                {id ? 'Riwayat Catatan' : 'Riwayat Catatan'}
               </p>
               <div className="space-y-2">
                 {updates.map((u) => (
@@ -451,7 +451,7 @@ function EscalationCard({
                     </div>
                     <div className="flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg p-2.5">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{u.author_name ?? 'Unknown'}</span>
+                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{u.author_name ?? 'Tidak diketahui'}</span>
                         <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatDateTime(u.created_at, language)}</span>
                       </div>
                       <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{u.message}</p>
@@ -466,12 +466,12 @@ function EscalationCard({
           {canAddUpdate && (
             <div>
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
-                {id ? 'Tambah Catatan' : 'Add Note'}
+                {id ? 'Tambah Catatan' : 'Tambah Catatan'}
               </p>
               <textarea
                 value={updateMsg}
                 onChange={(e) => setUpdateMsg(e.target.value)}
-                placeholder={id ? 'Tulis update situasi terbaru...' : 'Write the latest situation update...'}
+                placeholder={id ? 'Tulis pembaruan situasi terbaru...' : 'Tulis pembaruan situasi terbaru...'}
                 rows={2}
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
@@ -482,13 +482,13 @@ function EscalationCard({
                   className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
                   {addUpdateMutation.isPending
-                    ? (id ? 'Mengirim...' : 'Sending...')
-                    : (id ? 'Kirim Catatan' : 'Send Note')}
+                    ? (id ? 'Mengirim...' : 'Mengirim...')
+                    : (id ? 'Kirim Catatan' : 'Kirim Catatan')}
                 </button>
               </div>
               {addUpdateMutation.isError && (
                 <p className="text-xs text-red-600 mt-1">
-                  {id ? 'Gagal mengirim catatan.' : 'Failed to send note.'}
+                  {id ? 'Gagal mengirim catatan.' : 'Gagal mengirim catatan.'}
                 </p>
               )}
             </div>
@@ -505,16 +505,16 @@ function EscalationCard({
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  {id ? 'Minta Tindakan Manager' : 'Request Manager Action'}
+                  {id ? 'Minta Tindakan Manajer' : 'Minta Tindakan Manajer'}
                 </button>
               ) : (
                 <div className="border border-amber-200 dark:border-amber-700 rounded-lg p-3 bg-amber-50 dark:bg-amber-900/20 space-y-3">
                   <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-                    {id ? 'Minta Tindakan Manager' : 'Request Manager Action'}
+                    {id ? 'Minta Tindakan Manajer' : 'Minta Tindakan Manajer'}
                   </p>
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {id ? 'Jenis Tindakan' : 'Action Type'}
+                      {id ? 'Jenis Tindakan' : 'Jenis Tindakan'}
                     </label>
                     <select
                       value={actionType}
@@ -528,12 +528,12 @@ function EscalationCard({
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {id ? 'Catatan' : 'Note'} <span className="text-red-500">*</span>
+                      {id ? 'Catatan' : 'Catatan'} <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       value={actionNote}
                       onChange={(e) => setActionNote(e.target.value)}
-                      placeholder={id ? 'Jelaskan kenapa tindakan ini diperlukan...' : 'Explain why this action is needed...'}
+                      placeholder={id ? 'Jelaskan mengapa tindakan ini diperlukan...' : 'Jelaskan mengapa tindakan ini diperlukan...'}
                       rows={2}
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
                     />
@@ -543,7 +543,7 @@ function EscalationCard({
                       onClick={() => { setShowActionForm(false); setActionNote(''); }}
                       className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50"
                     >
-                      {id ? 'Batal' : 'Cancel'}
+                      {id ? 'Batal' : 'Batal'}
                     </button>
                     <button
                       onClick={handleRequestAction}
@@ -551,14 +551,14 @@ function EscalationCard({
                       className="px-3 py-1.5 text-xs font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 disabled:opacity-50"
                     >
                       {requestActionMutation.isPending
-                        ? (id ? 'Mengirim...' : 'Sending...')
-                        : (id ? 'Kirim Permintaan' : 'Send Request')}
+                        ? (id ? 'Mengirim...' : 'Mengirim...')
+                        : (id ? 'Kirim Permintaan' : 'Kirim Permintaan')}
                     </button>
                   </div>
                   {requestActionMutation.isError && (
                     <p className="text-xs text-red-600">
                       {(requestActionMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error
-                        ?? (id ? 'Gagal mengirim permintaan.' : 'Failed to send request.')}
+                        ?? (id ? 'Gagal mengirim permintaan.' : 'Gagal mengirim permintaan.')}
                     </p>
                   )}
                 </div>

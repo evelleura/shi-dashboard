@@ -491,17 +491,17 @@ export default function ProjectsPage() {
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center gap-2">
                 <span className="inline-block w-5 h-4 rounded-sm border-l-4 border-l-emerald-400 bg-emerald-50/60 dark:bg-emerald-900/20" />
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><span className="w-2 h-2 rounded-full bg-green-500" />On Track</span>
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><span className="w-2 h-2 rounded-full bg-green-500" />{language === 'id' ? 'Baik' : 'On Track'}</span>
                 <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'SPI >= 0.95, aman' : 'SPI >= 0.95, on track'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block w-5 h-4 rounded-sm border-l-4 border-l-amber-400 bg-amber-50/70 dark:bg-amber-900/25" />
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><span className="w-2 h-2 rounded-full bg-yellow-500" />Warning</span>
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><span className="w-2 h-2 rounded-full bg-yellow-500" />{language === 'id' ? 'Waspada' : 'Warning'}</span>
                 <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'SPI 0.85-0.95, waspada' : 'SPI 0.85-0.95, caution'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block w-5 h-4 rounded-sm border-l-4 border-l-red-500 bg-red-50/80 dark:bg-red-900/30" />
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><span className="w-2 h-2 rounded-full bg-red-500" />Critical</span>
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><span className="w-2 h-2 rounded-full bg-red-500" />{language === 'id' ? 'Kritis' : 'Critical'}</span>
                 <span className="text-gray-500 dark:text-gray-400">{language === 'id' ? 'SPI < 0.85, perlu tindakan' : 'SPI < 0.85, act now'}</span>
               </div>
             </div>

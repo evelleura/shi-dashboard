@@ -159,7 +159,7 @@ export default function Layout({ children }: Props) {
         className={`fixed inset-y-0 left-0 z-50 w-56 bg-slate-900 transform transition-transform duration-200 lg:translate-x-0 overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        aria-label="Main navigation"
+        aria-label="Navigasi utama"
       >
         <div className="flex flex-col h-full">
           {/* Brand */}
@@ -201,7 +201,7 @@ export default function Layout({ children }: Props) {
                     {NAV_ICONS[item.icon]}
                     {t(item.labelKey, language)}
                     {badge != null && badge > 0 && (
-                      <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center" aria-label={`${badge} open`}>
+                      <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center" aria-label={`${badge} terbuka`}>
                         {badge}
                       </span>
                     )}
@@ -232,7 +232,7 @@ export default function Layout({ children }: Props) {
               <button
                 onClick={toggle}
                 className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label={isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
               >
                 {isDark ? (
                   <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -248,8 +248,8 @@ export default function Layout({ children }: Props) {
               <button
                 onClick={toggleLanguage}
                 className="flex items-center justify-center px-2 py-1.5 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors border border-slate-700 hover:border-slate-600 min-w-[32px]"
-                aria-label={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
-                title={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
+                aria-label={language === 'id' ? 'Ganti ke Bahasa Inggris' : 'Ganti ke Bahasa Indonesia'}
+                title={language === 'id' ? 'Ganti ke Bahasa Inggris' : 'Ganti ke Bahasa Indonesia'}
               >
                 {language === 'id' ? 'ID' : 'EN'}
               </button>
@@ -296,7 +296,7 @@ export default function Layout({ children }: Props) {
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              aria-label="Open sidebar"
+              aria-label="Buka bilah samping"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -309,8 +309,8 @@ export default function Layout({ children }: Props) {
               <button
                 onClick={() => window.location.reload()}
                 className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                aria-label="Reload page"
-                title="Reload page"
+                aria-label="Muat ulang halaman"
+                title="Muat ulang halaman"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

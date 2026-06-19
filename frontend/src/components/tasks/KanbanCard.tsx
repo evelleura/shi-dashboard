@@ -46,7 +46,7 @@ export default function KanbanCard({
     <div
       className={`relative bg-white dark:bg-gray-800 rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow ${borderClass}`}
       role="listitem"
-      aria-label={`Task: ${task.name}`}
+      aria-label={`Tugas: ${task.name}`}
     >
       {sequenceNum != null && (
         <span className="absolute top-2.5 right-2.5 text-[10px] font-bold text-gray-400 dark:text-gray-500">#{sequenceNum}</span>

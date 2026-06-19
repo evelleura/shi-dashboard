@@ -5,7 +5,7 @@ interface Props {
 
 export default function ViewToggle({ view, onChange }: Props) {
   return (
-    <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-50 dark:bg-gray-800" role="radiogroup" aria-label="View toggle">
+    <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-50 dark:bg-gray-800" role="radiogroup" aria-label="Pilih tampilan">
       <button
         role="radio"
         aria-checked={view === 'kanban'}
@@ -34,7 +34,7 @@ export default function ViewToggle({ view, onChange }: Props) {
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
         </svg>
-        Table
+        Tabel
       </button>
     </div>
   );

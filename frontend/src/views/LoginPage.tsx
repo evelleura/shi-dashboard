@@ -90,14 +90,14 @@ export default function LoginPage() {
           <div className="w-12 h-1 bg-blue-300/60 rounded-full mx-auto mb-6" />
 
           <p className="text-blue-100/80 dark:text-blue-200/60 text-sm leading-relaxed mb-8">
-            Project Management Dashboard dengan monitoring proyek real-time,
-            Schedule Performance Index (SPI), dan Early Warning System untuk
+            Dashboard Manajemen Proyek dengan pemantauan proyek real-time,
+            Schedule Performance Index (SPI), dan Sistem Peringatan Dini untuk
             pengelolaan proyek smart home yang efisien.
           </p>
 
           {/* Feature pills */}
           <div className="flex flex-wrap justify-center gap-2">
-            {['Real-time SPI', 'Kanban Board', '8 Chart Types', 'EWS Alert'].map((f) => (
+            {['SPI Real-time', 'Papan Kanban', '8 Jenis Grafik', 'Peringatan EWS'].map((f) => (
               <span
                 key={f}
                 className="px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm border border-white/20 text-blue-100"

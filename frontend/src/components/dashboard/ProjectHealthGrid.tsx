@@ -1,7 +1,6 @@
 import type { DashboardProject } from '../../types';
 import ProjectCard from './ProjectCard';
 import EmptyState from '../ui/EmptyState';
-import { a } from 'vitest/dist/chunks/suite.B2jumIFP.js'
 
 interface Props {
   projects: DashboardProject[];
@@ -14,7 +13,7 @@ export default function ProjectHealthGrid({ projects, filter }: Props) {
     : projects;
 
   if (filtered.length === 0) {
-    return <EmptyState title="No projects found" description="Try changing the filter or create a new project." />;
+    return <EmptyState title="Tidak ada proyek ditemukan" description="Coba ubah filter atau buat proyek baru." />;
   }
 
   return (

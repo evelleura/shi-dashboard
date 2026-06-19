@@ -69,10 +69,10 @@ function TimeSpentDisplay({ task }: { task: Task }) {
 }
 
 const AGE_LEGEND: { key: RowAge; label: string; dot: string }[] = [
-  { key: 'new',    label: 'New (< 24h)',   dot: 'bg-blue-400' },
-  { key: 'recent', label: 'Recent (< 7d)', dot: 'bg-emerald-300' },
+  { key: 'new',    label: 'Baru (< 24 jam)',   dot: 'bg-blue-400' },
+  { key: 'recent', label: 'Terkini (< 7 hari)', dot: 'bg-emerald-300' },
   { key: 'normal', label: 'Normal',        dot: 'bg-gray-400' },
-  { key: 'stale',  label: 'Stale (no progress)', dot: 'bg-gray-300' },
+  { key: 'stale',  label: 'Mangkrak (tanpa kemajuan)', dot: 'bg-gray-300' },
 ];
 
 const PAGE_SIZES = [10, 25, 50];
@@ -151,19 +151,19 @@ export default function TaskTable({
 
   const handleExport = useCallback(() => {
     const rows = sorted.map((taskRow) => ({
-      'Task': taskRow.name,
-      'Description': taskRow.description ?? '',
-      ...(showProject ? { 'Project': taskRow.project_name ?? '' } : {}),
+      'Tugas': taskRow.name,
+      'Deskripsi': taskRow.description ?? '',
+      ...(showProject ? { 'Proyek': taskRow.project_name ?? '' } : {}),
       'Status': taskRow.status,
-      'Assignee': taskRow.assigned_to_name ?? '',
-      'Due Date': taskRow.due_date ? formatDate(taskRow.due_date, language) : '',
-      'Est. Hours': taskRow.estimated_hours ?? '',
-      'Time Spent': formatTimeSpent(Number(taskRow.time_spent_seconds) || 0),
-      'Evidence': taskRow.evidence_count ?? 0,
+      'Penugasan': taskRow.assigned_to_name ?? '',
+      'Tenggat Waktu': taskRow.due_date ? formatDate(taskRow.due_date, language) : '',
+      'Estimasi Jam': taskRow.estimated_hours ?? '',
+      'Waktu Terpakai': formatTimeSpent(Number(taskRow.time_spent_seconds) || 0),
+      'Bukti': taskRow.evidence_count ?? 0,
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+    XLSX.utils.book_append_sheet(wb, ws, 'Tugas');
     XLSX.writeFile(wb, 'tasks.xlsx');
   }, [sorted, showProject]);
 
@@ -208,7 +208,7 @@ export default function TaskTable({
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          Export Excel
+          Ekspor Excel
         </button>
       </div>
 
@@ -224,7 +224,7 @@ export default function TaskTable({
               <SortHeader label={t('label.status', language)} field="status" />
               <SortHeader label={t('label.assignee', language)} field="assigned_to_name" />
               <SortHeader label={t('label.due_date', language)} field="due_date" />
-              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Est.</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estimasi</th>
               <SortHeader label={language === 'id' ? 'Waktu' : 'Time'} field="time" />
               <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{language === 'id' ? 'Bukti' : 'Evidence'}</th>
             </tr>
@@ -291,13 +291,13 @@ export default function TaskTable({
                         )}
                       </div>
                       {urgency === 'overtime' && (
-                        <span className="shrink-0 text-[10px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">OT</span>
+                        <span className="shrink-0 text-[10px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">LBR</span>
                       )}
                       {urgency === 'over_deadline' && (
-                        <span className="shrink-0 text-[10px] font-medium text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full">OD</span>
+                        <span className="shrink-0 text-[10px] font-medium text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full">TLB</span>
                       )}
                       {age === 'new' && !urgency && (
-                        <span className="shrink-0 text-[10px] font-medium text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full">NEW</span>
+                        <span className="shrink-0 text-[10px] font-medium text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full">BARU</span>
                       )}
                     </div>
                   </td>

@@ -225,7 +225,7 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, changi
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" role="region" aria-label="Kanban board">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" role="region" aria-label="Papan Kanban">
         {COLUMNS.map((col) => {
           const colTasks = grouped[col.id];
           const isOver = overColumnId === col.id && activeTask !== null;

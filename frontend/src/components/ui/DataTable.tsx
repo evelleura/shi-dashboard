@@ -77,10 +77,10 @@ const AGE_COLORS: Record<RowAge, string> = {
 };
 
 const AGE_LEGEND: { key: RowAge; label: string; dot: string }[] = [
-  { key: 'new',    label: 'New (< 24h)',   dot: 'bg-blue-400' },
-  { key: 'recent', label: 'Recent (< 7d)', dot: 'bg-emerald-300' },
+  { key: 'new',    label: 'Baru (< 24 jam)',   dot: 'bg-blue-400' },
+  { key: 'recent', label: 'Terkini (< 7 hari)', dot: 'bg-emerald-300' },
   { key: 'normal', label: 'Normal',        dot: 'bg-gray-400' },
-  { key: 'stale',  label: 'Stale (no progress)', dot: 'bg-gray-300' },
+  { key: 'stale',  label: 'Tertahan (tanpa kemajuan)', dot: 'bg-gray-300' },
 ];
 
 // Stripe + wash latar baris. Token -> warna; pemanggil memetakan maknanya.
@@ -116,7 +116,7 @@ export default function DataTable<T>({
   showExport = true,
   footer,
   actionColumn,
-  emptyMessage = 'No data found.',
+  emptyMessage = 'Belum ada data.',
   className = '',
 }: DataTableProps<T>) {
 
@@ -231,7 +231,7 @@ export default function DataTable<T>({
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-          <span>{sorted.length} row{sorted.length !== 1 ? 's' : ''}</span>
+          <span>{sorted.length} baris</span>
           {rowAge && !rowStripe && (
             <div className="hidden sm:flex items-center gap-3">
               <span className="text-gray-300">|</span>
@@ -250,12 +250,12 @@ export default function DataTable<T>({
               <button
                 onClick={() => setShowColumnMenu((v) => !v)}
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 transition-colors"
-                aria-label="Toggle columns"
+                aria-label="Atur kolom"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
                 </svg>
-                Columns
+                Kolom
                 <span className="text-gray-400 dark:text-gray-500">{visibleColumns.length}/{toggleableColumns.length}</span>
               </button>
               {showColumnMenu && (
@@ -268,14 +268,14 @@ export default function DataTable<T>({
                         onClick={showAllColumns}
                         className="text-[10px] font-medium text-blue-600 dark:text-blue-400 hover:underline"
                       >
-                        Show All
+                        Tampilkan Semua
                       </button>
                       <span className="text-gray-300 dark:text-gray-600 text-[10px]">|</span>
                       <button
                         onClick={hideOptionalColumns}
                         className="text-[10px] font-medium text-gray-500 dark:text-gray-400 hover:underline"
                       >
-                        Reset
+                        Atur Ulang
                       </button>
                     </div>
                     {toggleableColumns.map((col) => (
@@ -305,7 +305,7 @@ export default function DataTable<T>({
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Export Excel
+              Ekspor Excel
             </button>
           )}
         </div>
@@ -395,7 +395,7 @@ export default function DataTable<T>({
       {sorted.length > pageSizeOptions[0] && (
         <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <span>Show</span>
+            <span>Tampilkan</span>
             <select
               value={pageSize}
               onChange={(e) => handlePageSize(Number(e.target.value))}
@@ -405,14 +405,14 @@ export default function DataTable<T>({
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
-            <span>per page</span>
+            <span>per halaman</span>
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(0)}
               disabled={safePage === 0}
               className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="First page"
+              aria-label="Halaman pertama"
             >
               &laquo;
             </button>
@@ -420,7 +420,7 @@ export default function DataTable<T>({
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={safePage === 0}
               className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Previous page"
+              aria-label="Halaman sebelumnya"
             >
               &lsaquo;
             </button>
@@ -431,7 +431,7 @@ export default function DataTable<T>({
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage >= totalPages - 1}
               className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Next page"
+              aria-label="Halaman berikutnya"
             >
               &rsaquo;
             </button>
@@ -439,7 +439,7 @@ export default function DataTable<T>({
               onClick={() => setPage(totalPages - 1)}
               disabled={safePage >= totalPages - 1}
               className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Last page"
+              aria-label="Halaman terakhir"
             >
               &raquo;
             </button>

@@ -12,7 +12,7 @@ function SearchIcon() {
 
 function SpinnerIcon() {
   return (
-    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 shrink-0" aria-label="Searching..." />
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 shrink-0" aria-label="Mencari..." />
   );
 }
 
@@ -47,9 +47,9 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  project: 'Projects',
-  task: 'Tasks',
-  client: 'Clients',
+  project: 'Proyek',
+  task: 'Tugas',
+  client: 'Klien',
 };
 
 const TYPE_LABEL_COLORS: Record<string, string> = {
@@ -134,9 +134,9 @@ export default function GlobalSearchBar() {
             if (debouncedQuery.length >= 2) setOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Search projects, tasks, clients..."
+          placeholder="Cari proyek, tugas, klien..."
           className="flex-1 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 bg-transparent outline-none"
-          aria-label="Global search"
+          aria-label="Pencarian global"
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls="global-search-dropdown"
@@ -187,11 +187,11 @@ export default function GlobalSearchBar() {
           ) : isFetching ? (
             <div className="flex items-center justify-center py-6 gap-2 text-sm text-gray-400 dark:text-gray-500">
               <SpinnerIcon />
-              <span>Searching...</span>
+              <span>Mencari...</span>
             </div>
           ) : (
             <div className="py-6 text-center text-sm text-gray-400 dark:text-gray-500">
-              No results for &ldquo;{debouncedQuery}&rdquo;
+              Tidak ada hasil untuk &ldquo;{debouncedQuery}&rdquo;
             </div>
           )}
         </div>

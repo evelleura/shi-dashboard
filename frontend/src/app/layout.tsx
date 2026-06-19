@@ -4,7 +4,7 @@ import Providers from './providers';
 
 export const metadata: Metadata = {
   title: 'SHI Dashboard',
-  description: 'PT Smart Home Inovasi - Project Management Dashboard',
+  description: 'PT Smart Home Inovasi - Dashboard Manajemen Proyek',
   // Set favicon lengkap di public/ (favicon.ico + svg + png + apple + manifest).
   // Next.js menyuntik <link> yang sesuai ke <head>.
   icons: {

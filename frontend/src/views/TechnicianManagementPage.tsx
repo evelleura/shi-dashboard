@@ -85,9 +85,14 @@ function HealthBadge({ status }: { status: string | null }) {
     amber: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
     red: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
   };
+  const labels: Record<string, string> = {
+    green: 'Baik',
+    amber: 'Waspada',
+    red: 'Kritis',
+  };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${colors[status] ?? 'bg-gray-100 text-gray-600'}`}>
-      {status}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[status] ?? 'bg-gray-100 text-gray-600'}`}>
+      {labels[status] ?? status}
     </span>
   );
 }
@@ -158,7 +163,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       },
       {
         key: 'name',
-        label: 'Name',
+        label: 'Nama',
         render: (t) => (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -175,7 +180,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       },
       {
         key: 'project_count',
-        label: 'Projects',
+        label: 'Proyek',
         render: (t) => (
           <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{t.project_count}</span>
         ),
@@ -184,11 +189,11 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       },
       {
         key: 'total_tasks',
-        label: 'Tasks',
+        label: 'Tugas',
         render: (t) => (
           <div className="text-sm">
             <span className="text-gray-700 dark:text-gray-300 font-medium">{t.completed_tasks}/{t.total_tasks}</span>
-            <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">done</span>
+            <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">selesai</span>
           </div>
         ),
         sortValue: (t) => t.total_tasks,
@@ -196,7 +201,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       },
       {
         key: 'active_tasks',
-        label: 'Active',
+        label: 'Aktif',
         render: (t) => (
           <span className={`text-sm font-medium ${t.active_tasks > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>
             {t.active_tasks}
@@ -207,7 +212,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       },
       {
         key: 'overdue_tasks',
-        label: 'Overdue',
+        label: 'Terlambat',
         render: (t) => (
           <span className={`text-sm font-medium ${t.overdue_tasks > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400'}`}>
             {t.overdue_tasks}
@@ -218,7 +223,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       },
       {
         key: 'total_time_seconds',
-        label: 'Time Logged',
+        label: 'Waktu Tercatat',
         render: (t) => (
           <span className="text-sm text-gray-600 dark:text-gray-400">{formatTime(t.total_time_seconds)}</span>
         ),
@@ -227,7 +232,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       },
       {
         key: 'evidence_count',
-        label: 'Evidence',
+        label: 'Bukti',
         render: (t) => (
           <span className="text-sm text-gray-600 dark:text-gray-400">{t.evidence_count}</span>
         ),
@@ -242,9 +247,9 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
 
   const handleCreate = async () => {
     setCreateError('');
-    if (!createForm.name.trim()) { setCreateError('Name is required.'); return; }
-    if (!createForm.email.trim()) { setCreateError('Email is required.'); return; }
-    if (createForm.password.length < 6) { setCreateError('Password must be at least 6 characters.'); return; }
+    if (!createForm.name.trim()) { setCreateError('Nama wajib diisi.'); return; }
+    if (!createForm.email.trim()) { setCreateError('Email wajib diisi.'); return; }
+    if (createForm.password.length < 6) { setCreateError('Password minimal 6 karakter.'); return; }
 
     try {
       await createMutation.mutateAsync({
@@ -256,7 +261,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       setCreateForm({ name: '', email: '', password: '' });
       setShowCreate(false);
     } catch (err: unknown) {
-      setCreateError(err instanceof Error ? err.message : 'Failed to create technician.');
+      setCreateError(err instanceof Error ? err.message : 'Gagal membuat teknisi.');
     }
   };
 
@@ -269,8 +274,8 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
   const handleUpdate = async () => {
     if (!editTech) return;
     setEditError('');
-    if (!editForm.name.trim()) { setEditError('Name is required.'); return; }
-    if (!editForm.email.trim()) { setEditError('Email is required.'); return; }
+    if (!editForm.name.trim()) { setEditError('Nama wajib diisi.'); return; }
+    if (!editForm.email.trim()) { setEditError('Email wajib diisi.'); return; }
 
     try {
       await updateMutation.mutateAsync({
@@ -279,7 +284,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       });
       setEditTech(null);
     } catch (err: unknown) {
-      setEditError(err instanceof Error ? err.message : 'Failed to update.');
+      setEditError(err instanceof Error ? err.message : 'Gagal memperbarui.');
     }
   };
 
@@ -301,12 +306,12 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
   const handleResetPassword = async () => {
     if (!resetTargetId) return;
     setResetError('');
-    if (newPassword.length < 6) { setResetError('Min 6 characters.'); return; }
+    if (newPassword.length < 6) { setResetError('Minimal 6 karakter.'); return; }
     try {
       await resetMutation.mutateAsync({ id: resetTargetId, password: newPassword });
       setShowResetModal(false);
     } catch (err: unknown) {
-      setResetError(err instanceof Error ? err.message : 'Failed to reset.');
+      setResetError(err instanceof Error ? err.message : 'Gagal mengatur ulang.');
     }
   };
 
@@ -321,7 +326,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
   }
 
   if (isError) {
-    return <p className="text-center text-red-500 text-sm py-16">Failed to load technicians.</p>;
+    return <p className="text-center text-red-500 text-sm py-16">Gagal memuat data teknisi.</p>;
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -331,9 +336,9 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Technician Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Manajemen Teknisi</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {technicians.length} technician{technicians.length !== 1 ? 's' : ''} registered
+            {technicians.length} teknisi terdaftar
           </p>
         </div>
         <button
@@ -343,7 +348,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          Add Technician
+          Tambah Teknisi
         </button>
       </div>
 
@@ -351,20 +356,20 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       <div className="flex gap-3">
         <input
           type="search"
-          placeholder="Search by name or email..."
+          placeholder="Cari berdasarkan nama atau email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-72 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
-          aria-label="Search technicians"
+          aria-label="Cari teknisi"
         />
       </div>
 
       {/* Table */}
       {filtered.length === 0 && technicians.length === 0 ? (
         <EmptyState
-          title="No technicians found"
-          description="Add the first technician to get started."
-          action={{ label: '+ Add Technician', onClick: () => { setShowCreate(true); } }}
+          title="Belum ada teknisi"
+          description="Tambahkan teknisi pertama untuk memulai."
+          action={{ label: '+ Tambah Teknisi', onClick: () => { setShowCreate(true); } }}
         />
       ) : (
         <DataTable<TechnicianRow>
@@ -375,16 +380,16 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
           defaultSortKey="name"
           defaultSortDesc={false}
           exportFileName="technicians"
-          emptyMessage="No technicians match your search."
+          emptyMessage="Tidak ada teknisi yang cocok dengan pencarian Anda."
           actionColumn={{
-            label: 'Actions',
+            label: 'Aksi',
             render: (t) => (
               <div className="flex items-center gap-2">
                 <button
                   onClick={(e) => { e.stopPropagation(); setSelectedId(t.id); }}
                   className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors"
-                  aria-label={`View ${t.name}`}
-                  title="View detail"
+                  aria-label={`Lihat ${t.name}`}
+                  title="Lihat detail"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -395,7 +400,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                   onClick={(e) => { e.stopPropagation(); openEdit(t); }}
                   className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                   aria-label={`Edit ${t.name}`}
-                  title="Edit"
+                  title="Ubah"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -404,8 +409,8 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                 <button
                   onClick={(e) => { e.stopPropagation(); openResetPassword(t.id, t.name); }}
                   className="text-amber-500 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors"
-                  aria-label={`Reset password for ${t.name}`}
-                  title="Reset password"
+                  aria-label={`Atur ulang password untuk ${t.name}`}
+                  title="Atur ulang password"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -415,8 +420,8 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                   <button
                     onClick={(e) => { e.stopPropagation(); setDeleteId(t.id); }}
                     className="text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    aria-label={`Delete ${t.name}`}
-                    title="Delete"
+                    aria-label={`Hapus ${t.name}`}
+                    title="Hapus"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -433,7 +438,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       <Modal
         open={selectedId !== null}
         onClose={() => setSelectedId(null)}
-        title={techDetail ? `Technician: ${techDetail.name}` : 'Technician Detail'}
+        title={techDetail ? `Teknisi: ${techDetail.name}` : 'Detail Teknisi'}
         maxWidth="max-w-4xl"
       >
         {detailLoading ? (
@@ -451,7 +456,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{techDetail.name}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{techDetail.email}</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Joined {techDetail.created_at ? formatDate(techDetail.created_at) : '--'}
+                  Bergabung {techDetail.created_at ? formatDate(techDetail.created_at) : '--'}
                 </p>
               </div>
             </div>
@@ -460,32 +465,32 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{techDetail.task_stats.total}</p>
-                <p className="text-xs text-blue-600 dark:text-blue-500">Total Tasks</p>
+                <p className="text-xs text-blue-600 dark:text-blue-500">Total Tugas</p>
               </div>
               <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{techDetail.task_stats.done}</p>
-                <p className="text-xs text-emerald-600 dark:text-emerald-500">Completed</p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-500">Selesai</p>
               </div>
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-red-700 dark:text-red-400">{techDetail.task_stats.overdue}</p>
-                <p className="text-xs text-red-600 dark:text-red-500">Overdue</p>
+                <p className="text-xs text-red-600 dark:text-red-500">Terlambat</p>
               </div>
               <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{formatTime(techDetail.task_stats.total_time_seconds)}</p>
-                <p className="text-xs text-purple-600 dark:text-purple-500">Time Logged</p>
+                <p className="text-xs text-purple-600 dark:text-purple-500">Waktu Tercatat</p>
               </div>
             </div>
 
             {/* Task status breakdown */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Task Breakdown</h4>
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Rincian Tugas</h4>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: 'To Do', value: techDetail.task_stats.to_do, color: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' },
-                  { label: 'In Progress', value: techDetail.task_stats.in_progress, color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' },
-                  { label: 'Working', value: techDetail.task_stats.working_on_it, color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' },
-                  { label: 'Review', value: techDetail.task_stats.review, color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' },
-                  { label: 'Done', value: techDetail.task_stats.done, color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' },
+                  { label: 'Belum Mulai', value: techDetail.task_stats.to_do, color: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' },
+                  { label: 'Dalam Proses', value: techDetail.task_stats.in_progress, color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' },
+                  { label: 'Sedang Dikerjakan', value: techDetail.task_stats.working_on_it, color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' },
+                  { label: 'Tinjauan', value: techDetail.task_stats.review, color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' },
+                  { label: 'Selesai', value: techDetail.task_stats.done, color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' },
                 ].map((s) => (
                   <span key={s.label} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${s.color}`}>
                     {s.label}
@@ -499,7 +504,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
             {techDetail.task_stats.total > 0 && (
               <div>
                 <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                  <span>Completion Rate</span>
+                  <span>Tingkat Penyelesaian</span>
                   <span>{Math.round((techDetail.task_stats.done / techDetail.task_stats.total) * 100)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
@@ -515,17 +520,17 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
             {techDetail.projects.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Assigned Projects ({techDetail.projects.length})
+                  Proyek yang Ditugaskan ({techDetail.projects.length})
                 </h4>
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 dark:bg-gray-800">
-                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Project</th>
-                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Client</th>
-                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Health</th>
-                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tasks</th>
-                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Phase</th>
+                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Proyek</th>
+                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Klien</th>
+                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kesehatan</th>
+                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tugas</th>
+                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fase</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -545,12 +550,12 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                             {p.my_completed}/{p.my_tasks}
                           </td>
                           <td className="px-3 py-2 text-center">
-                            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${
+                            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
                               p.phase === 'execution'
                                 ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                                 : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                             }`}>
-                              {p.phase}
+                              {p.phase === 'execution' ? 'Pengerjaan' : 'Survei'}
                             </span>
                           </td>
                         </tr>
@@ -565,17 +570,17 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
             {techDetail.recent_tasks.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Recent Tasks
+                  Tugas Terbaru
                 </h4>
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 dark:bg-gray-800">
-                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Task</th>
-                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Project</th>
+                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tugas</th>
+                        <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Proyek</th>
                         <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
-                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Due</th>
-                        <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Time</th>
+                        <th className="text-center px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tenggat</th>
+                        <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Waktu</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -619,17 +624,17 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
-                {techDetail.evidence_count} evidence files uploaded
+                {techDetail.evidence_count} berkas bukti diunggah
               </span>
             </div>
           </div>
         ) : (
-          <p className="text-center text-gray-500 py-8">Technician not found.</p>
+          <p className="text-center text-gray-500 py-8">Teknisi tidak ditemukan.</p>
         )}
       </Modal>
 
       {/* ── Create Technician Modal ──────────────────────────────────────────── */}
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Add New Technician">
+      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Tambah Teknisi Baru">
         <div className="space-y-4">
           {createError && (
             <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">
@@ -637,13 +642,13 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
             </p>
           )}
           <div>
-            <label htmlFor="tech-name" className={LABEL_CLASS}>Name *</label>
+            <label htmlFor="tech-name" className={LABEL_CLASS}>Nama *</label>
             <input
               id="tech-name"
               type="text"
               value={createForm.name}
               onChange={(e) => setCreateForm((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Full name"
+              placeholder="Nama lengkap"
               className={INPUT_CLASS}
             />
           </div>
@@ -654,7 +659,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
               type="email"
               value={createForm.email}
               onChange={(e) => setCreateForm((p) => ({ ...p, email: e.target.value }))}
-              placeholder="tech@example.com"
+              placeholder="teknisi@contoh.co.id"
               className={INPUT_CLASS}
             />
           </div>
@@ -665,27 +670,27 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
               type="password"
               value={createForm.password}
               onChange={(e) => setCreateForm((p) => ({ ...p, password: e.target.value }))}
-              placeholder="Min 6 characters"
+              placeholder="Minimal 6 karakter"
               minLength={6}
               className={INPUT_CLASS}
             />
           </div>
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            Role will be set to <span className="font-medium text-green-600 dark:text-green-400">Technician</span> automatically.
+            Peran akan otomatis diatur menjadi <span className="font-medium text-green-600 dark:text-green-400">Teknisi</span>.
           </p>
           <div className="flex gap-3 pt-2">
             <button
               onClick={() => setShowCreate(false)}
               className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancel
+              Batal
             </button>
             <button
               onClick={handleCreate}
               disabled={createMutation.isPending}
               className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
             >
-              {createMutation.isPending ? 'Creating...' : 'Create Technician'}
+              {createMutation.isPending ? 'Membuat...' : 'Buat Teknisi'}
             </button>
           </div>
         </div>
@@ -695,7 +700,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       <Modal
         open={editTech !== null}
         onClose={() => setEditTech(null)}
-        title={`Edit Technician — ${editTech?.name ?? ''}`}
+        title={`Ubah Teknisi — ${editTech?.name ?? ''}`}
       >
         <div className="space-y-4">
           {editError && (
@@ -704,7 +709,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
             </p>
           )}
           <div>
-            <label htmlFor="edit-tech-name" className={LABEL_CLASS}>Name *</label>
+            <label htmlFor="edit-tech-name" className={LABEL_CLASS}>Nama *</label>
             <input
               id="edit-tech-name"
               type="text"
@@ -728,14 +733,14 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
               onClick={() => setEditTech(null)}
               className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancel
+              Batal
             </button>
             <button
               onClick={handleUpdate}
               disabled={updateMutation.isPending}
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
             >
-              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+              {updateMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
             </button>
           </div>
         </div>
@@ -745,7 +750,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
       <Modal
         open={showResetModal}
         onClose={() => setShowResetModal(false)}
-        title={`Reset Password — ${resetTargetName}`}
+        title={`Atur Ulang Password — ${resetTargetName}`}
         maxWidth="max-w-sm"
       >
         <div className="space-y-4">
@@ -755,13 +760,13 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
             </p>
           )}
           <div>
-            <label htmlFor="reset-tech-pw" className={LABEL_CLASS}>New Password *</label>
+            <label htmlFor="reset-tech-pw" className={LABEL_CLASS}>Password Baru *</label>
             <input
               id="reset-tech-pw"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min 6 characters"
+              placeholder="Minimal 6 karakter"
               minLength={6}
               className={INPUT_CLASS}
               autoFocus
@@ -772,14 +777,14 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
               onClick={() => setShowResetModal(false)}
               className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancel
+              Batal
             </button>
             <button
               onClick={handleResetPassword}
               disabled={resetMutation.isPending}
               className="flex-1 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
             >
-              {resetMutation.isPending ? 'Resetting...' : 'Reset Password'}
+              {resetMutation.isPending ? 'Mengatur ulang...' : 'Atur Ulang Password'}
             </button>
           </div>
         </div>
@@ -790,9 +795,9 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
         open={deleteId !== null}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Delete Technician"
-        message="Are you sure you want to delete this technician? Their task assignments will be unlinked. This cannot be undone."
-        confirmLabel="Delete"
+        title="Hapus Teknisi"
+        message="Apakah Anda yakin ingin menghapus teknisi ini? Penugasan tugasnya akan dilepaskan. Tindakan ini tidak dapat dibatalkan."
+        confirmLabel="Hapus"
         variant="danger"
         loading={deleteMutation.isPending}
       />

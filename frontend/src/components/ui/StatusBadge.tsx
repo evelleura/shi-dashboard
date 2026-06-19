@@ -6,9 +6,9 @@ interface Props {
 }
 
 const config: Record<HealthStatus, { bg: string; text: string; label: string; dot: string }> = {
-  green: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-400', label: 'On Track', dot: 'bg-green-500' },
-  amber: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-400', label: 'Warning', dot: 'bg-yellow-500' },
-  red: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-400', label: 'Critical', dot: 'bg-red-500' },
+  green: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-400', label: 'Baik', dot: 'bg-green-500' },
+  amber: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-400', label: 'Waspada', dot: 'bg-yellow-500' },
+  red: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-400', label: 'Kritis', dot: 'bg-red-500' },
 };
 
 export default function StatusBadge({ status, showLabel = true }: Props) {

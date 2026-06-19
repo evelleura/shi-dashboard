@@ -4,9 +4,9 @@ import { useProjects } from '../hooks/useProjects';
 import type { DashboardProject } from '../types';
 
 const HEALTH_COLORS: Record<string, { bar: string; text: string; label: string }> = {
-  red:   { bar: 'bg-red-500',    text: 'text-red-700 dark:text-red-400',    label: 'Critical' },
-  amber: { bar: 'bg-amber-400',  text: 'text-amber-700 dark:text-amber-400', label: 'Warning' },
-  green: { bar: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', label: 'On Track' },
+  red:   { bar: 'bg-red-500',    text: 'text-red-700 dark:text-red-400',    label: 'Kritis' },
+  amber: { bar: 'bg-amber-400',  text: 'text-amber-700 dark:text-amber-400', label: 'Waspada' },
+  green: { bar: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', label: 'Baik' },
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -14,6 +14,13 @@ const STATUS_STYLES: Record<string, string> = {
   completed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
   'on-hold': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
   cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  active:    'Aktif',
+  completed: 'Selesai',
+  'on-hold': 'Ditunda',
+  cancelled: 'Dibatalkan',
 };
 
 function formatShort(d: string) {
@@ -91,15 +98,15 @@ export default function ProjectTimelinePage() {
   }
 
   if (isError) {
-    return <p className="text-center text-red-500 text-sm py-16">Failed to load projects.</p>;
+    return <p className="text-center text-red-500 text-sm py-16">Gagal memuat data proyek.</p>;
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Project Timeline</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Visual overview of all project schedules and health status</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Linimasa Proyek</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Ikhtisar visual jadwal dan status kesehatan seluruh proyek</p>
       </div>
 
       {/* Filters */}
@@ -109,18 +116,18 @@ export default function ProjectTimelinePage() {
           onChange={(e) => setFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-          <option value="on-hold">On Hold</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="all">Semua Status</option>
+          <option value="active">Aktif</option>
+          <option value="completed">Selesai</option>
+          <option value="on-hold">Ditunda</option>
+          <option value="cancelled">Dibatalkan</option>
         </select>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Category</option>
+          <option value="all">Semua Kategori</option>
           <option value="instalasi">Instalasi</option>
           <option value="maintenance">Maintenance</option>
           <option value="perbaikan">Perbaikan</option>
@@ -132,7 +139,7 @@ export default function ProjectTimelinePage() {
         </select>
 
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">
-          {([['start', 'Start Date'], ['end', 'End Date'], ['health', 'Health']] as const).map(([val, label]) => (
+          {([['start', 'Tanggal Mulai'], ['end', 'Tanggal Selesai'], ['health', 'Kesehatan']] as const).map(([val, label]) => (
             <button
               key={val}
               onClick={() => setSortBy(val)}
@@ -149,10 +156,10 @@ export default function ProjectTimelinePage() {
 
         {/* Legend */}
         <div className="flex items-center gap-3 ml-auto text-xs text-gray-500 dark:text-gray-400">
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> On Track</span>
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-400" /> Warning</span>
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-red-500" /> Critical</span>
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-gray-300 dark:bg-gray-600" /> No Data</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Baik</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-400" /> Waspada</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-red-500" /> Kritis</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-gray-300 dark:bg-gray-600" /> Tanpa Data</span>
         </div>
       </div>
 
@@ -178,7 +185,7 @@ export default function ProjectTimelinePage() {
         {/* Project rows */}
         {filtered.length === 0 ? (
           <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">
-            No projects match the filter.
+            Tidak ada proyek yang cocok dengan filter.
           </div>
         ) : (
           <div className="divide-y divide-gray-50 dark:divide-gray-700/50">
@@ -204,7 +211,7 @@ export default function ProjectTimelinePage() {
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-mono text-gray-400 dark:text-gray-500">{p.project_code}</span>
                       <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${STATUS_STYLES[p.status] ?? ''}`}>
-                        {p.status === 'on-hold' ? 'Hold' : p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                        {STATUS_LABELS[p.status] ?? p.status}
                       </span>
                     </div>
                     <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -214,7 +221,7 @@ export default function ProjectTimelinePage() {
                       {formatShort(p.start_date)} — {formatShort(p.end_date)}
                       {p.status === 'active' && (
                         <span className={isOverdue ? ' text-red-500 font-medium' : ''}>
-                          {isOverdue ? ` (${Math.abs(daysLeft)}d overdue)` : ` (${daysLeft}d left)`}
+                          {isOverdue ? ` (terlambat ${Math.abs(daysLeft)} hari)` : ` (${daysLeft} hari lagi)`}
                         </span>
                       )}
                     </p>
@@ -227,7 +234,7 @@ export default function ProjectTimelinePage() {
                       className="absolute top-0 bottom-0 w-px bg-blue-400/50 dark:bg-blue-500/40 z-10"
                       style={{ left: `${todayOffset}%` }}
                     >
-                      <div className="absolute -top-0.5 -translate-x-1/2 text-[8px] text-blue-500 font-medium">Today</div>
+                      <div className="absolute -top-0.5 -translate-x-1/2 text-[8px] text-blue-500 font-medium">Hari Ini</div>
                     </div>
 
                     {/* Bar */}
@@ -251,7 +258,7 @@ export default function ProjectTimelinePage() {
                       {/* Bar label */}
                       <div className="absolute inset-0 flex items-center px-2 overflow-hidden">
                         <span className="text-[10px] font-medium text-white truncate drop-shadow-sm">
-                          {p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks} tasks` : ''}
+                          {p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks} tugas` : ''}
                           {p.spi_value != null ? ` · SPI ${Number(p.spi_value).toFixed(2)}` : ''}
                         </span>
                       </div>
@@ -267,10 +274,10 @@ export default function ProjectTimelinePage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Projects', value: filtered.length, color: 'text-blue-600' },
-          { label: 'On Track', value: filtered.filter((p) => p.health_status === 'green').length, color: 'text-emerald-600' },
-          { label: 'Warning', value: filtered.filter((p) => p.health_status === 'amber').length, color: 'text-amber-600' },
-          { label: 'Critical', value: filtered.filter((p) => p.health_status === 'red').length, color: 'text-red-600' },
+          { label: 'Total Proyek', value: filtered.length, color: 'text-blue-600' },
+          { label: 'Baik', value: filtered.filter((p) => p.health_status === 'green').length, color: 'text-emerald-600' },
+          { label: 'Waspada', value: filtered.filter((p) => p.health_status === 'amber').length, color: 'text-amber-600' },
+          { label: 'Kritis', value: filtered.filter((p) => p.health_status === 'red').length, color: 'text-red-600' },
         ].map((s) => (
           <div key={s.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>

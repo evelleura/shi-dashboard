@@ -155,7 +155,7 @@ function HeroSection() {
     <section
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
       style={{ background: 'linear-gradient(160deg, #0d0d0d 0%, #1a1a2e 50%, #0d0d0d 100%)' }}
-      aria-label="Hero section"
+      aria-label="Bagian utama"
     >
       {/* Decorative blurred orbs simulating smart-device ambience */}
       <div
@@ -212,25 +212,25 @@ function HeroSection() {
         </div>
 
         <p className="text-gray-400 text-sm tracking-widest uppercase mb-6 font-medium">
-          Created by @dianputriiswandi
+          Dibuat oleh @dianputriiswandi
         </p>
 
         <h1
           className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-none tracking-tight mb-6"
           style={{ letterSpacing: '-0.02em' }}
         >
-          HOME TECHNOLOGY
+          Smart Home
           <br />
           <span
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: 'linear-gradient(90deg, #818cf8, #ec4899)' }}
           >
-            EXPERTS
+            Inovasi
           </span>
         </h1>
 
         <p className="text-gray-300 text-lg sm:text-xl max-w-2xl leading-relaxed mb-10">
-          Integrated control system of nearly every aspect of your home or business
+          Sistem kontrol terintegrasi untuk hampir setiap aspek rumah atau bisnis Anda
         </p>
 
         <button
@@ -238,13 +238,13 @@ function HeroSection() {
           className="px-10 py-3.5 rounded-full font-semibold text-white text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 focus:ring-offset-black hover:scale-105 active:scale-95"
           style={{ background: 'linear-gradient(90deg, #6366f1, #ec4899)' }}
         >
-          Sign In
+          Masuk
         </button>
       </div>
 
       {/* Scroll hint */}
       <div className="absolute bottom-8 flex flex-col items-center gap-1 opacity-50" aria-hidden="true">
-        <span className="text-gray-400 text-xs tracking-widest uppercase">Scroll</span>
+        <span className="text-gray-400 text-xs tracking-widest uppercase">Gulir</span>
         <div className="w-px h-8 bg-gradient-to-b from-gray-400 to-transparent" />
       </div>
     </section>
@@ -307,7 +307,7 @@ function IoTSection() {
     <section
       className="py-24 px-4"
       style={{ background: '#111111' }}
-      aria-label="What is IoT section"
+      aria-label="Apa itu IoT"
     >
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left: device illustration */}
@@ -363,9 +363,9 @@ function IoTSection() {
         {/* Right: text */}
         <div>
           <h2 className="text-3xl sm:text-4xl font-black text-white mb-6 leading-tight">
-            WHAT IS IOT?
+            APA ITU IOT?
             <br />
-            <span className="text-gray-400">WHAT ARE THE ADVANTAGES?</span>
+            <span className="text-gray-400">APA SAJA KEUNGGULANNYA?</span>
           </h2>
           <p className="text-gray-300 leading-relaxed mb-6">
             Internet of Things (IoT) adalah ekosistem perangkat fisik yang terhubung melalui internet,
@@ -383,7 +383,7 @@ function IoTSection() {
             style={{ borderColor: '#6366f1' }}
           >
             <p className="text-gray-200 italic text-lg leading-relaxed mb-3">
-              "We continue to teach IoT with successful events."
+              "Kami terus mengedukasi IoT melalui berbagai kegiatan yang berhasil."
             </p>
             <footer className="text-gray-500 text-sm font-medium not-italic">
               — Ando Iswandi
@@ -408,21 +408,21 @@ function ServicesSection() {
   const services: ServiceCard[] = [
     {
       icon: <IconCheck />,
-      title: 'Smart Home Solution',
+      title: 'Solusi Smart Home',
       description:
         'Jasa instalasi smart home lengkap meliputi sistem pencahayaan otomatis, kontrol AC, keamanan pintu, pengawasan CCTV, dan integrasi seluruh perangkat dalam satu platform yang mudah dikendalikan.',
       accent: '#6366f1',
     },
     {
       icon: <IconBuilding />,
-      title: 'Smart Office Solution',
+      title: 'Solusi Smart Office',
       description:
         'Jasa instalasi Smart Office meliputi Home City, pemasangan wifi, CCTV, dan fiber optic untuk mendukung efisiensi kerja modern yang terkoneksi dan produktif.',
       accent: '#ec4899',
     },
     {
       icon: <IconHotel />,
-      title: 'Smart Hotel Solution',
+      title: 'Solusi Smart Hotel',
       description:
         'Jasa instalasi Smart Hotel untuk apartemen, ruang publik, dan properti berpengalaman yang memadukan kenyamanan dengan teknologi terkini untuk pengalaman tamu tak terlupakan.',
       accent: '#8b5cf6',
@@ -433,7 +433,7 @@ function ServicesSection() {
     <section
       className="py-24 px-4 relative overflow-hidden"
       style={{ background: '#f5f5f5' }}
-      aria-label="Smart Home Services"
+      aria-label="Layanan Smart Home"
     >
       {/* Decorative blob shapes */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -464,7 +464,7 @@ function ServicesSection() {
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">
-            Smart Home Services
+            Layanan Smart Home
           </h2>
           <p className="text-gray-500 text-lg max-w-xl mx-auto">
             Solusi terintegrasi untuk hunian dan bisnis modern Anda
@@ -499,7 +499,7 @@ function ServicesSection() {
 function GallerySection() {
   const projects = [
     {
-      title: 'Smart Lock Door',
+      title: 'Kunci Pintu Pintar',
       subtitle: 'Sistem kunci pintu otomatis dengan kontrol jarak jauh',
       color: 'from-indigo-600 to-purple-700',
       icon: (
@@ -511,7 +511,7 @@ function GallerySection() {
       ),
     },
     {
-      title: 'Hydroponic Farm',
+      title: 'Kebun Hidroponik',
       subtitle: 'Sistem pertanian hidroponik terotomasi dengan sensor IoT',
       color: 'from-green-600 to-emerald-700',
       icon: (
@@ -521,7 +521,7 @@ function GallerySection() {
       ),
     },
     {
-      title: 'Smart Control Panel',
+      title: 'Panel Kontrol Pintar',
       subtitle: 'Panel kontrol terpusat untuk manajemen seluruh perangkat',
       color: 'from-pink-600 to-rose-700',
       icon: (
@@ -536,7 +536,7 @@ function GallerySection() {
       ),
     },
     {
-      title: 'Security Camera',
+      title: 'Kamera Keamanan',
       subtitle: 'Jaringan kamera keamanan 24/7 dengan AI detection',
       color: 'from-blue-600 to-cyan-700',
       icon: (
@@ -547,7 +547,7 @@ function GallerySection() {
       ),
     },
     {
-      title: 'Smart Lighting',
+      title: 'Pencahayaan Pintar',
       subtitle: 'Sistem pencahayaan otomatis hemat energi berbasis sensor',
       color: 'from-amber-500 to-orange-600',
       icon: (
@@ -558,7 +558,7 @@ function GallerySection() {
       ),
     },
     {
-      title: 'Smart Gateway Hub',
+      title: 'Hub Gerbang Pintar',
       subtitle: 'Hub sentral penghubung seluruh ekosistem IoT rumah Anda',
       color: 'from-violet-600 to-purple-800',
       icon: (
@@ -575,11 +575,11 @@ function GallerySection() {
   ];
 
   return (
-    <section className="py-24 px-4 bg-white" aria-label="Project Gallery">
+    <section className="py-24 px-4 bg-white" aria-label="Galeri Proyek">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">
-            Our Project Gallery
+            Galeri Proyek Kami
           </h2>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">
             Portofolio instalasi smart home dan IoT yang telah kami selesaikan dengan standar kualitas
@@ -633,7 +633,7 @@ function TestimonialsSection() {
   const testimonials: Testimonial[] = [
     {
       name: 'Garreth Smith',
-      role: 'System Analyst',
+      role: 'Analis Sistem',
       company: 'Tech Innovate Corp',
       text:
         'PT Smart Home Inovasi mengubah cara kami mengelola fasilitas kantor. Sistem IoT mereka sangat intuitif dan tim teknisi yang responsif memastikan instalasi berjalan lancar tanpa gangguan operasional.',
@@ -642,7 +642,7 @@ function TestimonialsSection() {
     },
     {
       name: 'Garreth Smith',
-      role: 'CEO Founder',
+      role: 'CEO Pendiri',
       company: 'Commercial Building Co.',
       text:
         'Investasi terbaik yang pernah kami lakukan untuk gedung komersial kami. Penghematan energi mencapai 35% sejak implementasi smart building solution dari SHI. Layanan purna jual mereka pun luar biasa.',
@@ -651,7 +651,7 @@ function TestimonialsSection() {
     },
     {
       name: 'Garreth Smith',
-      role: 'CEO Founder',
+      role: 'CEO Pendiri',
       company: 'Interior Design Studio',
       text:
         'Sebagai desainer interior, saya sangat menghargai bagaimana SHI mengintegrasikan teknologi tanpa mengorbankan estetika. Klien kami sangat puas dengan hasil akhirnya — fungsional sekaligus elegan.',
@@ -664,11 +664,11 @@ function TestimonialsSection() {
     <section
       className="py-24 px-4"
       style={{ background: '#0d0d0d' }}
-      aria-label="Testimonials"
+      aria-label="Testimoni"
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
-          <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">What Our Clients Say</h2>
+          <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">Apa Kata Klien Kami</h2>
           <p className="text-gray-500 text-lg">Kepercayaan klien adalah prioritas utama kami</p>
         </div>
 
@@ -685,7 +685,7 @@ function TestimonialsSection() {
               }`}
               style={{ background: '#1a1a1a' }}
               aria-pressed={active === i}
-              aria-label={`Testimonial from ${t.name}, ${t.role}`}
+              aria-label={`Testimoni dari ${t.name}, ${t.role}`}
             >
               {/* Avatar */}
               <div className="flex items-center gap-3 mb-5">
@@ -708,7 +708,7 @@ function TestimonialsSection() {
         </div>
 
         {/* Dot pagination */}
-        <div className="flex justify-center gap-2" role="group" aria-label="Testimonial navigation">
+        <div className="flex justify-center gap-2" role="group" aria-label="Navigasi testimoni">
           {testimonials.map((_, i) => (
             <button
               key={i}
@@ -719,7 +719,7 @@ function TestimonialsSection() {
                 height: 8,
                 background: active === i ? '#6366f1' : '#3a3a3a',
               }}
-              aria-label={`Go to testimonial ${i + 1}`}
+              aria-label={`Ke testimoni ${i + 1}`}
               aria-current={active === i ? 'true' : undefined}
             />
           ))}
@@ -736,10 +736,10 @@ function ContactSection() {
     <section
       className="py-24 px-4"
       style={{ background: '#111111' }}
-      aria-label="Contact Us"
+      aria-label="Hubungi Kami"
     >
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-4xl sm:text-5xl font-black text-white mb-12">Contact Us</h2>
+        <h2 className="text-4xl sm:text-5xl font-black text-white mb-12">Hubungi Kami</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
           {/* Address */}
@@ -748,7 +748,7 @@ function ContactSection() {
               <IconMapPin />
             </span>
             <div>
-              <p className="text-gray-400 text-sm font-medium mb-1 uppercase tracking-widest">Address</p>
+              <p className="text-gray-400 text-sm font-medium mb-1 uppercase tracking-widest">Alamat</p>
               <address className="text-gray-300 text-sm leading-relaxed not-italic">
                 Gedung Pixelkamp Lt2, Depok Square, Ruko J,<br />
                 Ring Road Utara No.10 Block C, Caturtunggal,<br />
@@ -764,13 +764,13 @@ function ContactSection() {
               <IconMail />
             </span>
             <div>
-              <p className="text-gray-400 text-sm font-medium mb-1 uppercase tracking-widest">Get in Touch</p>
+              <p className="text-gray-400 text-sm font-medium mb-1 uppercase tracking-widest">Hubungi Kami</p>
               <a
                 href="mailto:info@smarthomeinovasi.id"
                 className="text-indigo-400 hover:text-indigo-300 text-sm underline underline-offset-4 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 rounded"
-                aria-label="Send us an email"
+                aria-label="Kirim email kepada kami"
               >
-                Have a question? Contact us now
+                Punya pertanyaan? Hubungi kami sekarang
               </a>
               <p className="text-gray-500 text-xs mt-1">info@smarthomeinovasi.id</p>
             </div>
@@ -792,15 +792,15 @@ function Footer() {
     >
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-gray-500 text-sm">
-          Copyright &copy; 2026 | Built with{' '}
-          <span aria-label="love" role="img">
+          Hak Cipta &copy; 2026 | Dibuat dengan{' '}
+          <span aria-label="cinta" role="img">
             ❤
           </span>{' '}
-          by Dian's Laravel
+          oleh Dian
         </p>
 
         {/* Social icons */}
-        <nav aria-label="Social media links">
+        <nav aria-label="Tautan media sosial">
           <ul className="flex gap-4 list-none m-0 p-0">
             <li>
               <a
@@ -808,7 +808,7 @@ function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 rounded"
-                aria-label="Follow us on Twitter"
+                aria-label="Ikuti kami di Twitter"
               >
                 <IconTwitter />
               </a>
@@ -819,7 +819,7 @@ function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 rounded"
-                aria-label="Follow us on Facebook"
+                aria-label="Ikuti kami di Facebook"
               >
                 <IconFacebook />
               </a>
@@ -830,7 +830,7 @@ function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 rounded"
-                aria-label="Follow us on Instagram"
+                aria-label="Ikuti kami di Instagram"
               >
                 <IconInstagram />
               </a>
@@ -851,7 +851,7 @@ export default function LandingPage() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded"
       >
-        Skip to main content
+        Lewati ke konten utama
       </a>
       <main id="main-content">
         <HeroSection />

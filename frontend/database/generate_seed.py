@@ -177,11 +177,13 @@ CONSTRAINTS_POOL = _lines("constraints.txt")                          # catatan 
 ESC_POOL = [(t, d, p) for t, d, p in _rows("escalations.csv")]        # eskalasi <- escalations.csv
 
 # Faktor jadwal proyek SELESAI = durasi_aktual / durasi_rencana. SPI akhir = 1/faktor:
-# faktor <1 -> selesai lebih cepat (SPI>1); >1 -> telat (SPI<1). Sebaran realistis:
-# mayoritas tepat waktu/sedikit cepat, sebagian telat -> riwayat SPI BERVARIASI
-# (bukan "1 semua"). Dipakai build_tasks utk menggeser waktu penyelesaian tugas.
-SCHED_FACTORS = [0.70, 0.75, 0.80, 0.82, 0.88, 0.92, 0.96, 1.0, 1.0,
-                 1.04, 1.08, 1.15, 1.22, 1.30, 1.45]
+# faktor <1 -> selesai lebih cepat (SPI>1); >1 -> telat (SPI<1). Sebaran DICONDONGKAN
+# ke "sedikit telat" (mayoritas faktor >1) supaya RATA-RATA SPI portofolio ~0.9, bukan
+# ~1.0. Tetap BERVARIASI (sebagian cepat SPI>1) -> riwayat tak monoton/"1 semua".
+# Rata-rata SPI = AVG(spi_value) SEMUA proyek (dashboard.ts), didominasi proyek selesai
+# -> SET INI yang menentukan angkanya. Dipakai build_tasks utk geser waktu penyelesaian.
+SCHED_FACTORS = [0.82, 0.87, 0.93, 0.96, 1.03, 1.07, 1.12, 1.17, 1.17,
+                 1.21, 1.26, 1.34, 1.42, 1.52, 1.69]
 
 
 def pick(seq):

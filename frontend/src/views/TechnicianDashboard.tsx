@@ -115,8 +115,8 @@ export default function TechnicianDashboard() {
     done: p.my_completed,
   }));
 
-  const totalTasksLabel = language === 'id' ? 'Total Tugas' : 'Total Tasks';
-  const completedLabel = language === 'id' ? 'Selesai' : 'Completed';
+  const totalTasksLabel = 'Total Tugas';
+  const completedLabel = 'Selesai';
 
   return (
     <div className="space-y-6">
@@ -170,7 +170,7 @@ export default function TechnicianDashboard() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [String(value), language === 'id' ? 'Tugas' : 'Tasks']}
+                  formatter={(value) => [String(value), 'Tugas']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
                 />
                 <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
@@ -246,7 +246,7 @@ export default function TechnicianDashboard() {
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                  <span>{language === 'id' ? 'Tugas' : 'Tasks'}: {proj.my_completed}/{proj.my_task_count}</span>
+                  <span>Tugas: {proj.my_completed}/{proj.my_task_count}</span>
                   <span>{proj.my_task_count > 0 ? Math.round((proj.my_completed / proj.my_task_count) * 100) : 0}%</span>
                 </div>
                 {proj.my_task_count > 0 && (

@@ -17,13 +17,13 @@ const ACTIVITY_COLORS: Record<ActivityType, string> = {
 };
 
 const ACTIVITY_LABELS: Record<ActivityType, string> = {
-  arrival: 'Arrived',
-  start_work: 'Started work',
-  pause: 'Paused',
-  resume: 'Resumed',
-  note: 'Note',
-  photo: 'Photo',
-  complete: 'Completed',
+  arrival: 'Tiba di Lokasi',
+  start_work: 'Mulai Bekerja',
+  pause: 'Dijeda',
+  resume: 'Dilanjutkan',
+  note: 'Catatan',
+  photo: 'Foto',
+  complete: 'Selesai',
 };
 
 const ACTIVITY_ICONS: Record<ActivityType, string> = {
@@ -37,10 +37,10 @@ const ACTIVITY_ICONS: Record<ActivityType, string> = {
 };
 
 const TYPE_OPTIONS: { value: ActivityType; label: string }[] = [
-  { value: 'arrival', label: 'Arrival' },
-  { value: 'note', label: 'Note' },
-  { value: 'photo', label: 'Photo' },
-  { value: 'complete', label: 'Complete' },
+  { value: 'arrival', label: 'Tiba di Lokasi' },
+  { value: 'note', label: 'Catatan' },
+  { value: 'photo', label: 'Foto' },
+  { value: 'complete', label: 'Selesai' },
 ];
 
 function isToday(dateStr: string): boolean {
@@ -86,7 +86,7 @@ function ActivityItem({ activity }: { activity: TaskActivity }) {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-1.5 flex-wrap">
-          <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">{activity.user_name ?? 'User'}</span>
+          <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">{activity.user_name ?? 'Pengguna'}</span>
           <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full text-white ${color}`}>
             {label}
           </span>
@@ -103,7 +103,7 @@ function ActivityItem({ activity }: { activity: TaskActivity }) {
           >
             <img
               src={`/api/activities/${activity.id}/file`}
-              alt={activity.file_name ?? 'Activity photo'}
+              alt={activity.file_name ?? 'Foto aktivitas'}
               className="max-w-[200px] max-h-[150px] rounded-lg border border-gray-200 dark:border-gray-700 object-cover hover:opacity-90 transition-opacity"
               loading="lazy"
             />
@@ -177,7 +177,7 @@ export default function ActivityFeed({ taskId }: Props) {
   if (isError) {
     return (
       <div className="text-center py-6">
-        <p className="text-sm text-red-500">Failed to load activity feed. Please try again.</p>
+        <p className="text-sm text-red-500">Gagal memuat lini masa aktivitas. Silakan coba lagi.</p>
       </div>
     );
   }
@@ -188,15 +188,15 @@ export default function ActivityFeed({ taskId }: Props) {
       <div
         className="max-h-[300px] overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700 px-1"
         role="list"
-        aria-label="Activity feed"
+        aria-label="Lini masa aktivitas"
       >
         {activities.length === 0 ? (
           <div className="text-center py-8">
             <svg className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <p className="text-sm text-gray-400 dark:text-gray-500">No activity yet</p>
-            <p className="text-xs text-gray-300 dark:text-gray-600 mt-0.5">Post a note or log your arrival</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">Belum ada aktivitas</p>
+            <p className="text-xs text-gray-300 dark:text-gray-600 mt-0.5">Tambahkan catatan atau catat kedatangan Anda</p>
           </div>
         ) : (
           activities.map((activity) => (
@@ -219,7 +219,7 @@ export default function ActivityFeed({ taskId }: Props) {
               type="button"
               onClick={() => { setFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
               className="text-gray-400 hover:text-red-500 shrink-0"
-              aria-label="Remove file"
+              aria-label="Hapus file"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -234,7 +234,7 @@ export default function ActivityFeed({ taskId }: Props) {
             value={activityType}
             onChange={(e) => setActivityType(e.target.value as ActivityType)}
             className="text-xs border border-gray-300 dark:border-gray-600 rounded-md px-2 py-2 bg-white dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0"
-            aria-label="Activity type"
+            aria-label="Jenis aktivitas"
           >
             {TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -246,9 +246,9 @@ export default function ActivityFeed({ taskId }: Props) {
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder="Tulis pesan..."
             className="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Activity message"
+            aria-label="Pesan aktivitas"
           />
 
           {/* File attach */}
@@ -263,7 +263,7 @@ export default function ActivityFeed({ taskId }: Props) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
-            aria-label="Attach file"
+            aria-label="Lampirkan file"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
@@ -275,7 +275,7 @@ export default function ActivityFeed({ taskId }: Props) {
             type="submit"
             disabled={!message.trim() || createMutation.isPending}
             className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-md transition-colors shrink-0"
-            aria-label="Send activity"
+            aria-label="Kirim aktivitas"
           >
             {createMutation.isPending ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />

@@ -388,7 +388,7 @@ export default function ProjectDetailPage() {
 
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="flex gap-1 -mb-px" role="tablist" aria-label="Project detail tabs">
+        <nav className="flex gap-1 -mb-px" role="tablist" aria-label="Tab detail proyek">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -457,7 +457,7 @@ export default function ProjectDetailPage() {
                   <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{taskItem.name}</h3>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">({taskItem.evidence_count ?? 0} files)</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">({taskItem.evidence_count ?? 0} berkas)</span>
                     </div>
                   </div>
                   <div className="p-4 space-y-3">

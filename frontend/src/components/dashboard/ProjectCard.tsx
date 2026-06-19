@@ -59,7 +59,7 @@ export default function ProjectCard({ project }: Props) {
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
               project.phase === 'survey' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
             }`}>
-              {project.phase === 'survey' ? 'Survey' : 'Execution'}
+              {project.phase === 'survey' ? 'Survei' : 'Eksekusi'}
             </span>
           </div>
         </div>
@@ -81,13 +81,13 @@ export default function ProjectCard({ project }: Props) {
             </p>
           </div>
           <div>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500">Tasks</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500">Tugas</p>
             <p className="text-xs font-bold text-gray-700">
               {project.completed_tasks}/{project.total_tasks}
             </p>
           </div>
           <div>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500">Done</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500">Selesai</p>
             <p className="text-xs font-bold text-gray-700">{taskProgress}%</p>
           </div>
         </div>

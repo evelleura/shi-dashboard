@@ -9,17 +9,17 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-2xl">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Pengaturan / Settings
+          Pengaturan
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Sesuaikan tampilan dan bahasa aplikasi &middot; Customize display and language
+          Sesuaikan tampilan dan bahasa aplikasi
         </p>
       </div>
 
       {/* Language */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Bahasa / Language
+          Bahasa
         </h2>
         <div className="space-y-2">
           <button
@@ -30,7 +30,7 @@ export default function SettingsPage() {
                 : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
-            <span className="text-xl leading-none" role="img" aria-label="Indonesia flag">
+            <span className="text-xl leading-none" role="img" aria-label="Bendera Indonesia">
               &#x1F1EE;&#x1F1E9;
             </span>
             <span>Bahasa Indonesia</span>
@@ -50,7 +50,7 @@ export default function SettingsPage() {
                 : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
-            <span className="text-xl leading-none" role="img" aria-label="United Kingdom flag">
+            <span className="text-xl leading-none" role="img" aria-label="Bendera Inggris">
               &#x1F1EC;&#x1F1E7;
             </span>
             <span>English</span>
@@ -68,7 +68,7 @@ export default function SettingsPage() {
       {/* Theme */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Tema / Theme
+          Tema
         </h2>
         <div className="space-y-2">
           {(
@@ -76,23 +76,20 @@ export default function SettingsPage() {
               {
                 value: 'light' as const,
                 labelId: 'Terang',
-                labelEn: 'Light',
                 iconPath: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z',
               },
               {
                 value: 'dark' as const,
                 labelId: 'Gelap',
-                labelEn: 'Dark',
                 iconPath: 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z',
               },
               {
                 value: 'system' as const,
                 labelId: 'Sistem (ikut OS)',
-                labelEn: 'System (follow OS)',
                 iconPath: 'M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25',
               },
             ] as const
-          ).map(({ value, labelId, labelEn, iconPath }) => (
+          ).map(({ value, labelId, iconPath }) => (
             <button
               key={value}
               onClick={() => setTheme(value)}
@@ -106,7 +103,7 @@ export default function SettingsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d={iconPath} />
               </svg>
               <span>
-                {labelId} / {labelEn}
+                {labelId}
               </span>
               {theme === value && (
                 <span className="ml-auto">

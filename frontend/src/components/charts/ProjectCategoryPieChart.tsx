@@ -51,7 +51,7 @@ export default function ProjectCategoryPieChart({ dateRange }: Props) {
   if (chartData.length === 0) {
     return (
       <CardWrapper title="Kategori Proyek">
-        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No project data available</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Data proyek belum tersedia</p>
       </CardWrapper>
     );
   }
@@ -75,7 +75,7 @@ export default function ProjectCategoryPieChart({ dateRange }: Props) {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value) => [String(value), 'Projects']}
+            formatter={(value) => [String(value), 'Proyek']}
             contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
           />
           <Legend

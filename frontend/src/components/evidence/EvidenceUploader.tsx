@@ -8,11 +8,11 @@ interface Props {
 }
 
 const FILE_TYPE_OPTIONS = [
-  { value: 'photo', label: 'Photo' },
-  { value: 'document', label: 'Document' },
-  { value: 'form', label: 'Form' },
-  { value: 'screenshot', label: 'Screenshot' },
-  { value: 'other', label: 'Other' },
+  { value: 'photo', label: 'Foto' },
+  { value: 'document', label: 'Dokumen' },
+  { value: 'form', label: 'Formulir' },
+  { value: 'screenshot', label: 'Tangkapan Layar' },
+  { value: 'other', label: 'Lainnya' },
 ];
 
 export default function EvidenceUploader({ taskId, onUploadComplete }: Props) {
@@ -29,7 +29,7 @@ export default function EvidenceUploader({ taskId, onUploadComplete }: Props) {
     const selected = e.target.files?.[0];
     if (selected) {
       if (selected.size > 10 * 1024 * 1024) {
-        setError('File size must be under 10MB.');
+        setError('Ukuran file harus di bawah 10MB.');
         setFile(null);
         return;
       }
@@ -55,7 +55,7 @@ export default function EvidenceUploader({ taskId, onUploadComplete }: Props) {
       void qc.invalidateQueries({ queryKey: ['tasks'] });
       onUploadComplete?.();
     } catch {
-      setError('Upload failed. Please try again.');
+      setError('Unggahan gagal. Silakan coba lagi.');
     } finally {
       setUploading(false);
     }
@@ -70,7 +70,7 @@ export default function EvidenceUploader({ taskId, onUploadComplete }: Props) {
       )}
       {success && (
         <div className="p-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded text-green-700 dark:text-green-400 text-xs" role="status">
-          Evidence uploaded successfully.
+          Bukti berhasil diunggah.
         </div>
       )}
 
@@ -81,13 +81,13 @@ export default function EvidenceUploader({ taskId, onUploadComplete }: Props) {
           onChange={handleFileChange}
           accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
           className="flex-1 text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-600 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50"
-          aria-label="Select file to upload"
+          aria-label="Pilih file untuk diunggah"
         />
         <select
           value={fileType}
           onChange={(e) => setFileType(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="File type"
+          aria-label="Jenis file"
         >
           {FILE_TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -99,7 +99,7 @@ export default function EvidenceUploader({ taskId, onUploadComplete }: Props) {
         type="text"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        placeholder="Description (optional)"
+        placeholder="Deskripsi (opsional)"
         className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
@@ -114,7 +114,7 @@ export default function EvidenceUploader({ taskId, onUploadComplete }: Props) {
             disabled={uploading}
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-xs px-3 py-1.5 rounded-md transition-colors"
           >
-            {uploading ? 'Uploading...' : 'Upload'}
+            {uploading ? 'Mengunggah...' : 'Unggah'}
           </button>
         </div>
       )}

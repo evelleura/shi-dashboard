@@ -10,7 +10,7 @@ interface Props {
   submitLabel?: string;
 }
 
-export default function ProjectForm({ clients, onSubmit, onCancel, isPending, initialData, submitLabel = 'Create Project' }: Props) {
+export default function ProjectForm({ clients, onSubmit, onCancel, isPending, initialData, submitLabel = 'Buat Proyek' }: Props) {
   const [form, setForm] = useState({
     name: initialData?.name ?? '',
     description: initialData?.description ?? '',
@@ -33,15 +33,15 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
     setError('');
 
     if (!form.name.trim()) {
-      setError('Project name is required.');
+      setError('Nama proyek wajib diisi.');
       return;
     }
     if (!form.start_date || !form.end_date) {
-      setError('Start date and end date are required.');
+      setError('Tanggal mulai dan tanggal selesai wajib diisi.');
       return;
     }
     if (form.end_date <= form.start_date) {
-      setError('End date must be after start date.');
+      setError('Tanggal selesai harus setelah tanggal mulai.');
       return;
     }
     if (!form.client_id) {
@@ -61,7 +61,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
         target_description: form.target_description.trim() || undefined,
       });
     } catch {
-      setError('Failed to save project. Please check your inputs and try again.');
+      setError('Gagal menyimpan proyek. Periksa kembali isian Anda lalu coba lagi.');
     }
   };
 
@@ -74,7 +74,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
       )}
 
       <div>
-        <label htmlFor="proj-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Name *</label>
+        <label htmlFor="proj-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Proyek *</label>
         <input
           id="proj-name"
           type="text"
@@ -82,13 +82,13 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           value={form.name}
           onChange={handleChange}
           required
-          placeholder="e.g. Smart Home IoT Installation - Citra Raya"
+          placeholder="mis. Instalasi Smart Home IoT - Citra Raya"
           className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="proj-client" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client *</label>
+        <label htmlFor="proj-client" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Klien *</label>
         <select
           id="proj-client"
           name="client_id"
@@ -105,7 +105,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
       </div>
 
       <div>
-        <label htmlFor="proj-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+        <label htmlFor="proj-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
         <select
           id="proj-category"
           name="category"
@@ -114,32 +114,32 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="instalasi">Instalasi</option>
-          <option value="maintenance">Maintenance</option>
+          <option value="maintenance">Pemeliharaan</option>
           <option value="perbaikan">Perbaikan</option>
-          <option value="upgrade">Upgrade</option>
-          <option value="monitoring">Monitoring</option>
-          <option value="security">Security</option>
-          <option value="networking">Networking</option>
+          <option value="upgrade">Peningkatan</option>
+          <option value="monitoring">Pemantauan</option>
+          <option value="security">Keamanan</option>
+          <option value="networking">Jaringan</option>
           <option value="lainnya">Lainnya</option>
         </select>
       </div>
 
       <div>
-        <label htmlFor="proj-desc" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+        <label htmlFor="proj-desc" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi</label>
         <textarea
           id="proj-desc"
           name="description"
           value={form.description}
           onChange={handleChange}
           rows={2}
-          placeholder="Brief project description..."
+          placeholder="Deskripsi singkat proyek..."
           className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="proj-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date *</label>
+          <label htmlFor="proj-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal Mulai *</label>
           <input
             id="proj-start"
             type="date"
@@ -151,7 +151,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           />
         </div>
         <div>
-          <label htmlFor="proj-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date *</label>
+          <label htmlFor="proj-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal Selesai *</label>
           <input
             id="proj-end"
             type="date"
@@ -166,7 +166,7 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
       </div>
 
       <div>
-        <label htmlFor="proj-value" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Value (Rp)</label>
+        <label htmlFor="proj-value" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Proyek (Rp)</label>
         <input
           id="proj-value"
           type="number"
@@ -181,14 +181,14 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
       </div>
 
       <div>
-        <label htmlFor="proj-target" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target / Goal Description</label>
+        <label htmlFor="proj-target" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi Target / Sasaran</label>
         <textarea
           id="proj-target"
           name="target_description"
           value={form.target_description}
           onChange={handleChange}
           rows={2}
-          placeholder="What is the target outcome for this project?"
+          placeholder="Apa hasil yang ditargetkan untuk proyek ini?"
           className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
@@ -199,14 +199,14 @@ export default function ProjectForm({ clients, onSubmit, onCancel, isPending, in
           onClick={onCancel}
           className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
-          Cancel
+          Batal
         </button>
         <button
           type="submit"
           disabled={isPending}
           className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
         >
-          {isPending ? 'Saving...' : submitLabel}
+          {isPending ? 'Menyimpan...' : submitLabel}
         </button>
       </div>
     </form>

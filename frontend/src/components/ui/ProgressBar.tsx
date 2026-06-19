@@ -19,7 +19,7 @@ export default function ProgressBar({ actual, planned, showLabels = true }: Prop
     <div className="space-y-1">
       {showLabels && (
         <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-          <span>Progress</span>
+          <span>Kemajuan</span>
           <span>{clampedActual.toFixed(1)}% / {clampedPlanned.toFixed(1)}%</span>
         </div>
       )}
@@ -37,8 +37,8 @@ export default function ProgressBar({ actual, planned, showLabels = true }: Prop
       </div>
       {showLabels && (
         <div className="flex justify-between text-xs">
-          <span className={actualColor.replace('bg-', 'text-')}>Actual: {clampedActual.toFixed(1)}%</span>
-          <span className="text-gray-400 dark:text-gray-500">Plan: {clampedPlanned.toFixed(1)}%</span>
+          <span className={actualColor.replace('bg-', 'text-')}>Aktual: {clampedActual.toFixed(1)}%</span>
+          <span className="text-gray-400 dark:text-gray-500">Rencana: {clampedPlanned.toFixed(1)}%</span>
         </div>
       )}
     </div>

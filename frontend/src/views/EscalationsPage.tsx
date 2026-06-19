@@ -12,16 +12,16 @@ import Modal from '../components/ui/Modal';
 import type { Escalation, EscalationPriority, EscalationStatus, EscalationActionRequest } from '../types';
 
 const PRIORITY_CONFIG: Record<EscalationPriority, { bg: string; text: string; label: string }> = {
-  critical: { bg: 'bg-red-50 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400', label: 'Critical' },
-  high:     { bg: 'bg-orange-50 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400', label: 'High' },
-  medium:   { bg: 'bg-yellow-50 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-400', label: 'Medium' },
-  low:      { bg: 'bg-gray-50 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400', label: 'Low' },
+  critical: { bg: 'bg-red-50 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400', label: 'Kritis' },
+  high:     { bg: 'bg-orange-50 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400', label: 'Tinggi' },
+  medium:   { bg: 'bg-yellow-50 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-400', label: 'Sedang' },
+  low:      { bg: 'bg-gray-50 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400', label: 'Rendah' },
 };
 
 const STATUS_CONFIG: Record<EscalationStatus, { bg: string; text: string; label: string }> = {
-  open:      { bg: 'bg-red-100 dark:bg-red-900/40', text: 'text-red-700 dark:text-red-400', label: 'Open' },
-  in_review: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-400', label: 'In Review' },
-  resolved:  { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-700 dark:text-green-400', label: 'Resolved' },
+  open:      { bg: 'bg-red-100 dark:bg-red-900/40', text: 'text-red-700 dark:text-red-400', label: 'Terbuka' },
+  in_review: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-400', label: 'Dalam Tinjauan' },
+  resolved:  { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-700 dark:text-green-400', label: 'Selesai' },
   cancelled: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-500 dark:text-gray-400', label: 'Dibatalkan' },
 };
 
@@ -105,8 +105,8 @@ export default function EscalationsPage() {
   if (isError) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500 text-sm">Failed to load escalations.</p>
-        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">Retry</button>
+        <p className="text-red-500 text-sm">Gagal memuat eskalasi.</p>
+        <button onClick={() => void refetch()} className="mt-2 text-blue-600 text-sm underline">Coba Lagi</button>
       </div>
     );
   }
@@ -115,22 +115,22 @@ export default function EscalationsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Manajemen Eskalasi</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Review dan selesaikan eskalasi dari teknisi lapangan</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Tinjau dan selesaikan eskalasi dari teknisi lapangan</p>
       </div>
 
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-3 text-center">
             <p className="text-2xl font-bold text-red-600 dark:text-red-400">{summary.open}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Open</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Terbuka</p>
           </div>
           <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-center">
             <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{summary.in_review}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">In Review</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Dalam Tinjauan</p>
           </div>
           <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-3 text-center">
             <p className="text-2xl font-bold text-green-600 dark:text-green-400">{summary.resolved}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Resolved</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Selesai</p>
           </div>
           <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-center">
             <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{summary.total ?? 0}</p>
@@ -142,7 +142,7 @@ export default function EscalationsPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex gap-2 flex-wrap">
           {(['all', 'open', 'in_review', 'resolved', 'cancelled'] as const).map((status) => {
-            const labels: Record<string, string> = { all: 'Semua', open: 'Open', in_review: 'In Review', resolved: 'Resolved', cancelled: 'Dibatalkan' };
+            const labels: Record<string, string> = { all: 'Semua', open: 'Terbuka', in_review: 'Dalam Tinjauan', resolved: 'Selesai', cancelled: 'Dibatalkan' };
             const counts: Record<string, number | undefined> = {
               all: summary?.total, open: summary?.open, in_review: summary?.in_review, resolved: summary?.resolved, cancelled: undefined,
             };
@@ -293,7 +293,7 @@ function ManagerEscalationCard({
               )}
             </div>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-xs text-gray-500 dark:text-gray-400">oleh {escalation.reporter_name ?? 'Unknown'}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">oleh {escalation.reporter_name ?? 'Tidak diketahui'}</span>
               {escalation.project_name && (
                 <><span className="text-gray-300 dark:text-gray-600">|</span><span className="text-xs text-gray-500 dark:text-gray-400">{escalation.project_name}</span></>
               )}
@@ -395,7 +395,7 @@ function ManagerEscalationCard({
               <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">Resolusi</p>
               <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{escalation.resolution_notes ?? 'Tidak ada catatan'}</p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                Diselesaikan oleh {escalation.resolver_name ?? 'Unknown'} pada {escalation.resolved_at ? formatDateTime(escalation.resolved_at) : '--'}
+                Diselesaikan oleh {escalation.resolver_name ?? 'Tidak diketahui'} pada {escalation.resolved_at ? formatDateTime(escalation.resolved_at) : '--'}
               </p>
             </div>
           )}
@@ -412,7 +412,7 @@ function ManagerEscalationCard({
                     </div>
                     <div className="flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg p-2.5">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{u.author_name ?? 'Unknown'}</span>
+                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{u.author_name ?? 'Tidak diketahui'}</span>
                         <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatDateTime(u.created_at)}</span>
                       </div>
                       <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{u.message}</p>
@@ -455,7 +455,7 @@ function ManagerEscalationCard({
                   disabled={isReviewing}
                   className="px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg hover:bg-amber-100 disabled:opacity-50 transition-colors"
                 >
-                  {isReviewing ? 'Memproses...' : 'Mulai Review'}
+                  {isReviewing ? 'Memproses...' : 'Mulai Tinjauan'}
                 </button>
               )}
               {escalation.status === 'in_review' && (
