@@ -6,10 +6,10 @@
 Generator seed realistis PT Smart Home Inovasi (SHI) -> frontend/database/seed.sql
 
 Tujuan: rombak seed demo menjadi RIWAYAT OPERASI yang realistis dan konsisten:
-  - Model TIM TETAP: PT SHI punya N_TECHS teknisi; tiap orang mengerjakan 1 job pada
-    satu waktu (CAPACITY=1) secara BERURUTAN. Throughput perusahaan = N_TECHS / siklus
-    (~3-4 proyek/hari). Riwayat MULTI-TAHUN (YEARS_HISTORY) -> total proyek banyak
-    (mayoritas selesai + ~N_TECHS aktif utk dashboard EWS) TANPA menambah headcount.
+  - Model TIM TETAP (kecil): PT SHI punya N_TECHS teknisi; tiap orang mengerjakan 1 job
+    pada satu waktu (CAPACITY=1) secara BERURUTAN dgn jeda bench. Riwayat MULTI-TAHUN
+    (YEARS_HISTORY) -> ~400 proyek total (mayoritas selesai + ~N_TECHS aktif utk
+    dashboard EWS). Volume = N_TECHS x kerapatan (BENCH_GAP), bukan menumpuk konkurensi.
   - Klien retensi: sebagian klien (developer/hotel/RS/pemerintah/mall/pabrik) punya
     BANYAK proyek; perorangan sedikit.
   - Penjadwal (`FixedRoster` + heap di build_projects): teknisi bebas paling awal
@@ -33,13 +33,14 @@ from pathlib import Path
 
 # ============================ KONFIGURASI ============================
 SEED = 20260619
-# Model TIM TETAP: PT SHI punya N_TECHS teknisi; tiap orang 1 job pada satu waktu
-# (CAPACITY=1) dan mengerjakan proyek BERURUTAN. Throughput perusahaan = N_TECHS /
-# siklus-rata2 (target ~3-4 proyek/hari masuk & selesai). Riwayat MULTI-TAHUN ->
-# total proyek banyak TANPA menambah headcount (konkurensi tetap ~N_TECHS).
+# Model TIM TETAP (kecil): PT SHI punya N_TECHS teknisi; tiap orang 1 job pada satu
+# waktu (CAPACITY=1) dan mengerjakan proyek BERURUTAN dgn jeda bench. Riwayat MULTI-
+# TAHUN -> ~400 proyek total (mayoritas selesai + N_TECHS aktif utk EWS). Volume diatur
+# N_TECHS x kerapatan (BENCH_GAP), BUKAN menumpuk konkurensi. 400 job/2.5thn = operasi
+# kecil -> tim kecil (25 teknisi utk 400 job = nganggur). Peak konkurensi/teknisi = 1.
 YEARS_HISTORY = 2.5                # rentang riwayat ke belakang (multi-tahun)
-N_TECHS = 25                       # ukuran tim TETAP (5 base + 20 rekrut); diturunkan dari throughput 3-4/hari
-BENCH_GAP = (2, 3)                 # jeda hari antar proyek per teknisi; >=2 jaga ketat 1-job (tanpa sentuh batas)
+N_TECHS = 6                        # tim TETAP kecil (5 base + 1 rekrut) -> ~400 proyek / 2.5 thn
+BENCH_GAP = (4, 12)                # jeda hari antar proyek/teknisi; >=2 jaga 1-job + atur kerapatan ke ~400
 MAX_PROJECTS = 3000                # pengaman ukuran seed.sql
 NOMINAL_TODAY = datetime.date(2026, 6, 19)   # anchor kode proyek (kosmetik)
 OUT = Path(__file__).parent / "seed.sql"
@@ -288,8 +289,7 @@ def build_projects(clients):
     next_client = _client_picker(clients)
     # bucket kesehatan utk proyek AKTIF (manufaktur sebaran dashboard EWS).
     # SEHAT-saja (tanpa 'red'/'unrated'): perusahaan jaga citra -> proyek baru-jalan
-    # TIDAK boleh tampil merah/0.000/Belum-Dinilai di tabel. Panjang TETAP 95 supaya
-    # stream rng.choice identik -> 2206 proyek SELESAI byte-identik (verifikasi lama valid).
+    # TIDAK boleh tampil merah/0.000/Belum-Dinilai di tabel.
     health_buckets = (["amber"] * 15 + ["green"] * 50 + ["ahead"] * 30)
     projects = []
     pid = 0
