@@ -27,6 +27,7 @@ Jalankan:  python frontend/database/generate_seed.py
 from __future__ import annotations
 
 import datetime
+import math
 import random
 import re
 from pathlib import Path
@@ -40,8 +41,9 @@ SEED = 20260619
 # kecil -> tim kecil (25 teknisi utk 400 job = nganggur). Peak konkurensi/teknisi = 1.
 YEARS_HISTORY = 2.5                # rentang riwayat ke belakang (multi-tahun)
 N_TECHS = 6                        # tim TETAP kecil (5 base + 1 rekrut) -> ~400 proyek / 2.5 thn
-BENCH_GAP = (4, 12)                # jeda hari antar proyek/teknisi; >=2 jaga 1-job + atur kerapatan ke ~400
+BENCH_GAP = (4, 10)                # jeda hari antar proyek/teknisi; >=2 jaga 1-job + atur kerapatan ke ~400
 MAX_PROJECTS = 3000                # pengaman ukuran seed.sql
+SPI_CAP_PY = 2                     # cermin SPI_CAP di spiCalculator.ts (utk estimasi SPI di ringkasan)
 NOMINAL_TODAY = datetime.date(2026, 6, 19)   # anchor kode proyek (kosmetik)
 OUT = Path(__file__).parent / "seed.sql"
 PW_HASH = "$2b$10$zHDwO0pjo7VXN3wS4ADDMOjPBcLdw45k.nmrvoc8udB2whndJIRi6"  # password123
@@ -182,8 +184,16 @@ ESC_POOL = [(t, d, p) for t, d, p in _rows("escalations.csv")]        # eskalasi
 # ~1.0. Tetap BERVARIASI (sebagian cepat SPI>1) -> riwayat tak monoton/"1 semua".
 # Rata-rata SPI = AVG(spi_value) SEMUA proyek (dashboard.ts), didominasi proyek selesai
 # -> SET INI yang menentukan angkanya. Dipakai build_tasks utk geser waktu penyelesaian.
-SCHED_FACTORS = [0.82, 0.87, 0.93, 0.96, 1.03, 1.07, 1.12, 1.17, 1.17,
-                 1.21, 1.26, 1.34, 1.42, 1.52, 1.69]
+# GRANULARITAS: tiap proyek mengalikan faktor dgn jitter KONTINU (SCHED_JITTER) -> durasi
+# aktual pecahan -> SPI tak pernah mendarat di nilai "bulat" (1.500, 1.200). E[jitter]~1
+# -> rata-rata portofolio tak bergeser. Diukur tanpa floor di spiCalculator (sub-hari).
+# CITRA SEHAT: BASIS semua HIJAU (faktor < ~1.0, jitter sempit -> SPI basis selalu >=0.95).
+# Proyek Kritis/Waspada BUKAN dari sebaran acak -> DIPAKSA tepat N_RED + N_AMBER oleh
+# enforce_health_distribution (override durasi RENCANA beberapa proyek terpilih). Jadi
+# jumlah merah/kuning DETERMINISTIK (mis. 3 + 2), bukan ~seperempat board. Aktual tetap
+# granular (sub-hari) -> SPI tak "bulat".
+SCHED_FACTORS = [0.88, 0.91, 0.94, 0.97, 0.99]
+SCHED_JITTER = (0.98, 1.02)        # sempit -> faktor*jitter <= ~1.01 -> SPI basis hijau (>=0.95)
 
 
 def pick(seq):
@@ -292,7 +302,10 @@ def build_projects(clients):
     # bucket kesehatan utk proyek AKTIF (manufaktur sebaran dashboard EWS).
     # SEHAT-saja (tanpa 'red'/'unrated'): perusahaan jaga citra -> proyek baru-jalan
     # TIDAK boleh tampil merah/0.000/Belum-Dinilai di tabel.
-    health_buckets = (["amber"] * 15 + ["green"] * 50 + ["ahead"] * 30)
+    # Proyek AKTIF: HIJAU/di-depan saja (tanpa amber/red) -> board aktif bersih, dan
+    # total Waspada/Kritis portofolio = TEPAT yg dipaksa enforce_health_distribution
+    # pada proyek SELESAI (tak ada amber aktif yg menambah hitungan).
+    health_buckets = (["green"] * 60 + ["ahead"] * 40)
     projects = []
     pid = 0
     # heap (free_off, tid, prev_end): proses teknisi yang bebas paling awal -> rantai
@@ -309,18 +322,12 @@ def build_projects(clients):
         scale = weighted_scale(client["tipe"])
         dlo, dhi = DUR[scale]
         dur = rng.randint(dlo, dhi)
-        _sf = pick(SCHED_FACTORS)
-        _dur_float = dur * _sf
-        actual_dur = max(1, round(_dur_float))
-        # hindari SPI menumpuk tepat 1.0: geser +-1 hari utk sebagian proyek >=3 hari
-        # (job sangat pendek <3 hari realistis memang sering tepat waktu -> SPI 1).
-        if actual_dur == dur and dur >= 3 and rng.random() < 0.6:
-            actual_dur = max(1, dur + rng.choice([-1, 1, 1]))
-        # jam penyelesaian dikodekan dari fraksi float -> sub-hari precision di
-        # status_changed_at tugas terakhir -> spiCalculator membaca tanpa floor
-        # -> SPI tidak selalu rasional bulat (1.500, 1.200).
-        _frac = _dur_float - int(_dur_float)
-        completion_hour = min(23, max(1, int(_frac * 24)))
+        # faktor jadwal x jitter kontinu -> durasi AKTUAL pecahan (sub-hari). SPI akhir =
+        # rencana/aktual = 1/(faktor*jitter): kontinu -> granular, tak ada 1.500/1.200.
+        _sf = pick(SCHED_FACTORS) * rng.uniform(*SCHED_JITTER)
+        _dur_float = max(0.5, dur * _sf)               # durasi aktual presisi (hari, pecahan)
+        actual_dur = max(1, round(_dur_float))         # versi BULAT utk penjadwalan (heap/jeda)
+        _spi_est = min(round(dur / _dur_float, 4), SPI_CAP_PY)   # SPI yg akan dihitung recalc
 
         start_off = free_off + rng.randint(*BENCH_GAP)   # mulai setelah jeda dari proyek lalu
         if start_off + actual_dur >= 0:
@@ -358,7 +365,7 @@ def build_projects(clients):
             start_off=start_off, end_off=end_off, dur=dur, actual_dur=eff_dur, actual_end=actual_end,
             status=status, phase=phase, survey_approved=survey_approved, sap_off=sap_off,
             manager=manager, team=[tid], value=make_value(category, scale), bucket=bucket,
-            target=TARGET_DESC[category], completion_hour=completion_hour,
+            target=TARGET_DESC[category], actual_dur_float=_dur_float, spi_est=_spi_est,
         ))
         if status == "completed":
             # bebas lagi pada actual_end; jeda BENCH_GAP ditambah saat pop berikutnya
@@ -381,6 +388,71 @@ def clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
 
+def split_off(off_exact):
+    """Offset pecahan (hari, boleh negatif) -> (hari_floor, jam, menit) utk tsexpr.
+    Menyimpan komponen sub-hari supaya recalc (tanpa floor) menghitung durasi aktual
+    presisi -> SPI granular. floor (bukan int) supaya benar utk offset negatif."""
+    day = math.floor(off_exact)
+    rem = off_exact - day                          # 0..1
+    hh = clamp(int(rem * 24), 0, 23)
+    mm = clamp(int((rem * 24 - hh) * 60), 0, 59)
+    return day, hh, mm
+
+
+# ============================ DISTRIBUSI KESEHATAN PORTOFOLIO ============================
+# Citra perusahaan SEHAT: hanya SEDIKIT proyek bermasalah. Paksa TEPAT N_RED proyek SELESAI
+# jadi MERAH (Kritis, SPI<0.85) + N_AMBER jadi KUNING (Waspada, 0.85-0.95), sisanya HIJAU.
+# Caranya: override durasi RENCANA (end_date) -> SPI = rencana/aktual turun ke pita target.
+# Durasi AKTUAL (actual_dur_float, actual_end, jadwal heap) TIDAK disentuh -> tak ada riak
+# penjadwalan. Proyek dipilih TERSEBAR kronologis. Dipanggil SEBELUM build_tasks supaya
+# due-date tugas mengikuti durasi rencana yang baru.
+N_RED = 3
+N_AMBER = 2
+
+
+def _force_spi_band(p, lo, hi):
+    """Setel durasi RENCANA proyek agar SPI (=rencana/aktual) mendarat di [lo, hi).
+    True bila ada durasi-hari integer di pita itu (proyek cukup panjang)."""
+    af = max(1.0, p["actual_dur_float"])           # durasi AKTUAL (hari, pecahan) -- TETAP
+    lo_d = max(1, math.ceil(lo * af))              # durasi integer terkecil dgn SPI >= lo
+    hi_d = math.ceil(hi * af) - 1                  # terbesar dgn SPI < hi
+    if hi_d < lo_d:
+        return False                               # proyek terlalu pendek utk pita ini
+    new_dur = min(max(int(round((lo + hi) / 2 * af)), lo_d), hi_d)
+    p["dur"] = new_dur
+    p["end_off"] = p["start_off"] + new_dur        # end_date RENCANA (actual_end tak berubah)
+    p["spi_est"] = min(round(new_dur / af, 4), SPI_CAP_PY)
+    return True
+
+
+def enforce_health_distribution(projects):
+    completed = sorted((p for p in projects if p["status"] == "completed"),
+                       key=lambda p: p["start_off"])
+    n = len(completed)
+    if n == 0:
+        return (0, 0)
+    plan = [(0.62, 0.84)] * N_RED + [(0.86, 0.94)] * N_AMBER   # merah dulu, lalu kuning
+    m = len(plan)
+    used = set()
+    nred = namber = 0
+    for k, (lo, hi) in enumerate(plan):
+        center = min(n - 1, int(round((k + 0.5) / m * n)))     # posisi tersebar merata
+        placed = False
+        for off in range(n):                                   # spiral keluar dari center
+            for i in (center + off, center - off):
+                if 0 <= i < n and i not in used and _force_spi_band(completed[i], lo, hi):
+                    used.add(i)
+                    if hi <= 0.85:
+                        nred += 1
+                    else:
+                        namber += 1
+                    placed = True
+                    break
+            if placed:
+                break
+    return (nred, namber)
+
+
 def build_tasks(projects):
     tasks = []
     tid = 0
@@ -392,11 +464,11 @@ def build_tasks(projects):
         total = len(chosen)
         s, e, dur = p["start_off"], p["end_off"], p["dur"]
 
-        # durasi AKTUAL dari penjadwal (FixedRoster). Proyek selesai: actual_end < 0,
-        # tugas terakhir di-'done' mendarat di actual_end -> MAX(status_changed_at) =
-        # actual_end -> SPI akhir = durasi_rencana / durasi_aktual (recalculateSPI).
-        actual_end = p["actual_end"] if p["status"] == "completed" else e
-        actual_dur = p["actual_dur"] if p["status"] == "completed" else dur
+        # durasi AKTUAL dari penjadwal (FixedRoster). Proyek selesai: tugas 'done'
+        # ditebar PROPORSIONAL sepanjang durasi aktual PECAHAN -> tugas TERAKHIR
+        # mendarat tepat di start + durasi_aktual_float (sub-hari) -> MAX(status_changed_at)
+        # presisi & monoton -> recalc SPI = rencana/aktual GRANULAR (bukan 1.500/1.200).
+        actual_dur_float = p["actual_dur_float"] if p["status"] == "completed" else float(dur)
 
         # tentukan jumlah 'done' sesuai status/kesehatan
         if p["status"] == "completed":
@@ -426,22 +498,24 @@ def build_tasks(projects):
             if idx < done:
                 st = "done"
                 if p["status"] == "completed":
-                    # penyelesaian aktual mengikuti durasi aktual; tugas terakhir
-                    # mendarat di actual_end -> MAX(status_changed_at) = actual_end.
-                    upd_off = clamp(s + round((idx + 1) / total * actual_dur), s + 1, actual_end)
+                    # stamp sub-hari proporsional; tugas terakhir = start + durasi_aktual_float
+                    sc_off, sc_hh, sc_mm = split_off(s + (idx + 1) / total * actual_dur_float)
+                    upd_off = sc_off
                 else:
                     upd_off = clamp(due_off + rng.randint(-2, 1), s + 1, min(e, -1))
+                    sc_off, sc_hh, sc_mm = upd_off, 14, 0
             elif idx == working_idx and p["status"] != "on-hold":
                 st = "working_on_it"
                 upd_off = clamp(-rng.randint(0, 3), s + 1, 0)
+                sc_off, sc_hh, sc_mm = upd_off, 14, 0
             else:
                 st = "to_do"
                 upd_off = s
+                sc_off, sc_hh, sc_mm = s, 14, 0
             tasks.append(dict(
                 id=tid, proyek=p["id"], nama=nm, desc=ds, assigned=assignee, status=st,
                 due_off=due_off, is_survey=is_sv, est=est, created_by=p["manager"],
-                created_off=s, upd_off=upd_off,
-                comp_hour=p["completion_hour"] if (idx == done - 1 and p["status"] == "completed") else 14,
+                created_off=s, upd_off=upd_off, sc_off=sc_off, sc_hh=sc_hh, sc_mm=sc_mm,
             ))
         p["_task_ids"] = list(range(tid - total + 1, tid + 1))
         p["_total_tasks"] = total
@@ -596,11 +670,16 @@ def emit(clients, projects, tasks, roster, acts, reports, escs):
     out.append("  -- Tugas (status konsisten dgn posisi waktu & kesehatan target).")
     rows = []
     for t in tasks:
-        scoff = t["upd_off"] if t["status"] != "to_do" else t["created_off"]
+        # status_changed_at: to_do belum berubah -> = waktu dibuat; selain itu pakai
+        # stamp presisi (sub-hari utk proyek selesai -> SPI granular di recalc).
+        if t["status"] == "to_do":
+            sc = tsexpr(t["created_off"], 8, 0)
+        else:
+            sc = tsexpr(t["sc_off"], t["sc_hh"], t["sc_mm"])
         rows.append(
             f"  ({t['id']}, {t['proyek']}, {q(t['nama'])}, {q(t['desc'])}, {t['assigned']}, {q(t['status'])}, "
             f"{dexpr(t['due_off'])}, {str(t['is_survey']).upper()}, {t['est']}, NULL, "
-            f"{tsexpr(scoff, t.get('comp_hour', 14), 0)}, {t['created_by']}, {tsexpr(t['created_off'], 8, 0)}, {tsexpr(t['upd_off'], 15, 0)})")
+            f"{sc}, {t['created_by']}, {tsexpr(t['created_off'], 8, 0)}, {tsexpr(t['upd_off'], 15, 0)})")
     chunked_insert(out, "  INSERT INTO tb_tugas (id_tugas, id_proyek, nama_tugas, description, assigned_to, status, due_date, is_survey_task, estimated_hours, depends_on, status_changed_at, created_by, created_at, updated_at) VALUES", rows)
     out.append("")
 
@@ -649,6 +728,7 @@ def emit(clients, projects, tasks, roster, acts, reports, escs):
 def main():
     clients = build_clients()
     projects, roster = build_projects(clients)
+    nred, namber = enforce_health_distribution(projects)   # paksa tepat N_RED merah + N_AMBER kuning
     tasks = build_tasks(projects)
     acts, reports, escs = build_activities(projects, tasks)
     sql = emit(clients, projects, tasks, roster, acts, reports, escs)
@@ -686,6 +766,18 @@ def main():
     print(f"  kategori: {dict(cat)}")
     print(f"  tugas={len(tasks)} aktivitas={len(acts)} laporan={len(reports)} eskalasi={len(escs)}")
     print(f"  cek 1-job/teknisi: konkurensi maksimum per teknisi = {peak} (harus 1)")
+    # estimasi SPI proyek selesai (= yg akan dihitung recalc tanpa floor): cek avg ~0.9 + granular
+    spis = [p["spi_est"] for p in projects if p["status"] == "completed"]
+    if spis:
+        avg_spi = round(sum(spis) / len(spis), 3)
+        distinct = len(set(round(x, 3) for x in spis))
+        roundish = sum(1 for x in spis if abs(x * 4 - round(x * 4)) < 1e-6)  # kelipatan 0.25
+        rag = {"green": sum(1 for x in spis if x >= 0.95),
+               "amber": sum(1 for x in spis if 0.85 <= x < 0.95),
+               "red": sum(1 for x in spis if x < 0.85)}
+        print(f"  SPI selesai (estimasi recalc): avg={avg_spi}  min={round(min(spis),3)}  "
+              f"max={round(max(spis),3)}  distinct={distinct}/{len(spis)}  bulat(.25)={roundish}")
+        print(f"  RAG selesai (estimasi): {rag}")
 
 
 if __name__ == "__main__":
