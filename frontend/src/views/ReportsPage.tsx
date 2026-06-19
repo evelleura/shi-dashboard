@@ -510,10 +510,18 @@ export default function ReportsPage() {
   const [editProject, setEditProject] = useState<DashboardProject | null>(null);
   const [editForm, setEditForm] = useState({ name: '', status: '', phase: '', category: '', project_value: '' });
 
-  const allProjects = (projects as DashboardProject[]).filter((p) => {
-    if (categoryFilter === 'all') return true;
-    return (p as unknown as Record<string, string>).category === categoryFilter;
-  });
+  // Urutkan KRONOLOGIS (terbaru dulu) untuk laporan ringkasan -- BUKAN merah-dulu.
+  // API /projects meng-ORDER BY kesehatan (merah->amber->hijau) demi triase Dashboard;
+  // kalau dipakai apa adanya di sini, semua proyek MERAH menumpuk di atas tabel ->
+  // laporan "terlihat merah semua" padahal ~73% hijau (cuma 19% selesai-telat). Laporan
+  // seluruh proyek harus netral (kronologis), bukan triase. Sort pada array hasil filter
+  // (salinan baru) -> cache react-query tidak ikut termutasi.
+  const allProjects = (projects as DashboardProject[])
+    .filter((p) => categoryFilter === 'all' || (p as unknown as Record<string, string>).category === categoryFilter)
+    .sort((a, b) => {
+      const dt = new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+      return dt !== 0 ? dt : (b.project_code ?? '').localeCompare(a.project_code ?? '');
+    });
 
   const openEdit = (p: DashboardProject) => {
     setEditProject(p);
@@ -688,7 +696,7 @@ export default function ReportsPage() {
         {tab === 'summary' && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">All Projects Summary</h2>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Laporan Seluruh Proyek</h2>
               <span className="text-[10px] text-gray-400 dark:text-gray-500">{allProjects.length} projects</span>
             </div>
             <div className="overflow-x-auto">

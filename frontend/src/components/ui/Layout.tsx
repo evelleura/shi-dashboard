@@ -166,7 +166,7 @@ export default function Layout({ children }: Props) {
           <div className="px-4 py-4 border-b border-slate-800 dark:border-gray-800">
             <div className="flex items-center gap-2.5">
               <div className="h-12 w-12 rounded-lg bg-white p-1.5 flex items-center justify-center shrink-0">
-                <SHILogo square size={40} />
+                <SHILogo size={40} />
               </div>
               <div>
                 <p className="text-white font-bold text-base leading-tight">SHI Dashboard</p>
