@@ -343,6 +343,10 @@ export const createDailyReport = async (data: CreateDailyReportData): Promise<Da
   return res.data.data!;
 };
 
+export const deleteDailyReport = async (id: number): Promise<void> => {
+  await api.delete(`/daily-reports/${id}`);
+};
+
 // ==================== Dashboard ====================
 
 export const getDashboard = async (params?: DateRange): Promise<DashboardData> => {
@@ -496,6 +500,10 @@ export const reviewEscalation = async (id: number): Promise<Escalation> => {
 export const resolveEscalation = async (id: number, resolution_notes: string): Promise<Escalation> => {
   const res = await api.patch<ApiResponse<Escalation>>(`/escalations/${id}/resolve`, { resolution_notes });
   return res.data.data!;
+};
+
+export const deleteEscalation = async (id: number): Promise<void> => {
+  await api.delete(`/escalations/${id}`);
 };
 
 export const getEscalationUpdates = async (id: number): Promise<EscalationUpdate[]> => {

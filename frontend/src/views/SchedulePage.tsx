@@ -4,7 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getScheduleTasks } from '../services/api';
 import { TaskStatusBadge } from '../components/tasks/TaskStatusSelect';
 import CalendarView from '../components/schedule/CalendarView';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 import { useLanguage } from '../hooks/useLanguage';
+import { useAuth } from '../hooks/useAuth';
+import { useDeleteTask } from '../hooks/useTasks';
 import { t } from '../lib/i18n';
 import type { TaskStatus } from '../types';
 
@@ -87,6 +90,10 @@ export default function SchedulePage() {
     staleTime: 1000 * 60 * 2,
   });
   const router = useRouter();
+  const { user: me } = useAuth();
+  const canManage = me?.role === 'manajer' || me?.role === 'admin';
+  const deleteTaskMutation = useDeleteTask();
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; projectId: number } | null>(null);
 
   const [viewMode, setViewMode] = useState<'gantt' | 'kalender'>('gantt');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -398,11 +405,23 @@ export default function SchedulePage() {
                       const isOverdue = task.due_date && task.status !== 'done' && new Date(task.due_date) < new Date();
 
                       return (
-                        <div key={task.id} className="flex items-center hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                        <div key={task.id} className="group flex items-center hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                           {/* Task info column */}
                           <div className="w-64 shrink-0 px-4 py-2 pl-10 border-r border-gray-100 dark:border-gray-700">
                             <div className="flex items-center gap-1.5">
                               <span className="text-xs text-gray-800 dark:text-gray-200 truncate font-medium">{task.name}</span>
+                              {canManage && (
+                                <button
+                                  onClick={() => setDeleteTarget({ id: task.id, projectId: task.project_id })}
+                                  className="ml-auto shrink-0 text-gray-300 hover:text-red-600 dark:text-gray-600 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                                  title={language === 'id' ? 'Hapus tugas' : 'Delete task'}
+                                  aria-label={language === 'id' ? 'Hapus tugas' : 'Delete task'}
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
+                              )}
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
                               <TaskStatusBadge status={task.status} size="sm" />
@@ -482,6 +501,22 @@ export default function SchedulePage() {
           {t('schedule.overdue_legend', language)}
         </span>
       </div>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={async () => {
+          if (deleteTarget != null) {
+            await deleteTaskMutation.mutateAsync(deleteTarget);
+            setDeleteTarget(null);
+          }
+        }}
+        title="Hapus Tugas"
+        message="Hapus tugas ini? Tindakan ini tidak dapat dibatalkan."
+        confirmLabel="Hapus"
+        variant="danger"
+        loading={deleteTaskMutation.isPending}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
+import { roleSatisfies, ROLES } from '@/lib/rbac';
 import { query, getClient } from '@/lib/db';
 import { recalculateSPI } from '@/lib/spiCalculator';
 import { logChange } from './audit';
@@ -514,7 +515,7 @@ export async function changeTaskStatus(request: NextRequest, id: string) {
           error: `Cannot transition from '${currentStatus}' to '${status}'. Allowed: ${allowed.join(', ') || 'none'}`,
         }, { status: 400 });
       }
-    } else if (auth.user.role !== 'manajer') {
+    } else if (!roleSatisfies(auth.user.role, ROLES.MANAJER)) {
       return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
     }
 

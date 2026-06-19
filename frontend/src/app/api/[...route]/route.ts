@@ -302,6 +302,10 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       if (method === 'GET') return dailyReports.listByProject(request, r2);
       return methodNotAllowed();
     }
+    if (r1 && !r2) {
+      if (method === 'DELETE') return dailyReports.deleteDailyReport(request, r1);
+      return methodNotAllowed();
+    }
     return notFound();
   }
 

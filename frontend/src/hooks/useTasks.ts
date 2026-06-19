@@ -76,6 +76,7 @@ export function useDeleteTask() {
       void qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
       void qc.invalidateQueries({ queryKey: PROJECT_KEYS.detail(projectId) });
       void qc.invalidateQueries({ queryKey: ['dashboard'] });
+      void qc.invalidateQueries({ queryKey: ['schedule-tasks'] });
       toast('Tugas berhasil dihapus');
     },
     onError: () => { toast('Gagal menghapus tugas', 'error'); },

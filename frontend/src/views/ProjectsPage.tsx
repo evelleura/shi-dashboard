@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useProjects, useCreateProject, useUpdateProject } from '../hooks/useProjects';
+import { useProjects, useCreateProject, useUpdateProject, useDeleteProject } from '../hooks/useProjects';
 import { useClients } from '../hooks/useClients';
 import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 import ProjectForm from '../components/projects/ProjectForm';
 import DataTable, { type Column } from '../components/ui/DataTable';
 import { useLanguage } from '../hooks/useLanguage';
@@ -35,12 +36,14 @@ export default function ProjectsPage() {
   const { data: clients = [] } = useClients();
   const createMutation = useCreateProject();
   const updateMutation = useUpdateProject();
+  const deleteMutation = useDeleteProject();
   const router = useRouter();
   const { language } = useLanguage();
 
   const locale = language === 'id' ? 'id-ID' : 'en-US';
 
   const [showCreate, setShowCreate] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -354,6 +357,12 @@ export default function ProjectsPage() {
     setShowCreate(false);
   };
 
+  const handleDelete = async () => {
+    if (deleteId == null) return;
+    await deleteMutation.mutateAsync(deleteId);
+    setDeleteId(null);
+  };
+
   const handleRowClick = (p: DashboardProject) => {
     // Do not navigate if currently editing a cell in this row
     if (editingCell?.id === p.id) return;
@@ -455,6 +464,19 @@ export default function ProjectsPage() {
         defaultSortDesc={true}
         exportFileName="projects"
         emptyMessage={t('projects.no_found', language)}
+        actionColumn={{
+          render: (p) => (
+            <button
+              onClick={(e) => { e.stopPropagation(); setDeleteId(p.id); }}
+              className="text-red-400 hover:text-red-600 transition-colors"
+              aria-label={`${t('action.delete', language)} ${p.name}`}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          ),
+        }}
       />
 
       {/* Legend warna -- pisahkan jelas STATUS (siklus hidup) vs KESEHATAN/SPI (EWS). */}
@@ -523,6 +545,18 @@ export default function ProjectsPage() {
           isPending={createMutation.isPending}
         />
       </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title={t('project.delete_title', language)}
+        message={t('project.delete_message', language)}
+        confirmLabel={t('action.delete', language)}
+        variant="danger"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

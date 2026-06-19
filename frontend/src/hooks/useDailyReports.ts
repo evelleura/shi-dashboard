@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getDailyReports, createDailyReport } from '../services/api';
+import { getDailyReports, createDailyReport, deleteDailyReport } from '../services/api';
 import type { CreateDailyReportData } from '../types';
 
 export const DAILY_REPORT_KEYS = {
@@ -21,6 +21,16 @@ export function useCreateDailyReport() {
     mutationFn: (data: CreateDailyReportData) => createDailyReport(data),
     onSuccess: (_data, variables) => {
       void qc.invalidateQueries({ queryKey: DAILY_REPORT_KEYS.byProject(variables.project_id) });
+    },
+  });
+}
+
+export function useDeleteDailyReport(projectId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteDailyReport(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: DAILY_REPORT_KEYS.byProject(projectId) });
     },
   });
 }

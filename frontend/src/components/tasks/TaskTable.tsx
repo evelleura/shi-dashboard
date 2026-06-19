@@ -141,7 +141,7 @@ export default function TaskTable({
   // Adjacent tasks in sort_order sequence for up/down reorder
   const tasksByOrder = useMemo(() => [...tasks].sort((a, b) => a.sort_order - b.sort_order), [tasks]);
 
-  const canReorder = !!onSwapTasks && (userRole === 'manajer') && sortKey === 'order' && !sortDesc;
+  const canReorder = !!onSwapTasks && sortKey === 'order' && !sortDesc;
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDesc(!sortDesc);

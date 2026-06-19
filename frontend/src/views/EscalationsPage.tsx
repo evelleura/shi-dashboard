@@ -4,11 +4,13 @@ import {
   useEscalationSummary,
   useReviewEscalation,
   useResolveEscalation,
+  useDeleteEscalation,
   useEscalationUpdates,
   useAddEscalationUpdate,
   useRespondEscalationAction,
 } from '../hooks/useEscalations';
 import Modal from '../components/ui/Modal';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 import type { Escalation, EscalationPriority, EscalationStatus, EscalationActionRequest } from '../types';
 
 const PRIORITY_CONFIG: Record<EscalationPriority, { bg: string; text: string; label: string }> = {
@@ -67,14 +69,21 @@ export default function EscalationsPage() {
   const { data: summary } = useEscalationSummary();
   const reviewMutation = useReviewEscalation();
   const resolveMutation = useResolveEscalation();
+  const deleteMutation = useDeleteEscalation();
 
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortField>('priority');
   const [resolveModal, setResolveModal] = useState<Escalation | null>(null);
   const [resolutionNotes, setResolutionNotes] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<Escalation | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const handleReview = (id: number) => reviewMutation.mutate(id);
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) });
+  };
 
   const handleResolve = () => {
     if (!resolveModal || !resolutionNotes.trim()) return;
@@ -188,6 +197,7 @@ export default function EscalationsPage() {
               onToggle={() => setExpandedId(expandedId === esc.id ? null : esc.id)}
               onReview={handleReview}
               onResolve={(e) => { setResolveModal(e); setResolutionNotes(''); }}
+              onDelete={(e) => setDeleteTarget(e)}
               isReviewing={reviewMutation.isPending}
             />
           ))}
@@ -231,18 +241,30 @@ export default function EscalationsPage() {
           )}
         </div>
       </Modal>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title="Hapus Eskalasi"
+        message="Apakah Anda yakin ingin menghapus eskalasi ini? Tindakan ini tidak dapat dibatalkan."
+        confirmLabel="Hapus"
+        variant="danger"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }
 
 function ManagerEscalationCard({
-  escalation, expanded, onToggle, onReview, onResolve, isReviewing,
+  escalation, expanded, onToggle, onReview, onResolve, onDelete, isReviewing,
 }: {
   escalation: Escalation;
   expanded: boolean;
   onToggle: () => void;
   onReview: (id: number) => void;
   onResolve: (esc: Escalation) => void;
+  onDelete: (esc: Escalation) => void;
   isReviewing: boolean;
 }) {
   const pc = PRIORITY_CONFIG[escalation.priority];
@@ -447,27 +469,31 @@ function ManagerEscalationCard({
           )}
 
           {/* Action buttons */}
-          {escalation.status !== 'cancelled' && (
-            <div className="flex gap-2 pt-1 border-t border-gray-100 dark:border-gray-700">
-              {escalation.status === 'open' && (
-                <button
-                  onClick={() => onReview(escalation.id)}
-                  disabled={isReviewing}
-                  className="px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg hover:bg-amber-100 disabled:opacity-50 transition-colors"
-                >
-                  {isReviewing ? 'Memproses...' : 'Mulai Tinjauan'}
-                </button>
-              )}
-              {escalation.status === 'in_review' && (
-                <button
-                  onClick={() => onResolve(escalation)}
-                  className="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 transition-colors"
-                >
-                  Selesaikan
-                </button>
-              )}
-            </div>
-          )}
+          <div className="flex gap-2 pt-1 border-t border-gray-100 dark:border-gray-700">
+            {escalation.status === 'open' && (
+              <button
+                onClick={() => onReview(escalation.id)}
+                disabled={isReviewing}
+                className="px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg hover:bg-amber-100 disabled:opacity-50 transition-colors"
+              >
+                {isReviewing ? 'Memproses...' : 'Mulai Tinjauan'}
+              </button>
+            )}
+            {escalation.status === 'in_review' && (
+              <button
+                onClick={() => onResolve(escalation)}
+                className="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 transition-colors"
+              >
+                Selesaikan
+              </button>
+            )}
+            <button
+              onClick={() => onDelete(escalation)}
+              className="ml-auto px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 transition-colors"
+            >
+              Hapus
+            </button>
+          </div>
         </div>
       )}
     </div>

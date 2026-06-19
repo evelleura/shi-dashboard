@@ -10,6 +10,7 @@ import { useUpdateTask, useDeleteTask } from '../../hooks/useTasks';
 import { useTechnicians } from '../../hooks/useDashboard';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../lib/i18n';
+import { roleSatisfies, ROLES, type Role } from '../../lib/rbac';
 import type { Task, TaskStatus, UserRole, EscalationPriority, User, UpdateTaskData } from '../../types';
 
 function formatDuration(ms: number): string {
@@ -139,7 +140,7 @@ export default function TaskDetailModal({
   if (!task) return null;
 
   const isTechnician = userRole === 'teknisi';
-  const canEdit = userRole === 'manajer';
+  const canEdit = !!userRole && roleSatisfies(userRole as Role, ROLES.MANAJER);
   const isOverdue = task.due_date && task.status !== 'done' && task.status !== 'review' && new Date(task.due_date) < new Date();
   const isOvertime = isOverdue && (task.status === 'working_on_it' || task.status === 'in_progress');
   const isOverDeadline = isOverdue && task.status === 'to_do';

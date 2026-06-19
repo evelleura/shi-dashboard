@@ -88,3 +88,32 @@ export async function listByProject(request: NextRequest, projectId: string) {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function deleteDailyReport(request: NextRequest, id: string) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const reportId = parseInt(id);
+  if (isNaN(reportId)) {
+    return NextResponse.json({ success: false, error: 'ID laporan tidak valid' }, { status: 400 });
+  }
+
+  try {
+    const existing = await query<{ created_by: number }>(
+      'SELECT created_by FROM daily_reports WHERE id = $1',
+      [reportId]
+    );
+    if (existing.rowCount === 0) {
+      return NextResponse.json({ success: false, error: 'Catatan tidak ditemukan' }, { status: 404 });
+    }
+    // Teknisi hanya boleh menghapus catatannya sendiri; manajer/admin boleh menghapus semua.
+    if (auth.user.role === 'teknisi' && existing.rows[0].created_by !== auth.user.userId) {
+      return NextResponse.json({ success: false, error: 'Anda hanya bisa menghapus catatan Anda sendiri' }, { status: 403 });
+    }
+    await query('DELETE FROM daily_reports WHERE id = $1', [reportId]);
+    return NextResponse.json({ success: true, data: { id: reportId } });
+  } catch (err) {
+    console.error('Delete daily report error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}

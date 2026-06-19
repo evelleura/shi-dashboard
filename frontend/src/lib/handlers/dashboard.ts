@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
+import { roleSatisfies, ROLES } from '@/lib/rbac';
 import { query } from '@/lib/db';
 import { calculatePlannedValue } from '@/lib/spiCalculator';
 
@@ -439,7 +440,7 @@ export async function globalSearch(request: NextRequest) {
   const { role, userId } = auth.user;
 
   try {
-    if (role === 'manajer') {
+    if (roleSatisfies(role, ROLES.MANAJER)) {
       const [projectRows, taskRows, clientRows] = await Promise.all([
         query<{ id: number; name: string; project_code: string | null; status: string }>(
           `SELECT id_proyek AS id, nama_proyek AS name, project_code, status FROM tb_proyek

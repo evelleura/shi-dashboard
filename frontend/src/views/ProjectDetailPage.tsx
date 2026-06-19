@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useProject, useProjectTechnicians, useApproveSurvey, useRejectSurvey } from '../hooks/useProjects';
+import { useProject, useProjectTechnicians, useApproveSurvey, useRejectSurvey, useDeleteProject } from '../hooks/useProjects';
 import { useChangeTaskStatus, useCreateTask, useSwapTaskOrder } from '../hooks/useTasks';
 import { useTechnicianList } from '../hooks/useUsers';
 import StatusBadge from '../components/ui/StatusBadge';
 import ProgressBar from '../components/ui/ProgressBar';
 import Modal from '../components/ui/Modal';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 import KanbanBoard from '../components/tasks/KanbanBoard';
 import TaskTable from '../components/tasks/TaskTable';
 import TaskDetailModal from '../components/tasks/TaskDetailModal';
@@ -48,6 +49,7 @@ export default function ProjectDetailPage() {
 
   const approveSurveyMutation = useApproveSurvey();
   const rejectSurveyMutation = useRejectSurvey();
+  const deleteProjectMutation = useDeleteProject();
 
   const [activeTab, setActiveTab] = useState<TabId>('tasks');
   const [taskView, setTaskView] = useState<'kanban' | 'table'>('kanban');
@@ -55,6 +57,7 @@ export default function ProjectDetailPage() {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [showDelete, setShowDelete] = useState(false);
 
 
   const { can } = usePermissions();
@@ -87,6 +90,11 @@ export default function ProjectDetailPage() {
   const handleCreateTask = async (data: CreateTaskData) => {
     await createTask.mutateAsync(data);
     setShowTaskForm(false);
+  };
+
+  const handleDeleteProject = async () => {
+    await deleteProjectMutation.mutateAsync(projectId);
+    router.push('/projects');
   };
 
   const tabs: { id: TabId; label: string; count?: number }[] = [
@@ -143,7 +151,17 @@ export default function ProjectDetailPage() {
               )}
             </p>
           </div>
-          <StatusBadge status={project.health?.status ?? null} />
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <StatusBadge status={project.health?.status ?? null} />
+            {isManager && (
+              <button
+                onClick={() => setShowDelete(true)}
+                className="border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 text-sm px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              >
+                {t('project.delete', language)}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -516,6 +534,18 @@ export default function ProjectDetailPage() {
           projectPhase={project.phase}
         />
       </Modal>
+
+      {/* Delete Project Confirmation */}
+      <ConfirmDialog
+        open={showDelete}
+        onClose={() => setShowDelete(false)}
+        onConfirm={handleDeleteProject}
+        title={t('project.delete_title', language)}
+        message={t('project.delete_message', language)}
+        confirmLabel={t('action.delete', language)}
+        variant="danger"
+        loading={deleteProjectMutation.isPending}
+      />
     </div>
   );
 }

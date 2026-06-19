@@ -9,6 +9,7 @@ import {
   addEscalationUpdate,
   requestEscalationAction,
   respondEscalationAction,
+  deleteEscalation,
 } from '../services/api';
 import { useToast } from './useToast';
 import type { EscalationActionRequest } from '../types';
@@ -78,6 +79,20 @@ export function useResolveEscalation() {
       toast('Eskalasi berhasil diselesaikan');
     },
     onError: () => { toast('Gagal menyelesaikan eskalasi', 'error'); },
+  });
+}
+
+export function useDeleteEscalation() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  return useMutation({
+    mutationFn: (id: number) => deleteEscalation(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ESCALATION_KEYS.all });
+      void qc.invalidateQueries({ queryKey: ['dashboard'] });
+      toast('Eskalasi berhasil dihapus');
+    },
+    onError: () => { toast('Gagal menghapus eskalasi', 'error'); },
   });
 }
 
