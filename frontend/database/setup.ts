@@ -33,36 +33,26 @@ async function main() {
   console.log('Setting up database...');
   try {
     const scriptDir = path.resolve(path.dirname(process.argv[1] || __filename));
-    await runSQL(path.join(scriptDir, 'schema.sql'));
-    console.log('Schema created.');
+    // Skema + 8 user dasar. init.sql idempotent: CREATE TABLE IF NOT EXISTS +
+    // seed user dijaga "IF NOT EXISTS (SELECT 1 FROM tb_user)". Sama dgn jalur
+    // lokal run.py (tabel Indonesia tb_user/tb_proyek, BUKAN schema.sql English).
+    await runSQL(path.join(scriptDir, 'init.sql'));
+    console.log('Schema + base users ready.');
 
     const seedArg = process.argv.includes('--seed');
     const forceSeed = process.argv.includes('--force-seed');
     if (seedArg || forceSeed) {
-      // Idempotency guard: seed.sql contains many non-ON-CONFLICT INSERTs.
-      // Re-running it on a populated DB would duplicate-key crash. Skip
-      // unless --force-seed is passed explicitly.
-      const { rows } = await pool.query<{ n: string }>(
-        'SELECT COUNT(*)::text AS n FROM users',
-      );
-      const userCount = parseInt(rows[0].n, 10);
-      if (userCount > 0 && !forceSeed) {
-        console.log(`Seed: skipped (users table already has ${userCount} rows).`);
-      } else {
-        if (forceSeed && userCount > 0) {
-          // --force-seed means "wipe and reseed". Without TRUNCATE, the seed
-          // would dup-key crash whenever ANY existing email collides with the
-          // 8 seed users (admin@shi.co.id, budi@..., diana@..., etc).
-          // CASCADE handles FK refs from project_assignments, tasks, evidence,
-          // daily_reports, activities, escalations, audit_log, notifications.
-          // RESTART IDENTITY resets the SERIAL sequence so seed IDs (1..8) are
-          // honored cleanly.
-          console.log(`Force-seed: truncating users (was ${userCount} rows) and dependent tables ...`);
-          await pool.query('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
-        }
-        await runSQL(path.join(scriptDir, 'seed.sql'));
-        console.log('Seed data inserted.');
+      if (forceSeed) {
+        // "Wipe & reseed": kosongkan SEMUA (CASCADE) lalu bangun ulang 8 user
+        // dasar via init.sql. seed.sql termuat lagi karena tb_proyek jadi kosong.
+        console.log('Force-seed: truncating tb_user (+ CASCADE) and reseeding ...');
+        await pool.query('TRUNCATE TABLE tb_user RESTART IDENTITY CASCADE');
+        await runSQL(path.join(scriptDir, 'init.sql')); // re-insert 8 user dasar
       }
+      // seed.sql self-guard "IF NOT EXISTS (SELECT 1 FROM tb_proyek)": load HANYA
+      // saat DB belum punya proyek -> aman diulang tiap deploy tanpa dup-key.
+      await runSQL(path.join(scriptDir, 'seed.sql'));
+      console.log('Operational seed applied (or skipped by self-guard).');
     }
 
     console.log('Database setup complete!');

@@ -1,0 +1,38 @@
+# fly.toml -- shi-naskah (app naskah TA: Next.js 15 + Postgres, tabel Indonesia tb_*)
+# Region: sin (Singapore), region-match dengan Fly Postgres utk latensi rendah.
+
+app             = "shi-naskah"
+primary_region  = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+# Tiap deploy: init.sql (skema + 8 user dasar, idempotent) + seed.sql (data
+# operasional, self-guard IF NOT EXISTS tb_proyek) + backfill SPI (project_health).
+# Re-seed PAKSA (ganti data dummy):
+#   fly ssh console -a shi-naskah -C "bash -lc 'cd /app && bun database/setup.ts --force-seed && bun database/backfill-spi.ts'"
+[deploy]
+  release_command = "bun database/setup.ts --seed && bun database/backfill-spi.ts"
+
+[env]
+  PORT                    = "3000"
+  NODE_ENV                = "production"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[http_service]
+  internal_port        = 3000
+  force_https          = true
+  auto_stop_machines   = "stop"
+  auto_start_machines  = true
+  min_machines_running = 0
+  processes            = ["app"]
+
+  [http_service.concurrency]
+    type       = "connections"
+    hard_limit = 250
+    soft_limit = 200
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory   = "512mb"

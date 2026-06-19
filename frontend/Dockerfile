@@ -24,7 +24,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/uploads ./uploads
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
-COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/next.config.ts ./
+# database/ (init.sql + seed.sql + setup.ts) and src/ (spiCalculator for backfill)
+# are needed by the Fly release_command:
+#   bun database/setup.ts --seed && bun database/backfill-spi.ts
+COPY --from=builder /app/database ./database
+COPY --from=builder /app/src ./src
 
 EXPOSE 3000
 CMD ["bun", "run", "start"]
