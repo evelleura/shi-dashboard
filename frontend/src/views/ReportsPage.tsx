@@ -26,7 +26,16 @@ function formatRupiah(n: number) {
   return `Rp ${n.toLocaleString('id-ID')}`;
 }
 
-function HealthBadge({ status }: { status: string | null }) {
+function HealthBadge({ status, projectStatus }: { status: string | null; projectStatus?: string | null }) {
+  // RAG health is an early-warning signal only meaningful for ACTIVE projects.
+  // For non-active projects, show a neutral lifecycle pill instead of red/amber/green.
+  if (projectStatus != null && projectStatus !== 'active') {
+    const lc = projectStatus === 'completed' ? 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+      : projectStatus === 'on-hold' ? 'bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300'
+      : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400';
+    const label = projectStatus === 'completed' ? 'Selesai' : projectStatus === 'on-hold' ? 'Ditunda' : 'Dibatalkan';
+    return <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${lc}`}>{label}</span>;
+  }
   const cls = status === 'red' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
     : status === 'amber' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
     : status === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
@@ -149,7 +158,14 @@ function computeRangeWindow(startYmd: string, endYmd: string): PeriodWindow {
   return { startYmd: ymd(a), endYmd: ymd(b), range, label };
 }
 
-function reportHealthBadge(h: string | null): string {
+function reportHealthBadge(h: string | null, projectStatus?: string | null): string {
+  // RAG health applies only to ACTIVE projects; non-active -> neutral lifecycle badge.
+  if (projectStatus != null && projectStatus !== 'active') {
+    const lcLabel = projectStatus === 'completed' ? 'Selesai' : projectStatus === 'on-hold' ? 'Ditunda' : 'Dibatalkan';
+    const lcColor = projectStatus === 'completed' ? '#475569' : projectStatus === 'on-hold' ? '#57534e' : '#6b7280';
+    const lcBg = projectStatus === 'completed' ? '#e2e8f0' : projectStatus === 'on-hold' ? '#e7e5e4' : '#f3f4f6';
+    return `<span class="badge" style="color:${lcColor};background:${lcBg}">${lcLabel}</span>`;
+  }
   const label = h ? (HEALTH_LABEL[h] ?? h) : 'N/A';
   const color = h === 'red' ? '#b91c1c' : h === 'amber' ? '#b45309' : h === 'green' ? '#15803d' : '#6b7280';
   const bg = h === 'red' ? '#fee2e2' : h === 'amber' ? '#fef3c7' : h === 'green' ? '#dcfce7' : '#f3f4f6';
@@ -260,7 +276,7 @@ function buildReportHTML(data: ReportActivityData, periodLabel: string, periodRa
       <td class="mono">${escapeHtml(p.project_code)}</td>
       <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
       <td>${escapeHtml(STATUS_LABEL[p.status] ?? p.status)}<div class="sub">${escapeHtml(PHASE_LABEL[p.phase] ?? p.phase)}</div></td>
-      <td class="c">${reportHealthBadge(p.health_status)}</td>
+      <td class="c">${reportHealthBadge(p.health_status, p.status)}</td>
       <td class="c mono">${p.spi_value != null ? Number(p.spi_value).toFixed(2) : '-'}</td>
       <td class="c"><strong>${p.activity_count}</strong></td>
       <td class="c">${p.tasks_worked}</td>
@@ -322,9 +338,11 @@ function buildProjectsReportHTML(tab: ReportType, projects: DashboardProject[], 
   const spi = (v: unknown) => (v != null ? Number(v).toFixed(3) : '-');
   const rupiah = (v: unknown) => (Number(v) > 0 ? `Rp ${Number(v).toLocaleString('id-ID')}` : '-');
   const tasksCell = (p: DashboardProject) => (p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '-');
-  const greens = projects.filter((p) => p.health_status === 'green').length;
-  const ambers = projects.filter((p) => p.health_status === 'amber').length;
-  const reds = projects.filter((p) => p.health_status === 'red').length;
+  // RAG counts are early-warning only -> count ACTIVE projects only (a completed
+  // project is never "Kritis"). Keeps this consistent with the Dashboard.
+  const greens = projects.filter((p) => p.health_status === 'green' && p.status === 'active').length;
+  const ambers = projects.filter((p) => p.health_status === 'amber' && p.status === 'active').length;
+  const reds = projects.filter((p) => p.health_status === 'red' && p.status === 'active').length;
   const avgSpi = summary?.avg_spi != null ? Number(summary.avg_spi).toFixed(3) : '-';
 
   if (tab === 'health') {
@@ -339,7 +357,7 @@ function buildProjectsReportHTML(tab: ReportType, projects: DashboardProject[], 
       <td class="c">${i + 1}</td>
       <td class="mono">${escapeHtml(p.project_code)}</td>
       <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
-      <td class="c">${reportHealthBadge(p.health_status)}</td>
+      <td class="c">${reportHealthBadge(p.health_status, p.status)}</td>
       <td class="c mono">${spi(p.spi_value)}</td>
       <td class="c">${p.actual_progress != null ? `${Number(p.actual_progress).toFixed(1)}%` : '-'}</td>
       <td class="c">${p.planned_progress != null ? `${Number(p.planned_progress).toFixed(1)}%` : '-'}</td>
@@ -374,7 +392,7 @@ function buildProjectsReportHTML(tab: ReportType, projects: DashboardProject[], 
         <td class="c">${i + 1}</td>
         <td class="mono">${escapeHtml(p.project_code)}</td>
         <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
-        <td class="c">${reportHealthBadge(p.health_status)}</td>
+        <td class="c">${reportHealthBadge(p.health_status, p.status)}</td>
         <td class="c">${p.completed_tasks}</td>
         <td class="c">${p.total_tasks}</td>
         <td class="c"><strong>${pct}%</strong></td>
@@ -407,7 +425,7 @@ function buildProjectsReportHTML(tab: ReportType, projects: DashboardProject[], 
     <td class="mono">${escapeHtml(p.project_code)}</td>
     <td><strong>${escapeHtml(p.name)}</strong><div class="sub">${escapeHtml(p.client_name ?? '-')}</div></td>
     <td>${escapeHtml(STATUS_LABEL[p.status] ?? p.status)}<div class="sub">${escapeHtml(PHASE_LABEL[p.phase] ?? p.phase)}</div></td>
-    <td class="c">${reportHealthBadge(p.health_status)}</td>
+    <td class="c">${reportHealthBadge(p.health_status, p.status)}</td>
     <td class="c mono">${spi(p.spi_value)}</td>
     <td class="c">${tasksCell(p)}</td>
     <td class="nowrap">${formatDate(p.start_date)} &ndash; ${formatDate(p.end_date)}</td>
@@ -577,7 +595,7 @@ export default function ReportsPage() {
       'Client': p.client_name ?? '',
       'Status': p.status,
       'Phase': p.phase,
-      'Health': p.health_status ?? 'N/A',
+      'Health': p.status !== 'active' ? (p.status === 'completed' ? 'Selesai' : p.status === 'on-hold' ? 'Ditunda' : 'Dibatalkan') : (p.health_status ?? 'N/A'),
       'SPI': p.spi_value != null ? Number(p.spi_value).toFixed(3) : '',
       'Tasks Done': p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '',
       'Start Date': p.start_date,
@@ -729,7 +747,7 @@ export default function ReportsPage() {
                       <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.client_name ?? '-'}</td>
                       <td className="px-3 py-2.5"><StatusSelect value={p.status} onChange={(v) => handleInlineStatusChange(p, v)} /></td>
                       <td className="px-3 py-2.5"><PhaseSelect value={p.phase} onChange={(v) => handleInlinePhaseChange(p, v)} /></td>
-                      <td className="px-3 py-2.5"><HealthBadge status={p.health_status} /></td>
+                      <td className="px-3 py-2.5"><HealthBadge status={p.health_status} projectStatus={p.status} /></td>
                       <td className="px-3 py-2.5 text-gray-700 dark:text-gray-300 font-mono">{p.spi_value != null ? Number(p.spi_value).toFixed(3) : '-'}</td>
                       <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.total_tasks > 0 ? `${p.completed_tasks}/${p.total_tasks}` : '-'}</td>
                       <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{formatDate(p.start_date)} — {formatDate(p.end_date)}</td>
@@ -784,7 +802,7 @@ export default function ReportsPage() {
                       .map((p) => (
                         <tr key={p.id} className="hover:bg-blue-50/50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors group" onClick={() => router.push(`/projects/${p.id}`)}>
                           <td className="px-3 py-2.5 font-medium text-blue-600 dark:text-blue-400 group-hover:underline">{p.name}</td>
-                          <td className="px-3 py-2.5"><HealthBadge status={p.health_status} /></td>
+                          <td className="px-3 py-2.5"><HealthBadge status={p.health_status} projectStatus={p.status} /></td>
                           <td className="px-3 py-2.5 text-gray-700 dark:text-gray-300 font-mono">{p.spi_value != null ? Number(p.spi_value).toFixed(3) : '-'}</td>
                           <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.actual_progress != null ? `${Number(p.actual_progress).toFixed(1)}%` : '-'}</td>
                           <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.planned_progress != null ? `${Number(p.planned_progress).toFixed(1)}%` : '-'}</td>
@@ -829,7 +847,7 @@ export default function ReportsPage() {
                         <p className="text-xs font-medium text-blue-600 dark:text-blue-400 truncate group-hover:underline">{p.name}</p>
                         <p className="text-[10px] text-gray-400 dark:text-gray-500">{p.completed_tasks} of {p.total_tasks} tasks</p>
                       </div>
-                      <HealthBadge status={p.health_status} />
+                      <HealthBadge status={p.health_status} projectStatus={p.status} />
                       <div className="w-32 shrink-0">
                         <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-green-500' : pct >= 50 ? 'bg-blue-500' : 'bg-amber-500'}`} style={{ width: `${pct}%` }} />
@@ -871,7 +889,7 @@ export default function ReportsPage() {
                         <td className="px-3 py-2.5 font-mono text-gray-500 dark:text-gray-400">{p.project_code}</td>
                         <td className="px-3 py-2.5 font-medium text-blue-600 dark:text-blue-400 max-w-[200px] truncate group-hover:underline">{p.name}</td>
                         <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.client_name ?? '-'}</td>
-                        <td className="px-3 py-2.5"><HealthBadge status={p.health_status} /></td>
+                        <td className="px-3 py-2.5"><HealthBadge status={p.health_status} projectStatus={p.status} /></td>
                         <td className="px-3 py-2.5 text-gray-700 dark:text-gray-300 font-mono">{p.spi_value != null ? Number(p.spi_value).toFixed(3) : '-'}</td>
                         <td className="px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300">{p.activity_count}</td>
                         <td className="px-3 py-2.5 text-gray-600 dark:text-gray-400">{p.tasks_worked}</td>

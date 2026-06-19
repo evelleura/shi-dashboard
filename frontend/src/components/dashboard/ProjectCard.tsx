@@ -55,7 +55,7 @@ export default function ProjectCard({ project }: Props) {
             </p>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
-            <StatusBadge status={project.health_status} />
+            <StatusBadge status={project.health_status} projectStatus={project.status} />
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
               project.phase === 'survey' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
             }`}>

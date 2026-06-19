@@ -158,7 +158,7 @@ export default function ProjectDetailPage() {
             </p>
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0">
-            <StatusBadge status={project.health?.status ?? null} />
+            <StatusBadge status={project.health?.status ?? null} projectStatus={project.status} />
             {isManager && (
               <button
                 onClick={() => setShowDelete(true)}

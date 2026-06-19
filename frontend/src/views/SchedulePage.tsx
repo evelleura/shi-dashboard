@@ -42,6 +42,7 @@ interface ProjectGroup {
   start: Date;
   end: Date;
   health: string | null;
+  projectStatus: string;
   tasks: ScheduleTask[];
 }
 
@@ -132,6 +133,7 @@ export default function SchedulePage() {
           start: new Date(t.project_start),
           end: new Date(t.project_end),
           health: t.health_status,
+          projectStatus: t.project_status,
           tasks: [],
         });
       }
@@ -337,7 +339,11 @@ export default function SchedulePage() {
                       <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${CAT_BADGE[group.category] ?? CAT_BADGE.lainnya}`}>
                         {group.category}
                       </span>
-                      {group.health && (
+                      {group.projectStatus !== 'active' ? (
+                        <span className="text-[10px] font-bold uppercase text-gray-400 dark:text-gray-500">
+                          {group.projectStatus === 'completed' ? 'Selesai' : group.projectStatus === 'on-hold' ? 'Ditunda' : group.projectStatus === 'cancelled' ? 'Dibatalkan' : group.projectStatus}
+                        </span>
+                      ) : group.health && (
                         <span className={`text-[10px] font-bold uppercase ${HEALTH_COLORS[group.health] ?? 'text-gray-400'}`}>
                           {group.health}
                         </span>

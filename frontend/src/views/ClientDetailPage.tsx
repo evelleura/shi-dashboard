@@ -302,6 +302,15 @@ function statusBadgeClass(status: string): string {
   return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
 }
 
+// RAG (health) is an Early-Warning signal meaningful only for ACTIVE projects.
+// Non-active projects show a neutral lifecycle label instead of RAG.
+function lifecycleLabel(status: string): string {
+  if (status === 'completed') return 'Selesai';
+  if (status === 'on-hold') return 'Ditunda';
+  if (status === 'cancelled') return 'Dibatalkan';
+  return status;
+}
+
 // ── main page ────────────────────────────────────────────────────────────────
 
 export default function ClientDetailPage() {
@@ -634,9 +643,9 @@ export default function ClientDetailPage() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1.5">
-                            <span className={`w-2.5 h-2.5 rounded-full ${healthDot(p.health_status)}`} />
+                            <span className={`w-2.5 h-2.5 rounded-full ${p.status === 'active' ? healthDot(p.health_status) : 'bg-gray-400'}`} />
                             <span className="text-xs text-gray-600 dark:text-gray-400 capitalize">
-                              {p.health_status ?? '--'}
+                              {p.status === 'active' ? (p.health_status ?? '--') : lifecycleLabel(p.status)}
                             </span>
                           </div>
                         </td>

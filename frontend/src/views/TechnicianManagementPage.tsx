@@ -78,7 +78,22 @@ function formatDate(d: string): string {
   return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function HealthBadge({ status }: { status: string | null }) {
+function HealthBadge({ status, projectStatus }: { status: string | null; projectStatus?: string | null }) {
+  // RAG health is meaningful ONLY for active projects. For non-active lifecycle
+  // states (completed / on-hold / cancelled), show a neutral label instead --
+  // a finished or paused project is never "Kritis".
+  if (projectStatus && projectStatus !== 'active') {
+    const lifecycleLabels: Record<string, string> = {
+      completed: 'Selesai',
+      'on-hold': 'Ditunda',
+      cancelled: 'Dibatalkan',
+    };
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+        {lifecycleLabels[projectStatus] ?? projectStatus}
+      </span>
+    );
+  }
   if (!status) return <span className="text-xs text-gray-400">--</span>;
   const colors: Record<string, string> = {
     green: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
@@ -544,7 +559,7 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                           </td>
                           <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{p.client_name || '--'}</td>
                           <td className="px-3 py-2 text-center">
-                            <HealthBadge status={p.health_status} />
+                            <HealthBadge status={p.health_status} projectStatus={p.status} />
                           </td>
                           <td className="px-3 py-2 text-center text-gray-700 dark:text-gray-300">
                             {p.my_completed}/{p.my_tasks}

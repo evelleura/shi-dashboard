@@ -192,7 +192,9 @@ export default function ProjectTimelinePage() {
             {filtered.map((p) => {
               const startOffset = (daysBetween(timelineRange.minDate.toISOString(), p.start_date) / timelineRange.totalDays) * 100;
               const duration = (daysBetween(p.start_date, p.end_date) / timelineRange.totalDays) * 100;
-              const health = HEALTH_COLORS[p.health_status ?? ''];
+              // RAG (health) coloring is an Early-Warning signal meaningful only for ACTIVE projects.
+              // Non-active projects (Selesai/Ditunda/Dibatalkan) get a neutral bar, not RAG.
+              const health = p.status === 'active' ? HEALTH_COLORS[p.health_status ?? ''] : undefined;
               const barColor = health?.bar ?? 'bg-gray-300 dark:bg-gray-600';
               const isOverdue = new Date(p.end_date) < today && p.status === 'active';
               const daysLeft = daysBetween(today.toISOString(), p.end_date);
@@ -275,9 +277,9 @@ export default function ProjectTimelinePage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Total Proyek', value: filtered.length, color: 'text-blue-600' },
-          { label: 'Baik', value: filtered.filter((p) => p.health_status === 'green').length, color: 'text-emerald-600' },
-          { label: 'Waspada', value: filtered.filter((p) => p.health_status === 'amber').length, color: 'text-amber-600' },
-          { label: 'Kritis', value: filtered.filter((p) => p.health_status === 'red').length, color: 'text-red-600' },
+          { label: 'Baik', value: filtered.filter((p) => p.health_status === 'green' && p.status === 'active').length, color: 'text-emerald-600' },
+          { label: 'Waspada', value: filtered.filter((p) => p.health_status === 'amber' && p.status === 'active').length, color: 'text-amber-600' },
+          { label: 'Kritis', value: filtered.filter((p) => p.health_status === 'red' && p.status === 'active').length, color: 'text-red-600' },
         ].map((s) => (
           <div key={s.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>

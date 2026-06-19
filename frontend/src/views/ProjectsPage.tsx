@@ -270,7 +270,7 @@ export default function ProjectsPage() {
       // On Track (SPI ~1.0, tugas tuntas) -> JANGAN tampil N/A. 'Belum Dinilai'
       // hanya saat proyek terlalu baru (PV < 5%, data belum cukup). Merah hanya
       // muncul di proyek aktif yg tertinggal (selesai SPI 1.0 -> tak pernah merah).
-      render: (p) => <StatusBadge status={p.health_status ?? null} />,
+      render: (p) => <StatusBadge status={p.health_status ?? null} projectStatus={p.status} />,
       sortValue: (p) => {
         const order: Record<string, number> = { red: 0, amber: 1, green: 2 };
         return order[p.health_status ?? ''] ?? 3;
