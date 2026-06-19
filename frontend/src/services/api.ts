@@ -317,6 +317,14 @@ export const deleteEvidence = async (id: number): Promise<void> => {
 
 export const getEvidenceDownloadUrl = (id: number): string => `/api/evidence/${id}/download`;
 
+// Fetch the evidence file as a Blob through axios so the JWT Authorization
+// header is attached (a plain <a href>/<img src> navigation never sends it ->
+// "No token provided"). `dl` forces the attachment disposition.
+export const downloadEvidenceBlob = async (id: number, dl = false): Promise<Blob> => {
+  const res = await api.get(`/evidence/${id}/download${dl ? '?dl=1' : ''}`, { responseType: 'blob' });
+  return res.data as Blob;
+};
+
 // ==================== Activities ====================
 
 export const getTaskActivities = async (taskId: number): Promise<TaskActivity[]> => {

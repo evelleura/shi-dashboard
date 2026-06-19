@@ -15,6 +15,16 @@ const ALLOWED_MIMES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ];
 
+const MIME_BY_EXT: Record<string, string> = {
+  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+  '.gif': 'image/gif', '.webp': 'image/webp',
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xls': 'application/vnd.ms-excel',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+};
+
 function sanitizeFilename(filename: string): string {
   const ext = path.extname(filename).toLowerCase();
   const base = path.basename(filename, ext).replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 100);
@@ -135,10 +145,22 @@ export async function downloadEvidence(request: NextRequest, id: string) {
     const filePath = path.join(process.cwd(), evidence.file_path);
     if (!existsSync(filePath)) return NextResponse.json({ success: false, error: 'File not found on disk' }, { status: 404 });
     const fileBuffer = await readFile(filePath);
+
+    const ext = path.extname(evidence.file_name).toLowerCase();
+    const mime = MIME_BY_EXT[ext] || 'application/octet-stream';
+    // Images + PDF render inline (so "view" shows the file); everything else
+    // downloads. `?dl=1` forces download for any type.
+    const forceDownload = request.nextUrl.searchParams.get('dl') === '1';
+    const inlineable = mime.startsWith('image/') || mime === 'application/pdf';
+    const disposition = forceDownload || !inlineable ? 'attachment' : 'inline';
+    const asciiName = evidence.file_name.replace(/["\\\r\n]/g, '_');
+
     return new NextResponse(fileBuffer, {
       headers: {
-        'Content-Disposition': `attachment; filename="${evidence.file_name}"`,
-        'Content-Type': 'application/octet-stream',
+        'Content-Type': mime,
+        'Content-Disposition': `${disposition}; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(evidence.file_name)}`,
+        'Content-Length': String(fileBuffer.length),
+        'Cache-Control': 'private, max-age=3600',
       },
     });
   } catch (err) {
