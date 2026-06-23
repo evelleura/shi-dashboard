@@ -69,6 +69,14 @@ const HEALTH_COLORS: Record<string, string> = {
   red: 'text-red-600 dark:text-red-400',
 };
 
+// Label RAG selaras seluruh app (StatusBadge/HealthBadge): jangan tampilkan enum
+// mentah 'GREEN'/'AMBER'/'RED' -- pakai Baik/Waspada/Kritis.
+const HEALTH_LABELS: Record<string, string> = {
+  green: 'Baik',
+  amber: 'Waspada',
+  red: 'Kritis',
+};
+
 const CAT_BADGE: Record<string, string> = {
   instalasi: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
   maintenance: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
@@ -338,8 +346,8 @@ export default function SchedulePage() {
                         {group.category}
                       </span>
                       {group.health && (
-                        <span className={`text-[10px] font-bold uppercase ${HEALTH_COLORS[group.health] ?? 'text-gray-400'}`}>
-                          {group.health}
+                        <span className={`text-[10px] font-bold ${HEALTH_COLORS[group.health] ?? 'text-gray-400'}`}>
+                          {HEALTH_LABELS[group.health] ?? group.health}
                         </span>
                       )}
                     </div>
