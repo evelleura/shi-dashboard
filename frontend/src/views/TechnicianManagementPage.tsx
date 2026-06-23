@@ -22,6 +22,8 @@ interface TechnicianRow {
   overdue_tasks: number;
   total_time_seconds: number;
   evidence_count: number;
+  spi_value: number | null;
+  health_status: string | null;
 }
 
 interface TechnicianDetail {
@@ -31,6 +33,8 @@ interface TechnicianDetail {
   role: string;
   created_at: string;
   evidence_count: number;
+  spi_value: number | null;
+  health_status: string | null;
   projects: {
     id: number;
     project_code: string;
@@ -177,6 +181,25 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
         ),
         sortValue: (t) => t.name.toLowerCase(),
         exportValue: (t) => t.name,
+      },
+      {
+        key: 'spi_value',
+        label: 'SPI',
+        render: (t) => (
+          <div className="flex items-center gap-2">
+            <span className={`text-sm font-bold ${
+              t.health_status === 'red' ? 'text-red-600 dark:text-red-400'
+                : t.health_status === 'amber' ? 'text-amber-600 dark:text-amber-400'
+                : t.health_status === 'green' ? 'text-green-600 dark:text-green-400'
+                : 'text-gray-400'
+            }`}>
+              {t.spi_value != null ? Number(t.spi_value).toFixed(2) : '--'}
+            </span>
+            <HealthBadge status={t.health_status} />
+          </div>
+        ),
+        sortValue: (t) => t.spi_value ?? -1,
+        exportValue: (t) => (t.spi_value != null ? Number(t.spi_value).toFixed(2) : '--'),
       },
       {
         key: 'project_count',
@@ -458,6 +481,18 @@ export default function TechnicianManagementPage({ defaultDetailId }: { defaultD
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Bergabung {techDetail.created_at ? formatDate(techDetail.created_at) : '--'}
                 </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-xs text-gray-400 dark:text-gray-500">SPI</p>
+                <p className={`text-2xl font-bold ${
+                  techDetail.health_status === 'red' ? 'text-red-600 dark:text-red-400'
+                    : techDetail.health_status === 'amber' ? 'text-amber-600 dark:text-amber-400'
+                    : techDetail.health_status === 'green' ? 'text-green-600 dark:text-green-400'
+                    : 'text-gray-400'
+                }`}>
+                  {techDetail.spi_value != null ? Number(techDetail.spi_value).toFixed(2) : '--'}
+                </p>
+                <HealthBadge status={techDetail.health_status} />
               </div>
             </div>
 

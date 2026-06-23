@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useTechnicianDashboard } from '../hooks/useDashboard';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import TechQuickActionsBar from '../components/dashboard/TechQuickActionsBar';
+import StatusBadge from '../components/ui/StatusBadge';
 import DateRangePicker from '../components/ui/DateRangePicker';
 import TechProductivityChart from '../components/charts/TechProductivityChart';
 import TechTimeSpentChart from '../components/charts/TechTimeSpentChart';
@@ -59,6 +60,14 @@ export default function TechnicianDashboard() {
 
   const stats = data.my_tasks;
   const openEscalations = data.escalation_summary?.open ?? 0;
+
+  const mySpi = data.my_spi;
+  const spiVal = mySpi?.spi_value;
+  const spiColor =
+    mySpi?.status === 'red' ? 'text-red-600 dark:text-red-400'
+    : mySpi?.status === 'amber' ? 'text-amber-600 dark:text-amber-400'
+    : mySpi?.status === 'green' ? 'text-green-600 dark:text-green-400'
+    : 'text-gray-400 dark:text-gray-500';
 
   const inProgressCount = (stats.in_progress ?? 0) + (stats.working_on_it ?? 0);
   const reviewCount = stats.review ?? 0;
@@ -135,6 +144,20 @@ export default function TechnicianDashboard() {
 
       {/* Quick Actions */}
       <TechQuickActionsBar />
+
+      {/* My SPI -- teknisi melihat indeks kinerja jadwalnya sendiri */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-4 flex-wrap">
+        <div className="flex items-baseline gap-2">
+          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tech.my_spi', language)}</span>
+          <span className={`text-3xl font-bold ${spiColor}`}>
+            {spiVal != null ? Number(spiVal).toFixed(2) : '--'}
+          </span>
+        </div>
+        <StatusBadge status={mySpi?.status ?? null} />
+        <p className="text-xs text-gray-400 dark:text-gray-500 sm:ml-auto max-w-md">
+          {t('tech.spi_hint', language)}
+        </p>
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
