@@ -531,8 +531,6 @@ export async function changeTaskStatus(request: NextRequest, id: string) {
       }
     }
 
-    // Auto-track work duration: if leaving an active status (working_on_it),
-    // accumulate elapsed time since status_changed_at into time_spent_seconds.
     const wasActive = ACTIVE_STATUSES.has(currentStatus);
     const result = await query(
       wasActive
