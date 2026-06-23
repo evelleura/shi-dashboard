@@ -14,3 +14,4 @@ docs
 **/*.test.ts
 e2e
 playwright.config.ts
+tmp
