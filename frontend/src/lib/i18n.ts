@@ -323,6 +323,8 @@ export const translations = {
     'tech.overtime': 'Lembur',
     'tech.over_deadline': 'Melewati Tenggat',
     'tech.open_escalations': 'Eskalasi Terbuka',
+    'tech.my_spi': 'SPI Saya',
+    'tech.spi_hint': 'Indeks kinerja jadwal Anda: tugas selesai vs target waktu proyek. >= 0,95 Baik, < 0,85 Kritis.',
 
     // User management
     'user.management': 'Manajemen Pengguna',
@@ -700,6 +702,8 @@ export const translations = {
     'tech.overtime': 'Overtime',
     'tech.over_deadline': 'Over Deadline',
     'tech.open_escalations': 'Open Escalations',
+    'tech.my_spi': 'My SPI',
+    'tech.spi_hint': 'Your schedule performance index: completed tasks vs project time target. >= 0.95 good, < 0.85 critical.',
 
     // User management
     'user.management': 'User Management',
