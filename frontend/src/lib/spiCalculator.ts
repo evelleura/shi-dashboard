@@ -6,8 +6,8 @@ export type HealthStatus = 'green' | 'amber' | 'red';
 // Di bawah itu -> "Belum Dinilai" (null), supaya proyek baru tak menampilkan SPI
 // prematur/absurd (mis. SPI 1 utk proyek kosong, atau SPI 10 utk yang baru mulai
 // tapi sudah ada tugas selesai -> EV/PV meledak saat PV kecil).
-const MIN_PV_FOR_SPI = 5;   // persen durasi berjalan
-const SPI_CAP = 2;          // selaras domain chart [0,2]; SPI > 1 = di depan jadwal
+export const MIN_PV_FOR_SPI = 5;   // persen durasi berjalan
+export const SPI_CAP = 2;          // selaras domain chart [0,2]; SPI > 1 = di depan jadwal
 
 export interface ProjectHealth {
   project_id: number;
@@ -62,6 +62,27 @@ export function categorizeHealth(spiValue: number): HealthStatus {
   if (spiValue >= 0.95) return 'green';
   if (spiValue >= 0.85) return 'amber';
   return 'red';
+}
+
+/**
+ * SPI per-TEKNISI = earned-value dari PORSI tugas teknisi sendiri. Rumus EV/PV identik
+ * dengan SPI proyek aktif, hanya cakupannya tugas si teknisi di proyek AKTIF:
+ *   earned  = jumlah tugas teknisi berstatus 'done'
+ *   planned = Sigma (planned_progress_proyek / 100) atas tiap tugas teknisi
+ *             = "berapa tugas yang SEHARUSNYA selesai menurut jadwal proyeknya".
+ * SPI = earned / planned. >1 = di depan jadwal; di-cap SPI_CAP; RAG via categorizeHealth.
+ * planned <= 0 (tak ada tugas di proyek aktif yang cukup berjalan, PV < MIN_PV_FOR_SPI)
+ * -> null ("Belum Dinilai"), selaras kebijakan SPI proyek: tak menampilkan angka prematur.
+ * Filter PV >= MIN_PV_FOR_SPI dilakukan di SQL pemanggil; fungsi ini murni (mudah diuji).
+ */
+export function computeTechnicianSPI(
+  earned: number,
+  planned: number
+): { spi_value: number | null; status: HealthStatus | null } {
+  if (!Number.isFinite(planned) || planned <= 0) return { spi_value: null, status: null };
+  const raw = Math.round((earned / planned) * 10000) / 10000;
+  const spi = Math.min(raw, SPI_CAP);
+  return { spi_value: spi, status: categorizeHealth(spi) };
 }
 
 /**

@@ -12,6 +12,8 @@ import bcrypt from 'bcryptjs';
 import {
   calculatePlannedValue,
   categorizeHealth,
+  computeTechnicianSPI,
+  SPI_CAP,
   recalculateSPI,
 } from '../spiCalculator';
 
@@ -132,6 +134,33 @@ describe('categorizeHealth', () => {
     expect(categorizeHealth(0.84)).toBe('red');
     expect(categorizeHealth(0.5)).toBe('red');
     expect(categorizeHealth(0)).toBe('red');
+  });
+});
+
+// SPI per-teknisi: fungsi MURNI (earned/planned), tak menyentuh DB.
+describe('computeTechnicianSPI', () => {
+  it('returns null (Belum Dinilai) when planned <= 0 -- tak ada dasar jadwal', () => {
+    expect(computeTechnicianSPI(0, 0)).toEqual({ spi_value: null, status: null });
+    expect(computeTechnicianSPI(3, 0)).toEqual({ spi_value: null, status: null });
+  });
+
+  it('on-pace (earned == planned) -> SPI 1.0 hijau', () => {
+    const r = computeTechnicianSPI(5, 5);
+    expect(r.spi_value).toBe(1);
+    expect(r.status).toBe('green');
+  });
+
+  it('behind schedule (earned < planned) -> SPI < 0.85 merah', () => {
+    // 5 selesai vs 6.6 yang seharusnya -> 0.7576
+    const r = computeTechnicianSPI(5, 6.6);
+    expect(r.spi_value).toBeCloseTo(0.7576, 3);
+    expect(r.status).toBe('red');
+  });
+
+  it('caps SPI at SPI_CAP (tak ada angka absurd saat planned kecil)', () => {
+    const r = computeTechnicianSPI(10, 1);
+    expect(r.spi_value).toBe(SPI_CAP);
+    expect(r.status).toBe('green');
   });
 });
 

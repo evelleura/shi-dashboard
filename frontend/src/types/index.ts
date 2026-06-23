@@ -300,6 +300,7 @@ export interface TechnicianDashboardData {
     overtime: number;
     over_deadline: number;
   };
+  my_spi?: { spi_value: number | null; status: HealthStatus | null };
   assigned_projects: {
     id: number;
     name: string;

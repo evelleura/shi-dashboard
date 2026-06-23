@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
 import { roleSatisfies, ROLES } from '@/lib/rbac';
 import { query } from '@/lib/db';
-import { calculatePlannedValue } from '@/lib/spiCalculator';
+import { calculatePlannedValue, computeTechnicianSPI, MIN_PV_FOR_SPI } from '@/lib/spiCalculator';
 
 export async function getDashboard(request: NextRequest) {
   const auth = authenticateRequest(request);
@@ -124,7 +124,7 @@ export async function getTechnicianDashboard(request: NextRequest) {
 
   const userId = auth.user.userId;
   try {
-    const [taskSummary, assignedProjects, recentTasks, completedProjects, myEscalations] = await Promise.all([
+    const [taskSummary, assignedProjects, recentTasks, completedProjects, myEscalations, mySpiAgg] = await Promise.all([
       query(
         `SELECT COUNT(*)::int AS total,
           COUNT(*) FILTER (WHERE t.status = 'to_do')::int AS to_do,
@@ -196,12 +196,26 @@ export async function getTechnicianDashboard(request: NextRequest) {
          FROM tb_eskalasi WHERE reported_by = $1`,
         [userId]
       ),
+      // SPI teknisi sendiri: earned (tugas selesai) vs planned (Sigma PV proyek aktif).
+      query<{ earned: number; planned: number }>(
+        `SELECT COUNT(*) FILTER (WHERE t.status = 'done')::int AS earned,
+                COALESCE(SUM(ph.planned_progress) / 100.0, 0)::float AS planned
+         FROM tb_tugas t
+         JOIN tb_proyek p ON p.id_proyek = t.id_proyek
+         JOIN project_health ph ON ph.project_id = p.id_proyek
+         WHERE t.assigned_to = $1 AND p.status = 'active' AND ph.planned_progress >= ${MIN_PV_FOR_SPI}`,
+        [userId]
+      ),
     ]);
+
+    const spiRow = mySpiAgg.rows[0];
+    const my_spi = computeTechnicianSPI(Number(spiRow?.earned) || 0, Number(spiRow?.planned) || 0);
 
     return NextResponse.json({
       success: true,
       data: {
         my_tasks: taskSummary.rows[0],
+        my_spi,
         assigned_projects: assignedProjects.rows,
         completed_projects: completedProjects.rows,
         recent_tasks: recentTasks.rows,
