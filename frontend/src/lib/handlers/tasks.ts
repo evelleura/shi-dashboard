@@ -50,8 +50,9 @@ async function hasCircularDependency(taskId: number, dependsOn: number): Promise
   return false;
 }
 
-// Check if technician has overlapping tasks (for double-booking)
-async function findConflicts(technicianId: number, start: string, end: string, excludeTaskId?: number): Promise<Record<string, unknown>[]> {
+// Check if technician has overlapping tasks (for double-booking).
+// Exported supaya eksekutor ganti_teknisi (escalationActions) bisa pakai cek bentrok yang sama.
+export async function findConflicts(technicianId: number, start: string, end: string, excludeTaskId?: number): Promise<Record<string, unknown>[]> {
   const params: unknown[] = [technicianId, start, end];
   let sql = `
     SELECT t.id_tugas AS id, t.nama_tugas AS name, p.nama_proyek AS project_name, t.timeline_start, t.timeline_end, u.nama AS assigned_to_name

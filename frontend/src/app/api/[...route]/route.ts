@@ -53,6 +53,7 @@ import * as activities from '@/lib/handlers/activities';
 import * as audit from '@/lib/handlers/audit';
 import * as notifications from '@/lib/handlers/notifications';
 import * as dailyReports from '@/lib/handlers/dailyReports';
+import * as comments from '@/lib/handlers/comments';
 
 type Context = { params: Promise<{ route: string[] }> };
 
@@ -179,6 +180,11 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
       if (method === 'DELETE') return projects.unassignTechnician(request, r1, r3);
       return methodNotAllowed();
     }
+    if (r1 && r2 === 'comments' && !r3) {
+      if (method === 'GET')  return comments.listProjectComments(request, r1);
+      if (method === 'POST') return comments.createProjectComment(request, r1);
+      return methodNotAllowed();
+    }
     return notFound();
   }
 
@@ -229,8 +235,9 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     }
     if (r1 === 'search' && method === 'GET') return dashboard.globalSearch(request);
     if (r1 === 'report-activity' && method === 'GET') return dashboard.reportActivity(request);
-    if (r1 === 'technician' && r2 === 'productivity' && method === 'GET') return dashboard.technicianProductivity(request);
-    if (r1 === 'technician' && r2 === 'time-spent'   && method === 'GET') return dashboard.technicianTimeSpent(request);
+    if (r1 === 'technician' && r2 === 'productivity'  && method === 'GET') return dashboard.technicianProductivity(request);
+    if (r1 === 'technician' && r2 === 'time-spent'    && method === 'GET') return dashboard.technicianTimeSpent(request);
+    if (r1 === 'technician' && r2 === 'spi-breakdown' && method === 'GET') return dashboard.technicianSpiBreakdown(request);
     if (r1 === 'technician' && !r2) {
       if (method === 'GET') return dashboard.getTechnicianDashboard(request);
       return methodNotAllowed();
@@ -272,6 +279,16 @@ async function dispatch(request: NextRequest, context: Context): Promise<NextRes
     if (r1 && r2 === 'updates'         && method === 'GET')   return escalations.getUpdates(request, r1);
     if (r1 && r2 === 'action-request'  && method === 'POST')  return escalations.requestAction(request, r1);
     if (r1 && r2 === 'action-request'  && method === 'PATCH') return escalations.respondActionRequest(request, r1);
+    return notFound();
+  }
+
+  // ── Comments (Komentar Proyek) ────────────────────────────────────────────
+  if (r0 === 'comments') {
+    if (r1 && !r2) {
+      if (method === 'PATCH')  return comments.updateComment(request, r1);
+      if (method === 'DELETE') return comments.deleteComment(request, r1);
+      return methodNotAllowed();
+    }
     return notFound();
   }
 

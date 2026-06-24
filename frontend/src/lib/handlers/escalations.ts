@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
-import { query } from '@/lib/db';
+import { query, withTransaction } from '@/lib/db';
+import { recalculateSPI } from '@/lib/spiCalculator';
+import { createNotification } from './notifications';
+import { logChange } from './audit';
+import { executeEscalationAction, ActionError, type ActionParams, type ActionResult, type EscalationRow } from './escalationActions';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_MIMES = [
@@ -413,8 +417,10 @@ export async function respondActionRequest(request: NextRequest, id: string) {
   const escalationId = parseInt(id);
   if (isNaN(escalationId)) return NextResponse.json({ success: false, error: 'Invalid escalation ID' }, { status: 400 });
 
+  const managerId = auth.user.userId;
   const body = await request.json();
-  const { status: responseStatus, response_note } = body as { status?: string; response_note?: string };
+  const { status: responseStatus, response_note, action_params } = body as
+    { status?: string; response_note?: string; action_params?: ActionParams };
 
   if (!responseStatus || !['approved', 'rejected'].includes(responseStatus)) {
     return NextResponse.json({ success: false, error: 'status harus "approved" atau "rejected"' }, { status: 400 });
@@ -424,8 +430,10 @@ export async function respondActionRequest(request: NextRequest, id: string) {
   }
 
   try {
-    const check = await query<{ action_request_status: string | null; action_request: string | null }>(
-      'SELECT action_request_status, action_request FROM tb_eskalasi WHERE id_eskalasi = $1', [escalationId]
+    const check = await query<{ action_request_status: string | null; action_request: string | null;
+      task_id: number; project_id: number; reported_by: number }>(
+      `SELECT action_request_status, action_request, id_tugas AS task_id, id_proyek AS project_id, reported_by
+       FROM tb_eskalasi WHERE id_eskalasi = $1`, [escalationId]
     );
     if (check.rowCount === 0) return NextResponse.json({ success: false, error: 'Escalation not found' }, { status: 404 });
     const escRow = check.rows[0];
@@ -433,17 +441,121 @@ export async function respondActionRequest(request: NextRequest, id: string) {
       return NextResponse.json({ success: false, error: 'Tidak ada permintaan tindakan yang sedang menunggu persetujuan' }, { status: 409 });
     }
 
-    // 'batalkan_eskalasi' yang disetujui -> tutup eskalasi (naskah tak punya status 'cancelled', pakai 'closed').
-    const shouldClose = responseStatus === 'approved' && escRow.action_request === 'batalkan_eskalasi';
-    const updateSql = shouldClose
-      ? `UPDATE tb_eskalasi SET action_request_status=$1, action_request_note=$2, status='closed', updated_at=NOW() WHERE id_eskalasi=$3 ${ESKALASI_RETURNING}`
-      : `UPDATE tb_eskalasi SET action_request_status=$1, action_request_note=$2, updated_at=NOW() WHERE id_eskalasi=$3 ${ESKALASI_RETURNING}`;
+    // DITOLAK: cukup tandai rejected (perilaku lama, tanpa eksekusi).
+    if (responseStatus === 'rejected') {
+      const result = await query(
+        `UPDATE tb_eskalasi SET action_request_status='rejected', action_request_note=$1, updated_at=NOW()
+         WHERE id_eskalasi=$2 ${ESKALASI_RETURNING}`,
+        [response_note.trim(), escalationId]
+      );
+      return NextResponse.json({ success: true, data: result.rows[0] });
+    }
 
-    const result = await query(updateSql, [responseStatus, response_note.trim(), escalationId]);
-    return NextResponse.json({ success: true, data: result.rows[0] });
+    // DISETUJUI: eksekusi tindakan NYATA dalam SATU transaksi (cascade atomik).
+    const esc: EscalationRow = {
+      id: escalationId, task_id: escRow.task_id, project_id: escRow.project_id,
+      reported_by: escRow.reported_by, action_request: escRow.action_request ?? '',
+    };
+    let summary: ActionResult = { kind: 'none' };
+    const updated = await withTransaction(async (client) => {
+      summary = await executeEscalationAction(client, esc, action_params ?? {});
+      // 'batalkan_eskalasi' yang disetujui -> tutup eskalasi (pakai 'closed', naskah tak punya 'cancelled').
+      const shouldClose = esc.action_request === 'batalkan_eskalasi';
+      const sql = shouldClose
+        ? `UPDATE tb_eskalasi SET action_request_status='approved', action_request_note=$1, status='closed', updated_at=NOW() WHERE id_eskalasi=$2 ${ESKALASI_RETURNING}`
+        : `UPDATE tb_eskalasi SET action_request_status='approved', action_request_note=$1, updated_at=NOW() WHERE id_eskalasi=$2 ${ESKALASI_RETURNING}`;
+      const res = await client.query(sql, [response_note.trim(), escalationId]);
+      await client.query(
+        'INSERT INTO escalation_updates (escalation_id, author_id, message) VALUES ($1, $2, $3)',
+        [escalationId, managerId, actionSummaryMessage(esc.action_request, summary)]
+      );
+      return res.rows[0];
+    });
+
+    // Efek-ikutan non-transaksional (rekalkulasi SPI, notifikasi, audit). Gagal di sini
+    // TIDAK membatalkan cascade (sudah commit) -> cukup dicatat, bukan 500.
+    try {
+      await applyActionSideEffects(summary, esc, managerId);
+    } catch (sideErr) {
+      console.error('Action side-effects error (cascade already committed):', sideErr);
+    }
+
+    return NextResponse.json({ success: true, data: updated });
   } catch (err) {
+    if (err instanceof ActionError) {
+      return NextResponse.json({ success: false, error: err.message }, { status: 409 });
+    }
     console.error('Respond action request error:', err);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// Ringkasan tindakan utk utas eskalasi (escalation_updates).
+function actionSummaryMessage(action: string, summary: ActionResult): string {
+  switch (summary.kind) {
+    case 'ganti_teknisi':
+      return `[Tindakan disetujui] Ganti teknisi: ${summary.taskIds.length} tugas dialihkan ke teknisi #${summary.newTechId}.`;
+    case 'perpanjang_deadline':
+      return `[Tindakan disetujui] Perpanjang deadline tugas hingga ${summary.newDue ?? '-'}${summary.projectEndChanged ? ' (end_date proyek ikut digeser)' : ''}.`;
+    case 'recorded':
+      return `[Tindakan disetujui] ${action === 'ganti_alat' ? 'Ganti alat' : 'Mediasi klien'} dicatat sebagai instruksi penanganan.`;
+    default:
+      return `[Tindakan disetujui] ${action}.`;
+  }
+}
+
+async function actorName(userId: number): Promise<string> {
+  const r = await query<{ name: string }>('SELECT nama AS name FROM tb_user WHERE id_user = $1', [userId]);
+  return r.rows[0]?.name ?? 'Manajer';
+}
+
+// Efek-ikutan non-transaksional, dijalankan SETELAH cascade commit.
+async function applyActionSideEffects(summary: ActionResult, esc: EscalationRow, managerId: number): Promise<void> {
+  if (summary.kind === 'none') return;
+  const uName = await actorName(managerId);
+
+  if (summary.kind === 'ganti_teknisi') {
+    await recalculateSPI(summary.projectId);   // SPI proyek; SPI teknisi X & Y ikut (live)
+    const proj = await query<{ name: string }>('SELECT nama_proyek AS name FROM tb_proyek WHERE id_proyek = $1', [summary.projectId]);
+    const pName = proj.rows[0]?.name ?? 'Proyek';
+    await createNotification({
+      userId: summary.newTechId, type: 'task_assigned',
+      title: `Kamu mengambil alih ${summary.taskIds.length} tugas`,
+      body: `Lewat persetujuan eskalasi, kamu ditugaskan ulang di proyek ${pName}.`,
+      entityType: 'project', entityId: summary.projectId, projectId: summary.projectId,
+    });
+    if (summary.oldTechId) {
+      await createNotification({
+        userId: summary.oldTechId, type: 'task_unassigned',
+        title: 'Tugas dialihkan ke teknisi lain',
+        body: `${summary.taskIds.length} tugasmu di ${pName} dialihkan via eskalasi.`,
+        entityType: 'project', entityId: summary.projectId, projectId: summary.projectId,
+      });
+    }
+    await logChange({
+      entityType: 'escalation', entityId: esc.id, entityName: `Eskalasi #${esc.id}`, action: 'ganti_teknisi',
+      changes: [{ field: 'assigned_to', oldValue: summary.oldTechId != null ? String(summary.oldTechId) : null, newValue: String(summary.newTechId) }],
+      userId: managerId, userName: uName,
+    });
+    return;
+  }
+
+  if (summary.kind === 'perpanjang_deadline') {
+    await recalculateSPI(summary.projectId);   // PV berubah saat deadline/end_date digeser
+    await logChange({
+      entityType: 'escalation', entityId: esc.id, entityName: `Eskalasi #${esc.id}`, action: 'perpanjang_deadline',
+      changes: [{ field: 'due_date', oldValue: null, newValue: summary.newDue }],
+      userId: managerId, userName: uName,
+    });
+    return;
+  }
+
+  if (summary.kind === 'recorded') {
+    await logChange({
+      entityType: 'escalation', entityId: esc.id, entityName: `Eskalasi #${esc.id}`, action: summary.action,
+      changes: [{ field: 'action', oldValue: null, newValue: summary.action }],
+      userId: managerId, userName: uName,
+    });
   }
 }
 

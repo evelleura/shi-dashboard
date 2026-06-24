@@ -36,9 +36,11 @@ import type {
   RecentActivityItem,
   TechProductivityData,
   TechTimeSpentData,
+  TechnicianSpiBreakdownItem,
   AuditLogResponse,
   DailyReport,
   CreateDailyReportData,
+  ProjectComment,
 } from '../types';
 
 export const api = axios.create({
@@ -450,6 +452,11 @@ export const getTechnicianTimeSpent = async (params?: DateRange): Promise<TechTi
   return res.data.data!;
 };
 
+export const getTechnicianSpiBreakdown = async (): Promise<TechnicianSpiBreakdownItem[]> => {
+  const res = await api.get<ApiResponse<TechnicianSpiBreakdownItem[]>>('/dashboard/technician/spi-breakdown');
+  return res.data.data!;
+};
+
 export interface ReportActivityProject {
   id: number;
   project_code: string;
@@ -537,16 +544,47 @@ export const requestEscalationAction = async (
   return res.data.data!;
 };
 
+export interface EscalationActionParams {
+  new_technician_id?: number;
+  reassign_scope?: 'task' | 'all';
+  new_due_date?: string;
+  extra_days?: number;
+  cascade_project_end?: boolean;
+}
+
 export const respondEscalationAction = async (
   id: number,
   status: 'approved' | 'rejected',
-  response_note: string
+  response_note: string,
+  action_params?: EscalationActionParams
 ): Promise<Escalation> => {
   const res = await api.patch<ApiResponse<Escalation>>(`/escalations/${id}/action-request`, {
     status,
     response_note,
+    ...(action_params ? { action_params } : {}),
   });
   return res.data.data!;
+};
+
+// ==================== Comments (Komentar Proyek) ====================
+
+export const getProjectComments = async (projectId: number): Promise<ProjectComment[]> => {
+  const res = await api.get<ApiResponse<ProjectComment[]>>(`/projects/${projectId}/comments`);
+  return res.data.data!;
+};
+
+export const addProjectComment = async (projectId: number, message: string): Promise<ProjectComment> => {
+  const res = await api.post<ApiResponse<ProjectComment>>(`/projects/${projectId}/comments`, { message });
+  return res.data.data!;
+};
+
+export const updateProjectComment = async (id: number, message: string): Promise<ProjectComment> => {
+  const res = await api.patch<ApiResponse<ProjectComment>>(`/comments/${id}`, { message });
+  return res.data.data!;
+};
+
+export const deleteProjectComment = async (id: number): Promise<void> => {
+  await api.delete(`/comments/${id}`);
 };
 
 // ==================== Audit ====================

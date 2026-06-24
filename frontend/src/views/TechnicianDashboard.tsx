@@ -7,6 +7,7 @@ import StatusBadge from '../components/ui/StatusBadge';
 import DateRangePicker from '../components/ui/DateRangePicker';
 import TechProductivityChart from '../components/charts/TechProductivityChart';
 import TechTimeSpentChart from '../components/charts/TechTimeSpentChart';
+import TechnicianSPIBreakdownChart from '../components/charts/TechnicianSPIBreakdownChart';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import type { HealthStatus, DateRange } from '../types';
@@ -124,6 +125,23 @@ export default function TechnicianDashboard() {
     done: p.my_completed,
   }));
 
+  // Diagnostik SPI: angka mentah + tugas yang MENYERET turun (recent_tasks yg dulu tak ditampilkan).
+  const earned = mySpi?.earned ?? 0;
+  const planned = mySpi?.planned ?? 0;
+  // planned kini = jumlah tugas yang tenggatnya <= hari ini (bilangan bulat eksak).
+  const plannedLabel = Number.isInteger(planned) ? String(planned) : planned.toFixed(1);
+  const ratioPct = planned > 0 ? Math.min(100, (earned / planned) * 100) : 0;
+  const todayMid = new Date(new Date().toDateString()).getTime();
+  const isLate = (tk: { due_date?: string; status: string }) =>
+    !!tk.due_date && tk.status !== 'done' && new Date(tk.due_date).getTime() < todayMid;
+  const attentionTasks = [...data.recent_tasks]
+    .filter((tk) => tk.status !== 'done')
+    .sort((a, b) => (isLate(b) ? 1 : 0) - (isLate(a) ? 1 : 0))
+    .slice(0, 8);
+  const lateCount = data.recent_tasks.filter(isLate).length;
+  const statusLabelMap: Record<string, string> = { to_do: 'Belum Mulai', working_on_it: 'Dikerjakan', done: 'Selesai' };
+  const fmtDate = (d?: string) => (d ? new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : '-');
+
   const totalTasksLabel = 'Total Tugas';
   const completedLabel = 'Selesai';
 
@@ -145,18 +163,48 @@ export default function TechnicianDashboard() {
       {/* Quick Actions */}
       <TechQuickActionsBar />
 
-      {/* My SPI -- teknisi melihat indeks kinerja jadwalnya sendiri */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-4 flex-wrap">
-        <div className="flex items-baseline gap-2">
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tech.my_spi', language)}</span>
-          <span className={`text-3xl font-bold ${spiColor}`}>
-            {spiVal != null ? Number(spiVal).toFixed(2) : '--'}
-          </span>
+      {/* My SPI -- diagnostik: angka + KENAPA segini + apa yang menyeret turun */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+        <div className="flex items-center gap-4 flex-wrap mb-3">
+          <div className="flex items-baseline gap-2">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tech.my_spi', language)}</span>
+            <span className={`text-3xl font-bold ${spiColor}`}>
+              {spiVal != null ? Number(spiVal).toFixed(2) : '--'}
+            </span>
+          </div>
+          <StatusBadge status={mySpi?.status ?? null} />
+          {spiVal != null && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              = <span className="font-semibold text-gray-700 dark:text-gray-300">{earned}</span> tugas selesai dari{' '}
+              <span
+                className="font-semibold text-gray-700 dark:text-gray-300 underline decoration-dotted underline-offset-2 cursor-help"
+                title="Jumlah tugasmu yang tenggatnya jatuh sampai hari ini -- yang seharusnya sudah selesai sekarang. SPI = selesai / jatuh-tempo."
+              >
+                {plannedLabel}
+              </span>{' '}
+              tugas jatuh tempo
+            </span>
+          )}
         </div>
-        <StatusBadge status={mySpi?.status ?? null} />
-        <p className="text-xs text-gray-400 dark:text-gray-500 sm:ml-auto max-w-md">
-          {t('tech.spi_hint', language)}
-        </p>
+        {spiVal != null ? (
+          <>
+            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2">
+              <div
+                className={`h-full rounded-full ${mySpi?.status === 'red' ? 'bg-red-500' : mySpi?.status === 'amber' ? 'bg-amber-500' : 'bg-green-500'}`}
+                style={{ width: `${ratioPct}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {lateCount > 0 ? (
+                <>Penyebab utama: <span className="font-semibold text-red-600 dark:text-red-400">{lateCount} tugas melewati tenggat</span> menyeret SPI turun. Selesaikan tugas pada daftar di bawah untuk menaikkannya.</>
+              ) : (
+                <>Selesaikan tugas sesuai jadwal untuk menjaga SPI. Skala: &gt;= 0,95 Baik, 0,85-0,95 Waspada, &lt; 0,85 Kritis.</>
+              )}
+            </p>
+          </>
+        ) : (
+          <p className="text-xs text-gray-400 dark:text-gray-500">{t('tech.spi_hint', language)}</p>
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -230,6 +278,49 @@ export default function TechnicianDashboard() {
         <TechProductivityChart dateRange={dateRange} />
         <TechTimeSpentChart dateRange={dateRange} />
       </div>
+
+      {/* Tugas yang MENYERET SPI -- recent_tasks (belum-selesai) yang DULU tak ditampilkan */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Tugas yang Perlu Perhatian</h2>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Tugasmu yang belum selesai. Yang melewati tenggat (merah) langsung menyeret SPI turun.</p>
+        {attentionTasks.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Tidak ada tugas tertunda. Kerja bagus!</p>
+        ) : (
+          <div className="space-y-2">
+            {attentionTasks.map((tk) => {
+              const late = isLate(tk);
+              const daysLate = late && tk.due_date ? Math.floor((todayMid - new Date(tk.due_date).getTime()) / 86400000) : 0;
+              return (
+                <button
+                  key={tk.id}
+                  onClick={() => router.push(`/projects/${tk.project_id}`)}
+                  className={`w-full text-left flex items-center justify-between gap-3 p-3 rounded-lg border transition-colors ${late ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20' : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-1">{tk.name}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1">
+                      {tk.project_name}{tk.due_date ? ` -- tenggat ${fmtDate(tk.due_date)}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {late && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">
+                        Telat {daysLate}h
+                      </span>
+                    )}
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                      {statusLabelMap[tk.status] ?? tk.status}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* SPI PERSONAL teknisi dipecah per proyek (task-based: tugasnya sendiri, bukan SPI proyek) */}
+      <TechnicianSPIBreakdownChart />
 
       {/* Assigned Projects Cards */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">

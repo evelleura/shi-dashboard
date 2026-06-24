@@ -130,6 +130,18 @@ export interface EscalationUpdate {
   created_at: string;
 }
 
+export interface ProjectComment {
+  id: number;
+  project_id: number;
+  author_id: number;
+  author_name?: string;
+  parent_id?: number | null;
+  message: string;
+  is_edited: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Escalation {
   id: number;
   task_id: number;
@@ -300,7 +312,7 @@ export interface TechnicianDashboardData {
     overtime: number;
     over_deadline: number;
   };
-  my_spi?: { spi_value: number | null; status: HealthStatus | null };
+  my_spi?: { spi_value: number | null; status: HealthStatus | null; earned?: number; planned?: number };
   assigned_projects: {
     id: number;
     name: string;
@@ -482,6 +494,13 @@ export interface TechTimeSpentData {
   project_id: number;
   project_name: string;
   hours: number;
+}
+
+export interface TechnicianSpiBreakdownItem {
+  project_id: number;
+  project_name: string;
+  spi_value: number | null;
+  status: HealthStatus | null;
 }
 
 // === Audit Log ===

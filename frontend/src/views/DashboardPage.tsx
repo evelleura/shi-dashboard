@@ -9,6 +9,7 @@ import TasksByOwnerChart from '../components/charts/TasksByOwnerChart';
 import TasksByDueDateChart from '../components/charts/TasksByDueDateChart';
 import ProjectCategoryPieChart from '../components/charts/ProjectCategoryPieChart';
 import TechnicianWorkloadChart from '../components/charts/TechnicianWorkloadChart';
+import TechnicianSPIComparisonChart from '../components/charts/TechnicianSPIComparisonChart';
 import RecentActivityFeed from '../components/charts/RecentActivityFeed';
 import QuickActionsBar from '../components/dashboard/QuickActionsBar';
 import DateRangePicker from '../components/ui/DateRangePicker';
@@ -209,6 +210,9 @@ export default function DashboardPage() {
         <TasksByOwnerChart dateRange={dateRange} />
         <TasksByDueDateChart dateRange={dateRange} />
       </div>
+
+      {/* Charts Row 4: Technician SPI Comparison (full width) */}
+      <TechnicianSPIComparisonChart />
 
       {/* Charts Row 4: Overdue */}
       {/* <div className="grid grid-cols-1 gap-4">

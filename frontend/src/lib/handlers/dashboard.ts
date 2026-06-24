@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest, authorizeRoles } from '@/lib/auth';
 import { roleSatisfies, ROLES } from '@/lib/rbac';
 import { query } from '@/lib/db';
-import { calculatePlannedValue, computeTechnicianSPI, MIN_PV_FOR_SPI } from '@/lib/spiCalculator';
+import { calculatePlannedValue, computeTechnicianSPI } from '@/lib/spiCalculator';
 
 export async function getDashboard(request: NextRequest) {
   const auth = authenticateRequest(request);
@@ -196,20 +196,25 @@ export async function getTechnicianDashboard(request: NextRequest) {
          FROM tb_eskalasi WHERE reported_by = $1`,
         [userId]
       ),
-      // SPI teknisi sendiri: earned (tugas selesai) vs planned (Sigma PV proyek aktif).
+      // SPI PERSONAL teknisi: tugas selesai (earned) vs tugas yang tenggatnya sudah jatuh
+      // tempo hari ini (planned = "seharusnya selesai sekarang"). Berbasis tenggat PER-TUGAS
+      // si teknisi -> mengukur kedisiplinan INDIVIDU; TIDAK runtuh jadi SPI proyek (dulu
+      // earned/Sigma-PV = EV/PV = SPI proyek saat 1 teknisi = 1 proyek -> semua tampak sama).
       query<{ earned: number; planned: number }>(
         `SELECT COUNT(*) FILTER (WHERE t.status = 'done')::int AS earned,
-                COALESCE(SUM(ph.planned_progress) / 100.0, 0)::float AS planned
+                COUNT(*) FILTER (WHERE t.due_date <= CURRENT_DATE)::int AS planned
          FROM tb_tugas t
          JOIN tb_proyek p ON p.id_proyek = t.id_proyek
-         JOIN project_health ph ON ph.project_id = p.id_proyek
-         WHERE t.assigned_to = $1 AND p.status = 'active' AND ph.planned_progress >= ${MIN_PV_FOR_SPI}`,
+         WHERE t.assigned_to = $1 AND p.status = 'active'`,
         [userId]
       ),
     ]);
 
     const spiRow = mySpiAgg.rows[0];
-    const my_spi = computeTechnicianSPI(Number(spiRow?.earned) || 0, Number(spiRow?.planned) || 0);
+    const earnedSpi = Number(spiRow?.earned) || 0;
+    const plannedSpi = Number(spiRow?.planned) || 0;
+    // Sertakan earned/planned mentah supaya UI bisa MENJELASKAN angka SPI (bukan black box).
+    const my_spi = { ...computeTechnicianSPI(earnedSpi, plannedSpi), earned: earnedSpi, planned: plannedSpi };
 
     return NextResponse.json({
       success: true,
@@ -782,6 +787,52 @@ export async function technicianTimeSpent(request: NextRequest) {
     return NextResponse.json({ success: true, data: result.rows });
   } catch (err) {
     console.error('Technician time spent error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * SPI PERSONAL teknisi PEMANGGIL, dipecah per proyek aktif. Untuk tiap proyek yang
+ * ditugaskan, SPI dihitung dari TUGAS si teknisi sendiri di proyek itu (selesai vs jatuh
+ * tempo) -- BUKAN SPI proyek (project_health). Konsisten dgn SPI utama: task-based, per-teknisi.
+ */
+export async function technicianSpiBreakdown(request: NextRequest) {
+  const auth = authenticateRequest(request);
+  if (!auth.user) return auth.errorResponse;
+
+  const { userId } = auth.user;
+
+  try {
+    const result = await query<{ project_id: number; project_name: string; earned: number; planned: number }>(
+      `SELECT p.id_proyek AS project_id, p.nama_proyek AS project_name,
+              COUNT(t.id_tugas) FILTER (WHERE t.status = 'done')::int AS earned,
+              COUNT(t.id_tugas) FILTER (WHERE t.due_date <= CURRENT_DATE)::int AS planned
+       FROM tb_penugasan_proyek pa
+       JOIN tb_proyek p ON p.id_proyek = pa.id_proyek
+       LEFT JOIN tb_tugas t ON t.id_proyek = p.id_proyek AND t.assigned_to = $1
+       WHERE pa.id_user = $1 AND p.status = 'active'
+       GROUP BY p.id_proyek, p.nama_proyek`,
+      [userId]
+    );
+
+    const data = result.rows
+      .map((r) => {
+        const { spi_value, status } = computeTechnicianSPI(Number(r.earned) || 0, Number(r.planned) || 0);
+        return {
+          project_id: r.project_id,
+          project_name: r.project_name,
+          spi_value,
+          status,
+          earned: Number(r.earned) || 0,
+          planned: Number(r.planned) || 0,
+        };
+      })
+      // SPI terendah (paling perlu perhatian) di atas; yang "Belum Dinilai" di bawah.
+      .sort((a, b) => (a.spi_value ?? 99) - (b.spi_value ?? 99));
+
+    return NextResponse.json({ success: true, data });
+  } catch (err) {
+    console.error('Technician SPI breakdown error:', err);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

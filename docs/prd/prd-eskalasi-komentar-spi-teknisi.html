@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD - Eskalasi Bertindakan, Komentar Proyek, SPI Teknisi</title>
+<style>
+  :root{
+    --bg:#ffffff; --panel:#f7f8fa; --panel2:#eef1f5; --line:#e4e8ee;
+    --ink:#1b2430; --ink2:#5a6678; --us:#b7791f; --accent:#2563eb;
+    --yes:#1a7f37; --partial:#b7791f; --no:#aab2bf; --anti:#c9303e;
+    --mono:"SF Mono",ui-monospace,Consolas,monospace;
+    --sans:Inter,"Segoe UI",system-ui,sans-serif;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.6;font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  header.top{padding:56px 0 28px;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);text-transform:uppercase;letter-spacing:.18em;
+    font-size:11.5px;color:var(--accent);margin:0 0 14px}
+  h1{font-family:var(--serif);font-size:36px;line-height:1.16;margin:0 0 16px;font-weight:600;letter-spacing:-.01em}
+  p.lede{font-size:17px;color:var(--ink2);max-width:780px;margin:0 0 22px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .pill{font-family:var(--mono);font-size:11.5px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--ink2)}
+  .pill b{color:var(--ink);font-weight:600}
+  nav.toc{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.93);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px 0;margin-bottom:8px}
+  nav.toc .wrap{display:flex;flex-wrap:wrap;gap:5px 16px;font-family:var(--mono);font-size:12px}
+  nav.toc a{color:var(--ink2);text-decoration:none;white-space:nowrap}
+  nav.toc a:hover{color:var(--accent)}
+  section{padding:34px 0;border-bottom:1px solid var(--line)}
+  h2{font-family:var(--serif);font-size:25px;margin:0 0 8px;font-weight:600;letter-spacing:-.005em}
+  h2 .num{font-family:var(--mono);color:var(--accent);font-size:18px;margin-right:10px}
+  h3{font-size:17.5px;margin:26px 0 8px;font-weight:620;color:var(--ink)}
+  h4{font-size:14px;margin:18px 0 6px;font-weight:620;color:var(--ink2);
+    font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}
+  p{margin:10px 0}
+  a{color:var(--accent)}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:#1f4ba8}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;
+    line-height:1.5;color:var(--ink)}
+  pre code{background:none;border:none;padding:0;color:inherit}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:5px 0}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 11px;border:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel2);font-weight:620;color:var(--ink);font-size:12px;
+    text-transform:uppercase;letter-spacing:.04em}
+  td{color:var(--ink2)}
+  td b,td strong{color:var(--ink)}
+  tr:nth-child(even) td{background:rgba(20,30,48,.03)}
+  .callout{border-left:3px solid var(--line);background:var(--panel);
+    padding:13px 18px;margin:16px 0;border-radius:0 8px 8px 0}
+  .callout.rule{border-left-color:var(--us)}
+  .callout.ok{border-left-color:var(--yes)}
+  .callout.anti{border-left-color:var(--anti)}
+  .callout .lab{font-family:var(--mono);font-size:11px;text-transform:uppercase;
+    letter-spacing:.1em;margin:0 0 6px;font-weight:600}
+  .callout.rule .lab{color:var(--us)}
+  .callout.ok .lab{color:var(--yes)}
+  .callout.anti .lab{color:var(--anti)}
+  .callout p{margin:4px 0}
+  .tag{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 8px;
+    border-radius:4px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+  .tag.done{background:rgba(63,185,80,.16);color:var(--yes);border:1px solid rgba(63,185,80,.35)}
+  .tag.partial{background:rgba(217,154,43,.16);color:var(--partial);border:1px solid rgba(217,154,43,.35)}
+  .tag.gap{background:rgba(244,133,143,.14);color:var(--anti);border:1px solid rgba(244,133,143,.35)}
+  .tag.new{background:rgba(74,163,255,.14);color:var(--accent);border:1px solid rgba(74,163,255,.35)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}h1{font-size:27px}}
+  .fp{font-family:var(--mono);font-size:12px;color:var(--accent)}
+  footer{padding:40px 0 70px;color:var(--ink2);font-size:13px}
+  .flow{font-family:var(--mono);font-size:12.5px;background:var(--panel);
+    border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:14px 0;line-height:1.7}
+  .flow .step{color:var(--accent)}
+  hr.soft{border:none;border-top:1px dashed var(--line);margin:22px 0}
+  header.top{position:relative;overflow:hidden}
+  header.top::before{content:"";position:absolute;top:-130px;right:-90px;width:440px;height:440px;
+    background:radial-gradient(circle,rgba(37,99,235,.07),transparent 66%);pointer-events:none}
+  figure.dgm{margin:22px 0;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:18px 16px 12px;box-shadow:0 1px 3px rgba(20,30,48,.05)}
+  figure.dgm svg{display:block;width:100%;height:auto}
+  figure.dgm figcaption{font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+    margin-top:12px;text-align:center;letter-spacing:.02em}
+  .lgnd{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin-top:10px;
+    font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .lgnd i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <p class="kicker">PRD // PT Smart Home Inovasi Dashboard // frontend/</p>
+  <h1>Eskalasi Bertindakan, Komentar Proyek, &amp; SPI Teknisi</h1>
+  <p class="lede">Rencana produk untuk 4 fitur: (1) kategori eskalasi yang setiap kategorinya
+  benar-benar mengeksekusi <b>tindakan</b> (mis. ganti teknisi -&gt; reassign + reschedule +
+  rekalkulasi seluruh relasi), (2) komentar per proyek untuk komunikasi tim, (3) SPI per-teknisi,
+  dan (4) visualisasinya. Disusun setelah pembacaan langsung kode <code>frontend/</code> dan
+  graph naskah TA.</p>
+  <div class="meta">
+    <span class="pill">Target: <b>frontend/</b> (setia-naskah)</span>
+    <span class="pill">Stack: <b>Next.js 15 + PostgreSQL</b></span>
+    <span class="pill">Tanggal: <b>2026-06-24</b></span>
+    <span class="pill">Bahasa skema: <b>Indonesia (tb_*)</b></span>
+    <span class="pill">Status: <b>Draft untuk eksekusi</b></span>
+    <span class="pill">Revisi: <b>v1.1 (+ diagram alur)</b></span>
+  </div>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#ringkasan">0. Ringkasan</a>
+  <a href="#konteks">1. Konteks</a>
+  <a href="#f1">2. Eskalasi+Tindakan</a>
+  <a href="#f2">3. Komentar</a>
+  <a href="#f3">4. SPI Teknisi</a>
+  <a href="#f4">5. Visualisasi SPI</a>
+  <a href="#infra">6. Infra Bersama</a>
+  <a href="#fase">7. Fase</a>
+  <a href="#risiko">8. Risiko</a>
+  <a href="#lampiran">9. Lampiran</a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- ============ 0. RINGKASAN ============ -->
+<section id="ringkasan">
+  <h2><span class="num">0</span>Ringkasan Eksekutif</h2>
+  <p>Banyak fondasi sudah ada di kode. Ringkasan keadaan saat ini per fitur, hasil baca langsung:</p>
+
+  <table>
+    <thead><tr><th>Fitur</th><th>Keadaan saat ini di kode</th><th>Status</th><th>Inti pekerjaan</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>1. Kategori eskalasi + tindakan</b></td>
+        <td><code>tb_eskalasi</code> sudah punya <code>action_request</code> (5 kategori), <code>action_request_note</code>, <code>action_request_status</code>. Handler <code>requestAction</code> + <code>respondActionRequest</code> ada.</td>
+        <td><span class="tag partial">Sebagian</span></td>
+        <td>Persetujuan manajer <b>tidak mengeksekusi apa pun</b> (kecuali <code>batalkan_eskalasi</code> -&gt; close). Wire setiap kategori ke tindakan nyata + cascade transaksional.</td>
+      </tr>
+      <tr>
+        <td><b>2. Komentar per proyek</b></td>
+        <td>Tidak ada. <code>escalation_updates</code> (thread eskalasi), <code>task_activities</code> (log kerja), <code>daily_reports</code> (catatan kendala) bukan diskusi proyek.</td>
+        <td><span class="tag gap">Greenfield</span></td>
+        <td>Tambah tabel <code>tb_komentar_proyek</code>, API, tab di ProjectDetail. Tiru pola <code>escalation_updates</code>.</td>
+      </tr>
+      <tr>
+        <td><b>3. SPI teknisi</b></td>
+        <td><code>computeTechnicianSPI(earned, planned)</code> di <code>spiCalculator.ts</code>. Dipakai di dashboard teknisi (<code>my_spi</code>), daftar teknisi, detail teknisi.</td>
+        <td><span class="tag done">Selesai</span></td>
+        <td>Verifikasi 3 call-site konsisten + ekstrak SQL bersama (anti-drift) + dokumentasi rumus untuk sidang. Ringan.</td>
+      </tr>
+      <tr>
+        <td><b>4. Visualisasi SPI teknisi</b></td>
+        <td>Hanya kartu angka + badge (dashboard teknisi) dan kolom SPI (tabel teknisi). Tak ada chart SPI teknisi.</td>
+        <td><span class="tag partial">Sebagian</span></td>
+        <td>Chart perbandingan antar-teknisi (data live, mudah) + breakdown per-proyek. Tren butuh sumber histori (lihat 5.2).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout rule">
+    <p class="lab">Keputusan interpretasi (penting)</p>
+    <p>"Kategori eskalasi" ditafsirkan sebagai <b>5 <code>action_request</code> yang sudah ada</b>
+    (<code>ganti_teknisi</code>, <code>ganti_alat</code>, <code>perpanjang_deadline</code>,
+    <code>mediasi_client</code>, <code>batalkan_eskalasi</code>) -- bukan dimensi taksonomi baru.
+    Dasar: contoh user "misal ganti teknisi" persis salah satu nilai yang sudah ada, dan kalimat
+    "nanti ada tindakannya" menunjuk pada celah nyata: kategori ini sekarang cuma label tanpa efek.
+    Alternatif (kolom <code>kategori</code> masalah terpisah, mis. teknis/sumber-daya/jadwal/klien)
+    dibahas di <a href="#f1-open">2.9</a> sebagai opsi -- tidak dipilih sebagai default.</p>
+  </div>
+</section>
+
+<!-- ============ 1. KONTEKS ============ -->
+<section id="konteks">
+  <h2><span class="num">1</span>Konteks Arsitektur</h2>
+  <p>Yang perlu diketahui agar PRD ini bisa langsung dieksekusi tanpa membaca ulang seluruh repo.</p>
+
+  <h3>1.1 Pola wiring (ditiru untuk tiap fitur)</h3>
+  <p>Setiap fitur mengikuti rantai: <code>service (api.ts)</code> -&gt; <code>hook (useXxx.ts, TanStack Query)</code>
+  -&gt; <code>view</code> -&gt; <code>component</code>. Mutasi memanggil <code>invalidateQueries</code> + <code>useToast</code>.
+  i18n lewat <code>t('key', language)</code> dari kamus <code>lib/i18n.ts</code> (objek inline id/en, bukan file JSON).</p>
+
+  <h3>1.2 File &amp; tabel kunci</h3>
+  <table>
+    <thead><tr><th>Berkas</th><th>Peran</th></tr></thead>
+    <tbody>
+      <tr><td class="fp">database/init.sql</td><td>Skema. Tabel inti <code>tb_user, tb_klien, tb_proyek, tb_penugasan_proyek, tb_tugas, tb_bukti, tb_eskalasi</code>; pendukung <code>project_health, escalation_updates, daily_reports, task_activities, audit_log, notifications</code>.</td></tr>
+      <tr><td class="fp">src/lib/db.ts</td><td><code>query()</code> (pool) + <code>getClient()</code> (checkout untuk transaksi BEGIN/COMMIT). <b>Transaksi sudah didukung.</b></td></tr>
+      <tr><td class="fp">src/lib/spiCalculator.ts</td><td><code>recalculateSPI(projectId)</code>, <code>computeTechnicianSPI()</code>, <code>categorizeHealth()</code>, ambang RAG.</td></tr>
+      <tr><td class="fp">src/lib/handlers/escalations.ts</td><td>Semua handler eskalasi termasuk <code>requestAction</code> / <code>respondActionRequest</code>.</td></tr>
+      <tr><td class="fp">src/lib/handlers/tasks.ts</td><td><code>updateTask</code> (reassign + konflik jadwal), cek double-booking <code>findConflicts</code>.</td></tr>
+      <tr><td class="fp">src/lib/handlers/projects.ts</td><td><code>assignTechnician</code>, <code>unassignTechnician</code>, <code>autoAssign</code>.</td></tr>
+      <tr><td class="fp">src/lib/handlers/notifications.ts</td><td><code>createNotification(...)</code>.</td></tr>
+      <tr><td class="fp">src/lib/handlers/audit.ts</td><td><code>logChange(...)</code> -&gt; <code>audit_log</code>.</td></tr>
+      <tr><td class="fp">src/app/api/[...route]/route.ts</td><td>Dispatcher tunggal semua endpoint. Tambah rute baru di sini.</td></tr>
+      <tr><td class="fp">src/views/ProjectDetailPage.tsx</td><td>Tab: <code>tasks, evidence, charts, laporan, history</code>. Tempat tab <b>komentar</b> baru.</td></tr>
+      <tr><td class="fp">src/views/EscalationsPage.tsx</td><td>UI eskalasi; sudah ada blok action-request (request/respond).</td></tr>
+      <tr><td class="fp">src/views/TechnicianDashboard.tsx</td><td>Kartu "SPI Saya"; tempat chart SPI teknisi.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.3 Peran &amp; RBAC</h3>
+  <p>Dua peran fungsional: <code>teknisi</code> (pelapor lapangan, tak bisa tandai <code>done</code>) dan
+  <code>manajer</code> (CRUD penuh, review-gate, setujui tindakan). <code>admin</code> tersisa kosmetik.
+  Eskalasi: teknisi hanya lihat/aksi miliknya; manajer semua.</p>
+</section>
+
+<!-- ============ FITUR 1 ============ -->
+<section id="f1">
+  <h2><span class="num">2</span>Fitur 1 - Kategori Eskalasi yang Bertindakan</h2>
+  <p class="lede" style="font-size:15px">Setiap kategori eskalasi harus mengeksekusi tindakan nyata saat
+  manajer menyetujui, dan tindakan itu meriak ke seluruh relasi terkait (jadwal, penugasan, SPI, notifikasi, audit).</p>
+
+  <h3>2.1 Keadaan saat ini (terverifikasi di kode)</h3>
+  <p>Di <span class="fp">escalations.ts</span>: <code>requestAction</code> (baris 361) menyimpan permintaan
+  (<code>action_request</code> + note, status -&gt; <code>pending</code>). <code>respondActionRequest</code>
+  (baris 407) hanya mem-flip <code>action_request_status</code> jadi <code>approved/rejected</code>.</p>
+  <div class="callout anti">
+    <p class="lab">Celah inti</p>
+    <p>Satu-satunya efek samping nyata: <code>batalkan_eskalasi</code> yang disetujui -&gt; <code>status='closed'</code>.
+    <b>Persetujuan <code>ganti_teknisi</code>, <code>perpanjang_deadline</code>, <code>ganti_alat</code>,
+    <code>mediasi_client</code> tidak melakukan apa pun</b> ke <code>tb_tugas</code>, jadwal, atau SPI.
+    Manajer harus mengerjakan reassign secara manual di tempat lain. Inilah yang diminta user untuk ditutup.</p>
+  </div>
+
+  <h3>2.2 Grounding naskah</h3>
+  <p>Naskah TA mendefinisikan eskalasi hanya sampai: <code>priority</code> (low/medium/high), alur
+  <code>open -&gt; handled -&gt; closed</code>, dan "manajer mengirim <b>instruksi penanganan</b>"
+  (metode kelas <code>sendInstruction</code>). Naskah <b>tidak</b> mendefinisikan kategori-ke-tindakan.
+  Sistem tindakan ini adalah pengembangan (terinspirasi MDI/PDI Luthan 2023). Secara akademik,
+  bingkai fitur ini sebagai <b>operasionalisasi konkret <code>sendInstruction</code></b>: instruksi manajer
+  bukan sekadar teks, tapi tindakan tereksekusi.</p>
+  <div class="callout rule">
+    <p class="lab">Untuk sidang</p>
+    <p>Jika butuh fidelity naskah ketat, tandai bab ini sebagai "penyempurnaan di luar lingkup minimum naskah".
+    Defensible: naskah memang menyebut <code>sendInstruction</code>; kita menjadikannya eksekutif.</p>
+  </div>
+
+  <h3>2.3 Katalog kategori -&gt; tindakan</h3>
+  <p>Dua tingkat. <b>Eksekutif</b> = mengubah state &amp; cascade. <b>Tercatat</b> = log + notifikasi
+  (tak ada entitas untuk dimutasi -- naskah membuang materials &amp; tak punya entitas komunikasi-klien).</p>
+  <table>
+    <thead><tr><th>Kategori</th><th>Tingkat</th><th>Efek tereksekusi saat disetujui</th><th>Parameter approval</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>ganti_teknisi</code></td>
+        <td><span class="tag new">Eksekutif</span></td>
+        <td>Reassign tugas dari teknisi X ke Y; sinkron <code>tb_penugasan_proyek</code>; cek konflik jadwal Y; notifikasi X+Y+pelapor; rekalkulasi SPI proyek; SPI X &amp; Y berubah otomatis (live). <b>Cascade penuh -&gt; 2.4.</b></td>
+        <td><code>new_technician_id</code>, <code>reassign_scope</code> (tugas-ini | semua-tugas-X-di-proyek)</td>
+      </tr>
+      <tr>
+        <td><code>perpanjang_deadline</code></td>
+        <td><span class="tag new">Eksekutif</span></td>
+        <td>Update <code>tb_tugas.due_date</code> (+ <code>timeline_end</code>); opsional geser <code>tb_proyek.end_date</code>; rekalkulasi SPI (PV berubah). Notifikasi + audit. <b>Detail -&gt; 2.5.</b></td>
+        <td><code>new_due_date</code> (atau <code>extra_days</code>), <code>cascade_project_end</code> (bool)</td>
+      </tr>
+      <tr>
+        <td><code>batalkan_eskalasi</code></td>
+        <td><span class="tag new">Eksekutif</span></td>
+        <td>Tutup eskalasi (<code>status='closed'</code>). <b>Sudah jalan</b> -- tambah audit + catatan thread.</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><code>ganti_alat</code></td>
+        <td><span class="tag partial">Tercatat</span></td>
+        <td>Catat keputusan ke thread eskalasi + <code>resolution</code>; notifikasi pelaksana. Opsional bundel <code>perpanjang_deadline</code> kecil. Tak ada entitas alat (naskah buang materials).</td>
+        <td><code>note</code> (opsional <code>extra_days</code>)</td>
+      </tr>
+      <tr>
+        <td><code>mediasi_client</code></td>
+        <td><span class="tag partial">Tercatat</span></td>
+        <td>Catat rencana mediasi ke thread; notifikasi manajer/pelapor; flag pada proyek (opsional). Tak ada entitas komunikasi-klien.</td>
+        <td><code>note</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="f1-cascade">2.4 Cascade <code>ganti_teknisi</code> (andalan)</h3>
+  <p>User menekankan: "ganti teknisi -&gt; jadwal teknisi &amp; semua relasi yang berhubungan dengan teknisi
+  tsb pasti pengaruh." Berikut peta dampak lengkap (hasil telusur kode), dieksekusi dalam <b>satu transaksi</b>
+  (<code>getClient()</code> + BEGIN/COMMIT/ROLLBACK) supaya gagal-sebagian = rollback.</p>
+
+  <figure class="dgm">
+    <svg viewBox="0 0 760 472" role="img" aria-label="Relasi teknisi yang terdampak ganti_teknisi" font-family="'SF Mono',Consolas,monospace">
+      <g stroke-width="1.4" fill="none">
+        <line x1="380" y1="233" x2="95" y2="63" stroke="#2563eb" stroke-opacity=".62"/>
+        <line x1="380" y1="233" x2="290" y2="63" stroke="#2563eb" stroke-opacity=".62"/>
+        <line x1="380" y1="233" x2="490" y2="63" stroke="#b7791f" stroke-opacity=".62"/>
+        <line x1="380" y1="233" x2="665" y2="63" stroke="#2563eb" stroke-opacity=".62"/>
+        <line x1="380" y1="233" x2="95" y2="407" stroke="#1a7f37" stroke-opacity=".62"/>
+        <line x1="380" y1="233" x2="290" y2="407" stroke="#2563eb" stroke-opacity=".62"/>
+        <line x1="380" y1="233" x2="490" y2="407" stroke="#2563eb" stroke-opacity=".62"/>
+        <line x1="380" y1="233" x2="665" y2="407" stroke="#aab2bf" stroke-opacity=".62"/>
+      </g>
+      <rect x="305" y="206" width="150" height="54" rx="9" fill="#eef3fb" stroke="#2563eb" stroke-width="2"/>
+      <text x="380" y="230" text-anchor="middle" fill="#1b2430" font-size="12.5" font-weight="700">GANTI TEKNISI</text>
+      <text x="380" y="248" text-anchor="middle" fill="#2563eb" font-size="12">X  -&gt;  Y</text>
+      <g>
+        <rect x="20" y="40" width="150" height="46" rx="7" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="95" y="60" text-anchor="middle" fill="#1b2430" font-size="12" font-weight="600">tb_tugas</text>
+        <text x="95" y="76" text-anchor="middle" fill="#2563eb" font-size="10.5">assigned_to X-&gt;Y</text>
+        <rect x="215" y="40" width="150" height="46" rx="7" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="290" y="60" text-anchor="middle" fill="#1b2430" font-size="11.5" font-weight="600">tb_penugasan_proyek</text>
+        <text x="290" y="76" text-anchor="middle" fill="#2563eb" font-size="10.5">+ (P, Y)</text>
+        <rect x="415" y="40" width="150" height="46" rx="7" fill="#ffffff" stroke="#b7791f" stroke-width="1.5"/>
+        <text x="490" y="60" text-anchor="middle" fill="#1b2430" font-size="12" font-weight="600">jadwal / timeline</text>
+        <text x="490" y="76" text-anchor="middle" fill="#b7791f" font-size="10.5">cek bentrok Y</text>
+        <rect x="590" y="40" width="150" height="46" rx="7" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="665" y="60" text-anchor="middle" fill="#1b2430" font-size="12" font-weight="600">project_health</text>
+        <text x="665" y="76" text-anchor="middle" fill="#2563eb" font-size="10.5">rekalkulasi SPI</text>
+        <rect x="20" y="384" width="150" height="46" rx="7" fill="#ffffff" stroke="#1a7f37" stroke-width="1.5"/>
+        <text x="95" y="404" text-anchor="middle" fill="#1b2430" font-size="11.5" font-weight="600">SPI teknisi X &amp; Y</text>
+        <text x="95" y="420" text-anchor="middle" fill="#1a7f37" font-size="10.5">auto (live)</text>
+        <rect x="215" y="384" width="150" height="46" rx="7" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="290" y="404" text-anchor="middle" fill="#1b2430" font-size="12" font-weight="600">notifications</text>
+        <text x="290" y="420" text-anchor="middle" fill="#2563eb" font-size="10.5">+3 baris</text>
+        <rect x="415" y="384" width="150" height="46" rx="7" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="490" y="404" text-anchor="middle" fill="#1b2430" font-size="12" font-weight="600">audit_log</text>
+        <text x="490" y="420" text-anchor="middle" fill="#2563eb" font-size="10.5">+N jejak</text>
+        <rect x="590" y="384" width="150" height="46" rx="7" fill="#ffffff" stroke="#aab2bf" stroke-width="1.5"/>
+        <text x="665" y="404" text-anchor="middle" fill="#5a6678" font-size="11.5" font-weight="600">bukti &amp; lap. harian</text>
+        <text x="665" y="420" text-anchor="middle" fill="#5a6678" font-size="10.5">TAK diubah</text>
+      </g>
+    </svg>
+    <div class="lgnd">
+      <span><i style="background:#2563eb"></i>Baris DB berubah</span>
+      <span><i style="background:#b7791f"></i>Validasi jadwal</span>
+      <span><i style="background:#1a7f37"></i>SPI auto (live, tak disimpan)</span>
+      <span><i style="background:#aab2bf"></i>Sejarah tak diubah</span>
+    </div>
+    <figcaption>Satu persetujuan ganti_teknisi menyentuh SEMUA relasi ini sekaligus -- persis "jadwal &amp; semua relasi pasti pengaruh"</figcaption>
+  </figure>
+
+  <figure class="dgm">
+    <svg viewBox="0 0 860 226" role="img" aria-label="Eksekutor ganti_teknisi sebagai satu transaksi" font-family="'SF Mono',Consolas,monospace">
+      <defs>
+        <marker id="arA" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker>
+        <marker id="arX" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c9303e"/></marker>
+      </defs>
+      <g stroke="#2563eb" stroke-width="1.6" fill="none">
+        <line x1="190" y1="60" x2="246" y2="60" marker-end="url(#arA)"/>
+        <line x1="410" y1="60" x2="466" y2="60" marker-end="url(#arA)"/>
+        <line x1="630" y1="60" x2="686" y2="60" marker-end="url(#arA)"/>
+        <line x1="770" y1="78" x2="770" y2="126" marker-end="url(#arA)"/>
+        <line x1="690" y1="148" x2="524" y2="148" marker-end="url(#arA)"/>
+        <line x1="360" y1="148" x2="194" y2="148" marker-end="url(#arA)"/>
+      </g>
+      <rect x="30" y="42" width="160" height="36" rx="9" fill="#eef3fb" stroke="#2563eb" stroke-width="1.7"/>
+      <text x="110" y="64" text-anchor="middle" fill="#2563eb" font-size="12" font-weight="700">BEGIN tx</text>
+      <rect x="250" y="42" width="160" height="36" rx="9" fill="#ffffff" stroke="#c7cedb" stroke-width="1.5"/>
+      <text x="330" y="64" text-anchor="middle" fill="#1b2430" font-size="11.5">validasi Y (!= X)</text>
+      <rect x="470" y="42" width="160" height="36" rx="9" fill="#dbe8fe" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="550" y="57" text-anchor="middle" fill="#1b2430" font-size="11" font-weight="600">reassign tb_tugas</text>
+      <text x="550" y="70" text-anchor="middle" fill="#2563eb" font-size="9.5">assigned_to X-&gt;Y</text>
+      <rect x="690" y="42" width="160" height="36" rx="9" fill="#ffffff" stroke="#c7cedb" stroke-width="1.5"/>
+      <text x="770" y="64" text-anchor="middle" fill="#1b2430" font-size="11">sync tb_penugasan</text>
+      <rect x="690" y="130" width="160" height="36" rx="9" fill="#ffffff" stroke="#b7791f" stroke-width="1.6"/>
+      <text x="770" y="152" text-anchor="middle" fill="#1b2430" font-size="10.5">cek bentrok jadwal Y</text>
+      <rect x="360" y="130" width="160" height="36" rx="9" fill="#ffffff" stroke="#c7cedb" stroke-width="1.5"/>
+      <text x="440" y="152" text-anchor="middle" fill="#1b2430" font-size="10.5">recalc SPI + notif + audit</text>
+      <rect x="30" y="130" width="160" height="36" rx="9" fill="#dcf3e3" stroke="#1a7f37" stroke-width="1.7"/>
+      <text x="110" y="152" text-anchor="middle" fill="#1a7f37" font-size="12" font-weight="700">COMMIT</text>
+      <line x1="760" y1="200" x2="80" y2="200" stroke="#c9303e" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#arX)"/>
+      <text x="420" y="218" text-anchor="middle" fill="#c9303e" font-size="11">GAGAL di langkah mana pun -&gt; ROLLBACK: tak ada perubahan parsial</text>
+    </svg>
+    <figcaption>Eksekutor = satu transaksi atomik. Sukses semua -&gt; COMMIT; gagal satu -&gt; ROLLBACK penuh</figcaption>
+  </figure>
+
+  <h4>Langkah transaksi (X = teknisi lama, Y = baru, P = proyek)</h4>
+  <div class="flow">
+    <span class="step">1.</span> Validasi: Y aktif &amp; ber-peran <code>teknisi</code>, Y != X.<br>
+    <span class="step">2.</span> Tentukan himpunan tugas: tugas yang dieskalasi (default) atau semua tugas X di P yang belum <code>done</code> (jika <code>reassign_scope=all</code>).<br>
+    <span class="step">3.</span> Cek konflik jadwal Y: untuk tiap tugas, <code>findConflicts(Y, timeline_start, timeline_end, taskId)</code> -&gt; bentrok = tolak (409) atau peringatkan.<br>
+    <span class="step">4.</span> <code>UPDATE tb_tugas SET assigned_to=Y, updated_at=NOW() WHERE id_tugas IN (...)</code>.<br>
+    <span class="step">5.</span> <code>INSERT INTO tb_penugasan_proyek (id_proyek,id_user) VALUES (P,Y) ON CONFLICT DO NOTHING</code>. Jika X tak punya sisa tugas di P -&gt; opsional hapus penugasan X.<br>
+    <span class="step">6.</span> Notifikasi: Y ("ditugaskan"), X ("dilepas dari tugas"), pelapor ("permintaan disetujui").<br>
+    <span class="step">7.</span> <code>recalculateSPI(P)</code> -- refresh <code>project_health</code>.<br>
+    <span class="step">8.</span> <code>logChange()</code> per tugas (<code>assigned_to</code>: X-&gt;Y) ke <code>audit_log</code>.<br>
+    <span class="step">9.</span> Eskalasi: <code>action_request_status='approved'</code>, append <code>escalation_updates</code> berisi ringkasan tindakan; opsional <code>status='handled'</code>.<br>
+    <span class="step">10.</span> COMMIT. (SPI teknisi X &amp; Y tak perlu disentuh -- dihitung live saat query berikutnya.)
+  </div>
+
+  <h4>Matriks relasi terdampak</h4>
+  <table>
+    <thead><tr><th>Entitas</th><th>Kolom</th><th>Perubahan</th><th>Catatan</th></tr></thead>
+    <tbody>
+      <tr><td>Penugasan tugas</td><td><code>tb_tugas.assigned_to</code></td><td>X -&gt; Y</td><td>Pemicu rekalkulasi SPI.</td></tr>
+      <tr><td>Penugasan proyek</td><td><code>tb_penugasan_proyek</code></td><td>+ (P,Y); opsional - (P,X)</td><td>PK komposit, idempoten.</td></tr>
+      <tr><td>Jadwal</td><td><code>tb_tugas.timeline_start/end</code></td><td>tetap; divalidasi anti-bentrok untuk Y</td><td>"Jadwal teknisi" = union timeline tugasnya.</td></tr>
+      <tr><td>SPI proyek</td><td><code>project_health.*</code></td><td>rekalkulasi</td><td>Bisa tak berubah jika tugas belum <code>done</code>.</td></tr>
+      <tr><td>SPI teknisi X</td><td>(live)</td><td>earned/planned berkurang</td><td>Tak tersimpan; otomatis.</td></tr>
+      <tr><td>SPI teknisi Y</td><td>(live)</td><td>earned/planned bertambah</td><td>Tak tersimpan; otomatis.</td></tr>
+      <tr><td>Notifikasi</td><td><code>notifications</code></td><td>+3 baris</td><td>X, Y, pelapor.</td></tr>
+      <tr><td>Audit</td><td><code>audit_log</code></td><td>+N baris</td><td>Jejak per tugas.</td></tr>
+      <tr><td>Bukti</td><td><code>tb_bukti.uploaded_by</code></td><td><b>tak diubah</b></td><td>Sejarah X dipertahankan; Y bisa unggah baru.</td></tr>
+      <tr><td>Laporan harian</td><td><code>daily_reports.created_by</code></td><td><b>tak diubah</b></td><td>Sejarah pelapor dipertahankan.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout ok">
+    <p class="lab">Prinsip</p>
+    <p>Reassign mengubah <b>kepemilikan ke depan</b> (siapa kerjakan sisanya), bukan menulis ulang sejarah
+    (bukti/laporan tetap atas nama X). Itu benar untuk audit &amp; SPI: kontribusi <code>done</code> X tetap
+    miliknya; Y dinilai dari yang ia selesaikan.</p>
+  </div>
+
+  <h3>2.5 <code>perpanjang_deadline</code></h3>
+  <ul>
+    <li><b>Tugas saja:</b> <code>UPDATE tb_tugas SET due_date=, timeline_end=</code>. Memengaruhi hitungan
+    <code>overdue/overtime</code>, bukan PV proyek langsung.</li>
+    <li><b>Cascade ke proyek</b> (jika <code>cascade_project_end=true</code>): <code>UPDATE tb_proyek SET end_date=</code>.
+    <code>duration</code> auto (kolom generated). Ini <b>menurunkan PV</b> -&gt; <b>menaikkan SPI</b> seluruh proyek
+    (proyek jadi "lebih tidak terlambat"). Surface efek ini ke manajer sebelum konfirmasi.</li>
+    <li><code>recalculateSPI(P)</code>, audit, notifikasi pelaksana+pelapor, catatan thread. Transaksi tunggal.</li>
+  </ul>
+
+  <h3>2.6 Tindakan tercatat (ganti_alat, mediasi_client)</h3>
+  <p>Tanpa entitas untuk dimutasi, tindakan = (a) tulis <code>escalation_updates</code> ringkasan keputusan,
+  (b) set <code>resolution_notes</code>/lanjutkan status, (c) notifikasi. <code>ganti_alat</code> boleh bundel
+  <code>extra_days</code> kecil (memakai jalur perpanjang_deadline). Tetap minimal -- jangan bikin tabel alat
+  (langgar lingkup naskah).</p>
+
+  <h3>2.7 Perubahan: data, API, frontend</h3>
+  <h4>Data model</h4>
+  <p>Tak ada kolom baru wajib pada <code>tb_eskalasi</code> (field action_request* sudah ada). Reuse
+  <code>escalation_updates</code> + <code>audit_log</code> untuk jejak. (Opsional: kolom <code>action_executed_at</code>
+  timestamp untuk menandai sudah dieksekusi -- nice-to-have, bukan blocker.)</p>
+  <h4>API</h4>
+  <ul>
+    <li>Perluas body <code>PATCH /api/escalations/:id/action-request</code> (responder) dengan <code>action_params</code>
+    opsional: <code>{ new_technician_id?, reassign_scope?, new_due_date?, extra_days?, cascade_project_end? }</code>.</li>
+    <li>Pada <code>status='approved'</code>, route ke <b>executor per-kategori</b> (modul baru
+    <code>lib/handlers/escalationActions.ts</code>) dalam transaksi. Reject = perilaku lama.</li>
+    <li>Validasi parameter wajib per kategori (mis. <code>ganti_teknisi</code> butuh <code>new_technician_id</code>).</li>
+    <li>Ekspor ulang <code>findConflicts</code> dari <span class="fp">tasks.ts</span> agar bisa dipakai executor.</li>
+  </ul>
+  <h4>Frontend</h4>
+  <ul>
+    <li><span class="fp">EscalationsPage.tsx</span>: saat manajer menyetujui kategori eksekutif, tampilkan
+    form parameter (dropdown teknisi untuk <code>ganti_teknisi</code>, date-picker untuk <code>perpanjang_deadline</code>,
+    checkbox scope/cascade). Tampilkan ringkasan dampak ("Akan mereassign N tugas, notifikasi 2 teknisi").</li>
+    <li>Setelah sukses: invalidate <code>escalations</code>, <code>tasks</code>, <code>['dashboard']</code>, daftar/detail teknisi.</li>
+    <li>i18n: label kategori, tooltip dampak, pesan toast.</li>
+  </ul>
+
+  <h4>Sketsa executor (referensi implementasi)</h4>
+<pre><code>// lib/db.ts -- helper transaksi tipis di atas getClient() yang sudah ada
+export async function withTransaction&lt;T&gt;(fn: (c: PoolClient) =&gt; Promise&lt;T&gt;): Promise&lt;T&gt; {
+  const c = await getClient();
+  try { await c.query('BEGIN'); const r = await fn(c); await c.query('COMMIT'); return r; }
+  catch (e) { await c.query('ROLLBACK'); throw e; }   // gagal mana pun -&gt; batal semua
+  finally { c.release(); }
+}
+
+// lib/handlers/escalationActions.ts -- inti ganti_teknisi (dipanggil saat approve)
+async function execGantiTeknisi(esc, params, c /* client tx */) {
+  const Y = params.new_technician_id;
+  const taskIds = params.reassign_scope === 'all'
+    ? await openTaskIdsOfTechInProject(esc.reported_by, esc.project_id, c) // semua tugas X belum-done
+    : [esc.task_id];                                                       // default: tugas eskalasi
+  await assertTechnicianValid(Y, esc.reported_by, c);                      // Y aktif &amp; Y != X
+  for (const id of taskIds) await assertNoScheduleConflict(Y, id, c);      // findConflicts -> throw = ROLLBACK
+  await c.query(`UPDATE tb_tugas SET assigned_to=$1, updated_at=NOW() WHERE id_tugas = ANY($2)`, [Y, taskIds]);
+  await c.query(`INSERT INTO tb_penugasan_proyek (id_proyek,id_user) VALUES ($1,$2) ON CONFLICT DO NOTHING`, [esc.project_id, Y]);
+  await recalculateSPI(esc.project_id);          // SPI proyek; SPI teknisi X &amp; Y ikut (live, tak disimpan)
+  await notifyReassign(esc, Y, taskIds, c);      // notif X, Y, pelapor
+  await logReassign(esc, Y, taskIds, c);         // audit_log per tugas + escalation_updates
+}</code></pre>
+
+  <h3>2.8 Kriteria penerimaan</h3>
+  <ul>
+    <li>Menyetujui <code>ganti_teknisi</code> dengan Y benar-benar mengubah <code>tb_tugas.assigned_to</code>
+    pada tugas yang ditarget, dan Y muncul di <code>tb_penugasan_proyek</code>.</li>
+    <li>Bentrok jadwal Y diblok/diperingatkan via <code>findConflicts</code>.</li>
+    <li>SPI proyek &amp; SPI kedua teknisi mencerminkan perubahan tanpa langkah manual.</li>
+    <li>Notifikasi terkirim ke X, Y, pelapor; <code>audit_log</code> mencatat tiap perubahan <code>assigned_to</code>.</li>
+    <li>Gagal di tengah (mis. Y tak valid) -&gt; rollback penuh, tak ada perubahan parsial.</li>
+    <li><code>perpanjang_deadline</code> menggeser tanggal &amp; merekalkulasi SPI; cascade ke <code>end_date</code> hanya bila diminta.</li>
+    <li>Tindakan tercatat menulis thread + notifikasi tanpa membuat tabel baru.</li>
+  </ul>
+
+  <h3 id="f1-open">2.9 Opsi (tidak default): dimensi kategori masalah</h3>
+  <p>Jika kelak diinginkan klasifikasi <b>jenis masalah</b> (teknis / sumber-daya / jadwal / kualitas / klien)
+  terpisah dari tindakan, tambah kolom <code>tb_eskalasi.kategori</code> + tabel pemetaan
+  kategori-&gt;tindakan-disarankan (UI menyarankan, manajer tetap memilih). Mengikuti semangat MDI/PDI
+  (membedakan akar manajemen vs produksi). <b>Ditunda</b> sampai diminta -- default cukup 5 action_request.</p>
+</section>
+
+<!-- ============ FITUR 2 ============ -->
+<section id="f2">
+  <h2><span class="num">3</span>Fitur 2 - Komentar per Proyek</h2>
+  <p class="lede" style="font-size:15px">Ruang komunikasi tim per proyek. Greenfield bersih -- tiru pola thread
+  <code>escalation_updates</code> yang sudah terbukti.</p>
+
+  <h3>3.1 Keadaan saat ini</h3>
+  <p>Tidak ada fitur komentar. Yang mirip tapi <b>bukan</b> komentar proyek: <code>escalation_updates</code>
+  (terikat eskalasi), <code>task_activities</code> (enum log kerja teknisi), <code>daily_reports</code>
+  (catatan kendala harian). Tab ProjectDetail saat ini: <code>tasks, evidence, charts, laporan, history</code>.</p>
+
+  <h3>3.2 Data model <span class="tag new">baru</span></h3>
+<pre><code>CREATE TABLE IF NOT EXISTS tb_komentar_proyek (
+  id_komentar  SERIAL PRIMARY KEY,
+  id_proyek    INT NOT NULL REFERENCES tb_proyek(id_proyek) ON DELETE CASCADE,
+  author_id    INT NOT NULL REFERENCES tb_user(id_user),
+  parent_id    INT REFERENCES tb_komentar_proyek(id_komentar) ON DELETE CASCADE, -- 1 level (opsional)
+  message      TEXT NOT NULL,
+  is_edited    BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_komentar_proyek ON tb_komentar_proyek(id_proyek, created_at);</code></pre>
+  <p>Mulai <b>flat</b>; kolom <code>parent_id</code> disiapkan tapi UI balasan menyusul (ponytail: simpan kapasitas,
+  jangan bangun UI berjenjang sampai perlu).</p>
+
+  <h3>3.3 API <span class="tag new">baru</span></h3>
+  <table>
+    <thead><tr><th>Method + Path</th><th>Aksi</th><th>Izin</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET /api/projects/:id/comments</code></td><td>List (urut <code>created_at</code>)</td><td>Anggota proyek + manajer</td></tr>
+      <tr><td><code>POST /api/projects/:id/comments</code></td><td>Tambah</td><td>Anggota proyek + manajer</td></tr>
+      <tr><td><code>PATCH /api/comments/:id</code></td><td>Edit (set <code>is_edited</code>)</td><td>Penulis sendiri</td></tr>
+      <tr><td><code>DELETE /api/comments/:id</code></td><td>Hapus</td><td>Penulis atau manajer</td></tr>
+    </tbody>
+  </table>
+  <p>"Anggota proyek" = teknisi yang ada di <code>tb_penugasan_proyek</code> untuk proyek itu, atau manajer.
+  Handler baru <span class="fp">lib/handlers/comments.ts</span>; daftarkan di dispatcher route.</p>
+
+  <h3>3.4 Frontend</h3>
+  <ul>
+    <li>Tambah <code>'komentar'</code> ke union <code>TabId</code> + entri tab di <span class="fp">ProjectDetailPage.tsx</span>
+    (antara <code>laporan</code> dan <code>history</code>), badge jumlah komentar.</li>
+    <li>Komponen <span class="fp">components/ProjectCommentsPanel.tsx</span>: daftar gelembung
+    (avatar inisial + nama + waktu relatif), textarea kirim, aksi edit/hapus inline. Tiru gaya thread eskalasi.</li>
+    <li>Service <code>getProjectComments/addProjectComment/editComment/deleteComment</code> + hook
+    <code>useProjectComments(projectId)</code> (query + mutations, key <code>['projects',id,'comments']</code>,
+    <code>refetchInterval</code> ringan untuk semu-realtime).</li>
+    <li>i18n: <code>comment.placeholder, comment.send, comment.edited, comment.empty, comment.delete_confirm</code>.</li>
+  </ul>
+
+  <h3>3.5 Fase 2 (opsional)</h3>
+  <p>Notifikasi ke anggota proyek saat ada komentar baru (reuse <code>createNotification</code>); @mention; balasan 1-level.</p>
+
+  <h3>3.6 Kriteria penerimaan</h3>
+  <ul>
+    <li>Teknisi yang ditugaskan &amp; manajer bisa baca + kirim komentar di proyeknya; non-anggota tertolak.</li>
+    <li>Penulis bisa edit/hapus miliknya; manajer bisa hapus apa pun; <code>is_edited</code> tampak.</li>
+    <li>Komentar muncul tanpa reload (invalidate/poll); hapus proyek -&gt; komentar ikut terhapus (CASCADE).</li>
+  </ul>
+</section>
+
+<!-- ============ FITUR 3 ============ -->
+<section id="f3">
+  <h2><span class="num">4</span>Fitur 3 - SPI Teknisi</h2>
+  <p class="lede" style="font-size:15px">Sudah diimplementasi. PRD ini mendokumentasikannya &amp; menutup risiko drift.</p>
+
+  <h3>4.1 Rumus (terverifikasi, <span class="fp">spiCalculator.ts:78</span>)</h3>
+<pre><code>SPI_teknisi = earned / planned        // di-cap SPI_CAP=2; RAG via categorizeHealth
+  earned  = jumlah tugas teknisi berstatus 'done'
+  planned = Sigma(project_health.planned_progress / 100) atas tugas teknisi
+            di proyek AKTIF dengan PV >= MIN_PV_FOR_SPI (5%)
+  planned <= 0  ->  null ("Belum Dinilai")</code></pre>
+  <p>Ambang RAG identik proyek: hijau &gt;=0.95, kuning 0.85-0.95, merah &lt;0.85. Dihitung <b>live</b>
+  (tak disimpan) di 3 titik: dashboard teknisi (<code>my_spi</code>), <code>listTechnicians</code>,
+  <code>getTechnicianDetail</code>.</p>
+
+  <h3>4.2 Grounding naskah</h3>
+  <p>Naskah menyebut "rasio SPI individu" (Gambar 4.23, Dashboard Performa Teknisi) <b>tanpa rumus</b>.
+  Implementasi saat ini adalah operasionalisasi konkretnya -- catat di bab metodologi untuk pertahanan sidang.</p>
+
+  <h3>4.3 Penyempurnaan (ringan)</h3>
+  <ul>
+    <li><b>Anti-drift:</b> ekstrak SQL earned/planned ke satu helper (mis. <code>technicianSpiSql()</code>)
+    dipakai ketiga call-site -- cegah rumus menyimpang antar tempat. Verifikasi ketiganya kini identik.</li>
+    <li><b>Dokumentasi asumsi:</b> <code>planned</code> pakai PV level-proyek, bukan bobot per-tugas. Wajar untuk
+    skala TA; tandai sebagai ceiling (<code>ponytail:</code>) bila kelak ingin bobot per-tugas.</li>
+    <li><b>Konsistensi null:</b> pastikan UI menampilkan "Belum Dinilai" seragam saat <code>spi_value=null</code>.</li>
+  </ul>
+
+  <h3>4.4 Kriteria penerimaan</h3>
+  <ul>
+    <li>Satu sumber rumus; ketiga endpoint mengembalikan angka identik untuk teknisi yang sama.</li>
+    <li>Teknisi tanpa tugas di proyek aktif terukur -&gt; "Belum Dinilai", bukan 0 atau error.</li>
+  </ul>
+</section>
+
+<!-- ============ FITUR 4 ============ -->
+<section id="f4">
+  <h2><span class="num">5</span>Fitur 4 - Visualisasi SPI Teknisi</h2>
+
+  <h3>5.1 Keadaan saat ini</h3>
+  <p>Hanya kartu angka + badge (dashboard teknisi) dan kolom SPI (tabel manajemen teknisi). Tak ada chart
+  SPI khusus teknisi. Chart yang ada: <code>TechProductivityChart</code> (tugas selesai/minggu),
+  <code>TechTimeSpentChart</code> (jam/proyek), <code>SPITrendChart</code> (rata-rata SPI proyek -- <b>di-comment</b>
+  di dashboard).</p>
+
+  <div class="callout anti">
+    <p class="lab">Kendala: tak ada histori SPI</p>
+    <p><code>project_health</code> hanya 1 baris/proyek (upsert; <code>last_updated</code> ditimpa).
+    <code>chartSPITrend</code> meng-<code>GROUP BY DATE_TRUNC('week', last_updated)</code> -- ini <b>degenerate</b>
+    (semua kolaps ke minggu terakhir di-recalc). Karena itu <code>SPITrendChart</code> dimatikan. <b>Tren SPI
+    apa pun (proyek atau teknisi) butuh sumber waktu baru.</b></p>
+  </div>
+
+  <h3>5.2 Tiga visualisasi (urut prioritas)</h3>
+  <table>
+    <thead><tr><th>Viz</th><th>Butuh histori?</th><th>Sumber</th><th>Nilai/Effort</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>A. Perbandingan antar-teknisi</b> (bar horizontal ranking SPI tim, diwarnai RAG, sortable) -- view manajer</td>
+        <td><b>Tidak</b></td>
+        <td>Live <code>GET /api/users/technicians</code> (sudah kirim <code>spi_value+health_status</code>)</td>
+        <td>Tinggi / Rendah -- <b>kerjakan dulu</b></td>
+      </tr>
+      <tr>
+        <td><b>C. Breakdown SPI per-proyek</b> untuk satu teknisi (bar kontribusi tiap proyek aktif) -- detail teknisi</td>
+        <td><b>Tidak</b></td>
+        <td>Endpoint baru ringan; <code>computeTechnicianSPI</code> per proyek</td>
+        <td>Sedang / Rendah</td>
+      </tr>
+      <tr>
+        <td><b>B. Tren SPI teknisi sepanjang waktu</b> (garis mingguan) -- dashboard teknisi &amp; detail</td>
+        <td><b>Ya</b></td>
+        <td>Tabel snapshot baru (5.3)</td>
+        <td>Tinggi / Sedang -- fase berikutnya</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.3 Sumber histori untuk tren (Viz B) <span class="tag new">baru</span></h3>
+  <p>Dua opsi; rekomendasi <b>snapshot harian</b> (sederhana, kokoh, sekaligus memperbaiki tren SPI proyek
+  yang kini mati).</p>
+<pre><code>CREATE TABLE IF NOT EXISTS spi_snapshot (
+  id          SERIAL PRIMARY KEY,
+  snap_date   DATE NOT NULL,
+  scope       VARCHAR(12) NOT NULL,          -- 'project' | 'technician'
+  ref_id      INT NOT NULL,                  -- id_proyek atau id_user
+  spi_value   DECIMAL(6,4),
+  status      VARCHAR(10),
+  UNIQUE (snap_date, scope, ref_id)          -- dedup 1 baris/hari
+);</code></pre>
+  <ul>
+    <li>Tulis snapshot saat <code>recalculateAllActiveSPI()</code> berjalan + saat menghitung SPI teknisi,
+    <code>ON CONFLICT (snap_date,scope,ref_id) DO UPDATE</code>.</li>
+    <li>Dipicu cron harian (Fly schedule / route yang dipanggil cron). Tren = <code>SELECT ... ORDER BY snap_date</code>.</li>
+    <li><b>Demo TA:</b> seed bisa backfill <code>spi_snapshot</code> agar grafik tren berisi tanpa menunggu hari berlalu.</li>
+    <li>Opsi B2 (turunkan histori dari <code>tb_tugas.status_changed_at</code>) ditolak: kompleks &amp; aproksimatif.</li>
+  </ul>
+
+  <h3>5.4 Frontend</h3>
+  <ul>
+    <li><b>A:</b> <span class="fp">components/charts/TechnicianSPIComparisonChart.tsx</span> (Recharts BarChart),
+    di DashboardPage / TechnicianManagementPage. Warna batang dari <code>health_status</code>.</li>
+    <li><b>C:</b> bar breakdown di modal detail teknisi.</li>
+    <li><b>B:</b> <span class="fp">TechnicianSPITrendChart.tsx</span> (LineChart) di dashboard teknisi; garis acuan
+    0.85 (kritis) &amp; 0.95 (baik) seperti <code>SPITrendChart</code>. Sekalian hidupkan kembali tren SPI proyek pakai snapshot.</li>
+    <li>Service + hook + i18n mengikuti pola §1.1.</li>
+  </ul>
+
+  <h3>5.5 Kriteria penerimaan</h3>
+  <ul>
+    <li>Viz A menampilkan seluruh teknisi terurut SPI, warna RAG benar, "Belum Dinilai" tertangani.</li>
+    <li>Viz B menggambar tren dari <code>spi_snapshot</code>; kosong-state jelas bila data &lt; 2 titik.</li>
+    <li>Tren SPI proyek yang dulu mati hidup kembali memakai sumber snapshot yang sama (bonus konsistensi).</li>
+  </ul>
+</section>
+
+<!-- ============ INFRA ============ -->
+<section id="infra">
+  <h2><span class="num">6</span>Infrastruktur Bersama</h2>
+  <ul>
+    <li><b>Helper transaksi:</b> bungkus <code>getClient()</code> jadi <code>withTransaction(fn)</code>
+    (BEGIN/COMMIT/ROLLBACK/release). Dipakai executor <code>ganti_teknisi</code> &amp; <code>perpanjang_deadline</code>.
+    <code>getClient</code> sudah ada -- tinggal helper tipis.</li>
+    <li><b>SQL SPI teknisi bersama:</b> satu fungsi pembuat klausa earned/planned untuk 3 call-site (§4.3).</li>
+    <li><b>Ekspor <code>findConflicts</code>:</b> jadikan exportable dari <span class="fp">tasks.ts</span> agar executor reassign memakainya.</li>
+    <li><b>Tabel <code>spi_snapshot</code> + penulisnya</b> (§5.3) untuk semua kebutuhan tren.</li>
+  </ul>
+</section>
+
+<!-- ============ FASE ============ -->
+<section id="fase">
+  <h2><span class="num">7</span>Rencana Fase</h2>
+  <p>Urutan memaksimalkan nilai awal &amp; menumpuk fondasi. Bahasa lingkup, bukan waktu.</p>
+
+  <figure class="dgm">
+    <svg viewBox="0 0 620 268" role="img" aria-label="Roadmap fase pengerjaan" font-family="'SF Mono',Consolas,monospace">
+      <defs>
+        <marker id="arP" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker>
+      </defs>
+      <g stroke="#2563eb" stroke-width="1.6" fill="none">
+        <line x1="190" y1="73" x2="226" y2="73" marker-end="url(#arP)"/>
+        <line x1="190" y1="147" x2="226" y2="147" marker-end="url(#arP)"/>
+        <line x1="190" y1="221" x2="226" y2="221" marker-end="url(#arP)"/>
+        <line x1="410" y1="221" x2="426" y2="221" marker-end="url(#arP)"/>
+      </g>
+      <rect x="20" y="46" width="170" height="202" rx="10" fill="#eef3fb" stroke="#b7791f" stroke-width="1.7"/>
+      <text x="105" y="92" text-anchor="middle" fill="#b7791f" font-size="13" font-weight="700">FASE 0</text>
+      <text x="105" y="114" text-anchor="middle" fill="#1b2430" font-size="12">Fondasi</text>
+      <text x="105" y="140" text-anchor="middle" fill="#5a6678" font-size="9.5">withTransaction</text>
+      <text x="105" y="156" text-anchor="middle" fill="#5a6678" font-size="9.5">export findConflicts</text>
+      <text x="105" y="172" text-anchor="middle" fill="#5a6678" font-size="9.5">SPI SQL bersama</text>
+      <text x="105" y="198" text-anchor="middle" fill="#5a6678" font-size="9.5">(Fitur 3 selesai)</text>
+      <rect x="230" y="46" width="220" height="54" rx="9" fill="#ffffff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="340" y="68" text-anchor="middle" fill="#2563eb" font-size="12" font-weight="600">FASE 1 - Eskalasi bertindakan</text>
+      <text x="340" y="86" text-anchor="middle" fill="#5a6678" font-size="10">executor ganti_teknisi (andalan)</text>
+      <text x="340" y="112" text-anchor="middle" fill="#b7791f" font-size="9.5">1 &amp; 2 paralel</text>
+      <rect x="230" y="120" width="220" height="54" rx="9" fill="#ffffff" stroke="#c7cedb" stroke-width="1.5"/>
+      <text x="340" y="142" text-anchor="middle" fill="#1b2430" font-size="12">FASE 2 - Komentar proyek</text>
+      <text x="340" y="160" text-anchor="middle" fill="#5a6678" font-size="10">tb_komentar_proyek + tab</text>
+      <rect x="230" y="194" width="180" height="54" rx="9" fill="#ffffff" stroke="#c7cedb" stroke-width="1.5"/>
+      <text x="320" y="216" text-anchor="middle" fill="#1b2430" font-size="12">FASE 3 - Viz SPI live</text>
+      <text x="320" y="234" text-anchor="middle" fill="#5a6678" font-size="10">banding + breakdown</text>
+      <rect x="430" y="194" width="160" height="54" rx="9" fill="#ffffff" stroke="#c7cedb" stroke-width="1.5"/>
+      <text x="510" y="216" text-anchor="middle" fill="#1b2430" font-size="12">FASE 4 - Tren SPI</text>
+      <text x="510" y="234" text-anchor="middle" fill="#5a6678" font-size="10">spi_snapshot + cron</text>
+    </svg>
+    <figcaption>Fase 0 fondasi -&gt; cabang; Fitur 1 &amp; 2 jalan paralel; Fitur 4 = Fase 3 lalu 4</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr><th>Fase</th><th>Isi</th><th>Bergantung pada</th></tr></thead>
+    <tbody>
+      <tr><td><b>0 - Fondasi</b></td><td><code>withTransaction</code>, ekspor <code>findConflicts</code>, ekstrak SQL SPI teknisi (Fitur 3 beres di sini), scaffolding i18n.</td><td>-</td></tr>
+      <tr><td><b>1 - Eskalasi bertindakan</b></td><td>Executor <code>ganti_teknisi</code> (andalan) + <code>perpanjang_deadline</code> + tindakan tercatat; UI approve-berparameter di EscalationsPage. <b>Fitur 1.</b></td><td>Fase 0</td></tr>
+      <tr><td><b>2 - Komentar proyek</b></td><td>Tabel <code>tb_komentar_proyek</code>, handler, rute, tab + panel. <b>Fitur 2.</b></td><td>Independen (boleh paralel Fase 1)</td></tr>
+      <tr><td><b>3 - Viz SPI (live)</b></td><td>Viz A (perbandingan) + Viz C (breakdown). <b>Fitur 4 sebagian.</b></td><td>Fase 0</td></tr>
+      <tr><td><b>4 - Tren SPI</b></td><td><code>spi_snapshot</code> + penulis cron + backfill seed; Viz B + hidupkan tren proyek. <b>Fitur 4 sisanya.</b></td><td>Fase 3</td></tr>
+    </tbody>
+  </table>
+  <div class="callout ok">
+    <p class="lab">Jalur cepat</p>
+    <p>Fitur 3 hampir gratis (verifikasi + ekstrak). Fitur 2 &amp; Viz A bisa jalan paralel dengan Fitur 1.
+    Andalan (eksekutor ganti_teknisi) adalah satu-satunya bagian yang butuh kehati-hatian transaksi.</p>
+  </div>
+</section>
+
+<!-- ============ RISIKO ============ -->
+<section id="risiko">
+  <h2><span class="num">8</span>Risiko &amp; Keputusan Terbuka</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Sikap / Rekomendasi</th></tr></thead>
+    <tbody>
+      <tr><td><b>Lingkup reassign ganti_teknisi:</b> tugas yang dieskalasi saja, atau semua tugas X di proyek?</td>
+        <td>Default = tugas yang dieskalasi; sediakan opsi "semua tugas X di proyek ini" (checkbox <code>reassign_scope</code>). Manajer memutuskan saat approve.</td></tr>
+      <tr><td><b>perpanjang_deadline menggeser <code>end_date</code> proyek</b> menaikkan SPI semua.</td>
+        <td>Jadikan opt-in (<code>cascade_project_end</code>) &amp; tampilkan dampak SPI sebelum konfirmasi. Default: tugas saja.</td></tr>
+      <tr><td><b>Fidelity naskah:</b> sistem tindakan di luar lingkup minimum naskah.</td>
+        <td>Bingkai sebagai operasionalisasi <code>sendInstruction</code>. Konfirmasi ke Dian apakah masuk bab penyempurnaan.</td></tr>
+      <tr><td><b>ganti_alat / mediasi_client</b> tanpa entitas.</td>
+        <td>Tetap "tercatat" (thread + notifikasi). Jangan bikin tabel alat/komunikasi-klien (langgar lingkup naskah).</td></tr>
+      <tr><td><b>Tren SPI butuh scheduler</b> (Fly cron) untuk snapshot.</td>
+        <td>Terima ketergantungan; backfill seed untuk demo. Viz A &amp; C tak terdampak (live).</td></tr>
+      <tr><td><b>Kategori vs tindakan</b> (interpretasi).</td>
+        <td>Default: 5 action_request = kategori. Dimensi "jenis masalah" terpisah ditunda (§2.9) sampai diminta.</td></tr>
+      <tr><td><b>Konkurensi:</b> dua manajer approve tindakan pada eskalasi sama.</td>
+        <td>Guard <code>action_request_status='pending'</code> sudah ada; transaksi + cek ulang status di dalam tx.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ LAMPIRAN ============ -->
+<section id="lampiran">
+  <h2><span class="num">9</span>Lampiran - Titik Sentuh per Fitur</h2>
+  <div class="grid2">
+    <div>
+      <h4>Fitur 1 (eskalasi)</h4>
+      <ul>
+        <li class="fp">lib/handlers/escalations.ts (perluas respond)</li>
+        <li class="fp">lib/handlers/escalationActions.ts (BARU - executor)</li>
+        <li class="fp">lib/handlers/tasks.ts (ekspor findConflicts)</li>
+        <li class="fp">lib/db.ts (withTransaction)</li>
+        <li class="fp">app/api/[...route]/route.ts</li>
+        <li class="fp">views/EscalationsPage.tsx</li>
+        <li class="fp">services/api.ts + hooks/useEscalations.ts</li>
+        <li class="fp">lib/i18n.ts</li>
+      </ul>
+      <h4>Fitur 2 (komentar)</h4>
+      <ul>
+        <li class="fp">database/init.sql (tb_komentar_proyek)</li>
+        <li class="fp">lib/handlers/comments.ts (BARU)</li>
+        <li class="fp">app/api/[...route]/route.ts</li>
+        <li class="fp">views/ProjectDetailPage.tsx (tab)</li>
+        <li class="fp">components/ProjectCommentsPanel.tsx (BARU)</li>
+        <li class="fp">services/api.ts + hooks/useProjectComments.ts (BARU)</li>
+        <li class="fp">types/index.ts (ProjectComment)</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Fitur 3 (SPI teknisi)</h4>
+      <ul>
+        <li class="fp">lib/spiCalculator.ts (helper SQL bersama)</li>
+        <li class="fp">lib/handlers/dashboard.ts (verifikasi)</li>
+        <li class="fp">lib/handlers/users.ts (verifikasi)</li>
+      </ul>
+      <h4>Fitur 4 (visualisasi)</h4>
+      <ul>
+        <li class="fp">database/init.sql (spi_snapshot)</li>
+        <li class="fp">lib/spiCalculator.ts (tulis snapshot)</li>
+        <li class="fp">lib/handlers/dashboard.ts (endpoint viz A/B/C)</li>
+        <li class="fp">components/charts/TechnicianSPIComparisonChart.tsx (BARU)</li>
+        <li class="fp">components/charts/TechnicianSPITrendChart.tsx (BARU)</li>
+        <li class="fp">views/DashboardPage.tsx + TechnicianDashboard.tsx</li>
+        <li class="fp">services/api.ts + hooks/useDashboard.ts</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="soft">
+  <p style="color:var(--ink2);font-size:13px">Sumber kebenaran PRD ini = baca langsung kode (escalations.ts,
+  spiCalculator.ts, db.ts, init.sql via agen, route dispatcher) + graph naskah
+  <code>docs/naskah-extract/graph/nodes/divergences.md</code>. Setiap klaim "sudah ada / belum ada"
+  diverifikasi pada 2026-06-24.</p>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  PRD v1.1 -- Eskalasi Bertindakan, Komentar Proyek, SPI Teknisi &amp; Visualisasi.
+  Target <code>frontend/</code> (setia-naskah). Disusun untuk eksekusi bertahap. Diagram = inline SVG, self-contained.
+</div></footer>
+
+</body>
+</html>

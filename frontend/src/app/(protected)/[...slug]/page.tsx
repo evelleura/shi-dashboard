@@ -78,7 +78,12 @@ export default function ProtectedPage({ params }: Props) {
   if (!view) return notFound();
 
   // Gerbang rute terpusat: peran tanpa kapabilitas yang diwajibkan -> 403 panel.
-  if (user && !canAccessRoute(user.role, section)) {
+  // PENGECUALIAN: DETAIL proyek (/projects/:id) boleh dilihat teknisi (view-only --
+  // ProjectDetailPage menyembunyikan SEMUA aksi kelola via isManager; backend izinkan
+  // user terautentikasi). Hanya LIST kelola (/projects) yang tetap digerbang manajer.
+  // Tanpa ini, tautan teknisi (dashboard / my-projects) ke detail proyek kena 403 palsu.
+  const isProjectDetail = section === 'projects' && !!id;
+  if (user && !isProjectDetail && !canAccessRoute(user.role, section)) {
     return <Forbidden home={roleHome(user.role)} />;
   }
 

@@ -4,7 +4,7 @@ import { query } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { logChange } from './audit';
 import { PERMISSIONS, ASSIGNABLE_ROLES, ROLES, isRole } from '@/lib/rbac';
-import { computeTechnicianSPI, MIN_PV_FOR_SPI } from '@/lib/spiCalculator';
+import { computeTechnicianSPI } from '@/lib/spiCalculator';
 
 // Validasi peran yang dapat diberikan admin (teknisi|manajer|admin).
 const ASSIGNABLE_ROLES_MSG = `role must be one of: ${ASSIGNABLE_ROLES.join(', ')}`;
@@ -170,8 +170,8 @@ export async function listTechnicians(request: NextRequest) {
           AND t.status IN ('to_do', 'working_on_it')
         ) AS busy_today,
         COUNT(DISTINCT t.id_tugas) FILTER (WHERE t.due_date = CURRENT_DATE AND t.status != 'done')::int AS tasks_due_today,
-        -- SPI per-teknisi: earned (tugas selesai) vs planned (Sigma PV proyek aktif).
-        -- Subquery terisolasi supaya tak terpengaruh JOIN tb_bukti/penugasan di atas.
+        -- SPI PERSONAL teknisi: earned (tugas selesai) vs planned (tugas jatuh tempo <= hari ini).
+        -- Berbasis tenggat per-tugas -> kinerja INDIVIDU, bukan SPI proyek. Subquery terisolasi.
         spi.earned, spi.planned
        FROM tb_user u
        LEFT JOIN tb_penugasan_proyek pa ON pa.id_user = u.id_user
@@ -179,11 +179,10 @@ export async function listTechnicians(request: NextRequest) {
        LEFT JOIN tb_bukti te ON te.uploaded_by = u.id_user
        LEFT JOIN LATERAL (
          SELECT COUNT(*) FILTER (WHERE st.status = 'done')::int AS earned,
-                COALESCE(SUM(sph.planned_progress) / 100.0, 0)::float AS planned
+                COUNT(*) FILTER (WHERE st.due_date <= CURRENT_DATE)::int AS planned
          FROM tb_tugas st
          JOIN tb_proyek sp ON sp.id_proyek = st.id_proyek
-         JOIN project_health sph ON sph.project_id = sp.id_proyek
-         WHERE st.assigned_to = u.id_user AND sp.status = 'active' AND sph.planned_progress >= ${MIN_PV_FOR_SPI}
+         WHERE st.assigned_to = u.id_user AND sp.status = 'active'
        ) spi ON true
        WHERE u.role = 'teknisi'
        GROUP BY u.id_user, u.nama, u.email, u.created_at, spi.earned, spi.planned
@@ -275,14 +274,13 @@ export async function getTechnicianDetail(request: NextRequest, id: string) {
       [techId]
     );
 
-    // SPI per-teknisi (rumus sama dengan proyek aktif, cakupan tugas teknisi ini).
+    // SPI PERSONAL teknisi: earned (tugas selesai) vs planned (tugas jatuh tempo <= hari ini).
     const spiAgg = await query<{ earned: number; planned: number }>(
       `SELECT COUNT(*) FILTER (WHERE t.status = 'done')::int AS earned,
-              COALESCE(SUM(ph.planned_progress) / 100.0, 0)::float AS planned
+              COUNT(*) FILTER (WHERE t.due_date <= CURRENT_DATE)::int AS planned
        FROM tb_tugas t
        JOIN tb_proyek p ON p.id_proyek = t.id_proyek
-       JOIN project_health ph ON ph.project_id = p.id_proyek
-       WHERE t.assigned_to = $1 AND p.status = 'active' AND ph.planned_progress >= ${MIN_PV_FOR_SPI}`,
+       WHERE t.assigned_to = $1 AND p.status = 'active'`,
       [techId]
     );
     const techSpi = computeTechnicianSPI(

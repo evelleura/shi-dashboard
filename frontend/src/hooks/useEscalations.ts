@@ -11,6 +11,7 @@ import {
   respondEscalationAction,
   deleteEscalation,
 } from '../services/api';
+import type { EscalationActionParams } from '../services/api';
 import { useToast } from './useToast';
 import type { EscalationActionRequest } from '../types';
 
@@ -139,13 +140,19 @@ export function useRespondEscalationAction() {
   const qc = useQueryClient();
   const toast = useToast();
   return useMutation({
-    mutationFn: ({ id, status, response_note }: {
+    mutationFn: ({ id, status, response_note, action_params }: {
       id: number;
       status: 'approved' | 'rejected';
       response_note: string;
-    }) => respondEscalationAction(id, status, response_note),
+      action_params?: EscalationActionParams;
+    }) => respondEscalationAction(id, status, response_note, action_params),
     onSuccess: (_data, { status }) => {
       void qc.invalidateQueries({ queryKey: ESCALATION_KEYS.all });
+      void qc.invalidateQueries({ queryKey: ['dashboard'] });
+      void qc.invalidateQueries({ queryKey: ['technician-dashboard'] });
+      void qc.invalidateQueries({ queryKey: ['technicians'] });
+      void qc.invalidateQueries({ queryKey: ['tasks'] });
+      void qc.invalidateQueries({ queryKey: ['projects'] });
       toast(status === 'approved' ? 'Permintaan disetujui' : 'Permintaan ditolak');
     },
     onError: () => { toast('Gagal merespons permintaan', 'error'); },

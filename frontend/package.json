@@ -6,9 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:setup": "bunx tsx database/setup.ts",
-    "db:seed": "bunx tsx database/setup.ts --seed",
-    "db:backfill-spi": "bunx tsx database/backfill-spi.ts",
+    "db:setup": "bun database/setup.ts",
+    "db:seed": "bun database/setup.ts --seed",
+    "db:backfill-spi": "bun database/backfill-spi.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -16,7 +16,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:ci": "vitest run --coverage && playwright test",
-    "db:test:setup": "DB_NAME=shi_test bunx tsx database/setup.ts"
+    "db:test:setup": "DB_NAME=shi_test bun database/setup.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

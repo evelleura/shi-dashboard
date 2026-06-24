@@ -65,15 +65,14 @@ export function categorizeHealth(spiValue: number): HealthStatus {
 }
 
 /**
- * SPI per-TEKNISI = earned-value dari PORSI tugas teknisi sendiri. Rumus EV/PV identik
- * dengan SPI proyek aktif, hanya cakupannya tugas si teknisi di proyek AKTIF:
+ * SPI PERSONAL teknisi = kinerja jadwal INDIVIDU (bukan SPI proyek). Pemanggil menghitung
+ * dari tenggat PER-TUGAS si teknisi (BUKAN PV proyek), supaya tak runtuh jadi SPI proyek
+ * saat 1 teknisi = 1 proyek (dulu earned/Sigma-PV = EV/PV = SPI proyek -> semua teknisi sama):
  *   earned  = jumlah tugas teknisi berstatus 'done'
- *   planned = Sigma (planned_progress_proyek / 100) atas tiap tugas teknisi
- *             = "berapa tugas yang SEHARUSNYA selesai menurut jadwal proyeknya".
- * SPI = earned / planned. >1 = di depan jadwal; di-cap SPI_CAP; RAG via categorizeHealth.
- * planned <= 0 (tak ada tugas di proyek aktif yang cukup berjalan, PV < MIN_PV_FOR_SPI)
- * -> null ("Belum Dinilai"), selaras kebijakan SPI proyek: tak menampilkan angka prematur.
- * Filter PV >= MIN_PV_FOR_SPI dilakukan di SQL pemanggil; fungsi ini murni (mudah diuji).
+ *   planned = jumlah tugas teknisi yang tenggatnya <= hari ini (seharusnya sudah selesai)
+ * SPI = earned / planned. >1 = di depan jadwal (selesai lebih dari yang jatuh tempo);
+ * <1 = ada tugas jatuh-tempo belum selesai. Di-cap SPI_CAP; RAG via categorizeHealth.
+ * planned <= 0 (belum ada tugas jatuh tempo) -> null ("Belum Dinilai"). Fungsi murni.
  */
 export function computeTechnicianSPI(
   earned: number,

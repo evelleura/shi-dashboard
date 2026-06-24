@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, PoolClient } from "pg";
 
 // Prevent multiple Pool instances during hot reload in development
 const globalForPg = globalThis as unknown as {
@@ -38,5 +38,23 @@ export const query = <T = unknown>(text: string, params?: unknown[]) =>
   pool.query<T & Record<string, unknown>>(text, params);
 
 export const getClient = () => pool.connect();
+
+// Jalankan fn dalam SATU transaksi (BEGIN/COMMIT; ROLLBACK saat error, release
+// selalu). Dipakai eksekutor tindakan eskalasi (ganti_teknisi dll) supaya cascade
+// reassign + jadwal + SPI + notif + audit atomik: gagal sebagian = batal semua.
+export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await getClient();
+  try {
+    await client.query("BEGIN");
+    const result = await fn(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
 
 export default pool;

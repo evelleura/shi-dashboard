@@ -17,6 +17,7 @@ import EvidenceGallery from '../components/evidence/EvidenceGallery';
 import EvidenceUploader from '../components/evidence/EvidenceUploader';
 import EntityActivityTimeline from '../components/ui/EntityActivityTimeline';
 import DailyReportPanel from '../components/reports/DailyReportPanel';
+import ProjectCommentsPanel from '../components/ProjectCommentsPanel';
 import { useLanguage } from '../hooks/useLanguage';
 import { t } from '../lib/i18n';
 import type { Task, TaskStatus, CreateTaskData } from '../types';
@@ -24,7 +25,7 @@ import { useAuth } from '../hooks/useAuth';
 import { usePermissions } from '../hooks/usePermissions';
 import { PERMISSIONS } from '../lib/rbac';
 
-type TabId = 'tasks' | 'evidence' | 'charts' | 'laporan' | 'history';
+type TabId = 'tasks' | 'evidence' | 'charts' | 'laporan' | 'komentar' | 'history';
 
 function formatDate(d: string, locale: string) {
   return new Date(d).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
@@ -105,6 +106,7 @@ export default function ProjectDetailPage() {
     { id: 'evidence', label: t('project.tab_evidence', language) },
     { id: 'charts', label: t('project.tab_charts', language) },
     { id: 'laporan' as TabId, label: 'Laporan Harian' },
+    { id: 'komentar' as TabId, label: 'Komentar' },
     ...(isManager ? [{ id: 'history' as TabId, label: t('project.tab_history', language) }] : []),
   ];
 
@@ -547,6 +549,12 @@ export default function ProjectDetailPage() {
         {activeTab === 'laporan' && (
           <div className="space-y-4">
             <DailyReportPanel projectId={projectId} canSubmit={isTechnician || isManager} />
+          </div>
+        )}
+
+        {activeTab === 'komentar' && (
+          <div className="space-y-4">
+            <ProjectCommentsPanel projectId={projectId} />
           </div>
         )}
 

@@ -295,6 +295,39 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read, created_at DESC);
 
+-- ---------------------------------------------------------------------
+-- tb_komentar_proyek  (komunikasi tim per proyek - pendukung)
+-- Utas datar; parent_id disiapkan utk balasan 1-level (UI menyusul).
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS tb_komentar_proyek (
+  id_komentar  SERIAL PRIMARY KEY,
+  id_proyek    INT NOT NULL REFERENCES tb_proyek(id_proyek) ON DELETE CASCADE,
+  author_id    INT NOT NULL REFERENCES tb_user(id_user),
+  parent_id    INT REFERENCES tb_komentar_proyek(id_komentar) ON DELETE CASCADE,
+  message      TEXT NOT NULL,
+  is_edited    BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_komentar_proyek ON tb_komentar_proyek(id_proyek, created_at);
+
+-- ---------------------------------------------------------------------
+-- spi_snapshot  (riwayat SPI harian utk TREN proyek & teknisi - pendukung).
+-- project_health hanya 1 baris/proyek (kini), jadi tren butuh sumber waktu ini.
+-- Ditulis saat rekalkulasi; dedup 1 baris per (hari, scope, ref).
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS spi_snapshot (
+  id          SERIAL PRIMARY KEY,
+  snap_date   DATE NOT NULL,
+  scope       VARCHAR(12) NOT NULL,
+  ref_id      INT NOT NULL,
+  spi_value   DECIMAL(6,4),
+  status      VARCHAR(10),
+  UNIQUE (snap_date, scope, ref_id),
+  CONSTRAINT spi_snapshot_scope_check CHECK (scope IN ('project','technician'))
+);
+CREATE INDEX IF NOT EXISTS idx_spi_snapshot ON spi_snapshot(scope, ref_id, snap_date);
+
 -- =====================================================================
 -- SEED DATA (demo sidang). Guard: hanya jalan saat tb_user kosong supaya
 -- run.py aman memuat ulang skema ini berkali-kali (idempotent).

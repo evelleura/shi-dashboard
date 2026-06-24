@@ -15,6 +15,7 @@ import {
   getRecentActivity,
   getTechnicianProductivity,
   getTechnicianTimeSpent,
+  getTechnicianSpiBreakdown,
 } from '../services/api';
 import type { DateRange } from '../types';
 
@@ -34,6 +35,7 @@ export const QUERY_KEYS = {
   chartRecentActivity: (dr?: DateRange) => ['charts', 'recent-activity', dr] as const,
   techProductivity: (dr?: DateRange) => ['tech', 'productivity', dr] as const,
   techTimeSpent: (dr?: DateRange) => ['tech', 'time-spent', dr] as const,
+  techSpiBreakdown: ['tech', 'spi-breakdown'] as const,
 };
 
 export function useDashboard(dateRange?: DateRange, enabled = true) {
@@ -160,6 +162,14 @@ export function useTechTimeSpentChart(dateRange?: DateRange) {
   return useQuery({
     queryKey: QUERY_KEYS.techTimeSpent(dateRange),
     queryFn: () => getTechnicianTimeSpent(dateRange),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useTechnicianSpiBreakdown() {
+  return useQuery({
+    queryKey: QUERY_KEYS.techSpiBreakdown,
+    queryFn: getTechnicianSpiBreakdown,
     staleTime: 1000 * 60 * 2,
   });
 }

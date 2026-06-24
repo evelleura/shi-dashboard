@@ -9,8 +9,10 @@ import {
   useAddEscalationUpdate,
   useRespondEscalationAction,
 } from '../hooks/useEscalations';
+import { useTechnicians } from '../hooks/useDashboard';
 import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
+import type { EscalationActionParams } from '../services/api';
 import type { Escalation, EscalationPriority, EscalationStatus, EscalationActionRequest } from '../types';
 
 const PRIORITY_CONFIG: Record<EscalationPriority, { bg: string; text: string; label: string }> = {
@@ -70,6 +72,7 @@ export default function EscalationsPage() {
   const reviewMutation = useReviewEscalation();
   const resolveMutation = useResolveEscalation();
   const deleteMutation = useDeleteEscalation();
+  const respondActionMutation = useRespondEscalationAction();
 
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortField>('priority');
@@ -77,8 +80,17 @@ export default function EscalationsPage() {
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<Escalation | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [approveTarget, setApproveTarget] = useState<Escalation | null>(null);
 
   const handleReview = (id: number) => reviewMutation.mutate(id);
+
+  const handleApproveSubmit = (response_note: string, action_params?: EscalationActionParams) => {
+    if (!approveTarget) return;
+    respondActionMutation.mutate(
+      { id: approveTarget.id, status: 'approved', response_note, action_params },
+      { onSuccess: () => setApproveTarget(null) }
+    );
+  };
 
   const handleDelete = () => {
     if (!deleteTarget) return;
@@ -198,6 +210,7 @@ export default function EscalationsPage() {
               onReview={handleReview}
               onResolve={(e) => { setResolveModal(e); setResolutionNotes(''); }}
               onDelete={(e) => setDeleteTarget(e)}
+              onApprove={(e) => setApproveTarget(e)}
               isReviewing={reviewMutation.isPending}
             />
           ))}
@@ -242,6 +255,29 @@ export default function EscalationsPage() {
         </div>
       </Modal>
 
+      <Modal
+        open={approveTarget !== null}
+        onClose={() => setApproveTarget(null)}
+        title="Setujui Permintaan Tindakan"
+        maxWidth="max-w-md"
+        closeOnEscape={false}
+        closeOnOverlayClick={false}
+      >
+        {approveTarget && (
+          <ApproveActionForm
+            escalation={approveTarget}
+            onCancel={() => setApproveTarget(null)}
+            onSubmit={handleApproveSubmit}
+            isPending={respondActionMutation.isPending}
+            errorMsg={
+              respondActionMutation.isError
+                ? (respondActionMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Gagal menyimpan tanggapan.'
+                : null
+            }
+          />
+        )}
+      </Modal>
+
       <ConfirmDialog
         open={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
@@ -257,7 +293,7 @@ export default function EscalationsPage() {
 }
 
 function ManagerEscalationCard({
-  escalation, expanded, onToggle, onReview, onResolve, onDelete, isReviewing,
+  escalation, expanded, onToggle, onReview, onResolve, onDelete, onApprove, isReviewing,
 }: {
   escalation: Escalation;
   expanded: boolean;
@@ -265,6 +301,7 @@ function ManagerEscalationCard({
   onReview: (id: number) => void;
   onResolve: (esc: Escalation) => void;
   onDelete: (esc: Escalation) => void;
+  onApprove: (esc: Escalation) => void;
   isReviewing: boolean;
 }) {
   const pc = PRIORITY_CONFIG[escalation.priority];
@@ -274,7 +311,6 @@ function ManagerEscalationCard({
   const [updateMsg, setUpdateMsg] = useState('');
   const [respondNote, setRespondNote] = useState('');
   const [showRespondForm, setShowRespondForm] = useState(false);
-  const [respondAction, setRespondAction] = useState<'approved' | 'rejected'>('approved');
 
   const { data: updates } = useEscalationUpdates(expanded ? escalation.id : 0);
   const addUpdateMutation = useAddEscalationUpdate();
@@ -362,51 +398,53 @@ function ManagerEscalationCard({
                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{escalation.action_request_note}</p>
               )}
               {hasPendingRequest && (
-                !showRespondForm ? (
+                <div className="flex gap-2 mt-2 flex-wrap">
                   <button
-                    onClick={() => setShowRespondForm(true)}
-                    className="text-xs font-medium text-amber-700 dark:text-amber-400 underline hover:no-underline"
+                    onClick={() => onApprove(escalation)}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
                   >
-                    Tanggapi permintaan ini →
+                    Setujui & Jalankan
                   </button>
-                ) : (
-                  <div className="space-y-2 mt-2">
-                    <textarea
-                      value={respondNote}
-                      onChange={(e) => setRespondNote(e.target.value)}
-                      placeholder="Tulis catatan tanggapan..."
-                      rows={2}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
-                    <div className="flex gap-2 justify-end flex-wrap">
-                      <button
-                        onClick={() => { setShowRespondForm(false); setRespondNote(''); setRespondAction('approved'); }}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50"
-                      >
-                        Batal
-                      </button>
-                      <button
-                        onClick={() => { setRespondAction('rejected'); handleRespondAction('rejected'); }}
-                        disabled={!respondNote.trim() || respondActionMutation.isPending}
-                        className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg hover:bg-red-100 disabled:opacity-50"
-                      >
-                        {respondActionMutation.isPending && respondAction === 'rejected' ? 'Menyimpan...' : 'Tolak'}
-                      </button>
-                      <button
-                        onClick={() => { setRespondAction('approved'); handleRespondAction('approved'); }}
-                        disabled={!respondNote.trim() || respondActionMutation.isPending}
-                        className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50"
-                      >
-                        {respondActionMutation.isPending && respondAction === 'approved' ? 'Menyimpan...' : 'Setujui'}
-                      </button>
-                    </div>
-                    {respondActionMutation.isError && (
-                      <p className="text-xs text-red-600">
-                        {(respondActionMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Gagal menyimpan tanggapan.'}
-                      </p>
-                    )}
+                  {!showRespondForm ? (
+                    <button
+                      onClick={() => setShowRespondForm(true)}
+                      className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg hover:bg-red-100"
+                    >
+                      Tolak
+                    </button>
+                  ) : null}
+                </div>
+              )}
+              {hasPendingRequest && showRespondForm && (
+                <div className="space-y-2 mt-2">
+                  <textarea
+                    value={respondNote}
+                    onChange={(e) => setRespondNote(e.target.value)}
+                    placeholder="Tulis alasan penolakan..."
+                    rows={2}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  />
+                  <div className="flex gap-2 justify-end flex-wrap">
+                    <button
+                      onClick={() => { setShowRespondForm(false); setRespondNote(''); }}
+                      className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={() => handleRespondAction('rejected')}
+                      disabled={!respondNote.trim() || respondActionMutation.isPending}
+                      className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg hover:bg-red-100 disabled:opacity-50"
+                    >
+                      {respondActionMutation.isPending ? 'Menyimpan...' : 'Konfirmasi Tolak'}
+                    </button>
                   </div>
-                )
+                  {respondActionMutation.isError && (
+                    <p className="text-xs text-red-600">
+                      {(respondActionMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Gagal menyimpan tanggapan.'}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -496,6 +534,179 @@ function ManagerEscalationCard({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function ApproveActionForm({
+  escalation, onCancel, onSubmit, isPending, errorMsg,
+}: {
+  escalation: Escalation;
+  onCancel: () => void;
+  onSubmit: (response_note: string, action_params?: EscalationActionParams) => void;
+  isPending: boolean;
+  errorMsg: string | null;
+}) {
+  const action = escalation.action_request as EscalationActionRequest;
+  const { data: technicians, isLoading: techLoading } = useTechnicians();
+
+  const [responseNote, setResponseNote] = useState('');
+  // ganti_teknisi
+  const [newTechId, setNewTechId] = useState('');
+  const [reassignAll, setReassignAll] = useState(false);
+  // perpanjang_deadline
+  const [newDueDate, setNewDueDate] = useState('');
+  const [extraDays, setExtraDays] = useState('');
+  const [cascadeProjectEnd, setCascadeProjectEnd] = useState(false);
+
+  const inputClass =
+    'w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500';
+
+  // Validity per action type
+  let paramsValid = true;
+  if (action === 'ganti_teknisi') {
+    paramsValid = newTechId !== '';
+  } else if (action === 'perpanjang_deadline') {
+    paramsValid = newDueDate !== '' || (extraDays !== '' && Number(extraDays) > 0);
+  }
+  const canSubmit = responseNote.trim() !== '' && paramsValid && !isPending;
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    let action_params: EscalationActionParams | undefined;
+    if (action === 'ganti_teknisi') {
+      action_params = {
+        new_technician_id: Number(newTechId),
+        reassign_scope: reassignAll ? 'all' : 'task',
+      };
+    } else if (action === 'perpanjang_deadline') {
+      action_params = {};
+      if (newDueDate !== '') action_params.new_due_date = newDueDate;
+      else if (extraDays !== '') action_params.extra_days = Number(extraDays);
+      if (cascadeProjectEnd) action_params.cascade_project_end = true;
+    }
+    onSubmit(responseNote.trim(), action_params);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {ACTION_REQUEST_LABELS[action]}
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {escalation.project_name ?? '--'}{escalation.task_name ? ` — ${escalation.task_name}` : ''}
+        </p>
+        {escalation.action_request_note && (
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 whitespace-pre-wrap">{escalation.action_request_note}</p>
+        )}
+      </div>
+
+      {action === 'ganti_teknisi' && (
+        <>
+          <div>
+            <label htmlFor="new-tech" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Teknisi Pengganti <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="new-tech"
+              value={newTechId}
+              onChange={(e) => setNewTechId(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">{techLoading ? 'Memuat teknisi...' : 'Pilih teknisi...'}</option>
+              {(technicians ?? []).map((tech) => (
+                <option key={tech.id} value={tech.id}>
+                  {tech.name}
+                  {tech.spi_value != null ? ` (SPI ${Number(tech.spi_value).toFixed(2)})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+          <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={reassignAll}
+              onChange={(e) => setReassignAll(e.target.checked)}
+              className="rounded border-gray-300 dark:border-gray-600 text-green-600 focus:ring-green-500"
+            />
+            Alihkan SEMUA tugas teknisi ini di proyek
+          </label>
+        </>
+      )}
+
+      {action === 'perpanjang_deadline' && (
+        <>
+          <div>
+            <label htmlFor="new-due-date" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Tanggal Deadline Baru
+            </label>
+            <input
+              id="new-due-date"
+              type="date"
+              value={newDueDate}
+              onChange={(e) => { setNewDueDate(e.target.value); if (e.target.value) setExtraDays(''); }}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="extra-days" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Tambah Hari
+            </label>
+            <input
+              id="extra-days"
+              type="number"
+              min={1}
+              value={extraDays}
+              onChange={(e) => { setExtraDays(e.target.value); if (e.target.value) setNewDueDate(''); }}
+              placeholder="mis. 7"
+              className={inputClass}
+            />
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Isi salah satu: tanggal baru atau jumlah hari.</p>
+          </div>
+          <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={cascadeProjectEnd}
+              onChange={(e) => setCascadeProjectEnd(e.target.checked)}
+              className="rounded border-gray-300 dark:border-gray-600 text-green-600 focus:ring-green-500"
+            />
+            Geser juga tanggal selesai proyek
+          </label>
+        </>
+      )}
+
+      <div>
+        <label htmlFor="approve-note" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Catatan Tanggapan <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          id="approve-note"
+          value={responseNote}
+          onChange={(e) => setResponseNote(e.target.value)}
+          placeholder="Tulis catatan persetujuan..."
+          rows={3}
+          className={`${inputClass} resize-none`}
+        />
+      </div>
+
+      {errorMsg && <p className="text-xs text-red-600">{errorMsg}</p>}
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={onCancel}
+          className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50"
+        >
+          Batal
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+          className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50"
+        >
+          {isPending ? 'Memproses...' : 'Setujui & Jalankan'}
+        </button>
+      </div>
     </div>
   );
 }
