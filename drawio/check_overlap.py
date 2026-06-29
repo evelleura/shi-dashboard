@@ -3,7 +3,7 @@
 Lapor pasangan yang overlap > PAD toleransi. Bukan edge (edge tak punya geometry box)."""
 import xml.etree.ElementTree as ET
 
-f = r"D:\__CODING\personal\_gf\irene\shi-crm\diagram\erd_shi.drawio"
+f = r"D:\__CODING\personal\_gf\irene\shi-crm\diagram\erd_shi.final.drawio"
 root = ET.parse(f).getroot()
 boxes = []
 for c in root.iter('mxCell'):

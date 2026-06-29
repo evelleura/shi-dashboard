@@ -523,6 +523,44 @@ def build_tasks(projects):
     return tasks
 
 
+# ============================ SEBAR SPI TEKNISI (task-based) ============================
+# SPI per-TEKNISI (handler dashboard/users) = tugas-selesai / tugas-jatuh-tempo. Tanpa
+# intervensi, tugas proyek aktif rampung tepat waktu -> SPI teknisi MENUMPUK ~1.0 (semua
+# Baik). Fungsi ini MENYEBAR ke rentang RAG (Kritis/Waspada/Baik) dengan HANYA mengubah
+# DUE DATE tugas proyek aktif:
+#   - SPI target < 1: sebagian tugas belum-selesai dibuat SUDAH lewat tenggat (overdue).
+#   - SPI target > 1: sebagian tugas selesai dibuat "selesai lebih awal" (tenggat di depan).
+# TIDAK menyentuh jumlah 'done' -> KESEHATAN PROYEK (recalc done/total vs durasi) UTUH;
+# TANPA rng -> stream deterministik tak bergeser. Target per proyek aktif (urut id).
+# Stabil utk demo selama hari-ini di kisaran ~NOMINAL_TODAY+/-1 minggu (di luar itu drift).
+# Urutan SPI yang DIINGINKAN (menaik) utk proyek-proyek aktif. SPI dapat-dicapai dibatasi
+# done/total per proyek (due_cnt <= total), jadi tiap proyek dipasangkan ke target terdekat:
+# proyek dgn headroom terbesar (done/total terkecil) diberi target terendah.
+TECH_SPI_DESIRED = [0.67, 0.80, 0.90, 1.10, 1.33, 1.60]   # ~2 Kritis, 1 Waspada, 3 Baik->jauh-di-depan (cakup semua RAG, citra realistis)
+
+def spread_active_tech_spi(projects, tasks):
+    by_proj = {}
+    for t in tasks:
+        by_proj.setdefault(t["proyek"], []).append(t)
+    active = sorted(
+        [p for p in projects if p["status"] == "active" and p.get("_total_tasks")],
+        key=lambda p: p["_done_tasks"] / max(1, p["_total_tasks"]),   # headroom (min SPI) menaik
+    )
+    spread = []
+    for i, p in enumerate(active):
+        desired = TECH_SPI_DESIRED[i % len(TECH_SPI_DESIRED)]
+        done, total = p["_done_tasks"], p["_total_tasks"]
+        # pilih jumlah tugas jatuh-tempo (1..total) yang SPI-nya (done/due_cnt) TERDEKAT ke desired
+        due_cnt = min(range(1, total + 1), key=lambda d: abs(min(2.0, done / d) - desired))
+        for idx, t in enumerate(sorted(by_proj.get(p["id"], []), key=lambda t: t["id"])):
+            if idx < due_cnt:
+                t["due_off"] = -(3 + (idx % 5))                # sudah jatuh tempo (lampau)
+            else:
+                t["due_off"] = 12 + (idx - due_cnt)            # belum jatuh tempo (depan)
+        spread.append(round(min(2.0, done / due_cnt), 2))
+    return sorted(spread)
+
+
 # ============================ AKTIVITAS / LAPORAN / ESKALASI ============================
 ACT_MSG = {
     "arrival": "Tiba di lokasi proyek", "start_work": "Mulai pengerjaan instalasi",
@@ -731,6 +769,7 @@ def main():
     nred, namber = enforce_health_distribution(projects)   # paksa tepat N_RED merah + N_AMBER kuning
     tasks = build_tasks(projects)
     acts, reports, escs = build_activities(projects, tasks)
+    tech_spread = spread_active_tech_spi(projects, tasks)   # sebar SPI teknisi (RAG) -- ubah due-date saja
     sql = emit(clients, projects, tasks, roster, acts, reports, escs)
     OUT.write_text(sql, encoding="utf-8")
 
@@ -778,6 +817,10 @@ def main():
         print(f"  SPI selesai (estimasi recalc): avg={avg_spi}  min={round(min(spis),3)}  "
               f"max={round(max(spis),3)}  distinct={distinct}/{len(spis)}  bulat(.25)={roundish}")
         print(f"  RAG selesai (estimasi): {rag}")
+    trag = {"Kritis(<0.85)": sum(1 for s in tech_spread if s < 0.85),
+            "Waspada(.85-.95)": sum(1 for s in tech_spread if 0.85 <= s < 0.95),
+            "Baik(>=0.95)": sum(1 for s in tech_spread if s >= 0.95)}
+    print(f"  SPI teknisi aktif (target sebar, task-based): {sorted(tech_spread)}  RAG={trag}")
 
 
 if __name__ == "__main__":

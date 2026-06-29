@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Render drawio ERD -> PNG biar bisa diLIHAT (drawio CLI tak ada di env).
 Parse vertex (rect/ellipse/rhombus) + edge + label kardinalitas, gambar via matplotlib.
-Edge digambar lurus center-ke-center (drawio routing orthogonal, tapi cukup utk nilai kerapatan)."""
-import sys, xml.etree.ElementTree as ET
+Edge digambar di titik-sambung ASLI (exitX/entryX) lewat titik-belok = persis drawio ortogonal."""
+import sys, re, xml.etree.ElementTree as ET
 import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, Ellipse, Polygon
 
-f = sys.argv[1] if len(sys.argv) > 1 else r"D:\__CODING\personal\_gf\irene\shi-crm\diagram\erd_shi.drawio"
-out = sys.argv[2] if len(sys.argv) > 2 else r"D:\__CODING\personal\_gf\irene\shi-crm\tmp\erd_preview.png"
+f = sys.argv[1] if len(sys.argv) > 1 else r"D:\__CODING\personal\_gf\irene\shi-crm\diagram\erd_shi.final.drawio"
+out = sys.argv[2] if len(sys.argv) > 2 else r"D:\__CODING\personal\_gf\irene\shi-crm\drawio\erd_preview.png"
 root = ET.parse(f).getroot()
 
 verts, edges, labels = {}, [], []
@@ -20,7 +20,12 @@ for c in root.iter('mxCell'):
         kind = 'ellipse' if 'ellipse' in style else 'rhombus' if 'rhombus' in style else 'rect'
         verts[c.get('id')] = (x, y, w, h, kind, c.get('value') or '')
     elif c.get('edge') == '1':
-        edges.append((c.get('source'), c.get('target')))
+        wps = []
+        arr = g.find('Array') if g is not None else None
+        if arr is not None:
+            for p in arr.findall('mxPoint'):
+                wps.append((float(p.get('x')), -float(p.get('y'))))  # y dibalik
+        edges.append((c.get('source'), c.get('target'), wps, style))
     if c.get('vertex') == '1' and 'edgeLabel' in style and g is not None:
         rx = float(g.get('x') or 0)
         labels.append((c.get('parent'), c.get('value') or '', rx))
@@ -35,10 +40,21 @@ ys = [v[1] for v in verts.values()] + [v[1]+v[3] for v in verts.values()]
 W, H = max(xs)-min(xs), max(ys)-min(ys)
 fig, ax = plt.subplots(figsize=(W/90, H/90), dpi=110)
 
-for src, tgt in edges:  # SEMUA lurus center-ke-center = persis drawio (no orthogonal)
-    sc, tc = center(src), center(tgt)
-    if sc and tc:
-        ax.plot([sc[0], tc[0]], [sc[1], tc[1]], color='#888', lw=0.8, zorder=1)
+def anchor(cid, fx, fy):  # titik-sambung ASLI (exitX/entryX) bukan pusat
+    if cid not in verts: return None
+    x, y, w, h, *_ = verts[cid]
+    if fx is None or fy is None: return (x+w/2, -(y+h/2))
+    return (x+fx*w, -(y+fy*h))
+def f(style, key):
+    m = re.search(rf"{key}=([-\d.]+)", style); return float(m.group(1)) if m else None
+
+for src, tgt, wps, style in edges:  # lewat titik-belok = persis routing ortogonal drawio
+    sp = anchor(src, f(style, 'exitX'), f(style, 'exitY'))
+    tp = anchor(tgt, f(style, 'entryX'), f(style, 'entryY'))
+    if sp and tp:
+        xe = [sp[0]] + [p[0] for p in wps] + [tp[0]]
+        ye = [sp[1]] + [p[1] for p in wps] + [tp[1]]
+        ax.plot(xe, ye, color='#888', lw=0.8, zorder=1)
 
 for cid, (x, y, w, h, kind, val) in verts.items():
     cx, cy = x + w/2, -(y + h/2)
